@@ -300,6 +300,48 @@ html, body{
 }
 .action-link-btn.amber{color:var(--cargo);}
 
+/* ROTA: ORIGEM & DESTINO INTERACTIVOS */
+.route-inputs-card{
+  background:var(--ink3);border:1px solid var(--line);border-radius:14px;
+  padding:8px 12px;position:relative;margin-bottom:8px;
+}
+.route-input-row{
+  display:flex;align-items:center;gap:10px;padding:7px 6px;
+  border-radius:9px;transition:.15s;cursor:text;
+}
+.route-input-row.active-row{
+  background:rgba(212,175,55,0.09);border:1px solid rgba(212,175,55,0.35);
+}
+.route-input-sublabel{
+  display:block;font-size:9.5px;font-weight:700;color:var(--gold);
+  text-transform:uppercase;letter-spacing:.04em;margin-bottom:2px;
+}
+.route-input-row input{
+  background:none;border:none;color:#fff;font-family:var(--f);
+  font-size:13px;font-weight:600;width:100%;outline:none;
+}
+.route-input-row input::placeholder{color:var(--mut);font-weight:400;}
+.route-mini-btn{
+  background:var(--ink2);border:1px solid var(--line);color:var(--gold);
+  border-radius:7px;padding:4px 9px;font-size:10.5px;font-weight:700;
+  cursor:pointer;flex-shrink:0;transition:.15s;
+}
+.route-mini-btn:hover{background:var(--ink1);border-color:var(--gold);}
+.route-divider-line{
+  height:1px;background:var(--line);margin:4px 0 4px 22px;
+}
+.quick-route-chips{
+  display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;
+  padding:4px 0 6px;margin-bottom:6px;
+}
+.quick-route-chips::-webkit-scrollbar{display:none;}
+.q-chip{
+  background:var(--ink3);border:1px solid var(--line);color:#fff;
+  border-radius:20px;padding:5px 12px;font-size:11px;font-weight:600;
+  cursor:pointer;white-space:nowrap;flex-shrink:0;transition:.15s;
+}
+.q-chip:hover,.q-chip:active{border-color:var(--gold);color:var(--gold);background:var(--ink2);}
+
 /* ITENS DE SUGESTÃO / FAVORITOS */
 .sug-list{display:flex;flex-direction:column;margin-bottom:4px;}
 .sug-item{
@@ -697,15 +739,25 @@ html, body{
             <button onclick="requestGPSLocation('pax')" style="background:var(--ink3);border:1px solid var(--line);border-radius:8px;padding:5px 8px;font-size:10px;color:var(--gold);cursor:pointer;font-weight:700;">📍 Meu GPS</button>
           </div>
 
-          <div class="input-field-card" onclick="paxTo('dest')">
-            <span class="sq-dot a"></span><span id="pax-orig-text">Talatona, Rua Principal</span>
+          <div class="input-field-card" onclick="openRouteSelector('origin')">
+            <span class="sq-dot a"></span>
+            <div style="display:flex;flex-direction:column;flex:1;overflow:hidden;">
+              <span style="font-size:9.5px;color:var(--gold);font-weight:700;text-transform:uppercase;letter-spacing:0.04em;">Ponto de partida (De onde vai sair)</span>
+              <span id="pax-orig-text" style="font-weight:600;">Talatona, Rua Principal</span>
+            </div>
+            <span style="font-size:10px;color:var(--gold);background:var(--ink2);padding:3px 7px;border-radius:6px;border:1px solid var(--line);font-weight:700;">Editar</span>
           </div>
 
           <!-- PARAGENS INTERMÉDIAS -->
           <div id="pax-stops-container"></div>
 
-          <div class="input-field-card" onclick="paxTo('dest')">
-            <span class="sq-dot b"></span><span class="ph" id="pax-dest-prompt-text">Introduzir destino</span>
+          <div class="input-field-card" onclick="openRouteSelector('dest')">
+            <span class="sq-dot b"></span>
+            <div style="display:flex;flex-direction:column;flex:1;overflow:hidden;">
+              <span style="font-size:9.5px;color:var(--mut);font-weight:700;text-transform:uppercase;letter-spacing:0.04em;">Destino (Para onde vai)</span>
+              <span class="ph" id="pax-dest-prompt-text" style="font-weight:600;">Introduzir destino</span>
+            </div>
+            <span style="font-size:10px;color:var(--mut);background:var(--ink2);padding:3px 7px;border-radius:6px;border:1px solid var(--line);font-weight:700;">Escolher</span>
           </div>
 
           <div class="row-actions-bar">
@@ -720,25 +772,92 @@ html, body{
           <div class="sug-list" id="pax-fav-list"></div>
         </div>
 
-        <!-- 2. PANE DESTINO & PONTO DE REFERÊNCIA -->
+        <!-- 2. PANE DEFINIR TRAJECTO (ORIGEM & DESTINO EDITÁVEIS) -->
         <div class="sheet-pane" id="pane-dest">
-          <div class="sheet-title">Definir trajecto</div>
-          <div class="sheet-subtitle">Endereço e ponto de referência para o motorista</div>
-          <div class="input-field-card"><span class="sq-dot a"></span><span id="pax-orig-text2">Talatona, Rua Principal</span></div>
-          <div class="input-field-card" style="background:#1b211a;border:1px dashed var(--gold);">
-            <span class="sq-dot ref"></span>
-            <input type="text" id="inp-ponto-ref" placeholder="Ponto de referência (ex: próx. à bomba Sonangol)">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+            <div>
+              <div class="sheet-title">Definir trajecto</div>
+              <div class="sheet-subtitle" style="margin-bottom:0;">Insira de onde vai sair e o destino pretendido</div>
+            </div>
+            <button class="action-link-btn" onclick="swapOriginDestination()" style="background:var(--ink3);border:1px solid var(--line);border-radius:8px;padding:6px 10px;display:flex;align-items:center;gap:5px;font-size:11px;">
+              <span>⇅</span> Inverter
+            </button>
           </div>
-          <div class="input-field-card"><span class="sq-dot b"></span><span class="ph">Escolher destino</span></div>
+
+          <!-- ROTA: ORIGEM & DESTINO INTERACTIVOS -->
+          <div class="route-inputs-card">
+            <!-- PONTO DE PARTIDA -->
+            <div class="route-input-row" id="row-route-orig" onclick="setRouteFocus('origin')">
+              <span class="sq-dot a"></span>
+              <div style="flex:1;">
+                <label class="route-input-sublabel">Ponto de partida (De onde vai sair):</label>
+                <input type="text" id="inp-pax-orig" placeholder="Ex: Morro Bento, Rua Principal ou seu bairro" onfocus="setRouteFocus('origin')" oninput="onRouteInputTyped('origin')" autocomplete="off">
+              </div>
+              <button type="button" class="route-mini-btn" title="Detectar GPS" onclick="event.stopPropagation();fillOriginWithGPS()">📍 GPS</button>
+            </div>
+
+            <div class="route-divider-line"></div>
+
+            <!-- DESTINO -->
+            <div class="route-input-row" id="row-route-dest" onclick="setRouteFocus('dest')">
+              <span class="sq-dot b"></span>
+              <div style="flex:1;">
+                <label class="route-input-sublabel">Destino (Para onde vai):</label>
+                <input type="text" id="inp-pax-dest" placeholder="Ex: Aeroporto 4 de Fevereiro ou Kilamba" onfocus="setRouteFocus('dest')" oninput="onRouteInputTyped('dest')" autocomplete="off">
+              </div>
+              <button type="button" class="route-mini-btn" title="Limpar" onclick="event.stopPropagation();clearRouteInput('dest')">✕</button>
+            </div>
+          </div>
+
+          <!-- PONTO DE REFERÊNCIA -->
+          <div class="input-field-card" style="background:#171d15;border:1px dashed var(--gold);margin-top:6px;margin-bottom:8px;">
+            <span class="sq-dot ref"></span>
+            <input type="text" id="inp-ponto-ref" placeholder="Ponto de referência (ex: próx. à bomba Sonangol / padaria)" oninput="pontoRef=this.value">
+          </div>
+
+          <!-- ATALHOS RÁPIDOS DE LOCALIZAÇÃO -->
+          <div class="quick-route-chips">
+            <button class="q-chip" onclick="fillActiveWithShortcut('gps')">📍 Meu GPS</button>
+            <button class="q-chip" onclick="fillActiveWithShortcut('casa')">🏠 Casa</button>
+            <button class="q-chip" onclick="fillActiveWithShortcut('trab')">💼 Trabalho</button>
+            <button class="q-chip" onclick="fillActiveWithShortcut('aero')">✈️ Aeroporto</button>
+          </div>
+
+          <!-- TÍTULO DE SUGESTÕES CONTEXTUAL -->
+          <div style="display:flex;justify-content:space-between;align-items:center;margin:8px 0 4px;">
+            <span style="font-size:11px;font-weight:700;color:var(--gold);" id="sug-list-title">📍 Sugestões de locais</span>
+            <span style="font-size:10px;color:var(--mut);">Toque para seleccionar</span>
+          </div>
+
+          <!-- LISTA DE SUGESTÕES -->
           <div class="sug-list" id="pax-dest-list"></div>
+
+          <!-- BOTÃO DE CONFIRMAR TRAJECTO -->
+          <div style="margin-top:12px;">
+            <button class="main-action-btn btn-gold" id="btn-confirm-route" onclick="confirmRouteSelection()">Confirmar trajecto e ver preços →</button>
+          </div>
         </div>
 
         <!-- 3. PANE GIRO ENTREGA (ENCOMENDAS PEQUENAS) -->
         <div class="sheet-pane" id="pane-delivery">
           <div class="sheet-title">GIRO Entrega Rápida</div>
           <div class="sheet-subtitle">Envio de documentos e pequenas encomendas por mota</div>
-          <div class="input-field-card"><span class="sq-dot a"></span><span id="deliv-orig-label">Talatona, Rua Principal</span></div>
-          <div class="input-field-card"><span class="sq-dot b"></span><span id="deliv-dest-label">Centralidade do Kilamba</span></div>
+          <div class="input-field-card" onclick="openRouteSelector('origin')">
+            <span class="sq-dot a"></span>
+            <div style="flex:1;">
+              <div style="font-size:9.5px;color:var(--gold);font-weight:700;text-transform:uppercase;">Recolha da encomenda</div>
+              <span id="deliv-orig-label" style="font-weight:600;">Talatona, Rua Principal</span>
+            </div>
+            <span style="font-size:10px;color:var(--gold);font-weight:700;">Alterar</span>
+          </div>
+          <div class="input-field-card" onclick="openRouteSelector('dest')">
+            <span class="sq-dot b"></span>
+            <div style="flex:1;">
+              <div style="font-size:9.5px;color:var(--cargo);font-weight:700;text-transform:uppercase;">Entrega da encomenda</div>
+              <span id="deliv-dest-label" style="font-weight:600;">Centralidade do Kilamba</span>
+            </div>
+            <span style="font-size:10px;color:var(--cargo);font-weight:700;">Alterar</span>
+          </div>
           <div class="fare-details-box">
             <div style="font-weight:700;margin-bottom:6px;color:#fff;">Dados do destinatário (quem recebe):</div>
             <input type="text" id="deliv-dest-name" placeholder="Nome completo do destinatário" value="Manuel Kiala" style="width:100%;background:var(--ink2);border:1px solid var(--line);border-radius:8px;padding:8px;color:#fff;font-family:var(--f);font-size:12px;margin-bottom:6px;outline:none;">
@@ -1482,9 +1601,12 @@ let appMode = 'pax';    // 'pax' | 'delivery' | 'cargo'
 let currentProv = 'luanda';
 let provMult = 1.0;
 
+let originName = 'Talatona, Rua Principal';
+let destName = 'Centralidade do Kilamba';
+let activeRouteField = 'dest';
+let pontoRef = '';
 let tripKm = 6.2;
 let tripMins = 14;
-let destName = 'Centralidade do Kilamba';
 let stopsList = [];
 let offerMultiplier = 1.0;
 
@@ -1553,9 +1675,10 @@ Latitude: ${lat}
 Longitude: ${lng}
 Precisão: ${pos.coords.accuracy}m`;
       if (target === 'pax') {
-        document.getElementById('pax-orig-text').textContent = `Localização Actual GPS (${lat}, ${lng})`;
-        document.getElementById('pax-orig-text2').textContent = `Localização Actual GPS (${lat}, ${lng})`;
-        document.getElementById('pax-origin-lab').textContent = 'Você (GPS)';
+        originName = `Localização Actual GPS (${lat}, ${lng})`;
+        syncOriginDisplays();
+        const inpOrig = document.getElementById('inp-pax-orig');
+        if (inpOrig) inpOrig.value = originName;
       }
       playHapticSound('beep');
       alert(msg);
@@ -1746,6 +1869,163 @@ function setAppMode(mode) {
   }
 }
 
+function syncOriginDisplays() {
+  const t = originName || 'Ponto de partida';
+  const shortT = t.split(',')[0];
+  const el1 = document.getElementById('pax-orig-text');
+  if (el1) el1.textContent = t;
+  const elInp = document.getElementById('inp-pax-orig');
+  if (elInp && document.activeElement !== elInp) elInp.value = t;
+  const elDeliv = document.getElementById('deliv-orig-label');
+  if (elDeliv) elDeliv.textContent = t;
+  const elPinLab = document.getElementById('pax-origin-lab');
+  if (elPinLab) elPinLab.textContent = shortT;
+}
+
+function syncDestDisplays() {
+  const t = destName || 'Escolher destino';
+  const shortT = t.split(',')[0];
+  const elPrompt = document.getElementById('pax-dest-prompt-text');
+  if (elPrompt) {
+    elPrompt.textContent = t;
+    elPrompt.classList.remove('ph');
+  }
+  const elInp = document.getElementById('inp-pax-dest');
+  if (elInp && document.activeElement !== elInp) elInp.value = t;
+  const elDeliv = document.getElementById('deliv-dest-label');
+  if (elDeliv) elDeliv.textContent = t;
+  const elPinLab = document.getElementById('pax-dest-lab');
+  if (elPinLab) elPinLab.textContent = shortT;
+}
+
+function openRouteSelector(field) {
+  paxTo('dest');
+  setRouteFocus(field || 'dest');
+}
+
+function setRouteFocus(field) {
+  activeRouteField = field;
+  const rowOrig = document.getElementById('row-route-orig');
+  const rowDest = document.getElementById('row-route-dest');
+  const titleEl = document.getElementById('sug-list-title');
+
+  if (rowOrig) rowOrig.classList.toggle('active-row', field === 'origin');
+  if (rowDest) rowDest.classList.toggle('active-row', field === 'dest');
+
+  if (titleEl) {
+    titleEl.textContent = (field === 'origin') ? '📍 Sugestões para Ponto de Partida' : '🏁 Sugestões para Destino';
+  }
+
+  const inp = document.getElementById(field === 'origin' ? 'inp-pax-orig' : 'inp-pax-dest');
+  if (inp) {
+    inp.focus();
+    buildFavoritesAndDestinations(inp.value);
+  }
+}
+
+function onRouteInputTyped(field) {
+  const val = document.getElementById(field === 'origin' ? 'inp-pax-orig' : 'inp-pax-dest').value;
+  if (field === 'origin') {
+    originName = val || 'Ponto de partida';
+    syncOriginDisplays();
+  } else {
+    destName = val || 'Destino';
+    syncDestDisplays();
+  }
+  buildFavoritesAndDestinations(val);
+}
+
+function clearRouteInput(field) {
+  const inp = document.getElementById(field === 'origin' ? 'inp-pax-orig' : 'inp-pax-dest');
+  if (inp) {
+    inp.value = '';
+    onRouteInputTyped(field);
+    inp.focus();
+  }
+}
+
+function fillOriginWithGPS() {
+  requestGPSLocation('pax');
+  setRouteFocus('origin');
+}
+
+function fillActiveWithShortcut(type) {
+  const d = DESTINOS[currentProv];
+  if (type === 'gps') {
+    requestGPSLocation('pax');
+    return;
+  }
+  let target = null;
+  if (type === 'casa') target = d.favs[0];
+  else if (type === 'trab') target = d.favs[1];
+  else if (type === 'aero') target = d.lista.find(x => x[0].toLowerCase().includes('aeroporto')) || d.lista[0];
+
+  if (target) {
+    selectRouteLocation(target[1] || target[0], target[2] || 6.2, target[3] || 14);
+  }
+}
+
+function swapOriginDestination() {
+  const tmpName = originName;
+  originName = destName || 'Destino';
+  destName = tmpName;
+
+  document.getElementById('inp-pax-orig').value = originName;
+  document.getElementById('inp-pax-dest').value = destName;
+  syncOriginDisplays();
+  syncDestDisplays();
+  playHapticSound('beep');
+}
+
+function selectRouteLocation(nome, k, m) {
+  if (activeRouteField === 'origin') {
+    originName = nome;
+    const inp = document.getElementById('inp-pax-orig');
+    if (inp) inp.value = nome;
+    syncOriginDisplays();
+    playHapticSound('beep');
+    setRouteFocus('dest');
+  } else {
+    destName = nome;
+    if (k) tripKm = k;
+    if (m) tripMins = m;
+    const inp = document.getElementById('inp-pax-dest');
+    if (inp) inp.value = nome;
+    syncDestDisplays();
+    playHapticSound('beep');
+    confirmRouteSelection();
+  }
+}
+
+function selectDestination(nome, k, m) {
+  selectRouteLocation(nome, k, m);
+}
+
+function confirmRouteSelection() {
+  const inpOrig = document.getElementById('inp-pax-orig');
+  const inpDest = document.getElementById('inp-pax-dest');
+  const inpRef = document.getElementById('inp-ponto-ref');
+
+  if (inpOrig && inpOrig.value.trim()) originName = inpOrig.value.trim();
+  if (inpDest && inpDest.value.trim()) destName = inpDest.value.trim();
+  if (inpRef) pontoRef = inpRef.value.trim();
+
+  if (!originName || originName === 'Ponto de partida' || originName === 'Ponto de recolha') {
+    originName = DESTINOS[currentProv].origem;
+  }
+  if (!destName || destName === 'Destino' || destName === 'Introduzir destino') {
+    destName = DESTINOS[currentProv].lista[0][0];
+  }
+
+  syncOriginDisplays();
+  syncDestDisplays();
+
+  playHapticSound('beep');
+  if (appMode === 'cargo') paxTo('cargo');
+  else if (appMode === 'delivery') paxTo('delivery');
+  else paxTo('tier');
+}
+
 function setProv() {
   const s = document.getElementById('provSel');
   const o = s.options[s.selectedIndex];
@@ -1753,43 +2033,61 @@ function setProv() {
   provMult = parseFloat(o.dataset.mult);
   const d = DESTINOS[currentProv];
 
-  document.getElementById('pax-orig-text').textContent = d.origem;
-  document.getElementById('pax-orig-text2').textContent = d.origem;
-  document.getElementById('deliv-orig-label').textContent = d.origem;
-  document.getElementById('pax-origin-lab').textContent = o.textContent;
+  originName = d.origem;
+  destName = d.lista[0][0];
+  tripKm = d.lista[0][1];
+  tripMins = d.lista[0][2];
+
+  syncOriginDisplays();
+  syncDestDisplays();
 
   buildFavoritesAndDestinations();
   paxTo('idle');
   renderCentralEsquadras();
 }
 
-function buildFavoritesAndDestinations() {
+function buildFavoritesAndDestinations(filterText = '') {
   const d = DESTINOS[currentProv];
-  document.getElementById('pax-fav-list').innerHTML = d.favs.map(f => `
-    <div class="sug-item" onclick="selectDestination('${f[1].replace(/'/g,"")}', ${f[2]}, ${f[3]})">
-      <div class="sug-item-icon">${f[0] === 'Casa' ? '🏠' : '💼'}</div>
-      <div><b>${f[0]}</b><small>${f[1]}</small></div>
-    </div>
-  `).join('');
+  const q = (filterText || '').toLowerCase().trim();
 
-  document.getElementById('pax-dest-list').innerHTML = d.lista.map(l => `
-    <div class="sug-item" onclick="selectDestination('${l[0].replace(/'/g,"")}', ${l[1]}, ${l[2]})">
-      <div class="sug-item-icon">📍</div>
-      <div><b>${l[0]}</b><small>${l[1].toString().replace('.', ',')} km · ${l[2]} min</small></div>
-    </div>
-  `).join('');
-}
+  const favContainer = document.getElementById('pax-fav-list');
+  if (favContainer) {
+    favContainer.innerHTML = d.favs.map(f => `
+      <div class="sug-item" onclick="selectRouteLocation('${f[1].replace(/'/g, "\\'")}', ${f[2]}, ${f[3]})">
+        <div class="sug-item-icon">${f[0] === 'Casa' ? '🏠' : '💼'}</div>
+        <div><b>${f[0]}</b><small>${f[1]}</small></div>
+      </div>
+    `).join('');
+  }
 
-function selectDestination(nome, k, m) {
-  destName = nome;
-  tripKm = k;
-  tripMins = m;
-  document.getElementById('pax-dest-lab').textContent = nome.split(',')[0];
-  document.getElementById('deliv-dest-label').textContent = nome;
+  const destContainer = document.getElementById('pax-dest-list');
+  if (destContainer) {
+    const combined = [
+      ...d.favs.map(f => ({ nome: f[1], tipo: f[0], icon: f[0] === 'Casa' ? '🏠' : '💼', k: f[2], m: f[3] })),
+      ...d.lista.map(l => ({ nome: l[0], tipo: 'Local', icon: '📍', k: l[1], m: l[2] }))
+    ];
 
-  if (appMode === 'cargo') paxTo('cargo');
-  else if (appMode === 'delivery') paxTo('delivery');
-  else paxTo('tier');
+    const filtered = q ? combined.filter(c => c.nome.toLowerCase().includes(q)) : combined;
+
+    if (filtered.length === 0) {
+      destContainer.innerHTML = `
+        <div style="padding:14px;text-align:center;color:var(--mut);font-size:12px;">
+          Nenhum local pré-configurado para "<b>${(filterText || '').replace(/[&<>"']/g, '')}</b>".<br>
+          <span style="color:var(--gold);margin-top:4px;display:inline-block;">Pode usar este endereço directamente tocando em "Confirmar trajecto".</span>
+        </div>`;
+    } else {
+      destContainer.innerHTML = filtered.map(item => `
+        <div class="sug-item" onclick="selectRouteLocation('${item.nome.replace(/'/g, "\\'")}', ${item.k}, ${item.m})">
+          <div class="sug-item-icon">${item.icon}</div>
+          <div style="flex:1;overflow:hidden;">
+            <b>${item.nome}</b>
+            <small>${item.tipo !== 'Local' ? item.tipo + ' · ' : ''}${item.k.toString().replace('.', ',')} km · ${item.m} min</small>
+          </div>
+          <span style="font-size:11px;color:var(--gold);font-weight:700;">Seleccionar</span>
+        </div>
+      `).join('');
+    }
+  }
 }
 
 /* ==========================================================================
@@ -1877,7 +2175,7 @@ function renderTiers() {
   document.getElementById('cargo-extras-container').style.display = isCargo ? 'block' : 'none';
   document.getElementById('tier-pane-title').textContent = isCargo ? 'Veículos GIRO Carga' : isDelivery ? 'Opções de Entrega' : 'Escolher transporte';
   document.getElementById('tier-pane-subtitle').textContent = 
-    d.origem.split(',')[0] + (stopsList.length ? ' (' + stopsList.length + ' paragens)' : '') + ' → ' + destName.split(',')[0] + ' · ' + k.toFixed(1).replace('.', ',') + ' km · ' + m + ' min';
+    originName.split(',')[0] + (stopsList.length ? ' (' + stopsList.length + ' paragens)' : '') + ' → ' + destName.split(',')[0] + ' · ' + k.toFixed(1).replace('.', ',') + ' km · ' + m + ' min';
 
   const container = document.getElementById('tier-list-container');
 
@@ -2013,6 +2311,11 @@ function paxTo(state) {
   }
   else if (state === 'dest') {
     showPaxPane('pane-dest');
+    const inpOrig = document.getElementById('inp-pax-orig');
+    const inpDest = document.getElementById('inp-pax-dest');
+    if (inpOrig) inpOrig.value = originName;
+    if (inpDest) inpDest.value = (destName && destName !== 'Centralidade do Kilamba' && destName !== 'Destino') ? destName : '';
+    setRouteFocus(activeRouteField || 'dest');
   }
   else if (state === 'delivery') {
     showPaxPane('pane-delivery');
@@ -2104,7 +2407,7 @@ function paxTo(state) {
 
     document.getElementById('end-cargo-proof-box').style.display = (isCargo || isDelivery) ? 'block' : 'none';
     document.getElementById('end-view-title').textContent = isCargo ? 'Carga entregue com sucesso' : isDelivery ? 'Encomenda entregue' : 'Chegou ao destino';
-    document.getElementById('end-view-subtitle').textContent = DESTINOS[currentProv].origem.split(',')[0] + ' → ' + destName.split(',')[0] + ' · ' + k.toFixed(1).replace('.', ',') + ' km';
+    document.getElementById('end-view-subtitle').textContent = originName.split(',')[0] + ' → ' + destName.split(',')[0] + ' · ' + k.toFixed(1).replace('.', ',') + ' km';
 
     const tot = isCargo ? calculateCargoPrice(TIERS_CARGO[tierIdx]) : calculatePaxPrice(TIERS_PAX[tierIdx]);
     const catName = isCargo ? TIERS_CARGO[tierIdx].nome : TIERS_PAX[tierIdx].nome;
@@ -2171,6 +2474,8 @@ function toggleDriverOnline() {
       document.getElementById('req-gross-amount').textContent = kz(gross);
       document.getElementById('req-net-amount').textContent = kz(net);
       document.getElementById('req-dest-name').textContent = destName;
+      const elReqOrig = document.getElementById('req-origin-name');
+      if (elReqOrig) elReqOrig.textContent = originName;
       document.getElementById('req-trip-stats').textContent = tripKm.toString().replace('.', ',') + ' km · ' + tripMins + ' min de percurso';
 
       const badgeSlot = document.getElementById('drv-req-badge');
@@ -2454,6 +2759,8 @@ function confirmScheduleModal() {
 /* ==========================================================================
    17. INICIALIZAÇÃO GERAL DA APLICAÇÃO
    ========================================================================== */
+syncOriginDisplays();
+syncDestDisplays();
 buildFavoritesAndDestinations();
 renderTiers();
 updateDriverWalletDisplay();
