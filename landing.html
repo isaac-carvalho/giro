@@ -1,0 +1,786 @@
+<!DOCTYPE html>
+<html lang="pt-AO">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>GIRO Angola — Táxi Mais Barato, Menor Comissão (10%) & Segurança 24h</title>
+
+<!-- Meta Tags para SEO & Redes Sociais -->
+<meta name="description" content="GIRO: A plataforma de mobilidade urbana e carga mais segura de Angola. Menor comissão para motoristas (apenas 10%), corridas 10% mais baratas para passageiros e Botão de Pânico ligado a Central 24h e Esquadras.">
+<meta name="theme-color" content="#070907">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+<style>
+/* ==========================================================================
+   DESIGN SYSTEM GIRO — BLACK & LUXURY GOLD EDITION
+   ========================================================================== */
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+html{scroll-behavior:smooth;}
+body{
+  background:#070907;
+  color:#f8faf6;
+  font-family:'Inter',system-ui,-apple-system,sans-serif;
+  line-height:1.5;
+  overflow-x:hidden;
+}
+
+:root{
+  --gold:#d4af37;
+  --gold-glow:#f3e5ab;
+  --gold-deep:#261e05;
+  --gold-grad:linear-gradient(135deg, #f3e5ab 0%, #d4af37 50%, #aa820a 100%);
+  
+  --ink:#070907;
+  --ink1:#0d110d;
+  --ink2:#141814;
+  --ink3:#1c221c;
+  --line:#273026;
+  
+  --grn:#4fe36a;
+  --grndeep:#0e2e17;
+  
+  --red:#ff3b4e;
+  --reddeep:#3d1015;
+  
+  --cargo:#ffb703;
+  --cargodeep:#352500;
+  
+  --mut:#9ba399;
+  --f:'Inter',sans-serif;
+}
+
+/* CONTAINER & SECTIONS */
+.container{max-width:1120px;margin:0 auto;padding:0 20px;}
+a{color:inherit;text-decoration:none;}
+
+/* TOP ANNOUNCEMENT BAR */
+.top-banner{
+  background:linear-gradient(90deg, #1c1503 0%, #3a2b05 50%, #1c1503 100%);
+  border-bottom:1px solid rgba(212,175,55,0.3);
+  color:var(--gold);
+  text-align:center;
+  padding:8px 14px;
+  font-size:11.5px;
+  font-weight:700;
+  letter-spacing:.02em;
+}
+.top-banner b{color:#fff;}
+
+/* NAVBAR FLUTUANTE */
+.navbar{
+  position:sticky;top:0;z-index:100;
+  background:rgba(7,9,7,0.92);
+  backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);
+  border-bottom:1px solid var(--line);
+  padding:12px 0;
+}
+.nav-content{
+  display:flex;align-items:center;justify-content:space-between;gap:16px;
+}
+.brand{display:flex;align-items:center;gap:10px;}
+.brand-icon{
+  width:36px;height:36px;border-radius:10px;
+  background:var(--gold-grad);color:#060706;
+  font-weight:900;font-size:18px;display:flex;
+  align-items:center;justify-content:center;
+  box-shadow:0 0 16px rgba(212,175,55,0.35);
+}
+.brand-text b{font-size:17px;font-weight:900;letter-spacing:-.03em;display:block;line-height:1.1;}
+.brand-text span{font-size:9.5px;color:var(--gold);font-weight:700;}
+
+.nav-links{display:flex;align-items:center;gap:22px;}
+.nav-link{font-size:13px;font-weight:600;color:var(--mut);transition:.15s;}
+.nav-link:hover{color:var(--gold);}
+
+.nav-ctas{display:flex;align-items:center;gap:10px;}
+.btn-nav-ghost{
+  border:1px solid var(--line);background:var(--ink2);
+  color:#fff;font-size:12px;font-weight:700;
+  padding:8px 14px;border-radius:9px;transition:.15s;
+}
+.btn-nav-ghost:hover{border-color:var(--gold);color:var(--gold);}
+.btn-nav-gold{
+  background:var(--gold-grad);color:#060706;
+  font-size:12px;font-weight:800;padding:8px 16px;
+  border-radius:9px;box-shadow:0 2px 10px rgba(212,175,55,0.3);
+  transition:.15s;
+}
+.btn-nav-gold:hover{transform:translateY(-1px);box-shadow:0 4px 16px rgba(212,175,55,0.45);}
+
+/* HERO SECTION */
+.hero-sec{
+  padding:60px 0 50px;
+  background:radial-gradient(circle at 50% 10%, rgba(212,175,55,0.12) 0%, transparent 60%);
+  text-align:center;
+}
+.hero-badge{
+  display:inline-flex;align-items:center;gap:8px;
+  background:var(--gold-deep);border:1.5px solid var(--gold);
+  color:var(--gold);border-radius:30px;padding:6px 16px;
+  font-size:12px;font-weight:800;margin-bottom:20px;
+  box-shadow:0 0 20px rgba(212,175,55,0.2);
+}
+.hero-badge span.blip{width:7px;height:7px;border-radius:50%;background:var(--grn);box-shadow:0 0 8px var(--grn);}
+
+.hero-title{
+  font-size: clamp(32px, 5.5vw, 54px);
+  font-weight:900;letter-spacing:-.03em;
+  line-height:1.15;margin-bottom:18px;max-width:860px;margin-left:auto;margin-right:auto;
+}
+.hero-title .gold-text{
+  background:var(--gold-grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;
+}
+
+.hero-subtitle{
+  font-size: clamp(15px, 2.2vw, 18px);
+  color:var(--mut);max-width:720px;margin:0 auto 36px;
+  line-height:1.6;font-weight:500;
+}
+.hero-subtitle b{color:#fff;}
+
+/* DUAL CONVERSION CARDS */
+.dual-hero-grid{
+  display:grid;grid-template-columns:1fr 1fr;gap:20px;
+  max-width:920px;margin:0 auto 40px;text-align:left;
+}
+.hero-cta-card{
+  background:var(--ink2);border:1.5px solid var(--line);
+  border-radius:20px;padding:26px 24px;position:relative;
+  transition:.25s;box-shadow:0 12px 30px rgba(0,0,0,0.5);
+}
+.hero-cta-card:hover{
+  border-color:var(--gold);transform:translateY(-3px);
+  box-shadow:0 16px 40px rgba(212,175,55,0.15);
+}
+.hero-cta-card.featured{
+  border-color:var(--gold);background:linear-gradient(180deg, #181c15 0%, #121511 100%);
+}
+.hero-cta-card .card-tag{
+  display:inline-block;font-size:10.5px;font-weight:800;
+  text-transform:uppercase;letter-spacing:.05em;padding:4px 9px;
+  border-radius:6px;margin-bottom:12px;
+}
+.tag-pax{background:#1a2b1f;color:var(--grn);border:1px solid var(--grn);}
+.tag-drv{background:var(--gold-deep);color:var(--gold);border:1px solid var(--gold);}
+
+.hero-cta-card h3{font-size:20px;font-weight:800;margin-bottom:8px;color:#fff;}
+.hero-cta-card p{font-size:13px;color:var(--mut);margin-bottom:18px;line-height:1.5;}
+
+.benefit-list{list-style:none;margin-bottom:22px;}
+.benefit-list li{
+  display:flex;align-items:center;gap:8px;font-size:12.5px;
+  color:#e4e8e2;margin-bottom:7px;font-weight:600;
+}
+.benefit-list li span{color:var(--gold);font-weight:900;}
+
+.btn-cta-full{
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  width:100%;padding:14px;border-radius:12px;font-size:14px;
+  font-weight:800;font-family:var(--f);cursor:pointer;
+  transition:.15s;border:none;text-align:center;
+}
+.btn-gold{background:var(--gold-grad);color:#060706;box-shadow:0 4px 15px rgba(212,175,55,0.3);}
+.btn-gold:hover{filter:brightness(1.1);box-shadow:0 6px 20px rgba(212,175,55,0.5);}
+.btn-dark{background:var(--ink3);border:1px solid var(--line);color:#fff;}
+.btn-dark:hover{border-color:var(--gold);color:var(--gold);}
+
+/* TRUST METRICS STRIP */
+.metrics-strip{
+  display:grid;grid-template-columns:repeat(4, 1fr);gap:16px;
+  background:var(--ink1);border:1px solid var(--line);
+  border-radius:18px;padding:22px;max-width:920px;margin:0 auto;
+}
+.metric-box{text-align:center;}
+.metric-box b{
+  font-size:28px;font-weight:900;color:var(--gold);
+  display:block;letter-spacing:-.02em;line-height:1.1;
+}
+.metric-box span{font-size:11.5px;color:var(--mut);font-weight:600;}
+
+/* SECTIONS COMMONS */
+.section{padding:70px 0;}
+.sec-tag{
+  text-transform:uppercase;font-size:11px;font-weight:800;
+  color:var(--gold);letter-spacing:.08em;margin-bottom:8px;display:block;
+}
+.sec-title{
+  font-size: clamp(26px, 3.8vw, 38px);
+  font-weight:900;letter-spacing:-.02em;margin-bottom:14px;
+}
+.sec-desc{
+  font-size:15px;color:var(--mut);max-width:640px;line-height:1.6;margin-bottom:40px;
+}
+
+/* COMPARATIVO DE COMISSÕES (TABELA VISUAL) */
+.comparison-sec{background:#0a0d0a;border-top:1px solid var(--line);border-bottom:1px solid var(--line);}
+.comp-card{
+  background:var(--ink2);border:1px solid var(--line);border-radius:20px;
+  padding:30px;box-shadow:0 10px 40px rgba(0,0,0,0.4);
+}
+.comp-row{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:14px 16px;border-radius:12px;margin-bottom:10px;
+  background:var(--ink3);border:1px solid transparent;
+}
+.comp-row.highlight{
+  background:linear-gradient(90deg, #2b2207 0%, #1f1805 100%);
+  border-color:var(--gold);box-shadow:0 4px 18px rgba(212,175,55,0.18);
+}
+.comp-platform{display:flex;align-items:center;gap:12px;width:180px;}
+.comp-logo-box{
+  width:32px;height:32px;border-radius:8px;background:#000;
+  display:flex;align-items:center;justify-content:center;
+  font-weight:900;font-size:14px;
+}
+.comp-row.highlight .comp-logo-box{background:var(--gold-grad);color:#060706;}
+.comp-bar-container{flex:1;margin:0 24px;background:#0c0f0c;border-radius:20px;height:14px;overflow:hidden;position:relative;}
+.comp-bar-fill{height:100%;border-radius:20px;transition:width 1s ease;}
+.bar-giro{background:var(--gold-grad);width:10%;}
+.bar-heetch{background:#ff2d55;width:11.4%;}
+.bar-yango{background:#ff334b;width:13%;}
+.bar-ugo{background:#5856d6;width:20%;}
+.bar-tirosa{background:#ff9500;width:20%;}
+.bar-kubinga{background:#007aff;width:25%;}
+
+.comp-badge{
+  font-size:14px;font-weight:800;width:100px;text-align:right;
+}
+.comp-badge.lead{color:var(--gold);font-size:16px;}
+
+.kumbu-calc-box{
+  background:linear-gradient(135deg, #1e261b 0%, #151a13 100%);
+  border:1px solid var(--grn);border-radius:16px;padding:20px;
+  margin-top:24px;display:flex;align-items:center;justify-content:space-between;
+  gap:16px;
+}
+.kumbu-calc-text b{font-size:17px;color:#fff;display:block;margin-bottom:4px;}
+.kumbu-calc-text p{font-size:12.5px;color:var(--mut);line-height:1.5;}
+
+/* SEGURANÇA 24H (O GRANDE DIFERENCIAL) */
+.security-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:20px;}
+.sec-box{
+  background:var(--ink2);border:1px solid var(--line);
+  border-radius:18px;padding:26px;position:relative;
+  transition:.2s;
+}
+.sec-box:hover{border-color:var(--red);box-shadow:0 8px 30px rgba(255,59,78,0.12);}
+.sec-box.police{border-color:rgba(212,175,55,0.4);}
+.sec-box.police:hover{border-color:var(--gold);box-shadow:0 8px 30px rgba(212,175,55,0.2);}
+
+.sec-icon-circle{
+  width:46px;height:46px;border-radius:12px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:22px;margin-bottom:16px;
+}
+.icon-red{background:var(--reddeep);border:1px solid var(--red);color:var(--red);}
+.icon-gold{background:var(--gold-deep);border:1px solid var(--gold);color:var(--gold);}
+.icon-grn{background:var(--grndeep);border:1px solid var(--grn);color:var(--grn);}
+.icon-amb{background:#3a2800;border:1px solid var(--cargo);color:var(--cargo);}
+
+.sec-box h4{font-size:17px;font-weight:800;margin-bottom:8px;}
+.sec-box p{font-size:13px;color:var(--mut);line-height:1.6;}
+
+/* OS 3 SERVIÇOS */
+.services-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;}
+.serv-card{
+  background:var(--ink2);border:1px solid var(--line);
+  border-radius:18px;padding:26px;transition:.2s;
+}
+.serv-card:hover{border-color:var(--gold);transform:translateY(-2px);}
+.serv-badge{
+  display:inline-block;padding:3px 8px;border-radius:6px;font-size:10px;font-weight:800;
+  text-transform:uppercase;margin-bottom:12px;
+}
+.sb-pax{background:#152618;color:var(--grn);border:1px solid var(--grn);}
+.sb-deliv{background:#0c2830;color:#48cae4;border:1px solid #48cae4;}
+.sb-cargo{background:var(--cargodeep);color:var(--cargo);border:1px solid var(--cargo);}
+
+.serv-card h4{font-size:18px;font-weight:800;margin-bottom:8px;}
+.serv-card p{font-size:12.5px;color:var(--mut);line-height:1.5;margin-bottom:16px;}
+.serv-features{list-style:none;margin-bottom:20px;}
+.serv-features li{font-size:12px;color:#d5dbd3;margin-bottom:6px;display:flex;align-items:center;gap:6px;}
+.serv-features li span{color:var(--gold);font-weight:800;}
+
+/* DEPOIMENTOS */
+.testim-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;}
+.testim-card{
+  background:var(--ink2);border:1px solid var(--line);
+  border-radius:16px;padding:22px;position:relative;
+}
+.testim-card p{font-size:13px;font-style:italic;color:#e1e5df;margin-bottom:16px;line-height:1.5;}
+.testim-user{display:flex;align-items:center;gap:10px;}
+.testim-avatar{
+  width:40px;height:40px;border-radius:50%;background:var(--ink3);
+  border:1.5px solid var(--gold);display:flex;align-items:center;
+  justify-content:center;font-size:18px;
+}
+.testim-user b{font-size:13px;display:block;}
+.testim-user span{font-size:11px;color:var(--mut);}
+
+/* FAQ */
+.faq-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;max-width:920px;margin:0 auto;}
+.faq-item{
+  background:var(--ink2);border:1px solid var(--line);
+  border-radius:14px;padding:18px 20px;
+}
+.faq-item h5{font-size:14.5px;font-weight:700;color:var(--gold);margin-bottom:6px;}
+.faq-item p{font-size:12.5px;color:var(--mut);line-height:1.5;}
+
+/* FINAL BANNER CTA */
+.final-cta{
+  background:radial-gradient(circle at 50% 50%, rgba(212,175,55,0.18) 0%, rgba(7,9,7,1) 80%);
+  border-top:1px solid var(--line);border-bottom:1px solid var(--line);
+  padding:70px 20px;text-align:center;
+}
+.final-cta h2{font-size: clamp(28px, 4.5vw, 44px);font-weight:900;margin-bottom:14px;letter-spacing:-.02em;}
+.final-cta p{font-size:16px;color:var(--mut);max-width:600px;margin:0 auto 30px;}
+.final-btn-row{display:flex;align-items:center;justify-content:center;gap:14px;flex-wrap:wrap;}
+
+/* FOOTER */
+.footer{padding:40px 0;background:#050605;border-top:1px solid var(--line);font-size:12px;color:var(--mut);}
+.footer-content{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;}
+.footer-rights{display:flex;align-items:center;gap:6px;}
+
+/* RESPONSIVIDADE MOBILE */
+@media(max-width:850px){
+  .dual-hero-grid, .security-grid, .services-grid, .testim-grid, .faq-grid{grid-template-columns:1fr;}
+  .metrics-strip{grid-template-columns:repeat(2,1fr);gap:18px;}
+  .nav-links{display:none;}
+  .hero-sec{padding:40px 0 30px;}
+  .comp-row{flex-direction:column;align-items:flex-start;gap:8px;}
+  .comp-bar-container{width:100%;margin:4px 0;}
+  .comp-badge{width:auto;text-align:left;}
+  .kumbu-calc-box{flex-direction:column;align-items:flex-start;}
+}
+</style>
+</head>
+<body>
+
+<!-- TOP BANNER COMERCIAL -->
+<aside class="top-banner">
+  🔥 <b>O MAIS JUSTO DE ANGOLA:</b> Motorista paga apenas <b>10% de comissão</b> · Passageiro poupa <b>10% em cada corrida</b> vs Heetch & Yango.
+</aside>
+
+<!-- NAVBAR FLUTUANTE -->
+<header class="navbar">
+  <div class="container nav-content">
+    <a href="index.html" class="brand" title="Ir para a App">
+      <div class="brand-icon">G</div>
+      <div class="brand-text">
+        <b>GIRO</b>
+        <span>Segurança 24h · Angola</span>
+      </div>
+    </a>
+
+    <nav class="nav-links">
+      <a href="#vantagens" class="nav-link">Vantagens</a>
+      <a href="#comparativo" class="nav-link">Comparativo (10%)</a>
+      <a href="#seguranca" class="nav-link">Segurança & SOS</a>
+      <a href="#servicos" class="nav-link">Serviços</a>
+      <a href="#faq" class="nav-link">Dúvidas</a>
+    </nav>
+
+    <div class="nav-ctas">
+      <a href="index.html" class="btn-nav-ghost">Abrir App Web</a>
+      <a href="index.html?cadastro=driver" class="btn-nav-gold">Cadastrar Motorista</a>
+    </div>
+  </div>
+</header>
+
+<!-- 1. HERO SECTION -->
+<section class="hero-sec">
+  <div class="container">
+    <div class="hero-badge">
+      <span class="blip"></span>
+      <span>TÁXI QUE TE LEVA · SEGURANÇA QUE TE ACOMPANHA</span>
+    </div>
+
+    <h1 class="hero-title">
+      A Mobilidade Mais Segura de Angola com a <span class="gold-text">Menor Taxa do Mercado</span>.
+    </h1>
+
+    <p class="hero-subtitle">
+      Cansado de comissões abusivas e de viajar com medo? Na GIRO, cada viagem tem <b>Botão de Pânico ligado a uma Central 24h e Esquadras de Polícia</b>. O passageiro viaja com o <b>preço mais baixo do país</b> e o motorista leva mais kumbu com apenas <b>10% de comissão</b>.
+    </p>
+
+    <!-- CARDS DE CONVERSÃO IMEDIATA -->
+    <div class="dual-hero-grid">
+      <!-- CARD DO PASSAGEIRO -->
+      <div class="hero-cta-card">
+        <span class="card-tag tag-pax">Para Passageiros</span>
+        <h3>Viaja Rápido & Sem Pagar Mais</h3>
+        <p>Preços até 10% mais baratos que as plataformas estrangeiras. Carros limpos, pontuais e com ar condicionado.</p>
+        
+        <ul class="benefit-list">
+          <li><span>✓</span> Corridas 10% mais baratas que Heetch e Yango</li>
+          <li><span>✓</span> Botão de Pânico SOS silencioso em todas as viagens</li>
+          <li><span>✓</span> Opções de Moto (Kupapata), Económico e Conforto</li>
+          <li><span>✓</span> Pagamento por Multicaixa Express ou Dinheiro</li>
+        </ul>
+
+        <a href="index.html?view=pax" class="btn-cta-full btn-dark">
+          Pedir Táxi Agora na App →
+        </a>
+      </div>
+
+      <!-- CARD DO MOTORISTA -->
+      <div class="hero-cta-card featured">
+        <span class="card-tag tag-drv">Para Parceiros Motoristas</span>
+        <h3>Fatura com Apenas 10% de Taxa</h3>
+        <p>A taxa mais justa de Angola! Deixa de perder o teu suor com comissões de 13%, 15% ou 20%. Aqui o teu kumbu rende.</p>
+        
+        <ul class="benefit-list">
+          <li><span>★</span> <b>Apenas 10% de comissão</b> (mais baixo que Heetch 11,4%)</li>
+          <li><span>★</span> Recebimento no mesmo dia via Multicaixa Express</li>
+          <li><span>★</span> Rede de Socorro e Alerta entre motoristas colegas</li>
+          <li><span>★</span> Aceitamos Carros, Motas e Camiões de Carga</li>
+        </ul>
+
+        <a href="index.html?cadastro=driver" class="btn-cta-full btn-gold">
+          Cadastrar como Motorista (10%) →
+        </a>
+      </div>
+    </div>
+
+    <!-- FAIXA DE MÉTRICAS -->
+    <div class="metrics-strip">
+      <div class="metric-box">
+        <b>10%</b>
+        <span>Comissão para parceiros (a mais baixa de Angola)</span>
+      </div>
+      <div class="metric-box">
+        <b>−10%</b>
+        <span>Tarifas mais acessíveis para passageiros</span>
+      </div>
+      <div class="metric-box">
+        <b>24/7</b>
+        <span>Central humana conectada às Esquadras</span>
+      </div>
+      <div class="metric-box">
+        <b>18</b>
+        <span>Províncias com cobertura nacional</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 2. COMPARATIVO REAL DE COMISSÕES -->
+<section class="section comparison-sec" id="comparativo">
+  <div class="container">
+    <span class="sec-tag">Transparência Total no Kumbu</span>
+    <h2 class="sec-title">Por que os Motoristas Angolanos estão a Mudar para a GIRO?</h2>
+    <p class="sec-desc">
+      Compara as comissões cobradas em Luanda e vê com os teus próprios olhos quem realmente valoriza o esforço do condutor.
+    </p>
+
+    <div class="comp-card">
+      <!-- GIRO -->
+      <div class="comp-row highlight">
+        <div class="comp-platform">
+          <div class="comp-logo-box">G</div>
+          <div>
+            <b style="font-size:15px;color:#fff;">GIRO</b>
+            <small style="color:var(--gold);display:block;font-size:10.5px;font-weight:700;">Plataforma Angolana</small>
+          </div>
+        </div>
+        <div class="comp-bar-container">
+          <div class="comp-bar-fill bar-giro"></div>
+        </div>
+        <div class="comp-badge lead">10% <small style="display:block;font-size:10px;color:var(--grn);">Ficas com 90%!</small></div>
+      </div>
+
+      <!-- HEETCH -->
+      <div class="comp-row">
+        <div class="comp-platform">
+          <div class="comp-logo-box">H</div>
+          <div><b>Heetch</b><small style="color:var(--mut);display:block;font-size:10.5px;">Estrangeira</small></div>
+        </div>
+        <div class="comp-bar-container">
+          <div class="comp-bar-fill bar-heetch"></div>
+        </div>
+        <div class="comp-badge">11,4%</div>
+      </div>
+
+      <!-- YANGO -->
+      <div class="comp-row">
+        <div class="comp-platform">
+          <div class="comp-logo-box">Y</div>
+          <div><b>Yango</b><small style="color:var(--mut);display:block;font-size:10.5px;">Estrangeira (+ taxas)</small></div>
+        </div>
+        <div class="comp-bar-container">
+          <div class="comp-bar-fill bar-yango"></div>
+        </div>
+        <div class="comp-badge">13%</div>
+      </div>
+
+      <!-- UGO -->
+      <div class="comp-row">
+        <div class="comp-platform">
+          <div class="comp-logo-box">U</div>
+          <div><b>UGo</b><small style="color:var(--mut);display:block;font-size:10.5px;">Nacional</small></div>
+        </div>
+        <div class="comp-bar-container">
+          <div class="comp-bar-fill bar-ugo"></div>
+        </div>
+        <div class="comp-badge">20%</div>
+      </div>
+
+      <!-- TIROSA -->
+      <div class="comp-row">
+        <div class="comp-platform">
+          <div class="comp-logo-box">T</div>
+          <div><b>Tirosa</b><small style="color:var(--mut);display:block;font-size:10.5px;">Nacional</small></div>
+        </div>
+        <div class="comp-bar-container">
+          <div class="comp-bar-fill bar-tirosa"></div>
+        </div>
+        <div class="comp-badge">20%</div>
+      </div>
+
+      <!-- KUBINGA -->
+      <div class="comp-row">
+        <div class="comp-platform">
+          <div class="comp-logo-box">K</div>
+          <div><b>Kubinga</b><small style="color:var(--mut);display:block;font-size:10.5px;">Nacional</small></div>
+        </div>
+        <div class="comp-bar-container">
+          <div class="comp-bar-fill bar-kubinga"></div>
+        </div>
+        <div class="comp-badge">25%</div>
+      </div>
+
+      <!-- SIMULADOR DE GANHO -->
+      <div class="kumbu-calc-box">
+        <div class="kumbu-calc-text">
+          <b>💰 Faz as contas ao teu bolso:</b>
+          <p>
+            Se faturares 300.000 Kz no mês, na GIRO descontas apenas 30.000 Kz e <b>levas 270.000 Kz líquidos para casa</b>. Na concorrência chegas a perder 40.000 a 75.000 Kz! Na GIRO são até <b>45.000 Kz a mais para a tua família</b> todos os meses.
+          </p>
+        </div>
+        <a href="index.html?cadastro=driver" class="btn-nav-gold" style="padding:12px 20px;font-size:13px;white-space:nowrap;">
+          Aproveitar Taxa de 10% →
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 3. O DIFERENCIAL ABSOLUTO: SEGURANÇA MÁXIMA & BOTÃO DO PÂNICO -->
+<section class="section" id="seguranca">
+  <div class="container">
+    <span class="sec-tag">Blindagem Total em Angola</span>
+    <h2 class="sec-title">Em Angola, a Tua Vida e a Tua Viatura Têm Valor Sagrado</h2>
+    <p class="sec-desc">
+      O grande diferencial da GIRO é que nenhuma corrida fica desamparada. Criámos uma estrutura de quatro níveis de proteção para motoristas e passageiros:
+    </p>
+
+    <div class="security-grid">
+      <!-- 1. BOTÃO DE PÂNICO SILENCIOSO -->
+      <div class="sec-box">
+        <div class="sec-icon-circle icon-red">🚨</div>
+        <h4>1. Botão de Pânico Silencioso (SOS)</h4>
+        <p>
+          Disponível no ecrã do passageiro e do condutor. Em caso de assalto, ameaça ou emergência, basta um toque longo para disparar o alarme sem fazer barulho e sem levantar suspeitas do agressor.
+        </p>
+      </div>
+
+      <!-- 2. CENTRAL HUMANA 24H -->
+      <div class="sec-box police">
+        <div class="sec-icon-circle icon-gold">🏢</div>
+        <h4>2. Central Humana de Operações 24h</h4>
+        <p>
+          Não somos um robô automático. Temos operadores angolanos em sala de comando que monitoram desvios de rota, paragens suspeitas e recebem alertas instantâneos com ligação imediata de apoio.
+        </p>
+      </div>
+
+      <!-- 3. LIGAÇÃO ÀS ESQUADRAS DA POLÍCIA -->
+      <div class="sec-box police">
+        <div class="sec-icon-circle icon-grn">👮</div>
+        <h4>3. Acionamento da Esquadra Mais Próxima</h4>
+        <p>
+          Protocolo direto com os comandos da Polícia Nacional (7ª de Talatona, 14ª do Kilamba, 1ª da Mutamba e esquadras municipais). A viatura policial é enviada às coordenadas exatas de GPS.
+        </p>
+      </div>
+
+      <!-- 4. REDE SOLIDÁRIA P2P DE MOTORISTAS -->
+      <div class="sec-box">
+        <div class="sec-icon-circle icon-amb">🤝</div>
+        <h4>4. Alerta Peer-to-Peer Solidário</h4>
+        <p>
+          Se um motorista estiver em apuros, os condutores parceiros da GIRO num raio de 2 km recebem um alerta no mapa com a rota de socorro para prestar apoio mútuo e combater os assaltantes.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 4. OS NOSSOS SERVIÇOS COMPLETOS -->
+<section class="section" id="servicos" style="background:#0a0d0a;border-top:1px solid var(--line);border-bottom:1px solid var(--line);">
+  <div class="container">
+    <span class="sec-tag">Soluções Para Toda Angola</span>
+    <h2 class="sec-title">Tudo o Que Precisas Numa Única Aplicação</h2>
+    <p class="sec-desc">
+      Mobilidade diária, envio expresso de encomendas ou transporte pesado de mercadorias. Tudo com preço claro e sem surpresas.
+    </p>
+
+    <div class="services-grid">
+      <!-- PESSOAS -->
+      <div class="serv-card">
+        <span class="serv-badge sb-pax">Transporte de Pessoas</span>
+        <h4>GIRO Pessoas</h4>
+        <p>Carros e motas para o teu dia a dia com a garantia de segurança e preços 10% mais baixos.</p>
+        <ul class="serv-features">
+          <li><span>•</span> <b>GIRO Moto (Kupapata):</b> Fura o trânsito da cidade pelo menor custo.</li>
+          <li><span>•</span> <b>GIRO Económico:</b> O mais pedido para o trabalho e escola.</li>
+          <li><span>•</span> <b>GIRO Conforto:</b> Carros executivos recentes com ar condicionado.</li>
+          <li><span>•</span> <b>GIRO 7:</b> Espaço para até 7 pessoas com bagagem.</li>
+        </ul>
+        <a href="index.html?view=pax" class="btn-cta-full btn-dark" style="padding:10px;font-size:12px;">Pedir Viagem →</a>
+      </div>
+
+      <!-- ENTREGA -->
+      <div class="serv-card">
+        <span class="serv-badge sb-deliv">Encomendas Pequenas</span>
+        <h4>GIRO Entrega Rápida</h4>
+        <p>Envio urgente de documentos, chaves, medicamentos e compras por estafetas dedicados.</p>
+        <ul class="serv-features">
+          <li><span>•</span> <b>Código PIN de Segurança:</b> A encomenda só é entregue com o código de 4 dígitos.</li>
+          <li><span>•</span> <b>Rastreio em Tempo Real:</b> Segue o estafeta no mapa passo a passo.</li>
+          <li><span>•</span> <b>Preço fixo sem gasosa:</b> Sabes exactamente quanto vais pagar antes de enviar.</li>
+        </ul>
+        <a href="index.html?mode=delivery" class="btn-cta-full btn-dark" style="padding:10px;font-size:12px;">Enviar Encomenda →</a>
+      </div>
+
+      <!-- CARGA -->
+      <div class="serv-card">
+        <span class="serv-badge sb-cargo">Frete & Mudanças</span>
+        <h4>GIRO Carga & Fretes</h4>
+        <p>Transporte estruturado com rentabilidade de +50% no frete para materiais de construção e mudanças.</p>
+        <ul class="serv-features">
+          <li><span>•</span> <b>Vans Fechadas & Carrinhas:</b> Até 500 kg para móveis e eletrodomésticos.</li>
+          <li><span>•</span> <b>Camiões 1,5t e 3,5t:</b> Caixa aberta ou fechada para mercadorias.</li>
+          <li><span>•</span> <b>Serviço de Mudança com Ajudantes:</b> Equipa para carregar e descarregar.</li>
+        </ul>
+        <a href="index.html?mode=cargo" class="btn-cta-full btn-dark" style="padding:10px;font-size:12px;">Simular Frete de Carga →</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 5. DEPOIMENTOS REAIS DE ANGOLANOS -->
+<section class="section">
+  <div class="container">
+    <span class="sec-tag">Quem Usa e Aprova</span>
+    <h2 class="sec-title">A Opinião de Quem Roda na GIRO</h2>
+    <p class="sec-desc">Veja o testemunho de motoristas e passageiros que já não trocam a GIRO por nada.</p>
+
+    <div class="testim-grid">
+      <div class="testim-card">
+        <p>"Eu rodava noutra aplicação onde me tiravam quase 15% de comissão mais taxas escondidas. Na GIRO a comissão é fixa em 10% e o dinheiro cai direto no meu Multicaixa Express no mesmo dia. Rendo mais 60 mil Kwanzas no mês."</p>
+        <div class="testim-user">
+          <div class="testim-avatar">🚖</div>
+          <div>
+            <b>Domingos Manuel</b>
+            <span>Motorista Parceiro · Talatona, Luanda</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="testim-card">
+        <p>"Trabalho até tarde na baixa de Luanda e volto para o Kilamba à noite. Antes tinha receio de apanhar táxi. Com a GIRO sei que a Central está a vigiar a corrida e se houver qualquer coisa a esquadra é avisada. Dá uma paz de espírito que não tem preço."</p>
+        <div class="testim-user">
+          <div class="testim-avatar">👩🏾</div>
+          <div>
+            <b>Elisabete Carvalho</b>
+            <span>Passageira Frequente · Kilamba</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="testim-card">
+        <p>"Tenho uma loja de materiais e uso a GIRO Carga para levar cimento e blocos aos clientes de Viana e Benfica. É muito rápido, os motoristas são educados e o cliente recebe a mercadoria sem atrasos."</p>
+        <div class="testim-user">
+          <div class="testim-avatar">🚛</div>
+          <div>
+            <b>Mateus Kiala</b>
+            <span>Cliente Empresarial · Viana</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 6. PERGUNTAS FREQUENTES (FAQ) -->
+<section class="section" id="faq" style="background:#0a0d0a;border-top:1px solid var(--line);">
+  <div class="container">
+    <span class="sec-tag">Tire as Suas Dúvidas</span>
+    <h2 class="sec-title" style="text-align:center;">Perguntas Frequentes</h2>
+    <p class="sec-desc" style="text-align:center;margin-left:auto;margin-right:auto;">Tudo o que precisas saber para começar como passageiro ou motorista parceiro.</p>
+
+    <div class="faq-grid">
+      <div class="faq-item">
+        <h5>Como é feito o pagamento das corridas?</h5>
+        <p>Podes pagar de forma rápida e segura por Multicaixa Express ou em dinheiro no final da corrida. Sem esquemas e com recibo digital imediato.</p>
+      </div>
+
+      <div class="faq-item">
+        <h5>Como o motorista recebe os seus ganhos?</h5>
+        <p>Os ganhos líquidos (após a retenção justa de 10%) podem ser levantados a qualquer momento para o teu número do Multicaixa Express ou transferência bancária IBAN angolano.</p>
+      </div>
+
+      <div class="faq-item">
+        <h5>O que acontece se eu carregar no Botão de Pânico?</h5>
+        <p>A nossa Central 24h recebe imediatamente a tua localização GPS ao vivo, verifica o áudio e aciona a esquadra de polícia mais próxima para envio de viatura ao local.</p>
+      </div>
+
+      <div class="faq-item">
+        <h5>Quais são os documentos para ser motorista?</h5>
+        <p>Precisas do Bilhete de Identidade (B.I.), Carta de Condução válida, livrete/título do veículo e atestado de residência ou registo policial. O registo é feito na hora pela app.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 7. FINAL HERO CTA BANNER -->
+<section class="final-cta">
+  <div class="container">
+    <h2>Pronto Para Rodar com Segurança e Poupar Dinheiro?</h2>
+    <p>Junta-te a milhares de angolanos que já escolheram a plataforma mais justa e protegida do país.</p>
+
+    <div class="final-btn-row">
+      <a href="index.html?view=pax" class="btn-cta-full btn-dark" style="width:auto;padding:15px 28px;font-size:15px;">
+        🚗 Pedir Táxi Mais Barato
+      </a>
+      <a href="index.html?cadastro=driver" class="btn-cta-full btn-gold" style="width:auto;padding:15px 28px;font-size:15px;">
+        💼 Cadastrar Como Motorista (10% Taxa)
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- 8. FOOTER -->
+<footer class="footer">
+  <div class="container footer-content">
+    <div class="brand">
+      <div class="brand-icon" style="width:28px;height:28px;font-size:14px;">G</div>
+      <div class="brand-text">
+        <b>GIRO</b>
+        <span>Segurança 24h · Angola</span>
+      </div>
+    </div>
+
+    <div class="footer-rights">
+      <span>🇦🇴 Desenvolvido para Angola</span> · <span>© 2026 GIRO Mobility. Todos os direitos reservados.</span>
+    </div>
+
+    <div>
+      <a href="index.html" style="color:var(--gold);font-weight:700;">Aceder à Aplicação Web →</a>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

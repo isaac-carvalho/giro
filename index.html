@@ -755,6 +755,11 @@ html, body{
           </select>
         </div>
 
+        <!-- LINK PARA LANDING PAGE -->
+        <a href="landing.html" class="theme-toggle-btn" style="text-decoration:none;display:flex;align-items:center;gap:4px;font-size:10.5px;font-weight:700;padding:5px 8px;" title="Ver vantagens e comparativo de preços">
+          <span>✦</span> Vantagens
+        </a>
+
         <!-- PALETA SWITCH -->
         <button class="theme-toggle-btn" id="theme-switch-btn" onclick="toggleThemePalette()" title="Alternar Dourado / Verde">✨</button>
 
@@ -1202,7 +1207,7 @@ html, body{
 
           <div class="mode-switch-bar">
             <button class="mode-tab on" data-target="dsub-sos" onclick="switchDriverSubTab(this)">Segurança & SOS</button>
-            <button class="mode-tab" data-target="dsub-wal" onclick="switchDriverSubTab(this)">Carteira (15%)</button>
+            <button class="mode-tab" data-target="dsub-wal" onclick="switchDriverSubTab(this)">Carteira (10%)</button>
             <button class="mode-tab" data-target="dsub-his" onclick="switchDriverSubTab(this)">Histórico</button>
           </div>
 
@@ -1282,7 +1287,7 @@ html, body{
         <div class="req-timeout-bar" id="drv-req-timeout"><i></i></div>
         <div id="drv-req-badge"></div>
         <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;">
-          <div><small style="color:var(--mut);font-size:10px;">Recebe líquido (após 15% GIRO)</small><div style="font-size:22px;font-weight:900;color:var(--gold);" id="req-net-amount">—</div></div>
+          <div><small style="color:var(--mut);font-size:10px;">Recebe líquido (após 10% GIRO — menor taxa de Angola)</small><div style="font-size:22px;font-weight:900;color:var(--gold);" id="req-net-amount">—</div></div>
           <div style="text-align:right;"><small style="color:var(--mut);font-size:10px;">Tarifa Bruta</small><div style="font-size:13px;font-weight:700;" id="req-gross-amount">—</div></div>
         </div>
         <div style="display:flex;gap:10px;padding:4px 0;font-size:12px;">
@@ -1353,7 +1358,7 @@ html, body{
             <div style="background:var(--ink2);border:1px solid var(--line);border-radius:14px;padding:14px;">
               <h4 style="font-size:13px;margin-bottom:8px;">Comparativo de Comissão Cobrada ao Motorista</h4>
               <div style="font-size:11.5px;color:var(--mut);line-height:1.6;">
-                • Heetch: 11,4% | Yango: 13% | <b style="color:var(--gold);">GIRO: 15%</b> | UGo: 20% | Tirosa: 20% | Kubinga: 25%
+                • <b style="color:var(--gold);">GIRO: 10% (Líder em rentabilidade)</b> | Heetch: 11,4% | Yango: 13% | UGo: 20% | Tirosa: 20% | Kubinga: 25%
               </div>
             </div>
           </div>
@@ -1425,7 +1430,7 @@ html, body{
 
         <!-- 6. CANAL DE RECEBIMENTO -->
         <div class="auth-input-group">
-          <label>Canal de Recebimento dos Ganhos (15% Comissão GIRO) *</label>
+          <label>Canal de Recebimento dos Ganhos (Apenas 10% Comissão GIRO) *</label>
           <select id="reg-drv-payout-type" required>
             <option value="express" selected>Multicaixa Express (Número de Telemóvel)</option>
             <option value="iban">Transferência Bancária (IBAN Angolano AO06...)</option>
@@ -1627,9 +1632,9 @@ function playHapticSound(type) {
 }
 
 /* ==========================================================================
-   2. CONFIGURAÇÃO TARIFÁRIA ANGOLANA (MOTO -15%, CARGA +50%, COMISSÃO 15%)
+   2. CONFIGURAÇÃO TARIFÁRIA ANGOLANA (PREÇOS -10% QUE HEETCH, COMISSÃO 10%)
    ========================================================================== */
-const T_PAX = { base: 550, km: 240, min: 32, minimo: 1200, comissao: 0.15 };
+const T_PAX = { base: 495, km: 216, min: 29, minimo: 1080, comissao: 0.10 };
 
 const TIERS_PAX = [
   // GIRO Moto com 15% de desconto promocional / alta competitividade
@@ -2571,7 +2576,7 @@ document.querySelectorAll('#pax-star-rating .star-rating-icon').forEach(star => 
 });
 
 /* ==========================================================================
-   14. MOTORISTA & CARTEIRA (COMISSÃO 15%)
+   14. MOTORISTA & CARTEIRA (COMISSÃO 10%)
    ========================================================================== */
 let isDriverOnline = false;
 let driverTripStage = 0;
@@ -2669,7 +2674,7 @@ function acceptIncomingTrip() {
 
   document.getElementById('drv-trip-breakdown').innerHTML = `
     <div class="fare-line"><span>Tarifa bruta</span><b>${kz(gross)}</b></div>
-    <div class="fare-line"><span style="color:var(--red);">Comissão retida GIRO (15%)</span><b style="color:var(--red);">− ${kz(fee)}</b></div>
+    <div class="fare-line"><span style="color:var(--red);">Comissão retida GIRO (10%)</span><b style="color:var(--red);">− ${kz(fee)}</b></div>
     <div class="fare-line total"><span>Líquido a receber</span><b style="color:var(--gold);">${kz(net)}</b></div>
   `;
 
@@ -2714,7 +2719,7 @@ function advanceDriverTrip() {
     const net = gross - fee;
 
     const title = isCargo ? "Operação de Carga Concluída!" : "Viagem Concluída!";
-    alert(title + "\n\n" + "Tarifa Bruta: " + kz(gross) + "\n" + "Comissão GIRO (15%): − " + kz(fee) + "\n" + "Creditado na carteira: " + kz(net));
+    alert(title + "\n\n" + "Tarifa Bruta: " + kz(gross) + "\n" + "Comissão GIRO (10%): − " + kz(fee) + "\n" + "Creditado na carteira: " + kz(net));
 
     creditDriverWallet(net);
     clearDriverTimers();
@@ -2744,14 +2749,14 @@ function updateDriverWalletDisplay() {
   document.getElementById('drv-rides-count').textContent = driverRidesCount;
   document.getElementById('drv-wallet-breakdown').innerHTML = `
     <div class="fare-line"><span>Bruto hoje (${driverRidesCount} serviços)</span><b>${kz(driverGrossToday)}</b></div>
-    <div class="fare-line"><span style="color:var(--red);">Comissão retida GIRO (15%)</span><b style="color:var(--red);">− ${kz(driverGrossToday * T_PAX.comissao)}</b></div>
-    <div class="fare-line total"><span>Líquido acumulado</span><b style="color:var(--gold);">${kz(driverGrossToday * 0.85)}</b></div>
+    <div class="fare-line"><span style="color:var(--red);">Comissão retida GIRO (10%)</span><b style="color:var(--red);">− ${kz(driverGrossToday * T_PAX.comissao)}</b></div>
+    <div class="fare-line total"><span>Líquido acumulado</span><b style="color:var(--gold);">${kz(driverGrossToday * 0.90)}</b></div>
   `;
 }
 
 function creditDriverWallet(net) {
   driverBalance += net;
-  driverGrossToday += (net / 0.85);
+  driverGrossToday += (net / 0.90);
   driverRidesCount++;
   updateDriverWalletDisplay();
   renderDriverHistory();
@@ -2901,6 +2906,19 @@ function confirmScheduleModal() {
    ========================================================================== */
 syncOriginDisplays();
 syncDestDisplays();
+// Processamento de parâmetros de URL para integração com Landing Page
+(function checkUrlParams() {
+  try {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('cadastro')) {
+      openAuthModal(params.get('cadastro'));
+    } else if (params.get('view')) {
+      switchView(params.get('view'));
+    } else if (params.get('mode')) {
+      setAppMode(params.get('mode'));
+    }
+  } catch(e) {}
+})();
 buildFavoritesAndDestinations();
 renderTiers();
 updateDriverWalletDisplay();
