@@ -2268,16 +2268,8 @@ function advanceDriverTrip() {
     const fee = gross * T_PAX.comissao;
     const net = gross - fee;
 
-    alert((isCargo ? 'Operação de Carga Concluída!
-
-' : 'Viagem Concluída!
-
-') +
-      'Tarifa Bruta: ' + kz(gross) + '
-' +
-      'Comissão GIRO (15%): − ' + kz(fee) + '
-' +
-      'Creditado na carteira: ' + kz(net));
+    const title = isCargo ? "Operação de Carga Concluída!" : "Viagem Concluída!";
+    alert(title + "\n\n" + "Tarifa Bruta: " + kz(gross) + "\n" + "Comissão GIRO (15%): − " + kz(fee) + "\n" + "Creditado na carteira: " + kz(net));
 
     creditDriverWallet(net);
     clearDriverTimers();
