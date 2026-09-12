@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<title>GIRO — Mobilidade &amp; Carga com Segurança 24h</title>
+<title>GIRO — Mobilidade, Carga & Segurança 24h em Angola</title>
 
 <!-- PWA & Mobile Web App Meta Tags -->
 <meta name="theme-color" content="#070907">
@@ -18,26 +18,33 @@
 
 <style>
 /* ==========================================================================
-   DESIGN SYSTEM NATIVO MOBILE-FIRST — GIRO V5.1 (PRO ARCHITECTURE)
+   DESIGN SYSTEM NATIVO MOBILE-FIRST — GIRO V5.2 (BLACK & LUXURY GOLD EDITION)
    ========================================================================== */
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;-webkit-user-select:none;user-select:none;}
 input, textarea, select{user-select:auto;-webkit-user-select:auto;}
 
 :root{
-  --ink:#070907;
-  --ink1:#0d0f0d;
-  --ink2:#141714;
-  --ink3:#1c201c;
-  --ink4:#252b24;
-  --line:#2b3229;
+  /* Tema Padrão: Dourado Elegante & Preto Tech */
+  --ink:#060706;
+  --ink1:#0c0e0c;
+  --ink2:#131613;
+  --ink3:#1a1f1a;
+  --ink4:#242a23;
+  --line:#2d352b;
+  
+  --gold:#d4af37;
+  --gold-glow:#f3e5ab;
+  --gold-dark:#8c7322;
+  --gold-deep:#2b2207;
+  --gold-grad:linear-gradient(135deg, #f3e5ab 0%, #d4af37 50%, #aa820a 100%);
   
   --grn:#4fe36a;
   --grnd:#2c7a3f;
   --grndeep:#123a1e;
   
-  --wht:#f4f6f1;
-  --mut:#8e978b;
-  --mutd:#5d655a;
+  --wht:#f8faf6;
+  --mut:#959e92;
+  --mutd:#5d6659;
   
   --red:#ff3b4e;
   --reddeep:#3d1015;
@@ -54,6 +61,18 @@ input, textarea, select{user-select:auto;-webkit-user-select:auto;}
   --f:'Inter',-apple-system,BlinkMacSystemFont,system-ui,sans-serif;
   --safe-top: env(safe-area-inset-top, 0px);
   --safe-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+/* Tema Original Verde Neon */
+body.theme-emerald{
+  --gold:#4fe36a;
+  --gold-glow:#a3f7b2;
+  --gold-dark:#2c7a3f;
+  --gold-deep:#123a1e;
+  --gold-grad:linear-gradient(135deg, #a3f7b2 0%, #4fe36a 50%, #2c7a3f 100%);
+  --grn:#4fe36a;
+  --grnd:#2c7a3f;
+  --grndeep:#123a1e;
 }
 
 html, body{
@@ -81,28 +100,28 @@ html, body{
    BARRA SUPERIOR GLOBAL (HEADER)
    ========================================================================== */
 .app-header{
-  padding:calc(8px + var(--safe-top)) 16px 10px;
-  background:rgba(11,13,11,0.92);
-  backdrop-filter:blur(16px);
-  -webkit-backdrop-filter:blur(16px);
+  padding:calc(8px + var(--safe-top)) 14px 10px;
+  background:rgba(10,12,10,0.94);
+  backdrop-filter:blur(18px);
+  -webkit-backdrop-filter:blur(18px);
   border-bottom:1px solid var(--line);
   display:flex;
   align-items:center;
   justify-content:space-between;
   z-index:100;
   flex-shrink:0;
-  gap:10px;
+  gap:8px;
 }
-.brand{display:flex;align-items:center;gap:9px;cursor:pointer;}
+.brand{display:flex;align-items:center;gap:8px;cursor:pointer;}
 .brand-icon{
   width:32px;height:32px;border-radius:9px;
-  background:linear-gradient(135deg,var(--grn),var(--grnd));
-  color:#07130a;font-weight:900;font-size:16px;
+  background:var(--gold-grad);
+  color:#060706;font-weight:900;font-size:16px;
   display:flex;align-items:center;justify-content:center;
-  letter-spacing:-.04em;box-shadow:0 0 14px rgba(79,227,106,.25);
+  letter-spacing:-.04em;box-shadow:0 0 14px rgba(212,175,55,.3);
 }
-.brand-text b{font-size:16px;font-weight:900;letter-spacing:-.03em;display:block;line-height:1.1;}
-.brand-text span{font-size:9.5px;color:var(--mut);font-weight:500;}
+.brand-text b{font-size:15px;font-weight:900;letter-spacing:-.03em;display:block;line-height:1.1;color:#fff;}
+.brand-text span{font-size:9px;color:var(--gold);font-weight:600;}
 
 /* SELETOR DE MODO / PERFIL DO TOPO */
 .role-pills{
@@ -112,16 +131,19 @@ html, body{
 .role-btn{
   border:none;background:none;color:var(--mut);
   font-family:var(--f);font-size:11px;font-weight:700;
-  padding:5px 11px;border-radius:7px;cursor:pointer;transition:.15s;
+  padding:5px 9px;border-radius:7px;cursor:pointer;transition:.15s;
 }
-.role-btn.on{background:var(--grn);color:#07130a;box-shadow:0 1px 6px rgba(0,0,0,.3);}
-.role-btn.on.cargo{background:var(--cargo);color:#07130a;}
+.role-btn.on{background:var(--gold-grad);color:#060706;box-shadow:0 1px 6px rgba(0,0,0,.4);}
 
-/* PROVÍNCIA & REDE TELEMETRIA */
+/* PROVÍNCIA & PALETA SWITCH */
 .header-meta{display:flex;align-items:center;gap:6px;}
+.theme-toggle-btn{
+  background:var(--ink2);border:1px solid var(--line);color:var(--gold);
+  border-radius:8px;padding:5px 7px;font-size:11px;cursor:pointer;font-weight:800;
+}
 .prov-sel-box{
-  display:flex;align-items:center;gap:5px;background:var(--ink2);
-  border:1px solid var(--line);padding:5px 9px;border-radius:8px;font-size:11px;color:var(--mut);
+  display:flex;align-items:center;gap:4px;background:var(--ink2);
+  border:1px solid var(--line);padding:5px 8px;border-radius:8px;font-size:11px;color:var(--mut);
 }
 .prov-sel-box select{
   background:none;border:none;color:var(--wht);
@@ -129,8 +151,6 @@ html, body{
 }
 .prov-sel-box select option{background:var(--ink2);color:#fff;}
 .net-blip{width:7px;height:7px;border-radius:50%;background:var(--grn);box-shadow:0 0 8px var(--grn);}
-.net-blip.weak{background:var(--amb);box-shadow:0 0 8px var(--amb);}
-.net-blip.off{background:var(--red);box-shadow:0 0 8px var(--red);}
 
 /* ==========================================================================
    VIEWPORT PRINCIPAL (FULL MOBILE RESPONSIVE)
@@ -155,12 +175,12 @@ html, body{
    MAPA COMPLETO SVG INTERACTIVO
    ========================================================================== */
 .map-canvas{
-  position:absolute;inset:0;background:#101410;overflow:hidden;z-index:1;
+  position:absolute;inset:0;background:#0d110d;overflow:hidden;z-index:1;
 }
 .map-canvas svg{width:100%;height:100%;display:block;}
 .map-overlay-grad{
   position:absolute;inset:0;
-  background:linear-gradient(180deg,rgba(7,9,7,.75) 0 10%,transparent 24%,transparent 55%,rgba(7,9,7,.94) 100%);
+  background:linear-gradient(180deg,rgba(6,7,6,.75) 0 10%,transparent 24%,transparent 55%,rgba(6,7,6,.94) 100%);
   pointer-events:none;z-index:5;
 }
 
@@ -175,7 +195,7 @@ html, body{
 }
 .pin-circle{width:14px;height:14px;border-radius:50%;border:3px solid var(--ink1);box-shadow:0 0 8px rgba(0,0,0,.6);}
 .map-pin.a .pin-circle{background:#fff;}
-.map-pin.b .pin-circle{background:var(--grn);}
+.map-pin.b .pin-circle{background:var(--gold);}
 .map-pin.stop .pin-circle{background:var(--amb);}
 .pin-label{
   position:absolute;left:50%;top:-5px;transform:translate(-50%,-100%);
@@ -186,14 +206,14 @@ html, body{
   content:'';position:absolute;bottom:-4px;left:50%;transform:translateX(-50%);
   border:4px solid transparent;border-top-color:#fff;border-bottom:0;
 }
-.map-pin.b .pin-label{background:var(--grn);color:#07130a;}
-.map-pin.b .pin-label::after{border-top-color:var(--grn);}
-.map-pin.stop .pin-label{background:var(--amb);color:#07130a;}
+.map-pin.b .pin-label{background:var(--gold);color:#070907;}
+.map-pin.b .pin-label::after{border-top-color:var(--gold);}
+.map-pin.stop .pin-label{background:var(--amb);color:#070907;}
 .map-pin.stop .pin-label::after{border-top-color:var(--amb);}
 
 /* CHIPS FLUTUANTES NO MAPA */
 .floating-chip{
-  position:absolute;top:12px;z-index:45;background:rgba(20,23,20,0.92);
+  position:absolute;top:12px;z-index:45;background:rgba(19,22,19,0.92);
   backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
   border:1px solid var(--line);border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,.6);
   color:#fff;display:flex;align-items:center;
@@ -207,24 +227,24 @@ html, body{
   left:60px;right:60px;padding:9px 12px;gap:8px;font-size:11.5px;font-weight:600;
 }
 .surge-banner{
-  top:58px;left:14px;background:#35290b;border:1px solid var(--amb);color:var(--amb);
+  top:58px;left:14px;background:#35290b;border:1px solid var(--gold);color:var(--gold);
   border-radius:9px;padding:5px 10px;font-size:10.5px;font-weight:700;display:none;
 }
 .surge-banner.on{display:flex;align-items:center;gap:5px;}
 
 /* ==========================================================================
-   BOTTOM SHEET NATIVA MODERNA (PASSAGEIRO & MOTORISTA)
+   BOTTOM SHEET NATIVA MODERNA
    ========================================================================== */
 .bottom-sheet{
   position:absolute;left:0;right:0;bottom:0;
-  background:rgba(18,22,18,0.97);
+  background:rgba(15,18,15,0.98);
   backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);
   border-radius:24px 24px 0 0;
   border-top:1px solid var(--line);
-  box-shadow:0 -12px 40px rgba(0,0,0,.75);
+  box-shadow:0 -12px 40px rgba(0,0,0,.85);
   z-index:50;
   padding:6px 16px calc(14px + var(--safe-bottom));
-  max-height:84%;
+  max-height:86%;
   overflow-y:auto;
   scrollbar-width:none;
   transition:transform .3s cubic-bezier(.25,1,.5,1);
@@ -249,7 +269,7 @@ html, body{
   padding:8px 4px;border-radius:9px;cursor:pointer;
   display:flex;align-items:center;justify-content:center;gap:5px;transition:.15s;
 }
-.mode-tab.on{background:var(--ink2);color:var(--grn);box-shadow:0 2px 6px rgba(0,0,0,.4);}
+.mode-tab.on{background:var(--ink2);color:var(--gold);box-shadow:0 2px 6px rgba(0,0,0,.4);}
 .mode-tab.on.cargo{color:var(--cargo);}
 .mode-tab.on.delivery{color:var(--deliv);}
 
@@ -262,7 +282,7 @@ html, body{
 .input-field-card:hover{border-color:var(--line);}
 .sq-dot{width:8px;height:8px;flex-shrink:0;}
 .sq-dot.a{border-radius:50%;background:#fff;}
-.sq-dot.b{background:var(--grn);}
+.sq-dot.b{background:var(--gold);}
 .sq-dot.stop{background:var(--amb);border-radius:2px;}
 .sq-dot.ref{background:var(--cargo);border-radius:50%;}
 .input-field-card span{font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
@@ -275,7 +295,7 @@ html, body{
 
 .row-actions-bar{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;}
 .action-link-btn{
-  background:none;border:none;color:var(--grn);font-family:var(--f);
+  background:none;border:none;color:var(--gold);font-family:var(--f);
   font-size:11.5px;font-weight:700;cursor:pointer;padding:3px 2px;
 }
 .action-link-btn.amber{color:var(--cargo);}
@@ -299,12 +319,12 @@ html, body{
   border:1.5px solid transparent;cursor:pointer;margin-bottom:6px;
   background:rgba(255,255,255,.02);transition:.15s;
 }
-.tier-card.on{border-color:var(--grn);background:var(--grndeep);}
+.tier-card.on{border-color:var(--gold);background:var(--gold-deep);}
 .tier-card.cargo-on{border-color:var(--cargo);background:var(--cargodeep);}
 .tier-card.recommended{position:relative;}
 .tier-card.recommended::before{
   content:'Recomendado para a sua carga';position:absolute;top:-8px;right:12px;
-  background:var(--amb);color:#07130a;font-size:9px;font-weight:800;
+  background:var(--gold);color:#07130a;font-size:9px;font-weight:800;
   padding:2px 7px;border-radius:6px;
 }
 .tier-icon{width:42px;height:30px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
@@ -312,7 +332,7 @@ html, body{
 .tier-card b{font-size:13px;display:block;}
 .tier-card small{font-size:10.5px;color:var(--mut);}
 .tier-card .tier-price{margin-left:auto;text-align:right;}
-.tier-card .tier-price b{font-size:13.5px;}
+.tier-card .tier-price b{font-size:13.5px;color:var(--gold);}
 .tier-card .tier-price small{font-size:10px;}
 
 /* PRESETS DE CUBAGEM DE CARGA RÁPIDA */
@@ -334,7 +354,7 @@ html, body{
   background:var(--ink2);border:1px solid var(--line);color:#fff;
   border-radius:7px;padding:4px 9px;font-size:11px;font-weight:700;cursor:pointer;
 }
-.offer-btn.active{border-color:var(--grn);background:var(--grndeep);color:var(--grn);}
+.offer-btn.active{border-color:var(--gold);background:var(--gold-deep);color:var(--gold);}
 
 /* DETALHAMENTO DE TARIFA (FARE BOX) */
 .fare-details-box{background:var(--ink3);border-radius:12px;padding:11px 13px;margin:9px 0;font-size:11px;}
@@ -356,18 +376,19 @@ html, body{
   display:flex;align-items:center;gap:9px;background:var(--ink3);
   border-radius:10px;padding:9px 12px;font-size:12px;cursor:pointer;border:1.5px solid transparent;
 }
-.pay-opt-row.on{border-color:var(--grn);}
+.pay-opt-row.on{border-color:var(--gold);}
 
 /* BOTÕES GLOBAIS NATIVOS */
 .main-action-btn{
   width:100%;padding:14px;border:none;border-radius:13px;
-  font-family:var(--f);font-weight:800;font-size:14.5px;cursor:pointer;
+  font-family:var(--f);font-weight:800;font-size:14px;cursor:pointer;
   display:flex;align-items:center;justify-content:center;gap:8px;
   transition:filter .15s, transform .1s;
 }
 .main-action-btn:active{transform:scale(.985);}
-.btn-green{background:var(--grn);color:#07130a;}
-.btn-amber{background:var(--cargo);color:#07130a;}
+.btn-gold{background:var(--gold-grad);color:#060706;box-shadow:0 2px 10px rgba(212,175,55,.25);}
+.btn-green{background:var(--grn);color:#060706;}
+.btn-amber{background:var(--cargo);color:#060706;}
 .btn-ghost{background:var(--ink3);color:#fff;}
 .btn-red{background:var(--red);color:#fff;}
 .two-btn-row{display:flex;gap:8px;}
@@ -375,42 +396,78 @@ html, body{
 
 /* RADAR DE BUSCA */
 .search-radar{height:64px;display:flex;align-items:center;justify-content:center;margin-bottom:2px;}
-.radar-center-dot{width:14px;height:14px;border-radius:50%;background:var(--grn);position:relative;}
+.radar-center-dot{width:14px;height:14px;border-radius:50%;background:var(--gold);position:relative;}
 .radar-center-dot::before,.radar-center-dot::after{
-  content:'';position:absolute;inset:-6px;border-radius:50%;border:2px solid var(--grn);
+  content:'';position:absolute;inset:-6px;border-radius:50%;border:2px solid var(--gold);
   animation:radarPulse 1.8s ease-out infinite;
 }
 .radar-center-dot::after{animation-delay:.9s;}
 @keyframes radarPulse{0%{transform:scale(.5);opacity:.9;}100%{transform:scale(3.2);opacity:0;}}
 .search-progress{height:3px;border-radius:3px;background:var(--ink3);overflow:hidden;margin-bottom:12px;}
-.search-progress i{display:block;height:100%;background:var(--grn);width:0;}
+.search-progress i{display:block;height:100%;background:var(--gold);width:0;}
 @keyframes progressBarAnim{to{width:100%;}}
 
-/* CARD DO MOTORISTA / CONDUTOR */
-.driver-card{display:flex;align-items:center;gap:11px;padding-bottom:11px;border-bottom:1px solid var(--ink3);margin-bottom:11px;}
-.avatar-badge{
-  width:46px;height:46px;border-radius:50%;
-  background:linear-gradient(140deg,#33422e,#1a2117);
-  display:flex;align-items:center;justify-content:center;font-weight:800;color:var(--grn);font-size:15px;flex-shrink:0;
+/* ==========================================================================
+   CARD CLEAN / CLARO PARA TELA DE VIAGEM EM ANDAMENTO
+   ========================================================================== */
+.clean-trip-card{
+  background:#ffffff;
+  color:#111411;
+  border-radius:18px;
+  padding:14px 15px;
+  margin-bottom:11px;
+  box-shadow:0 8px 30px rgba(0,0,0,.45);
 }
-.driver-name{font-size:14px;font-weight:700;}
-.driver-meta{font-size:11px;color:var(--mut);margin-top:2px;}
-.plate-tag{margin-left:auto;background:var(--ink3);border-radius:8px;padding:6px 9px;text-align:center;flex-shrink:0;}
-.plate-tag b{font-size:11.5px;font-weight:700;display:block;}
-.plate-tag small{font-size:9px;color:var(--mut);}
+.clean-trip-card .driver-card{
+  border-bottom:1px solid #e8ece7;
+  padding-bottom:10px;
+  margin-bottom:10px;
+}
+.clean-trip-card .driver-name{color:#070a07;font-size:15px;font-weight:800;}
+.clean-trip-card .driver-meta{color:#586355;font-size:11.5px;}
+.clean-trip-card .avatar-badge{
+  background:#f0b429;
+  color:#060706;
+  font-weight:900;
+}
+.clean-trip-card .plate-tag{
+  background:#f2f5f1;
+  border:1px solid #dbe2da;
+}
+.clean-trip-card .plate-tag b{color:#070a07;font-size:12px;}
+.clean-trip-card .plate-tag small{color:#6c7769;}
 
-.quick-action-grid{display:flex;gap:6px;margin-bottom:10px;}
-.quick-action-btn{
-  flex:1;background:var(--ink3);border:none;border-radius:11px;
-  padding:9px 3px;color:#fff;font-family:var(--f);font-size:10.5px;font-weight:600;
+.clean-trip-card .fare-details-box{
+  background:#f7f9f6;
+  border:1px solid #e4eae2;
+  color:#222a21;
+}
+.clean-trip-card .fare-line{color:#5b6658;}
+.clean-trip-card .fare-line b{color:#070a07;}
+
+.clean-quick-action-btn{
+  flex:1;background:#f3f6f2;border:1px solid #e1e7e0;border-radius:11px;
+  padding:9px 3px;color:#0e130d;font-family:var(--f);font-size:11px;font-weight:700;
   cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:4px;
 }
-.quick-action-btn:hover{background:var(--ink4);}
-.quick-action-btn i{font-style:normal;font-size:14px;}
+.clean-quick-action-btn:hover{background:#e7ede5;}
+.clean-quick-action-btn i{font-style:normal;font-size:15px;}
 
 /* ==========================================================================
-   SISTEMA DE SEGURANÇA SOS & OVERLAYS
+   ALERTA DE SINISTRO / SOS ENTRE COLEGAS MOTORISTAS (PEER-TO-PEER COMRADE)
    ========================================================================== */
+.peer-sos-banner{
+  position:absolute;top:10px;left:10px;right:10px;z-index:75;
+  background:linear-gradient(135deg,#540e16,#2d060b);
+  border:2px solid var(--red);border-radius:16px;
+  padding:12px 14px;box-shadow:0 14px 40px rgba(0,0,0,.9);
+  animation:sosShake 0.6s ease-in-out infinite alternate;
+  display:none;
+}
+.peer-sos-banner.on{display:block;}
+@keyframes sosShake{0%{transform:scale(1);}100%{transform:scale(1.02);}}
+
+/* SISTEMA DE SEGURANÇA SOS & OVERLAYS */
 .sos-hold-btn{
   width:100%;border:none;border-radius:14px;padding:0;background:var(--reddeep);
   border:1.5px solid var(--red);position:relative;overflow:hidden;cursor:pointer;
@@ -454,26 +511,41 @@ html, body{
 .rec-dot{width:6px;height:6px;border-radius:50%;background:var(--red);animation:blinkDot 1s step-start infinite;}
 @keyframes blinkDot{50%{opacity:0;}}
 
-/* MODAIS GENÉRICOS */
+/* ==========================================================================
+   MODAIS & TELAS DE CADASTRO / LOGIN
+   ========================================================================== */
 .modal-backdrop{
   position:absolute;inset:0;background:rgba(0,0,0,.85);z-index:95;
-  display:none;align-items:center;justify-content:center;padding:20px;
+  display:none;align-items:center;justify-content:center;padding:16px;
 }
 .modal-backdrop.on{display:flex;}
 .modal-window{
-  background:var(--ink2);border:1px solid var(--line);border-radius:18px;
-  padding:18px;width:100%;max-width:320px;box-shadow:0 20px 50px rgba(0,0,0,.85);
+  background:var(--ink2);border:1px solid var(--line);border-radius:20px;
+  padding:18px;width:100%;max-width:340px;box-shadow:0 20px 50px rgba(0,0,0,.85);
+  max-height:90%;overflow-y:auto;
 }
+.auth-input-group{margin-bottom:10px;}
+.auth-input-group label{font-size:10.5px;color:var(--mut);font-weight:600;display:block;margin-bottom:4px;}
+.auth-input-group input, .auth-input-group select{
+  width:100%;background:var(--ink3);border:1px solid var(--line);border-radius:10px;
+  padding:9px 12px;color:#fff;font-family:var(--f);font-size:12px;outline:none;
+}
+.auth-input-group select option{background:var(--ink2);color:#fff;}
+.auth-input-group small{font-size:9.5px;color:var(--mut);display:block;margin-top:3px;}
 
-/* ==========================================================================
-   PAINEL DO MOTORISTA (DRIVER SPECIFIC)
-   ========================================================================== */
+.doc-upload-box{
+  background:var(--ink3);border:1.5px dashed var(--line);border-radius:10px;
+  padding:10px;text-align:center;cursor:pointer;margin-top:4px;
+}
+.doc-upload-box.uploaded{border-color:var(--gold);background:var(--gold-deep);}
+
+/* MOTORISTA ESPECÍFICO */
 .driver-toggle-header{display:flex;align-items:center;justify-content:space-between;padding:4px 0 11px;}
 .toggle-switch{
   width:46px;height:26px;border-radius:20px;background:var(--ink3);
   position:relative;cursor:pointer;transition:.2s;flex-shrink:0;
 }
-.toggle-switch.on{background:var(--grn);}
+.toggle-switch.on{background:var(--gold);}
 .toggle-switch::after{
   content:'';position:absolute;top:3px;left:3px;width:20px;height:20px;
   border-radius:50%;background:#fff;transition:.2s;
@@ -481,30 +553,26 @@ html, body{
 .toggle-switch.on::after{left:23px;}
 .driver-stats-grid{display:flex;border-top:1px solid var(--ink3);padding-top:10px;margin-bottom:10px;}
 .driver-stats-grid div{flex:1;text-align:center;}
-.driver-stats-grid b{display:block;font-size:14.5px;font-weight:800;}
+.driver-stats-grid b{display:block;font-size:14.5px;font-weight:800;color:var(--gold);}
 .driver-stats-grid small{font-size:9.5px;color:var(--mut);}
 
 /* CARD DE PEDIDO A ENTRAR (MOTORISTA) */
 .incoming-req-card{
   position:absolute;left:12px;right:12px;bottom:12px;z-index:60;
-  background:var(--ink2);border:1.5px solid var(--grn);border-radius:18px;
+  background:var(--ink2);border:1.5px solid var(--gold);border-radius:18px;
   padding:14px;box-shadow:0 12px 40px rgba(0,0,0,.85);
   transform:translateY(160%);transition:transform .35s cubic-bezier(.25,1,.5,1);
 }
 .incoming-req-card.cargo-type{border-color:var(--cargo);}
 .incoming-req-card.on{transform:translateY(0);}
 .req-timeout-bar{height:4px;background:var(--ink3);border-radius:4px;overflow:hidden;margin-bottom:11px;}
-.req-timeout-bar i{display:block;height:100%;background:var(--grn);width:100%;}
+.req-timeout-bar i{display:block;height:100%;background:var(--gold);width:100%;}
 .incoming-req-card.cargo-type .req-timeout-bar i{background:var(--cargo);}
 .req-timeout-bar.run i{animation:shrinkTimeout 14s linear forwards;}
 @keyframes shrinkTimeout{to{width:0;}}
 
-/* ==========================================================================
-   CENTRAL 24H (DASHBOARD AMPLO OU EXPANSÍVEL)
-   ========================================================================== */
-.central-view-layout{
-  display:flex;height:100%;width:100%;overflow:hidden;
-}
+/* CENTRAL 24H */
+.central-view-layout{display:flex;height:100%;width:100%;overflow:hidden;}
 .central-sidebar{
   width:300px;background:var(--ink2);border-right:1px solid var(--line);
   display:flex;flex-direction:column;flex-shrink:0;
@@ -538,9 +606,11 @@ html, body{
       <button class="role-btn on" id="nav-btn-pax" onclick="switchView('pax')">Passageiro</button>
       <button class="role-btn" id="nav-btn-drv" onclick="switchView('drv')">Motorista</button>
       <button class="role-btn" id="nav-btn-cen" onclick="switchView('cen')">Central</button>
+      <button class="role-btn" id="nav-btn-auth" onclick="openAuthModal('driver')" style="color:var(--gold);">Cadastro</button>
     </div>
 
     <div class="header-meta">
+      <button class="theme-toggle-btn" id="theme-switch-btn" onclick="toggleThemePalette()" title="Alternar Dourado / Verde">✨</button>
       <div class="prov-sel-box">
         <span class="net-blip" id="net-status-dot" title="Rede 4G Estável"></span>
         <select id="provSel" onchange="setProv()">
@@ -571,20 +641,20 @@ html, body{
       <!-- MAPA SVG DE FUNDO -->
       <div class="map-canvas">
         <svg viewBox="0 0 400 800" preserveAspectRatio="xMidYMid slice">
-          <rect width="400" height="800" fill="#101410"/>
-          <path d="M-20 220 H420" stroke="#252a22" stroke-width="26"/>
-          <path d="M-20 500 H420" stroke="#252a22" stroke-width="20"/>
-          <path d="M100 -20 V820" stroke="#252a22" stroke-width="22"/>
-          <path d="M280 -20 V820" stroke="#252a22" stroke-width="16"/>
-          <path d="M-20 360 L420 320" stroke="#1e2320" stroke-width="12"/>
-          <path d="M-20 640 H420" stroke="#1e2320" stroke-width="12"/>
-          <path d="M190 -20 V820" stroke="#1e2320" stroke-width="10"/>
-          <rect x="120" y="240" width="60" height="52" fill="#161b15"/><rect x="210" y="240" width="40" height="52" fill="#161b15"/>
-          <rect x="120" y="380" width="40" height="44" fill="#161b15"/><rect x="290" y="380" width="60" height="44" fill="#161b15"/>
-          <rect x="30" y="240" width="52" height="52" fill="#161b15"/><rect x="30" y="530" width="52" height="70" fill="#161b15"/>
-          <rect x="200" y="530" width="50" height="70" fill="#161b15"/>
+          <rect width="400" height="800" fill="#0d110d"/>
+          <path d="M-20 220 H420" stroke="#222820" stroke-width="26"/>
+          <path d="M-20 500 H420" stroke="#222820" stroke-width="20"/>
+          <path d="M100 -20 V820" stroke="#222820" stroke-width="22"/>
+          <path d="M280 -20 V820" stroke="#222820" stroke-width="16"/>
+          <path d="M-20 360 L420 320" stroke="#1b211a" stroke-width="12"/>
+          <path d="M-20 640 H420" stroke="#1b211a" stroke-width="12"/>
+          <path d="M190 -20 V820" stroke="#1b211a" stroke-width="10"/>
+          <rect x="120" y="240" width="60" height="52" fill="#141913"/><rect x="210" y="240" width="40" height="52" fill="#141913"/>
+          <rect x="120" y="380" width="40" height="44" fill="#141913"/><rect x="290" y="380" width="60" height="44" fill="#141913"/>
+          <rect x="30" y="240" width="52" height="52" fill="#141913"/><rect x="30" y="530" width="52" height="70" fill="#141913"/>
+          <rect x="200" y="530" width="50" height="70" fill="#141913"/>
           <!-- ROTA DINÂMICA -->
-          <path id="pax-route-svg" d="M100 500 L100 220 L280 220 L280 90" stroke="#4fe36a" stroke-width="4.5" fill="none" stroke-linecap="round" opacity="0" style="stroke-dasharray:700;stroke-dashoffset:700;"/>
+          <path id="pax-route-svg" d="M100 500 L100 220 L280 220 L280 90" stroke="var(--gold)" stroke-width="4.5" fill="none" stroke-linecap="round" opacity="0" style="stroke-dasharray:700;stroke-dashoffset:700;"/>
         </svg>
 
         <!-- CARRO DO PASSAGEIRO -->
@@ -619,8 +689,13 @@ html, body{
 
         <!-- 1. PANE IDLE -->
         <div class="sheet-pane on" id="pane-idle">
-          <div class="sheet-title" id="pax-greeting">Boa tarde, Elisabete</div>
-          <div class="sheet-subtitle" id="pax-sub-prompt">Para onde vamos em Luanda?</div>
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+            <div>
+              <div class="sheet-title" id="pax-greeting">Boa tarde, Elisabete</div>
+              <div class="sheet-subtitle" id="pax-sub-prompt">Para onde vamos em Luanda?</div>
+            </div>
+            <button onclick="requestGPSLocation('pax')" style="background:var(--ink3);border:1px solid var(--line);border-radius:8px;padding:5px 8px;font-size:10px;color:var(--gold);cursor:pointer;font-weight:700;">📍 Meu GPS</button>
+          </div>
 
           <div class="input-field-card" onclick="paxTo('dest')">
             <span class="sq-dot a"></span><span id="pax-orig-text">Talatona, Rua Principal</span>
@@ -650,7 +725,7 @@ html, body{
           <div class="sheet-title">Definir trajecto</div>
           <div class="sheet-subtitle">Endereço e ponto de referência para o motorista</div>
           <div class="input-field-card"><span class="sq-dot a"></span><span id="pax-orig-text2">Talatona, Rua Principal</span></div>
-          <div class="input-field-card" style="background:#1b211a;border:1px dashed var(--grnd);">
+          <div class="input-field-card" style="background:#1b211a;border:1px dashed var(--gold);">
             <span class="sq-dot ref"></span>
             <input type="text" id="inp-ponto-ref" placeholder="Ponto de referência (ex: próx. à bomba Sonangol)">
           </div>
@@ -668,15 +743,15 @@ html, body{
             <div style="font-weight:700;margin-bottom:6px;color:#fff;">Dados do destinatário (quem recebe):</div>
             <input type="text" id="deliv-dest-name" placeholder="Nome completo do destinatário" value="Manuel Kiala" style="width:100%;background:var(--ink2);border:1px solid var(--line);border-radius:8px;padding:8px;color:#fff;font-family:var(--f);font-size:12px;margin-bottom:6px;outline:none;">
             <input type="text" id="deliv-dest-phone" placeholder="Telefone (+244 9XX XXX XXX)" value="+244 923 888 777" style="width:100%;background:var(--ink2);border:1px solid var(--line);border-radius:8px;padding:8px;color:#fff;font-family:var(--f);font-size:12px;outline:none;">
-            <div style="font-size:10.5px;color:var(--mut);margin-top:6px;">PIN de segurança para entrega: <b style="color:var(--grn);">8 3 1 4</b></div>
+            <div style="font-size:10.5px;color:var(--mut);margin-top:6px;">PIN de segurança para entrega: <b style="color:var(--gold);">8 3 1 4</b></div>
           </div>
-          <button class="main-action-btn btn-green" onclick="paxTo('tier')">Continuar para opções de envio</button>
+          <button class="main-action-btn btn-gold" onclick="paxTo('tier')">Continuar para opções de envio</button>
         </div>
 
         <!-- 4. PANE GIRO CARGA (PRESETS, PESO & AJUDANTES) -->
         <div class="sheet-pane" id="pane-cargo">
           <div class="sheet-title">Descrição da Carga</div>
-          <div class="sheet-subtitle">Selecção rápida de volumes para cálculo de peso e cubagem</div>
+          <div class="sheet-subtitle">Selecção rápida de volumes para cálculo de peso e cubagem (+50% frete estruturado)</div>
 
           <div style="font-size:11px;font-weight:700;margin-bottom:6px;color:var(--cargo);">Itens típicos em Angola (Cubagem rápida):</div>
           <div class="cargo-preset-grid">
@@ -691,7 +766,7 @@ html, body{
           <div class="offer-box">
             <div>
               <b>Ajudantes para carregamento</b>
-              <small style="display:block;color:var(--mut);font-size:10px;">+8.000 Kz por ajudante profissional</small>
+              <small style="display:block;color:var(--mut);font-size:10px;">+12.000 Kz por ajudante profissional</small>
             </div>
             <div class="offer-controls">
               <button class="offer-btn" onclick="updateHelpersDelta(-1)">−</button>
@@ -727,7 +802,7 @@ html, body{
           <!-- EXTRAS CARGA -->
           <div id="cargo-extras-container" style="display:none;margin-bottom:8px;">
             <div class="input-field-card" onclick="toggleCargoInsurance()">
-              <div><b>Seguro de Carga GIRO Protect</b><small style="color:var(--mut);display:block;font-size:10.5px;">2% do valor declarado (mín. 3.000 Kz)</small></div>
+              <div><b>Seguro de Carga GIRO Protect</b><small style="color:var(--mut);display:block;font-size:10.5px;">2% do valor declarado (mín. 4.500 Kz)</small></div>
               <div class="toggle-switch" id="sw-cargo-insurance" style="margin-left:auto;"></div>
             </div>
             <div class="input-field-card" onclick="toggleCargoUrgent()">
@@ -742,13 +817,13 @@ html, body{
             <span>💳</span><span id="selected-pay-text">Multicaixa Express</span><span style="margin-left:auto;color:var(--mut);">›</span>
           </div>
           <div class="pay-options-list" id="pay-options-drawer">
-            <div class="pay-opt-row on" onclick="selectPaymentMethod(this,'Multicaixa Express')"><span>💳</span>Multicaixa Express</div>
+            <div class="pay-opt-row on" onclick="selectPaymentMethod(this,'Multicaixa Express')"><span>💳</span>Multicaixa Express (Automático)</div>
             <div class="pay-opt-row" onclick="selectPaymentMethod(this,'Unitel Money')"><span>📱</span>Unitel Money</div>
-            <div class="pay-opt-row" onclick="selectPaymentMethod(this,'Kwik')"><span>⚡</span>Kwik</div>
+            <div class="pay-opt-row" onclick="selectPaymentMethod(this,'Kwik')"><span>⚡</span>Kwik (Transferência Instantânea)</div>
             <div class="pay-opt-row" onclick="selectPaymentMethod(this,'Dinheiro')"><span>💵</span>Dinheiro no local</div>
           </div>
 
-          <button class="main-action-btn btn-green" id="btn-confirm-tier" onclick="paxTo('search')">Confirmar pedido</button>
+          <button class="main-action-btn btn-gold" id="btn-confirm-tier" onclick="paxTo('search')">Confirmar pedido</button>
         </div>
 
         <!-- 6. PANE BUSCA -->
@@ -760,30 +835,32 @@ html, body{
           <button class="main-action-btn btn-ghost" onclick="paxTo('idle')">Cancelar</button>
         </div>
 
-        <!-- 7. PANE VIAGEM EM ANDAMENTO -->
+        <!-- 7. PANE VIAGEM EM ANDAMENTO (TELA CLARA / CLEAN A PEDIDO DO CLIENTE) -->
         <div class="sheet-pane" id="pane-trip">
-          <div class="driver-card">
-            <div class="avatar-badge" id="trip-driver-avatar">DM</div>
-            <div>
-              <div class="driver-name" id="trip-driver-name">Domingos Manuel</div>
-              <div class="driver-meta" id="trip-driver-meta">★ 4.9 · Toyota Corolla cinza</div>
+          <div class="clean-trip-card">
+            <div class="driver-card">
+              <div class="avatar-badge" id="trip-driver-avatar">DM</div>
+              <div>
+                <div class="driver-name" id="trip-driver-name">Domingos Manuel</div>
+                <div class="driver-meta" id="trip-driver-meta">★ 4.9 · Toyota Corolla cinza</div>
+              </div>
+              <div class="plate-tag"><b id="trip-driver-plate">LD-23-45-AA</b><small>Matrícula</small></div>
             </div>
-            <div class="plate-tag"><b id="trip-driver-plate">LD-23-45-AA</b><small>Matrícula</small></div>
-          </div>
 
-          <div class="fare-details-box" style="margin-top:0;">
-            <div class="fare-line">
-              <span id="trip-code-label">Código de recolha</span>
-              <b style="letter-spacing:.25em;color:var(--grn);font-size:15px;" id="trip-code-val">4 7 2 9</b>
+            <div class="fare-details-box" style="margin-top:0;">
+              <div class="fare-line">
+                <span id="trip-code-label">Código de segurança</span>
+                <b style="letter-spacing:.25em;color:#0b7a2d;font-size:16px;" id="trip-code-val">4 7 2 9</b>
+              </div>
+              <div class="fare-line"><span id="trip-code-hint">Diga o código ao motorista antes de embarcar</span></div>
             </div>
-            <div class="fare-line"><span id="trip-code-hint">Diga o código ao motorista antes de embarcar</span></div>
-          </div>
 
-          <div class="quick-action-grid">
-            <button class="quick-action-btn" onclick="alert('Chat seguro GIRO aberto.')"><i>💬</i>Chat</button>
-            <button class="quick-action-btn" onclick="alert('A ligar para o motorista (+244 923 111 222)...')"><i>📞</i>Ligar</button>
-            <button class="quick-action-btn" onclick="openShareModal()"><i>↗</i>Partilhar</button>
-            <button class="quick-action-btn" onclick="simulateDeviateAlert()"><i>⚠</i>Simular Desvio</button>
+            <div class="quick-action-grid" style="display:flex;gap:6px;margin:10px 0 0;">
+              <button class="clean-quick-action-btn" onclick="alert('Chat seguro GIRO aberto com o condutor.')"><i>💬</i>Chat</button>
+              <button class="clean-quick-action-btn" onclick="alert('A ligar para o motorista (+244 923 111 222)...')"><i>📞</i>Ligar</button>
+              <button class="clean-quick-action-btn" onclick="openShareModal()"><i>↗</i>Partilhar</button>
+              <button class="clean-quick-action-btn" onclick="simulateDeviateAlert()"><i>⚠</i>Desvio</button>
+            </div>
           </div>
 
           <!-- BOTÃO SOS PASSAGEIRO -->
@@ -817,14 +894,14 @@ html, body{
           </div>
 
           <div id="end-cargo-proof-box" style="display:none;background:var(--ink3);border-radius:12px;padding:11px;margin-bottom:10px;text-align:center;">
-            <b style="font-size:12px;color:var(--grn);display:block;margin-bottom:4px;">📸 Comprovativo digital de entrega registado</b>
+            <b style="font-size:12px;color:var(--gold);display:block;margin-bottom:4px;">📸 Comprovativo digital de entrega registado</b>
             <div style="background:#131713;border:1px dashed var(--line);border-radius:8px;padding:10px;font-size:11px;color:var(--mut);">
               Receptor: <b style="color:#fff;">Manuel Kiala</b> · Validado via PIN 8314
             </div>
           </div>
 
           <div class="fare-details-box" id="end-fare-box"></div>
-          <button class="main-action-btn btn-green" onclick="paxTo('idle')">Concluir</button>
+          <button class="main-action-btn btn-gold" onclick="paxTo('idle')">Concluir</button>
         </div>
 
       </div>
@@ -834,19 +911,33 @@ html, body{
          VISTA 2: MOTORISTA & ESTAFETA
          ======================================================================== -->
     <section class="view-section" id="view-drv">
+      <!-- ALERTA PEER-TO-PEER (COLEGA EM PERIGO / SOS REDE) -->
+      <div class="peer-sos-banner" id="peer-sos-alert-banner">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+          <span style="background:var(--red);color:#fff;font-size:10px;font-weight:900;padding:2px 7px;border-radius:5px;">🚨 COLEGA EM SINISTRO / SOCORRO</span>
+          <small style="color:#ffc2c7;font-size:10.5px;font-weight:700;">A 1,4 km de si</small>
+        </div>
+        <div style="font-size:12.5px;font-weight:800;color:#fff;" id="peer-sos-victim-name">Domingos Manuel (Corolla LD-23-45-AA)</div>
+        <div style="font-size:11px;color:#ffebeb;margin:2px 0 8px;" id="peer-sos-location">Localização: Rua Principal do Talatona (Próx. à Sonangol)</div>
+        <div class="two-btn-row">
+          <button class="main-action-btn btn-ghost" style="padding:7px;font-size:11px;" onclick="dismissPeerSos()">Dispensar</button>
+          <button class="main-action-btn btn-red" style="padding:7px;font-size:11px;" onclick="acceptPeerSupport()">📍 Ir Apoiar Colega (Navegar)</button>
+        </div>
+      </div>
+
       <div class="map-canvas">
         <svg viewBox="0 0 400 800" preserveAspectRatio="xMidYMid slice">
-          <rect width="400" height="800" fill="#101410"/>
-          <path d="M-20 250 H420" stroke="#252a22" stroke-width="26"/>
-          <path d="M-20 500 H420" stroke="#252a22" stroke-width="20"/>
-          <path d="M120 -20 V820" stroke="#252a22" stroke-width="22"/>
-          <path d="M290 -20 V820" stroke="#252a22" stroke-width="16"/>
-          <path d="M-20 380 L420 350" stroke="#1e2320" stroke-width="12"/>
-          <path id="drv-route-svg" d="M120 500 L120 250 L290 250" stroke="#4fe36a" stroke-width="4.5" fill="none" stroke-linecap="round" opacity="0"/>
+          <rect width="400" height="800" fill="#0d110d"/>
+          <path d="M-20 250 H420" stroke="#222820" stroke-width="26"/>
+          <path d="M-20 500 H420" stroke="#222820" stroke-width="20"/>
+          <path d="M120 -20 V820" stroke="#222820" stroke-width="22"/>
+          <path d="M290 -20 V820" stroke="#222820" stroke-width="16"/>
+          <path d="M-20 380 L420 350" stroke="#1b211a" stroke-width="12"/>
+          <path id="drv-route-svg" d="M120 500 L120 250 L290 250" stroke="var(--gold)" stroke-width="4.5" fill="none" stroke-linecap="round" opacity="0"/>
         </svg>
 
         <div class="map-car" id="drv-car-el" style="left:120px;top:500px;">
-          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="11" fill="#4fe36a"/><path d="M6.5 13.5v-2.2l1.3-3a1 1 0 0 1 .9-.6h6.6a1 1 0 0 1 .9.6l1.3 3v2.2a.8.8 0 0 1-.8.8h-.6a.8.8 0 0 1-.8-.8v-.4H8.7v.4a.8.8 0 0 1-.8.8h-.6a.8.8 0 0 1-.8-.8Z" fill="#07130a"/></svg>
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="11" fill="#d4af37"/><path d="M6.5 13.5v-2.2l1.3-3a1 1 0 0 1 .9-.6h6.6a1 1 0 0 1 .9.6l1.3 3v2.2a.8.8 0 0 1-.8.8h-.6a.8.8 0 0 1-.8-.8v-.4H8.7v.4a.8.8 0 0 1-.8.8h-.6a.8.8 0 0 1-.8-.8Z" fill="#060706"/></svg>
         </div>
         <div class="map-pin b" id="drv-pin-target" style="left:290px;top:250px;opacity:0;"><div class="pin-label" id="drv-pin-label">Elisabete C.</div><div class="pin-circle"></div></div>
         <div class="map-overlay-grad"></div>
@@ -861,8 +952,9 @@ html, body{
         <div id="drv-home-dock">
           <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;background:var(--ink3);border-radius:10px;padding:6px 10px;">
             <span style="font-size:11px;color:var(--mut);">Perfil de Condução:</span>
-            <select id="drv-role-select" onchange="toggleDriverRole()" style="background:none;border:none;color:var(--grn);font-family:var(--f);font-weight:700;font-size:11px;outline:none;cursor:pointer;">
+            <select id="drv-role-select" onchange="toggleDriverRole()" style="background:none;border:none;color:var(--gold);font-family:var(--f);font-weight:700;font-size:11px;outline:none;cursor:pointer;">
               <option value="pax" style="background:var(--ink2);color:#fff;">Passageiros (Carro)</option>
+              <option value="moto" style="background:var(--ink2);color:var(--amb);">Passageiros (Moto / Kupapata)</option>
               <option value="cargo" style="background:var(--ink2);color:var(--cargo);">Carga (Van / Camião)</option>
             </select>
           </div>
@@ -878,11 +970,11 @@ html, body{
           <div class="driver-stats-grid">
             <div><b id="drv-net-today">15.470 Kz</b><small>líquido hoje</small></div>
             <div><b id="drv-rides-count">9</b><small>serviços</small></div>
-            <div><b>4.9</b><small>avaliação</small></div>
+            <div><b style="color:#fff;">4.9</b><small>avaliação</small></div>
           </div>
 
           <div class="mode-switch-bar">
-            <button class="mode-tab on" data-target="dsub-sos" onclick="switchDriverSubTab(this)">Segurança</button>
+            <button class="mode-tab on" data-target="dsub-sos" onclick="switchDriverSubTab(this)">Segurança & SOS</button>
             <button class="mode-tab" data-target="dsub-wal" onclick="switchDriverSubTab(this)">Carteira (15%)</button>
             <button class="mode-tab" data-target="dsub-his" onclick="switchDriverSubTab(this)">Histórico</button>
           </div>
@@ -892,24 +984,30 @@ html, body{
               <div class="sos-fill-bar" id="drv-sos-fill-bar"></div>
               <div class="sos-hold-content">
                 <div class="sos-hold-icon">⚠</div>
-                <div class="sos-hold-text"><b>Botão de Pânico (SOS)</b><small>Mantenha pressionado 3 segundos</small></div>
+                <div class="sos-hold-text"><b>Botão de Pânico (SOS Motorista)</b><small>Alerta Central 24h e colegas na área (3s)</small></div>
               </div>
             </button>
+
+            <div style="margin-top:8px;display:flex;gap:6px;">
+              <button onclick="simulatePeerAlert()" style="flex:1;background:var(--ink3);border:1px solid var(--line);border-radius:8px;padding:6px;color:var(--mut);font-size:10px;cursor:pointer;">Simular Alerta de Colega em Perigo</button>
+              <button onclick="requestGPSLocation('drv')" style="background:var(--ink3);border:1px solid var(--line);border-radius:8px;padding:6px;color:var(--gold);font-size:10px;cursor:pointer;font-weight:700;">📍 Testar GPS</button>
+            </div>
+
             <div class="fare-details-box" style="margin-top:8px;margin-bottom:0;">
-              <div class="fare-line"><span>Contacto de emergência</span><b>Rebeca M. (+244 924 ***)</b></div>
+              <div class="fare-line"><span>Rede de Protecção de Colegas</span><b style="color:var(--gold);">Activa (Raio 5 km)</b></div>
               <div class="fare-line"><span>Gravação áudio telemétrica</span><b style="color:var(--grn);">Activa</b></div>
-              <div class="fare-line"><span>Central GIRO 24h</span><b style="color:var(--grn);">Online</b></div>
+              <div class="fare-line"><span>Central GIRO & Polícia 24h</span><b style="color:var(--grn);">Online</b></div>
             </div>
           </div>
 
           <div class="dsub-pane" id="dsub-wal" style="display:none;">
-            <div style="background:linear-gradient(135deg,var(--grndeep),var(--ink3));border-radius:14px;padding:14px;margin-bottom:10px;">
-              <small style="font-size:10.5px;color:var(--mut);">Saldo disponível</small>
-              <b style="font-size:24px;font-weight:800;display:block;margin:3px 0;" id="drv-wallet-balance">47.320 Kz</b>
-              <div style="font-size:10.5px;color:var(--grn);">Levantamento via Multicaixa Express</div>
+            <div style="background:linear-gradient(135deg,var(--gold-deep),var(--ink3));border-radius:14px;padding:14px;margin-bottom:10px;border:1px solid var(--gold-dark);">
+              <small style="font-size:10.5px;color:var(--mut);">Saldo disponível para levantamento</small>
+              <b style="font-size:24px;font-weight:800;display:block;margin:3px 0;color:var(--gold);" id="drv-wallet-balance">47.320 Kz</b>
+              <div style="font-size:10.5px;color:#fff;">Conta cadastrada: <b style="color:var(--gold);" id="drv-account-preview">Multicaixa Express (923 111 222)</b></div>
             </div>
             <div class="fare-details-box" id="drv-wallet-breakdown"></div>
-            <button class="main-action-btn btn-green" onclick="alert('Transferência enviada para a sua conta via Multicaixa Express.')">Levantar saldo</button>
+            <button class="main-action-btn btn-gold" onclick="openWithdrawModal()">Levantar Saldo da Carteira</button>
           </div>
 
           <div class="dsub-pane" id="dsub-his" style="display:none;">
@@ -920,7 +1018,7 @@ html, body{
         <!-- EM SERVIÇO (MOTORISTA) -->
         <div id="drv-active-trip-dock" style="display:none;">
           <div class="driver-card">
-            <div class="avatar-badge">EC</div>
+            <div class="avatar-badge" style="background:var(--gold);color:#060706;">EC</div>
             <div>
               <div class="driver-name" id="drv-client-name">Elisabete C.</div>
               <div class="driver-meta" id="drv-trip-leg-text">Recolha · Talatona, Rua Principal</div>
@@ -940,13 +1038,13 @@ html, body{
             <button class="main-action-btn btn-ghost" style="padding:10px;font-size:12px;" onclick="alert('Navegação GPS Waze/Maps iniciada.')">🧭 Navegar</button>
           </div>
 
-          <button class="main-action-btn btn-green" id="drv-step-action-btn" onclick="advanceDriverTrip()" style="margin-bottom:9px;">Cheguei ao local</button>
+          <button class="main-action-btn btn-gold" id="drv-step-action-btn" onclick="advanceDriverTrip()" style="margin-bottom:9px;">Cheguei ao local</button>
 
           <button class="sos-hold-btn" id="drv-sos-hold-btn2">
             <div class="sos-fill-bar" id="drv-sos-fill-bar2"></div>
             <div class="sos-hold-content">
               <div class="sos-hold-icon">⚠</div>
-              <div class="sos-hold-text"><b>Botão de Pânico (SOS)</b><small>Mantenha pressionado 3 segundos</small></div>
+              <div class="sos-hold-text"><b>Botão de Pânico (SOS)</b><small>Alerta Central e colegas da área (3s)</small></div>
             </div>
           </button>
         </div>
@@ -957,7 +1055,7 @@ html, body{
         <div class="req-timeout-bar" id="drv-req-timeout"><i></i></div>
         <div id="drv-req-badge"></div>
         <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;">
-          <div><small style="color:var(--mut);font-size:10px;">Recebe líquido (após 15% GIRO)</small><div style="font-size:22px;font-weight:900;" id="req-net-amount">—</div></div>
+          <div><small style="color:var(--mut);font-size:10px;">Recebe líquido (após 15% GIRO)</small><div style="font-size:22px;font-weight:900;color:var(--gold);" id="req-net-amount">—</div></div>
           <div style="text-align:right;"><small style="color:var(--mut);font-size:10px;">Tarifa Bruta</small><div style="font-size:13px;font-weight:700;" id="req-gross-amount">—</div></div>
         </div>
         <div style="display:flex;gap:10px;padding:4px 0;font-size:12px;">
@@ -970,7 +1068,7 @@ html, body{
         </div>
         <div class="two-btn-row" style="margin-top:10px;">
           <button class="main-action-btn btn-ghost" onclick="declineIncomingTrip()">Recusar</button>
-          <button class="main-action-btn btn-green" onclick="acceptIncomingTrip()">Aceitar</button>
+          <button class="main-action-btn btn-gold" onclick="acceptIncomingTrip()">Aceitar</button>
         </div>
       </div>
     </section>
@@ -1002,7 +1100,7 @@ html, body{
               <div><b style="font-size:15px;color:var(--cargo);" id="cen-kpi-cargo">24</b><small style="display:block;font-size:9.5px;color:var(--mut);">entregas de carga</small></div>
               <div><b style="font-size:15px;color:var(--red);" id="cen-kpi-sos">0</b><small style="display:block;font-size:9.5px;color:var(--mut);">SOS activos</small></div>
             </div>
-            <div style="font-size:11px;color:var(--grn);font-weight:600;">Central Humana Activa · Operador: Mateus V.</div>
+            <div style="font-size:11px;color:var(--gold);font-weight:600;">Central Humana Activa · Operador: Mateus V.</div>
           </div>
 
           <div style="flex:1;overflow-y:auto;padding:14px;">
@@ -1028,7 +1126,7 @@ html, body{
             <div style="background:var(--ink2);border:1px solid var(--line);border-radius:14px;padding:14px;">
               <h4 style="font-size:13px;margin-bottom:8px;">Comparativo de Comissão Cobrada ao Motorista</h4>
               <div style="font-size:11.5px;color:var(--mut);line-height:1.6;">
-                • Heetch: 11,4% | Yango: 13% | <b style="color:var(--grn);">GIRO: 15%</b> | UGo: 20% | Tirosa: 20% | Kubinga: 25%
+                • Heetch: 11,4% | Yango: 13% | <b style="color:var(--gold);">GIRO: 15%</b> | UGo: 20% | Tirosa: 20% | Kubinga: 25%
               </div>
             </div>
           </div>
@@ -1039,17 +1137,144 @@ html, body{
   </main>
 
   <!-- ==========================================================================
-       OVERLAYS GLOBAIS DE SOS & MODAIS
+       MODAIS DE AUTENTICAÇÃO, CADASTRO, DOCUMENTOS & LEVANTAMENTO
        ========================================================================== -->
+  <!-- MODAL DE CADASTRO E LOGIN (MOTORISTA / PASSAGEIRO) -->
+  <div class="modal-backdrop" id="auth-modal-el">
+    <div class="modal-window">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+        <h3 style="font-size:15px;color:#fff;" id="auth-modal-title">Cadastro de Motorista GIRO</h3>
+        <button onclick="closeAuthModal()" style="background:none;border:none;color:var(--mut);font-size:16px;cursor:pointer;">✕</button>
+      </div>
+
+      <div class="mode-switch-bar" style="margin-bottom:12px;">
+        <button class="mode-tab on" id="auth-tab-driver" onclick="switchAuthRole('driver')">🚗 Condutor</button>
+        <button class="mode-tab" id="auth-tab-pax" onclick="switchAuthRole('pax')">👤 Passageiro</button>
+      </div>
+
+      <!-- FORMULÁRIO MOTORISTA -->
+      <form id="form-driver-auth" onsubmit="handleDriverRegister(event)">
+        <div class="auth-input-group">
+          <label>Categoria de Transporte *</label>
+          <select id="reg-drv-type" onchange="updateDriverFormFields()" required>
+            <option value="carro">Carro de Passageiros (Económico / Conforto)</option>
+            <option value="moto">Moto Táxi (Kupapata / Rápido no Trânsito)</option>
+            <option value="carga">Carga & Frete (Van / Camião Ligeiro ou Médio)</option>
+          </select>
+        </div>
+
+        <div class="auth-input-group">
+          <label>Nome Completo *</label>
+          <input type="text" id="reg-drv-name" placeholder="Ex: Mateus Domingos Kiala" required>
+        </div>
+
+        <div class="auth-input-group">
+          <label>Telefone Unitel / Africell (+244) *</label>
+          <input type="tel" id="reg-drv-phone" placeholder="+244 923 000 000" required>
+        </div>
+
+        <div class="auth-input-group">
+          <label>Número do B.I. (Bilhete de Identidade) *</label>
+          <input type="text" id="reg-drv-bi" placeholder="Ex: 004829182LA041" required>
+        </div>
+
+        <div class="auth-input-group">
+          <label>Carta de Condução / Matrícula do Veículo *</label>
+          <input type="text" id="reg-drv-plate" placeholder="Matrícula: LD-00-00-AA" required>
+        </div>
+
+        <div class="auth-input-group">
+          <label>Canal de Recebimento dos Ganhos (15% Comissão GIRO) *</label>
+          <select id="reg-drv-payout-type" required>
+            <option value="express">Multicaixa Express (Número de Telemóvel)</option>
+            <option value="iban">Transferência Bancária (IBAN Angolano AO06...)</option>
+            <option value="unitel_money">Unitel Money</option>
+          </select>
+        </div>
+
+        <div class="auth-input-group">
+          <label>Dado do Recebimento (Telefone Express ou IBAN) *</label>
+          <input type="text" id="reg-drv-payout-val" placeholder="+244 923 111 222 ou AO06..." required>
+        </div>
+
+        <div class="auth-input-group">
+          <label>Comprovativo de Residência / Registo Policial</label>
+          <div class="doc-upload-box" id="drv-doc-box" onclick="simulateDocUpload('drv-doc-box', 'Documentos Validados Digitalmente')">
+            <span style="font-size:16px;">📄</span>
+            <div style="font-size:10.5px;color:var(--mut);" id="drv-doc-box-text">Toque para anexar foto do B.I. e Atestado</div>
+          </div>
+        </div>
+
+        <button type="submit" class="main-action-btn btn-gold" style="margin-top:12px;">Concluir Cadastro & Ficar Apto</button>
+      </form>
+
+      <!-- FORMULÁRIO PASSAGEIRO -->
+      <form id="form-pax-auth" style="display:none;" onsubmit="handlePaxRegister(event)">
+        <div class="auth-input-group">
+          <label>Nome Completo *</label>
+          <input type="text" id="reg-pax-name" placeholder="Ex: Elisabete Carvalho" required>
+        </div>
+
+        <div class="auth-input-group">
+          <label>Telefone para Confirmação (+244) *</label>
+          <input type="tel" id="reg-pax-phone" placeholder="+244 924 000 000" required>
+        </div>
+
+        <div class="auth-input-group">
+          <label>Número do B.I. (Verificação de Segurança) *</label>
+          <input type="text" id="reg-pax-bi" placeholder="Ex: 005912443LA032" required>
+        </div>
+
+        <div class="auth-input-group">
+          <label>Comprovativo de Endereço / Bairro *</label>
+          <input type="text" id="reg-pax-addr" placeholder="Ex: Talatona, Condomínio das Acácias" required>
+        </div>
+
+        <div class="auth-input-group">
+          <label>Foto do B.I. ou Comprovativo (Opcional no registo rápido)</label>
+          <div class="doc-upload-box" id="pax-doc-box" onclick="simulateDocUpload('pax-doc-box', 'B.I. Anexado com Sucesso')">
+            <span style="font-size:16px;">🪪</span>
+            <div style="font-size:10.5px;color:var(--mut);" id="pax-doc-box-text">Toque para carregar foto do B.I.</div>
+          </div>
+        </div>
+
+        <button type="submit" class="main-action-btn btn-gold" style="margin-top:12px;">Salvar Perfil de Passageiro</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL DE LEVANTAMENTO CARTEIRA MOTORISTA -->
+  <div class="modal-backdrop" id="withdraw-modal-el">
+    <div class="modal-window">
+      <h3 style="font-size:14.5px;margin-bottom:6px;color:#fff;">Levantamento de Ganhos</h3>
+      <p style="font-size:11.5px;color:var(--mut);margin-bottom:12px;">Transfira o seu saldo acumulado directo para a sua conta.</p>
+      
+      <div style="background:var(--ink3);padding:10px;border-radius:10px;font-size:11.5px;margin-bottom:12px;">
+        Saldo Total: <b style="color:var(--gold);" id="withdraw-modal-bal">47.320 Kz</b><br>
+        Destino: <span id="withdraw-modal-dest" style="color:#fff;">Multicaixa Express (923 111 222)</span>
+      </div>
+
+      <div class="auth-input-group">
+        <label>Valor a levantar (Kz):</label>
+        <input type="number" id="inp-withdraw-amt" value="47320" min="1000">
+      </div>
+
+      <div class="two-btn-row">
+        <button class="main-action-btn btn-ghost" onclick="closeWithdrawModal()">Cancelar</button>
+        <button class="main-action-btn btn-gold" onclick="executeWithdraw()">Confirmar Envio</button>
+      </div>
+    </div>
+  </div>
+
   <!-- OVERLAY SOS GERAL -->
   <div class="sos-fullscreen-overlay" id="global-sos-overlay">
     <div class="sos-pulse-ring"></div>
     <h2 id="sos-overlay-title">Alerta SOS de Emergência</h2>
-    <p id="sos-overlay-subtitle">A Central GIRO 24h e o Comando da Polícia Nacional receberam a telemetria ao vivo.</p>
+    <p id="sos-overlay-subtitle">A Central GIRO 24h, a Polícia Nacional e todos os parceiros na área receberam o alerta.</p>
     <div class="sos-checklist">
-      <div class="sos-check-item done"><i>✓</i>Coordenadas GPS transmitidas com precisão</div>
+      <div class="sos-check-item done"><i>✓</i>Coordenadas GPS transmitidas ao vivo</div>
       <div class="sos-check-item done"><i>✓</i>Operador Mateus V. assumiu a ocorrência</div>
-      <div class="sos-check-item done"><i>✓</i>Esquadra mais próxima accionada</div>
+      <div class="sos-check-item done"><i>✓</i>Esquadra mais próxima e rede de colegas avisados</div>
       <div class="sos-check-item done"><i>✓</i>Contacto de emergência notificado</div>
     </div>
     <div class="recording-badge"><span class="rec-dot"></span>Canal de áudio e telemetria sincronizados</div>
@@ -1062,11 +1287,11 @@ html, body{
       <h3 style="font-size:14.5px;margin-bottom:6px;color:#fff;">Partilhar viagem ao vivo</h3>
       <p style="font-size:11.5px;color:var(--mut);line-height:1.4;margin-bottom:12px;">O seu contacto de confiança acompanhará a rota e o condutor em tempo real.</p>
       <div style="background:var(--ink3);padding:9px;border-radius:9px;font-size:11px;margin-bottom:12px;">
-        Contacto: <b style="color:var(--grn);">Rebeca M. (+244 924 111 222)</b>
+        Contacto: <b style="color:var(--gold);">Rebeca M. (+244 924 111 222)</b>
       </div>
       <div class="two-btn-row">
         <button class="main-action-btn btn-ghost" onclick="closeShareModal()">Fechar</button>
-        <button class="main-action-btn btn-green" onclick="alert('Ligação de rastreio enviada por WhatsApp e SMS com sucesso!');closeShareModal();">Enviar</button>
+        <button class="main-action-btn btn-gold" onclick="alert('Ligação de rastreio enviada por WhatsApp e SMS com sucesso!');closeShareModal();">Enviar</button>
       </div>
     </div>
   </div>
@@ -1078,7 +1303,7 @@ html, body{
       <p style="font-size:11px;color:var(--mut);margin-bottom:10px;">Defina a data e hora em que precisa da viatura.</p>
       <div style="margin-bottom:8px;">
         <label style="font-size:10.5px;color:var(--mut);display:block;margin-bottom:3px;">Data:</label>
-        <input type="date" id="sched-input-date" value="2026-09-11" style="width:100%;background:var(--ink3);border:1px solid var(--line);border-radius:8px;padding:8px;color:#fff;font-family:var(--f);font-size:12px;outline:none;">
+        <input type="date" id="sched-input-date" value="2026-09-15" style="width:100%;background:var(--ink3);border:1px solid var(--line);border-radius:8px;padding:8px;color:#fff;font-family:var(--f);font-size:12px;outline:none;">
       </div>
       <div style="margin-bottom:12px;">
         <label style="font-size:10.5px;color:var(--mut);display:block;margin-bottom:3px;">Hora:</label>
@@ -1094,11 +1319,11 @@ html, body{
 </div>
 
 <!-- ==========================================================================
-     MOTOR JAVASCRIPT NATIVO (WEB AUDIO, PWA, TELÊMETRIA & REGRAS DE NEGÓCIO)
+     MOTOR JAVASCRIPT NATIVO (GPS, PEER-TO-PEER SOS, CADASTRO, TARIFAS & REGRAS)
      ========================================================================== -->
 <script>
 /* ==========================================================================
-   1. SÍNTESE DE ÁUDIO NATIVA (WEB AUDIO API - ZERO FICHEIROS EXTERNOS)
+   1. SÍNTESE DE ÁUDIO NATIVA (WEB AUDIO API)
    ========================================================================== */
 let audioCtx = null;
 function getAudioContext() {
@@ -1115,7 +1340,7 @@ function playHapticSound(type) {
       const osc = ctx.createOscillator();
       const gain = ctx.createGain();
       osc.type = 'sine';
-      osc.frequency.setValueAtTime(800, ctx.currentTime);
+      osc.frequency.setValueAtTime(850, ctx.currentTime);
       gain.gain.setValueAtTime(0.12, ctx.currentTime);
       gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.15);
       osc.connect(gain); gain.connect(ctx.destination);
@@ -1139,7 +1364,7 @@ function playHapticSound(type) {
       osc.frequency.setValueAtTime(960, ctx.currentTime);
       osc.frequency.setValueAtTime(600, ctx.currentTime + 0.2);
       osc.frequency.setValueAtTime(960, ctx.currentTime + 0.4);
-      gain.gain.setValueAtTime(0.2, ctx.currentTime);
+      gain.gain.setValueAtTime(0.25, ctx.currentTime);
       gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.6);
       osc.connect(gain); gain.connect(ctx.destination);
       osc.start(); osc.stop(ctx.currentTime + 0.6);
@@ -1153,32 +1378,34 @@ function playHapticSound(type) {
 }
 
 /* ==========================================================================
-   2. CONFIGURAÇÃO TARIFÁRIA ANGOLANA & TABELAS DE DADOS
+   2. CONFIGURAÇÃO TARIFÁRIA ANGOLANA (MOTO -15%, CARGA +50%, COMISSÃO 15%)
    ========================================================================== */
 const T_PAX = { base: 550, km: 240, min: 32, minimo: 1200, comissao: 0.15 };
 
 const TIERS_PAX = [
-  { id: 'moto', nome: 'GIRO Moto', desc: '1 lugar · rápido no trânsito', mult: 0.55, cor: '#f0b429', eta: 3,
+  // GIRO Moto com 15% de desconto promocional / alta competitividade
+  { id: 'moto', nome: 'GIRO Moto (Kupapata)', desc: '1 lugar · rápido no trânsito (−15%)', mult: 0.4675, cor: '#f0b429', eta: 3,
     svg: '<svg viewBox="0 0 40 26"><circle cx="8" cy="19" r="5" fill="none" stroke="#f0b429" stroke-width="2.4"/><circle cx="32" cy="19" r="5" fill="none" stroke="#f0b429" stroke-width="2.4"/><path d="M8 19l7-8h9l4 8M17 11l-3-4h-4" stroke="#f0b429" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>' },
   { id: 'eco', nome: 'GIRO Económico', desc: '4 lugares · o mais pedido', mult: 1.0, cor: '#f4f6f1', eta: 4,
     svg: '<svg viewBox="0 0 40 26"><path d="M3 19v-5l3-6.6A1.9 1.9 0 0 1 7.8 6h24.4a1.9 1.9 0 0 1 1.8 1.4L37 14v5a1.3 1.3 0 0 1-1.3 1.3h-1.9A1.3 1.3 0 0 1 32.5 19v-1h-25v1a1.3 1.3 0 0 1-1.3 1.3H4.3A1.3 1.3 0 0 1 3 19Z" fill="#f4f6f1"/></svg>' },
-  { id: 'conf', nome: 'GIRO Conforto', desc: 'Viatura recente · ar condicionado', mult: 1.45, cor: '#4fe36a', eta: 6,
-    svg: '<svg viewBox="0 0 40 26"><path d="M2 20v-6l3.2-7.2A2 2 0 0 1 7.1 5h25.8a2 2 0 0 1 1.9 1.3L38 14v6a1.4 1.4 0 0 1-1.4 1.4h-2.1A1.4 1.4 0 0 1 33.1 20v-1.2H6.9V20a1.4 1.4 0 0 1-1.4 1.4H3.4A1.4 1.4 0 0 1 2 20Z" fill="#4fe36a"/></svg>' },
+  { id: 'conf', nome: 'GIRO Conforto', desc: 'Viatura recente · ar condicionado', mult: 1.45, cor: '#d4af37', eta: 6,
+    svg: '<svg viewBox="0 0 40 26"><path d="M2 20v-6l3.2-7.2A2 2 0 0 1 7.1 5h25.8a2 2 0 0 1 1.9 1.3L38 14v6a1.4 1.4 0 0 1-1.4 1.4h-2.1A1.4 1.4 0 0 1 33.1 20v-1.2H6.9V20a1.4 1.4 0 0 1-1.4 1.4H3.4A1.4 1.4 0 0 1 2 20Z" fill="#d4af37"/></svg>' },
   { id: 'sete', nome: 'GIRO 7', desc: '7 lugares · família ou bagagem', mult: 1.9, cor: '#8d968a', eta: 9,
     svg: '<svg viewBox="0 0 40 26"><path d="M1 21v-7l3.4-8A2.1 2.1 0 0 1 6.4 4h27.2a2.1 2.1 0 0 1 2 1.7L39 14v7a1.5 1.5 0 0 1-1.5 1.5h-2.3A1.5 1.5 0 0 1 33.7 21v-1.3H6.3V21A1.5 1.5 0 0 1 4.8 22.5H2.5A1.5 1.5 0 0 1 1 21Z" fill="#8d968a"/></svg>' }
 ];
 
+// Carga com +50% no frete estruturado para garantir rentabilidade
 const TIERS_CARGO = [
-  { id: 'c_moto', nome: 'GIRO Moto Carga', veiculo: 'Mota com caixa', capacidade: 'até 20 kg / 40×40×40 cm', maxKg: 20, base: 700, km: 180, min: 25, minimo: 1500, eta: 5, cor: '#f0b429',
+  { id: 'c_moto', nome: 'GIRO Moto Carga', veiculo: 'Mota com caixa', capacidade: 'até 20 kg / 40×40×40 cm', maxKg: 20, base: 1050, km: 270, min: 38, minimo: 2250, eta: 5, cor: '#f0b429',
     svg: '<svg viewBox="0 0 40 26"><circle cx="8" cy="19" r="5" fill="none" stroke="#f0b429" stroke-width="2.4"/><circle cx="32" cy="19" r="5" fill="none" stroke="#f0b429" stroke-width="2.4"/><rect x="18" y="7" width="12" height="8" rx="1.5" fill="#f0b429"/></svg>' },
-  { id: 'c_van', nome: 'GIRO Van', veiculo: 'Carrinha fechada', capacidade: 'até 500 kg / 4 m³', maxKg: 500, base: 2500, km: 420, min: 55, minimo: 5000, eta: 8, cor: '#48cae4',
+  { id: 'c_van', nome: 'GIRO Van', veiculo: 'Carrinha fechada', capacidade: 'até 500 kg / 4 m³', maxKg: 500, base: 3750, km: 630, min: 82, minimo: 7500, eta: 8, cor: '#48cae4',
     svg: '<svg viewBox="0 0 40 26"><path d="M2 19v-9l4-4h24l6 5v8a1 1 0 0 1-1 1h-2a1 1 0 0 1-1-1v-1H8v1a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1Z" fill="#48cae4"/></svg>' },
-  { id: 'c_ligeiro', nome: 'GIRO Camião Ligeiro', veiculo: 'Camião caixa aberta 1,5 t', capacidade: 'até 1.500 kg / 9 m³', maxKg: 1500, base: 6000, km: 780, min: 90, minimo: 14000, eta: 12, cor: '#ffb703',
+  { id: 'c_ligeiro', nome: 'GIRO Camião Ligeiro', veiculo: 'Camião caixa aberta 1,5 t', capacidade: 'até 1.500 kg / 9 m³', maxKg: 1500, base: 9000, km: 1170, min: 135, minimo: 21000, eta: 12, cor: '#ffb703',
     svg: '<svg viewBox="0 0 40 26"><path d="M2 19v-4h18V8h12l5 6v5a1 1 0 0 1-1 1h-2a1 1 0 0 1-1-1v-1H8v1a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1Z" fill="#ffb703"/></svg>' },
-  { id: 'c_medio', nome: 'GIRO Camião Médio', veiculo: 'Camião 3,5 t', capacidade: 'até 3.500 kg / 18 m³', maxKg: 3500, base: 12000, km: 1250, min: 140, minimo: 30000, eta: 18, cor: '#fb8500',
+  { id: 'c_medio', nome: 'GIRO Camião Médio', veiculo: 'Camião 3,5 t', capacidade: 'até 3.500 kg / 18 m³', maxKg: 3500, base: 18000, km: 1875, min: 210, minimo: 45000, eta: 18, cor: '#fb8500',
     svg: '<svg viewBox="0 0 40 26"><path d="M1 20v-5h19V6h13l6 8v6a1 1 0 0 1-1 1h-2v-1H8v1H3a1 1 0 0 1-1-1Z" fill="#fb8500"/></svg>' },
-  { id: 'c_mudanca', nome: 'GIRO Mudanças', veiculo: 'Camião com equipa', capacidade: 'até 5.000 kg / 25 m³', maxKg: 5000, base: 25000, km: 1600, min: 180, minimo: 60000, eta: 25, cor: '#4fe36a',
-    svg: '<svg viewBox="0 0 40 26"><path d="M1 20v-6h20V5h13l5 8v7a1 1 0 0 1-1 1h-2v-1H8v1H3a1 1 0 0 1-1-1Z" fill="#4fe36a"/></svg>' }
+  { id: 'c_mudanca', nome: 'GIRO Mudanças', veiculo: 'Camião com equipa', capacidade: 'até 5.000 kg / 25 m³', maxKg: 5000, base: 37500, km: 2400, min: 270, minimo: 90000, eta: 25, cor: '#d4af37',
+    svg: '<svg viewBox="0 0 40 26"><path d="M1 20v-6h20V5h13l5 8v7a1 1 0 0 1-1 1h-2v-1H8v1H3a1 1 0 0 1-1-1Z" fill="#d4af37"/></svg>' }
 ];
 
 const DESTINOS = {
@@ -1248,7 +1475,7 @@ const ESQUADRAS_POLICIA = [
 const kz = n => Math.round(n).toLocaleString('pt-PT') + ' Kz';
 
 /* ==========================================================================
-   3. ESTADO GLOBAL DA APLICAÇÃO (EM MEMÓRIA)
+   3. ESTADO GLOBAL DA APLICAÇÃO
    ========================================================================== */
 let activeView = 'pax'; // 'pax' | 'drv' | 'cen'
 let appMode = 'pax';    // 'pax' | 'delivery' | 'cargo'
@@ -1259,7 +1486,7 @@ let tripKm = 6.2;
 let tripMins = 14;
 let destName = 'Centralidade do Kilamba';
 let stopsList = [];
-let offerMultiplier = 1.0; // Negociação
+let offerMultiplier = 1.0;
 
 let tierIdx = 1;
 let payMethod = 'Multicaixa Express';
@@ -1270,6 +1497,18 @@ let cargoWeight = 350;
 let cargoHelpers = 1;
 let cargoInsurance = false;
 let cargoUrgent = false;
+
+// Perfil de condutor cadastrado
+let registeredDriver = {
+  name: 'Domingos Manuel',
+  phone: '+244 923 111 222',
+  type: 'carro',
+  plate: 'LD-23-45-AA',
+  bi: '004829182LA041',
+  payoutType: 'express',
+  payoutVal: '+244 923 111 222',
+  status: 'Aprovado'
+};
 
 /* ==========================================================================
    4. CÁLCULOS MATEMÁTICOS DE TARIFA
@@ -1284,20 +1523,197 @@ function calculateEffectiveDistance() {
 function calculatePaxPrice(tierObj) {
   const { k, m } = calculateEffectiveDistance();
   const bruto = (T_PAX.base + T_PAX.km * k + T_PAX.min * m) * provMult * tierObj.mult * surgeMult * offerMultiplier;
-  return Math.max(T_PAX.minimo * provMult, bruto);
+  return Math.max(T_PAX.minimo * provMult * (tierObj.id === 'moto' ? 0.85 : 1.0), bruto);
 }
 
 function calculateCargoPrice(tierObj) {
   const { k, m } = calculateEffectiveDistance();
   let baseCalc = (tierObj.base + tierObj.km * k + tierObj.min * m) * provMult;
-  baseCalc += (cargoHelpers * 8000);
-  if (cargoInsurance) baseCalc += Math.max(3000, 150000 * 0.02);
+  baseCalc += (cargoHelpers * 12000);
+  if (cargoInsurance) baseCalc += Math.max(4500, 150000 * 0.02);
   if (cargoUrgent) baseCalc *= 1.3;
   return Math.max(tierObj.minimo * provMult, baseCalc * offerMultiplier);
 }
 
 /* ==========================================================================
-   5. NAVEGAÇÃO DE VISTAS (PASSAGEIRO, MOTORISTA, CENTRAL)
+   5. GEOLOCALIZAÇÃO GPS NATIVA (HTML5 GEOLOCATION API)
+   ========================================================================== */
+function requestGPSLocation(target) {
+  if (!navigator.geolocation) {
+    alert('Geolocalização GPS não suportada neste dispositivo. Usando ponto de rede local.');
+    return;
+  }
+  
+  navigator.geolocation.getCurrentPosition(
+    pos => {
+      const lat = pos.coords.latitude.toFixed(4);
+      const lng = pos.coords.longitude.toFixed(4);
+      const msg = `📍 GPS Detectado com Sucesso:
+Latitude: ${lat}
+Longitude: ${lng}
+Precisão: ${pos.coords.accuracy}m`;
+      if (target === 'pax') {
+        document.getElementById('pax-orig-text').textContent = `Localização Actual GPS (${lat}, ${lng})`;
+        document.getElementById('pax-orig-text2').textContent = `Localização Actual GPS (${lat}, ${lng})`;
+        document.getElementById('pax-origin-lab').textContent = 'Você (GPS)';
+      }
+      playHapticSound('beep');
+      alert(msg);
+    },
+    err => {
+      alert('Aviso GPS: Permissão não concedida ou sinal fraco. Mantendo coordenadas de referência de ' + currentProv.toUpperCase() + '.');
+    },
+    { enableHighAccuracy: true, timeout: 8000, maximumAge: 0 }
+  );
+}
+
+/* ==========================================================================
+   6. PALETA DE CORES (BLACK & GOLD vs EMERALD ORIGINAL)
+   ========================================================================== */
+function toggleThemePalette() {
+  document.body.classList.toggle('theme-emerald');
+  const isEmerald = document.body.classList.contains('theme-emerald');
+  document.getElementById('theme-switch-btn').textContent = isEmerald ? '🌿' : '✨';
+  playHapticSound('beep');
+}
+
+/* ==========================================================================
+   7. CADASTRO & VERIFICAÇÃO DE DOCUMENTOS (B.I., CARTA, PAGAMENTO)
+   ========================================================================== */
+function openAuthModal(role) {
+  document.getElementById('auth-modal-el').classList.add('on');
+  switchAuthRole(role || 'driver');
+}
+
+function closeAuthModal() {
+  document.getElementById('auth-modal-el').classList.remove('on');
+}
+
+function switchAuthRole(role) {
+  const isDrv = (role === 'driver');
+  document.getElementById('auth-tab-driver').className = 'mode-tab' + (isDrv ? ' on' : '');
+  document.getElementById('auth-tab-pax').className = 'mode-tab' + (!isDrv ? ' on' : '');
+  document.getElementById('auth-modal-title').textContent = isDrv ? 'Cadastro de Parceiro GIRO' : 'Cadastro de Passageiro';
+  document.getElementById('form-driver-auth').style.display = isDrv ? 'block' : 'none';
+  document.getElementById('form-pax-auth').style.display = !isDrv ? 'block' : 'none';
+  playHapticSound('beep');
+}
+
+function simulateDocUpload(boxId, text) {
+  const el = document.getElementById(boxId);
+  el.classList.add('uploaded');
+  document.getElementById(boxId + '-text').textContent = '✓ ' + text;
+  playHapticSound('beep');
+}
+
+function updateDriverFormFields() {
+  const t = document.getElementById('reg-drv-type').value;
+  const plateInp = document.getElementById('reg-drv-plate');
+  if (t === 'moto') {
+    plateInp.placeholder = 'Matrícula da Mota (ex: LD-12-34-M)';
+  } else if (t === 'carga') {
+    plateInp.placeholder = 'Matrícula do Camião/Van (ex: LD-88-90-CZ)';
+  } else {
+    plateInp.placeholder = 'Matrícula da Viatura (ex: LD-23-45-AA)';
+  }
+}
+
+function handleDriverRegister(e) {
+  e.preventDefault();
+  const name = document.getElementById('reg-drv-name').value;
+  const phone = document.getElementById('reg-drv-phone').value;
+  const type = document.getElementById('reg-drv-type').value;
+  const plate = document.getElementById('reg-drv-plate').value;
+  const bi = document.getElementById('reg-drv-bi').value;
+  const pType = document.getElementById('reg-drv-payout-type').value;
+  const pVal = document.getElementById('reg-drv-payout-val').value;
+
+  registeredDriver = { name, phone, type, plate, bi, payoutType: pType, payoutVal: pVal, status: 'Aprovado' };
+
+  document.getElementById('drv-profile-name').textContent = name + (type === 'carga' ? ' (Carga)' : type === 'moto' ? ' (Moto)' : '');
+  document.getElementById('drv-role-select').value = (type === 'carga') ? 'cargo' : (type === 'moto') ? 'moto' : 'pax';
+  document.getElementById('drv-account-preview').textContent = `${pType.toUpperCase()}: ${pVal}`;
+  
+  closeAuthModal();
+  switchView('drv');
+  alert(`✅ Cadastro de Parceiro Concluído com Sucesso!
+
+Nome: ${name}
+Categoria: ${type.toUpperCase()}
+Documentos (B.I. ${bi}): Validados
+Recebimento: ${pVal}
+
+O seu perfil está 100% apto para iniciar e receber chamadas.`);
+}
+
+function handlePaxRegister(e) {
+  e.preventDefault();
+  const name = document.getElementById('reg-pax-name').value;
+  const phone = document.getElementById('reg-pax-phone').value;
+  const bi = document.getElementById('reg-pax-bi').value;
+  const addr = document.getElementById('reg-pax-addr').value;
+
+  document.getElementById('pax-greeting').textContent = 'Boa tarde, ' + name.split(' ')[0];
+  closeAuthModal();
+  switchView('pax');
+  alert(`✅ Perfil de Passageiro Verificado!
+
+Nome: ${name}
+B.I.: ${bi}
+Endereço Registado: ${addr}
+
+A sua conta foi validada segundo as directrizes de segurança de Angola.`);
+}
+
+/* ==========================================================================
+   8. LEVANTAMENTO DA CARTEIRA DO MOTORISTA
+   ========================================================================== */
+function openWithdrawModal() {
+  document.getElementById('withdraw-modal-bal').textContent = kz(driverBalance);
+  document.getElementById('withdraw-modal-dest').textContent = registeredDriver.payoutVal ? `${registeredDriver.payoutType.toUpperCase()}: ${registeredDriver.payoutVal}` : 'Multicaixa Express (923 111 222)';
+  document.getElementById('inp-withdraw-amt').value = driverBalance;
+  document.getElementById('withdraw-modal-el').classList.add('on');
+}
+
+function closeWithdrawModal() {
+  document.getElementById('withdraw-modal-el').classList.remove('on');
+}
+
+function executeWithdraw() {
+  const amt = parseInt(document.getElementById('inp-withdraw-amt').value) || 0;
+  if (amt <= 0 || amt > driverBalance) {
+    alert('Valor de levantamento inválido ou superior ao saldo disponível.');
+    return;
+  }
+  driverBalance -= amt;
+  updateDriverWalletDisplay();
+  closeWithdrawModal();
+  alert(`💸 Transferência Concluída!
+
+Valor: ${kz(amt)}
+Destino: ${registeredDriver.payoutVal || '923 111 222'}
+Processado via EMIS / Multicaixa Express Instantâneo.`);
+}
+
+/* ==========================================================================
+   9. ALERTA DE SINISTRO PEER-TO-PEER ENTRE COLEGAS MOTORISTAS
+   ========================================================================== */
+function simulatePeerAlert() {
+  playHapticSound('sos');
+  document.getElementById('peer-sos-alert-banner').classList.add('on');
+}
+
+function dismissPeerSos() {
+  document.getElementById('peer-sos-alert-banner').classList.remove('on');
+}
+
+function acceptPeerSupport() {
+  document.getElementById('peer-sos-alert-banner').classList.remove('on');
+  alert('Rota prioritária de apoio traçada no GPS! Viatura a caminho das coordenadas de socorro do colega.');
+}
+
+/* ==========================================================================
+   10. NAVEGAÇÃO DE VISTAS (PASSAGEIRO, MOTORISTA, CENTRAL)
    ========================================================================== */
 function switchView(view) {
   activeView = view;
@@ -1377,7 +1793,7 @@ function selectDestination(nome, k, m) {
 }
 
 /* ==========================================================================
-   6. MULTI-PARAGEM & CUBAGEM DE CARGA
+   11. MULTI-PARAGEM & CUBAGEM DE CARGA
    ========================================================================== */
 function addStopInteractive() {
   if (stopsList.length >= 3) {
@@ -1450,7 +1866,7 @@ function toggleCargoUrgent() {
 }
 
 /* ==========================================================================
-   7. RENDERIZAR TIERS & TARIFA
+   12. RENDERIZAR TIERS & TARIFA
    ========================================================================== */
 function renderTiers() {
   const isCargo = (appMode === 'cargo');
@@ -1529,10 +1945,10 @@ function renderFareSummary() {
       <div class="fare-line"><span>Bandeirada (${t.nome})</span><b>${kz(t.base * provMult)}</b></div>
       <div class="fare-line"><span>${k.toFixed(1).replace('.', ',')} km × ${kz(t.km * provMult)}</span><b>${kz(t.km * k * provMult)}</b></div>
       <div class="fare-line"><span>${m} min de percurso</span><b>${kz(t.min * m * provMult)}</b></div>
-      ${cargoHelpers > 0 ? `<div class="fare-line"><span>${cargoHelpers} Ajudante(s)</span><b>${kz(cargoHelpers * 8000)}</b></div>` : ''}
-      ${cargoInsurance ? `<div class="fare-line"><span style="color:var(--grn)">Seguro Protect</span><b>${kz(Math.max(3000, 3000))}</b></div>` : ''}
+      ${cargoHelpers > 0 ? `<div class="fare-line"><span>${cargoHelpers} Ajudante(s)</span><b>${kz(cargoHelpers * 12000)}</b></div>` : ''}
+      ${cargoInsurance ? `<div class="fare-line"><span style="color:var(--gold)">Seguro Protect</span><b>${kz(Math.max(4500, 4500))}</b></div>` : ''}
       ${cargoUrgent ? `<div class="fare-line"><span style="color:var(--amb)">Urgência Prioritária (+30%)</span><b>aplicado</b></div>` : ''}
-      <div class="fare-line total"><span>Total Estimado</span><b>${kz(total)}</b></div>
+      <div class="fare-line total"><span>Total Estimado</span><b style="color:var(--gold);">${kz(total)}</b></div>
     `;
   } else {
     const t = TIERS_PAX[tierIdx];
@@ -1543,7 +1959,7 @@ function renderFareSummary() {
       <div class="fare-line"><span>${m} min de percurso</span><b>${kz(T_PAX.min * m * provMult * t.mult)}</b></div>
       ${stopsList.length > 0 ? `<div class="fare-line"><span>${stopsList.length} Paragens intermédias</span><b>incluído</b></div>` : ''}
       ${surgeMult > 1 ? `<div class="fare-line"><span style="color:var(--amb)">Procura alta ×${surgeMult}</span><b style="color:var(--amb)">aplicado</b></div>` : ''}
-      <div class="fare-line total"><span>Total Estimado</span><b>${kz(total)}</b></div>
+      <div class="fare-line total"><span>Total Estimado</span><b style="color:var(--gold);">${kz(total)}</b></div>
     `;
   }
 }
@@ -1562,7 +1978,7 @@ function selectPaymentMethod(el, text) {
 }
 
 /* ==========================================================================
-   8. TRANSIÇÃO DE ESTADOS DO PASSAGEIRO
+   13. TRANSIÇÃO DE ESTADOS DO PASSAGEIRO
    ========================================================================== */
 let paxActiveTimers = [];
 const paxCarEl = document.getElementById('pax-car-el');
@@ -1650,9 +2066,9 @@ function paxTo(state) {
       document.getElementById('trip-code-val').textContent = '8 3 1 4';
       document.getElementById('trip-code-hint').textContent = 'O destinatário deve fornecer este PIN ao estafeta';
     } else {
-      document.getElementById('trip-driver-name').textContent = 'Domingos Manuel';
+      document.getElementById('trip-driver-name').textContent = registeredDriver.name;
       document.getElementById('trip-driver-meta').textContent = '★ 4.9 · Toyota Corolla cinza';
-      document.getElementById('trip-driver-plate').textContent = 'LD-23-45-AA';
+      document.getElementById('trip-driver-plate').textContent = registeredDriver.plate;
       document.getElementById('trip-code-label').textContent = 'Código de recolha';
       document.getElementById('trip-code-val').textContent = '4 7 2 9';
       document.getElementById('trip-code-hint').textContent = 'Diga o código ao motorista antes de entrar';
@@ -1696,8 +2112,8 @@ function paxTo(state) {
     document.getElementById('end-fare-box').innerHTML = `
       <div class="fare-line"><span>Categoria / Veículo</span><b>${catName}</b></div>
       <div class="fare-line"><span>Pagamento</span><b>${payMethod}</b></div>
-      ${isCargo && cargoHelpers > 0 ? `<div class="fare-line"><span>Ajudantes (${cargoHelpers})</span><b>${kz(cargoHelpers * 8000)}</b></div>` : ''}
-      <div class="fare-line total"><span>Total pago</span><b>${kz(tot)}</b></div>
+      ${isCargo && cargoHelpers > 0 ? `<div class="fare-line"><span>Ajudantes (${cargoHelpers})</span><b>${kz(cargoHelpers * 12000)}</b></div>` : ''}
+      <div class="fare-line total"><span>Total pago</span><b style="color:var(--gold);">${kz(tot)}</b></div>
     `;
   }
 }
@@ -1705,19 +2121,19 @@ function paxTo(state) {
 document.querySelectorAll('#pax-star-rating .star-rating-icon').forEach(star => {
   star.onclick = () => {
     document.querySelectorAll('#pax-star-rating .star-rating-icon').forEach(x => {
-      x.style.color = (+x.dataset.v <= +star.dataset.v) ? '#f0b429' : '#2c3128';
+      x.style.color = (+x.dataset.v <= +star.dataset.v) ? '#d4af37' : '#2c3128';
     });
     playHapticSound('beep');
   };
 });
 
 /* ==========================================================================
-   9. MOTORISTA & CARTEIRA (COMISSÃO 15%)
+   14. MOTORISTA & CARTEIRA (COMISSÃO 15%)
    ========================================================================== */
 let isDriverOnline = false;
 let driverTripStage = 0;
 let driverActiveTimers = [];
-let driverRole = 'pax'; // 'pax' | 'cargo'
+let driverRole = 'pax'; // 'pax' | 'moto' | 'cargo'
 
 const drvCarEl = document.getElementById('drv-car-el');
 const drvRouteSvg = document.getElementById('drv-route-svg');
@@ -1726,7 +2142,7 @@ function clearDriverTimers() { driverActiveTimers.forEach(clearTimeout); driverA
 
 function toggleDriverRole() {
   driverRole = document.getElementById('drv-role-select').value;
-  document.getElementById('drv-profile-name').textContent = (driverRole === 'cargo') ? 'Mateus Kiala (Carga)' : 'Domingos Manuel';
+  document.getElementById('drv-profile-name').textContent = (driverRole === 'cargo') ? 'Mateus Kiala (Carga)' : (driverRole === 'moto') ? 'António Kupapata (Moto)' : 'Domingos Manuel';
   playHapticSound('beep');
 }
 
@@ -1748,7 +2164,8 @@ function toggleDriverOnline() {
     driverActiveTimers.push(setTimeout(() => {
       if (!isDriverOnline) return;
       const isCargo = (driverRole === 'cargo');
-      const gross = isCargo ? calculateCargoPrice(TIERS_CARGO[1]) : calculatePaxPrice(TIERS_PAX[1]);
+      const isMoto = (driverRole === 'moto');
+      const gross = isCargo ? calculateCargoPrice(TIERS_CARGO[1]) : isMoto ? calculatePaxPrice(TIERS_PAX[0]) : calculatePaxPrice(TIERS_PAX[1]);
       const net = gross * (1 - T_PAX.comissao);
 
       document.getElementById('req-gross-amount').textContent = kz(gross);
@@ -1762,9 +2179,12 @@ function toggleDriverOnline() {
       if (isCargo) {
         cardEl.classList.add('cargo-type');
         badgeSlot.innerHTML = '<span style="background:var(--cargodeep);border:1px solid var(--cargo);color:var(--cargo);padding:2px 7px;border-radius:6px;font-size:10px;font-weight:700;display:inline-block;margin-bottom:6px;">🚛 GIRO CARGA — Van 500 kg</span>';
+      } else if (isMoto) {
+        cardEl.classList.remove('cargo-type');
+        badgeSlot.innerHTML = '<span style="background:var(--ambdeep);border:1px solid var(--amb);color:var(--amb);padding:2px 7px;border-radius:6px;font-size:10px;font-weight:700;display:inline-block;margin-bottom:6px;">🏍 GIRO MOTO (Kupapata)</span>';
       } else {
         cardEl.classList.remove('cargo-type');
-        badgeSlot.innerHTML = '';
+        badgeSlot.innerHTML = '<span style="background:var(--gold-deep);border:1px solid var(--gold);color:var(--gold);padding:2px 7px;border-radius:6px;font-size:10px;font-weight:700;display:inline-block;margin-bottom:6px;">🚗 GIRO Económico</span>';
       }
 
       cardEl.classList.add('on');
@@ -1791,20 +2211,21 @@ function acceptIncomingTrip() {
   document.getElementById('drv-status-ban').style.display = 'flex';
 
   const isCargo = (driverRole === 'cargo');
+  const isMoto = (driverRole === 'moto');
   document.getElementById('drv-cargo-details-banner').style.display = isCargo ? 'block' : 'none';
   document.getElementById('drv-status-text').textContent = isCargo ? 'A caminho da recolha da carga · 4 min' : 'A caminho do passageiro · 4 min';
   document.getElementById('drv-pin-target').style.opacity = 1;
   drvRouteSvg.style.opacity = 1;
   driverTripStage = 1;
 
-  const gross = isCargo ? calculateCargoPrice(TIERS_CARGO[1]) : calculatePaxPrice(TIERS_PAX[1]);
+  const gross = isCargo ? calculateCargoPrice(TIERS_CARGO[1]) : isMoto ? calculatePaxPrice(TIERS_PAX[0]) : calculatePaxPrice(TIERS_PAX[1]);
   const fee = gross * T_PAX.comissao;
   const net = gross - fee;
 
   document.getElementById('drv-trip-breakdown').innerHTML = `
     <div class="fare-line"><span>Tarifa bruta</span><b>${kz(gross)}</b></div>
     <div class="fare-line"><span style="color:var(--red);">Comissão retida GIRO (15%)</span><b style="color:var(--red);">− ${kz(fee)}</b></div>
-    <div class="fare-line total"><span>Líquido a receber</span><b>${kz(net)}</b></div>
+    <div class="fare-line total"><span>Líquido a receber</span><b style="color:var(--gold);">${kz(net)}</b></div>
   `;
 
   playHapticSound('beep');
@@ -1822,6 +2243,7 @@ function advanceDriverTrip() {
   driverTripStage++;
   const btn = document.getElementById('drv-step-action-btn');
   const isCargo = (driverRole === 'cargo');
+  const isMoto = (driverRole === 'moto');
 
   if (driverTripStage === 2) {
     btn.textContent = isCargo ? 'Validar Código da Carga (9142)' : 'Confirmar código 4729';
@@ -1842,13 +2264,19 @@ function advanceDriverTrip() {
       }, i * 1300));
     });
   } else {
-    const gross = isCargo ? calculateCargoPrice(TIERS_CARGO[1]) : calculatePaxPrice(TIERS_PAX[1]);
+    const gross = isCargo ? calculateCargoPrice(TIERS_CARGO[1]) : isMoto ? calculatePaxPrice(TIERS_PAX[0]) : calculatePaxPrice(TIERS_PAX[1]);
     const fee = gross * T_PAX.comissao;
     const net = gross - fee;
 
-    alert((isCargo ? 'Operação de Carga Concluída!\n\n' : 'Viagem Concluída!\n\n') +
-      'Tarifa Bruta: ' + kz(gross) + '\n' +
-      'Comissão GIRO (15%): − ' + kz(fee) + '\n' +
+    alert((isCargo ? 'Operação de Carga Concluída!
+
+' : 'Viagem Concluída!
+
+') +
+      'Tarifa Bruta: ' + kz(gross) + '
+' +
+      'Comissão GIRO (15%): − ' + kz(fee) + '
+' +
       'Creditado na carteira: ' + kz(net));
 
     creditDriverWallet(net);
@@ -1880,7 +2308,7 @@ function updateDriverWalletDisplay() {
   document.getElementById('drv-wallet-breakdown').innerHTML = `
     <div class="fare-line"><span>Bruto hoje (${driverRidesCount} serviços)</span><b>${kz(driverGrossToday)}</b></div>
     <div class="fare-line"><span style="color:var(--red);">Comissão retida GIRO (15%)</span><b style="color:var(--red);">− ${kz(driverGrossToday * T_PAX.comissao)}</b></div>
-    <div class="fare-line total"><span>Líquido acumulado</span><b>${kz(driverGrossToday * 0.85)}</b></div>
+    <div class="fare-line total"><span>Líquido acumulado</span><b style="color:var(--gold);">${kz(driverGrossToday * 0.85)}</b></div>
   `;
 }
 
@@ -1894,21 +2322,21 @@ function creditDriverWallet(net) {
 
 function renderDriverHistory() {
   const items = [
-    ['18:42', destName.split(',')[0], calculatePaxPrice(TIERS_PAX[1]), 'Passageiros'],
-    ['17:55', 'Viana (Carga)', 28000, 'GIRO Van'],
-    ['17:10', 'Ilha de Luanda', 5240, 'Passageiros'],
-    ['16:22', 'Talatona', 2610, 'Passageiros']
+    ['18:42', destName.split(',')[0], calculatePaxPrice(TIERS_PAX[1]), 'Passageiros (Carro)'],
+    ['17:55', 'Viana (Carga)', 42000, 'GIRO Van (+50%)'],
+    ['17:10', 'Ilha de Luanda', 5240, 'Passageiros (Carro)'],
+    ['16:22', 'Talatona (Moto)', 1850, 'GIRO Moto (−15%)']
   ];
   document.getElementById('drv-history-list').innerHTML = items.map(r => `
     <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--ink3);font-size:11.5px;">
       <div><b>${r[1]}</b><small style="display:block;color:var(--mut);font-size:10px;">${r[0]} · ${r[3]}</small></div>
-      <div style="text-align:right;"><b>${kz(r[2] * 0.85)}</b><small style="display:block;color:var(--mut);font-size:9.5px;">bruto ${kz(r[2])}</small></div>
+      <div style="text-align:right;"><b style="color:var(--gold);">${kz(r[2] * 0.85)}</b><small style="display:block;color:var(--mut);font-size:9.5px;">bruto ${kz(r[2])}</small></div>
     </div>
   `).join('');
 }
 
 /* ==========================================================================
-   10. SISTEMA DE SEGURANÇA SOS & CENTRAL 24H
+   15. SISTEMA DE SEGURANÇA SOS & CENTRAL 24H
    ========================================================================== */
 function bindHoldButton(buttonId, fillId) {
   const btn = document.getElementById(buttonId);
@@ -1939,7 +2367,7 @@ bindHoldButton('drv-sos-hold-btn', 'drv-sos-fill-bar');
 bindHoldButton('drv-sos-hold-btn2', 'drv-sos-fill-bar2');
 
 function triggerSilentSos() {
-  alert('Alerta SOS Silencioso emitido: Telemetria e áudio transmitidos de imediato para a Central GIRO 24h sem alertas visíveis na tela.');
+  alert('Alerta SOS Silencioso emitido: Telemetria, microfone e coordenadas transmitidas de imediato para a Central GIRO 24h e colegas na área sem alertas na tela.');
   pushCentralAlert('SOS_SILENT');
 }
 
@@ -1947,6 +2375,9 @@ function triggerGlobalSos() {
   playHapticSound('sos');
   document.getElementById('global-sos-overlay').classList.add('on');
   pushCentralAlert('SOS_FULL');
+  
+  // Alerta também toda a rede de colegas motoristas
+  simulatePeerAlert();
 }
 
 function cancelGlobalSos() {
@@ -1956,7 +2387,7 @@ function cancelGlobalSos() {
 
 function simulateDeviateAlert() {
   pushCentralAlert('DEVIATE');
-  alert('Simulação de Desvio de Rota: Viatura saiu do trajecto traçado há 5 min. Alerta amarelo telemétrico gerado na Central.');
+  alert('Simulação de Desvio de Rota: Viatura saiu do trajecto traçado há 4 min. Alerta amarelo telemétrico gerado na Central 24h.');
 }
 
 function pushCentralAlert(type) {
@@ -1976,13 +2407,13 @@ function pushCentralAlert(type) {
 
   card.innerHTML = `
     <div style="display:flex;justify-content:space-between;margin-bottom:5px;">
-      <span style="font-size:9.5px;font-weight:800;background:${isYellow ? 'var(--amb)' : 'var(--red)'};color:#070907;padding:2px 6px;border-radius:4px;">${isYellow ? 'DESVIO DE ROTA' : 'SOS ACTIVO'}</span>
+      <span style="font-size:9.5px;font-weight:800;background:${isYellow ? 'var(--amb)' : 'var(--red)'};color:#070907;padding:2px 6px;border-radius:4px;">${isYellow ? 'DESVIO DE ROTA' : 'SOS ACTIVO (SINISTRO)'}</span>
       <small style="font-size:10px;color:var(--mut);">Agora</small>
     </div>
-    <div style="font-size:12px;font-weight:700;">Domingos Manuel (Toyota Corolla)</div>
-    <div style="font-size:10.5px;color:#e0c9cb;margin:3px 0 8px;">Rua do Talatona · Passageiro: Elisabete C.</div>
+    <div style="font-size:12px;font-weight:700;">${registeredDriver.name} (${registeredDriver.plate})</div>
+    <div style="font-size:10.5px;color:#e0c9cb;margin:3px 0 8px;">Rua do Talatona · Passageiro: Elisabete C. · Rede de Apoio: 12 motoristas notificados</div>
     <div style="display:flex;gap:5px;">
-      <button style="flex:1;background:var(--red);color:#fff;border:none;padding:6px;border-radius:6px;font-size:10px;font-weight:700;cursor:pointer;" onclick="alert('A contactar oficial da 7ª Esquadra Talatona...')">Ligar Esquadra</button>
+      <button style="flex:1;background:var(--red);color:#fff;border:none;padding:6px;border-radius:6px;font-size:10px;font-weight:700;cursor:pointer;" onclick="alert('A contactar oficial da 7ª Esquadra Talatona e despacho de apoio...')">Ligar Esquadra</button>
       <button style="flex:1;background:rgba(255,255,255,.1);color:#fff;border:none;padding:6px;border-radius:6px;font-size:10px;cursor:pointer;" onclick="resolveCentralAlert()">Encerrar</button>
     </div>
   `;
@@ -2003,7 +2434,7 @@ function renderCentralEsquadras() {
     <tr style="border-bottom:1px solid var(--ink3);">
       <td style="padding:7px 10px;"><b>${e.prov}</b></td>
       <td style="padding:7px 10px;">${e.nome}</td>
-      <td style="padding:7px 10px;color:var(--grn);">${e.tel}</td>
+      <td style="padding:7px 10px;color:var(--gold);font-weight:700;">${e.tel}</td>
       <td style="padding:7px 10px;">${e.oficial}</td>
       <td style="padding:7px 10px;color:var(--amb);font-weight:700;">${e.eta}</td>
       <td style="padding:7px 10px;"><button style="background:var(--ink3);border:1px solid var(--line);color:#fff;padding:3px 7px;border-radius:5px;font-size:10px;cursor:pointer;" onclick="alert('Canal prioritário para ${e.nome} acionado.')">Accionar</button></td>
@@ -2012,7 +2443,7 @@ function renderCentralEsquadras() {
 }
 
 /* ==========================================================================
-   11. AGENDAMENTO & PARTILHA MODAIS
+   16. AGENDAMENTO & PARTILHA MODAIS
    ========================================================================== */
 function openShareModal() { document.getElementById('share-modal-el').classList.add('on'); }
 function closeShareModal() { document.getElementById('share-modal-el').classList.remove('on'); }
@@ -2029,7 +2460,7 @@ function confirmScheduleModal() {
 }
 
 /* ==========================================================================
-   12. INICIALIZAÇÃO GERAL DA APLICAÇÃO
+   17. INICIALIZAÇÃO GERAL DA APLICAÇÃO
    ========================================================================== */
 buildFavoritesAndDestinations();
 renderTiers();
