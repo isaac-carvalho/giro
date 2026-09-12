@@ -100,17 +100,22 @@ html, body{
    BARRA SUPERIOR GLOBAL (HEADER)
    ========================================================================== */
 .app-header{
-  padding:calc(8px + var(--safe-top)) 14px 10px;
-  background:rgba(10,12,10,0.94);
-  backdrop-filter:blur(18px);
-  -webkit-backdrop-filter:blur(18px);
+  padding:calc(8px + var(--safe-top)) 14px 8px;
+  background:rgba(10,12,10,0.96);
+  backdrop-filter:blur(20px);
+  -webkit-backdrop-filter:blur(20px);
   border-bottom:1px solid var(--line);
+  display:flex;
+  flex-direction:column;
+  gap:7px;
+  z-index:100;
+  flex-shrink:0;
+}
+.header-top-row{
   display:flex;
   align-items:center;
   justify-content:space-between;
-  z-index:100;
-  flex-shrink:0;
-  gap:8px;
+  width:100%;
 }
 .brand{display:flex;align-items:center;gap:8px;cursor:pointer;}
 .brand-icon{
@@ -118,22 +123,72 @@ html, body{
   background:var(--gold-grad);
   color:#060706;font-weight:900;font-size:16px;
   display:flex;align-items:center;justify-content:center;
-  letter-spacing:-.04em;box-shadow:0 0 14px rgba(212,175,55,.3);
+  letter-spacing:-.04em;box-shadow:0 0 14px rgba(212,175,55,.35);
 }
 .brand-text b{font-size:15px;font-weight:900;letter-spacing:-.03em;display:block;line-height:1.1;color:#fff;}
-.brand-text span{font-size:9px;color:var(--gold);font-weight:600;}
+.brand-text span{font-size:9.5px;color:var(--gold);font-weight:700;}
 
-/* SELETOR DE MODO / PERFIL DO TOPO */
-.role-pills{
-  display:flex;background:var(--ink2);
-  border:1px solid var(--line);border-radius:10px;padding:3px;gap:2px;
+.header-actions{
+  display:flex;
+  align-items:center;
+  gap:6px;
 }
-.role-btn{
-  border:none;background:none;color:var(--mut);
-  font-family:var(--f);font-size:11px;font-weight:700;
-  padding:5px 9px;border-radius:7px;cursor:pointer;transition:.15s;
+.header-auth-btn{
+  background:var(--gold-deep);
+  border:1.5px solid var(--gold);
+  color:var(--gold);
+  border-radius:9px;
+  padding:6px 12px;
+  font-size:11.5px;
+  font-weight:800;
+  font-family:var(--f);
+  display:flex;
+  align-items:center;
+  gap:5px;
+  cursor:pointer;
+  white-space:nowrap;
+  box-shadow:0 0 12px rgba(212,175,55,0.25);
+  transition:.15s;
 }
-.role-btn.on{background:var(--gold-grad);color:#060706;box-shadow:0 1px 6px rgba(0,0,0,.4);}
+.header-auth-btn:hover, .header-auth-btn:active{
+  background:var(--gold);
+  color:#060706;
+}
+
+/* NAVEGAÇÃO DE PERFIS (3 ABAS SEGMENTADAS) */
+.role-nav-bar{
+  display:flex;
+  background:var(--ink2);
+  border:1px solid var(--line);
+  border-radius:11px;
+  padding:3px;
+  gap:3px;
+  width:100%;
+}
+.role-nav-btn{
+  flex:1;
+  border:none;
+  background:none;
+  color:var(--mut);
+  font-family:var(--f);
+  font-size:11.5px;
+  font-weight:700;
+  padding:7px 4px;
+  border-radius:8px;
+  cursor:pointer;
+  transition:.15s;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:5px;
+  white-space:nowrap;
+}
+.role-nav-btn.on{
+  background:var(--gold-grad);
+  color:#060706;
+  font-weight:800;
+  box-shadow:0 2px 8px rgba(0,0,0,.5);
+}
 
 /* PROVÍNCIA & PALETA SWITCH */
 .header-meta{display:flex;align-items:center;gap:6px;}
@@ -557,23 +612,61 @@ html, body{
    MODAIS & TELAS DE CADASTRO / LOGIN
    ========================================================================== */
 .modal-backdrop{
-  position:absolute;inset:0;background:rgba(0,0,0,.85);z-index:95;
-  display:none;align-items:center;justify-content:center;padding:16px;
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,0.88);
+  backdrop-filter:blur(14px);
+  -webkit-backdrop-filter:blur(14px);
+  z-index:9999;
+  display:none;
+  align-items:flex-start;
+  justify-content:center;
+  padding:calc(16px + var(--safe-top)) 16px calc(24px + var(--safe-bottom));
+  overflow-y:auto;
+  -webkit-overflow-scrolling:touch;
 }
 .modal-backdrop.on{display:flex;}
 .modal-window{
-  background:var(--ink2);border:1px solid var(--line);border-radius:20px;
-  padding:18px;width:100%;max-width:340px;box-shadow:0 20px 50px rgba(0,0,0,.85);
-  max-height:90%;overflow-y:auto;
+  background:var(--ink2);
+  border:1.5px solid var(--gold);
+  border-radius:20px;
+  padding:20px 18px;
+  width:100%;
+  max-width:390px;
+  box-shadow:0 24px 60px rgba(0,0,0,.95), 0 0 30px rgba(212,175,55,.18);
+  margin:auto 0;
+  max-height:none;
+  position:relative;
 }
-.auth-input-group{margin-bottom:10px;}
-.auth-input-group label{font-size:10.5px;color:var(--mut);font-weight:600;display:block;margin-bottom:4px;}
+.auth-input-group{margin-bottom:12px;}
+.auth-input-group label{
+  font-size:11px;
+  color:var(--gold);
+  font-weight:700;
+  display:block;
+  margin-bottom:5px;
+  letter-spacing:.02em;
+}
 .auth-input-group input, .auth-input-group select{
-  width:100%;background:var(--ink3);border:1px solid var(--line);border-radius:10px;
-  padding:9px 12px;color:#fff;font-family:var(--f);font-size:12px;outline:none;
+  width:100%;
+  background:var(--ink3);
+  border:1px solid var(--line);
+  border-radius:10px;
+  padding:11px 13px;
+  color:#fff;
+  font-family:var(--f);
+  font-size:13px;
+  font-weight:500;
+  outline:none;
+  transition:.15s;
+}
+.auth-input-group input:focus, .auth-input-group select:focus{
+  border-color:var(--gold);
+  background:var(--ink1);
+  box-shadow:0 0 12px rgba(212,175,55,0.25);
 }
 .auth-input-group select option{background:var(--ink2);color:#fff;}
-.auth-input-group small{font-size:9.5px;color:var(--mut);display:block;margin-top:3px;}
+.auth-input-group small{font-size:10px;color:var(--mut);display:block;margin-top:4px;}
 
 .doc-upload-box{
   background:var(--ink3);border:1.5px dashed var(--line);border-radius:10px;
@@ -635,40 +728,55 @@ html, body{
        HEADER PRINCIPAL DA APLICAÇÃO
        ========================================================================== -->
   <header class="app-header">
-    <div class="brand" onclick="paxTo('idle')">
-      <div class="brand-icon">G</div>
-      <div class="brand-text">
-        <b>GIRO</b>
-        <span>Segurança 24h · Angola</span>
+    <div class="header-top-row">
+      <div class="brand" onclick="paxTo('idle')">
+        <div class="brand-icon">G</div>
+        <div class="brand-text">
+          <b>GIRO</b>
+          <span>Angola 24h</span>
+        </div>
+      </div>
+
+      <div class="header-actions">
+        <!-- SELETOR DE PROVÍNCIA -->
+        <div class="prov-sel-box">
+          <span class="net-blip" id="net-status-dot" title="Rede 4G Estável"></span>
+          <select id="provSel" onchange="setProv()">
+            <option value="luanda" data-mult="1">Luanda</option>
+            <option value="benguela" data-mult="0.88">Benguela</option>
+            <option value="lobito" data-mult="0.88">Lobito</option>
+            <option value="huambo" data-mult="0.82">Huambo</option>
+            <option value="lubango" data-mult="0.85">Lubango</option>
+            <option value="cabinda" data-mult="1.06">Cabinda</option>
+            <option value="malanje" data-mult="0.8">Malanje</option>
+            <option value="namibe" data-mult="0.84">Namibe</option>
+            <option value="soyo" data-mult="1.02">Soyo</option>
+            <option value="uige" data-mult="0.8">Uíge</option>
+          </select>
+        </div>
+
+        <!-- PALETA SWITCH -->
+        <button class="theme-toggle-btn" id="theme-switch-btn" onclick="toggleThemePalette()" title="Alternar Dourado / Verde">✨</button>
+
+        <!-- BOTÃO DE CADASTRO COM ALTO DESTAQUE E TOTAL LEGILEBILIDADE -->
+        <button class="header-auth-btn" id="nav-btn-auth" onclick="openAuthModal('driver')" title="Cadastro de Motorista ou Passageiro">
+          <span style="font-size:13px;">👤</span> Cadastro
+        </button>
       </div>
     </div>
 
-    <!-- SELETOR DE VISTA / PERFIL -->
-    <div class="role-pills">
-      <button class="role-btn on" id="nav-btn-pax" onclick="switchView('pax')">Passageiro</button>
-      <button class="role-btn" id="nav-btn-drv" onclick="switchView('drv')">Motorista</button>
-      <button class="role-btn" id="nav-btn-cen" onclick="switchView('cen')">Central</button>
-      <button class="role-btn" id="nav-btn-auth" onclick="openAuthModal('driver')" style="color:var(--gold);">Cadastro</button>
-    </div>
-
-    <div class="header-meta">
-      <button class="theme-toggle-btn" id="theme-switch-btn" onclick="toggleThemePalette()" title="Alternar Dourado / Verde">✨</button>
-      <div class="prov-sel-box">
-        <span class="net-blip" id="net-status-dot" title="Rede 4G Estável"></span>
-        <select id="provSel" onchange="setProv()">
-          <option value="luanda" data-mult="1">Luanda</option>
-          <option value="benguela" data-mult="0.88">Benguela</option>
-          <option value="lobito" data-mult="0.88">Lobito</option>
-          <option value="huambo" data-mult="0.82">Huambo</option>
-          <option value="lubango" data-mult="0.85">Lubango</option>
-          <option value="cabinda" data-mult="1.06">Cabinda</option>
-          <option value="malanje" data-mult="0.8">Malanje</option>
-          <option value="namibe" data-mult="0.84">Namibe</option>
-          <option value="soyo" data-mult="1.02">Soyo</option>
-          <option value="uige" data-mult="0.8">Uíge</option>
-        </select>
-      </div>
-    </div>
+    <!-- NAVEGAÇÃO DE PERFIS (3 ABAS SEGMENTADAS PERFEITAS) -->
+    <nav class="role-nav-bar">
+      <button class="role-nav-btn on" id="nav-btn-pax" onclick="switchView('pax')">
+        <span>🚗</span> Passageiro
+      </button>
+      <button class="role-nav-btn" id="nav-btn-drv" onclick="switchView('drv')">
+        <span>🚖</span> Motorista
+      </button>
+      <button class="role-nav-btn" id="nav-btn-cen" onclick="switchView('cen')">
+        <span>🏢</span> Central 24h
+      </button>
+    </nav>
   </header>
 
   <!-- ==========================================================================
@@ -1261,103 +1369,125 @@ html, body{
   <!-- MODAL DE CADASTRO E LOGIN (MOTORISTA / PASSAGEIRO) -->
   <div class="modal-backdrop" id="auth-modal-el">
     <div class="modal-window">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
-        <h3 style="font-size:15px;color:#fff;" id="auth-modal-title">Cadastro de Motorista GIRO</h3>
-        <button onclick="closeAuthModal()" style="background:none;border:none;color:var(--mut);font-size:16px;cursor:pointer;">✕</button>
+      <!-- CABEÇALHO DO MODAL COM BOTÃO FECHAR GRANDE -->
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(--line);">
+        <div>
+          <h3 style="font-size:16px;font-weight:900;color:#fff;display:flex;align-items:center;gap:6px;" id="auth-modal-title">
+            <span style="color:var(--gold);">👤</span> Cadastro Oficial GIRO
+          </h3>
+          <p style="font-size:11px;color:var(--mut);margin-top:2px;">Preencha os seus dados para activar o seu perfil</p>
+        </div>
+        <button onclick="closeAuthModal()" style="background:var(--ink3);border:1px solid var(--line);color:var(--mut);width:32px;height:32px;border-radius:50%;font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;">✕</button>
       </div>
 
-      <div class="mode-switch-bar" style="margin-bottom:12px;">
-        <button class="mode-tab on" id="auth-tab-driver" onclick="switchAuthRole('driver')">🚗 Condutor</button>
+      <!-- ABAS CONDUTOR OU PASSAGEIRO -->
+      <div class="mode-switch-bar" style="margin-bottom:14px;">
+        <button class="mode-tab on" id="auth-tab-driver" onclick="switchAuthRole('driver')">🚗 Condutor / Motorista</button>
         <button class="mode-tab" id="auth-tab-pax" onclick="switchAuthRole('pax')">👤 Passageiro</button>
       </div>
 
       <!-- FORMULÁRIO MOTORISTA -->
       <form id="form-driver-auth" onsubmit="handleDriverRegister(event)">
+        <!-- 1. NOME COMPLETO DO MOTORISTA EM PRIMEIRO LUGAR DESTAQUE -->
+        <div class="auth-input-group">
+          <label>Nome Completo do Motorista *</label>
+          <input type="text" id="reg-drv-name" placeholder="Ex: Mateus Domingos Kiala" value="Domingos Manuel" required autocomplete="name">
+          <small>Insira o seu nome completo conforme o Bilhete de Identidade.</small>
+        </div>
+
+        <!-- 2. TELEFONE -->
+        <div class="auth-input-group">
+          <label>Telefone Unitel / Africell (+244) *</label>
+          <input type="tel" id="reg-drv-phone" placeholder="+244 923 000 000" value="+244 923 111 222" required autocomplete="tel">
+        </div>
+
+        <!-- 3. CATEGORIA -->
         <div class="auth-input-group">
           <label>Categoria de Transporte *</label>
           <select id="reg-drv-type" onchange="updateDriverFormFields()" required>
-            <option value="carro">Carro de Passageiros (Económico / Conforto)</option>
+            <option value="carro" selected>Carro de Passageiros (Económico / Conforto)</option>
             <option value="moto">Moto Táxi (Kupapata / Rápido no Trânsito)</option>
             <option value="carga">Carga & Frete (Van / Camião Ligeiro ou Médio)</option>
           </select>
         </div>
 
-        <div class="auth-input-group">
-          <label>Nome Completo *</label>
-          <input type="text" id="reg-drv-name" placeholder="Ex: Mateus Domingos Kiala" required>
-        </div>
-
-        <div class="auth-input-group">
-          <label>Telefone Unitel / Africell (+244) *</label>
-          <input type="tel" id="reg-drv-phone" placeholder="+244 923 000 000" required>
-        </div>
-
+        <!-- 4. BILHETE DE IDENTIDADE -->
         <div class="auth-input-group">
           <label>Número do B.I. (Bilhete de Identidade) *</label>
-          <input type="text" id="reg-drv-bi" placeholder="Ex: 004829182LA041" required>
+          <input type="text" id="reg-drv-bi" placeholder="Ex: 004829182LA041" value="004829182LA041" required>
         </div>
 
+        <!-- 5. MATRÍCULA -->
         <div class="auth-input-group">
           <label>Carta de Condução / Matrícula do Veículo *</label>
-          <input type="text" id="reg-drv-plate" placeholder="Matrícula: LD-00-00-AA" required>
+          <input type="text" id="reg-drv-plate" placeholder="Matrícula: LD-00-00-AA" value="LD-23-45-AA" required>
         </div>
 
+        <!-- 6. CANAL DE RECEBIMENTO -->
         <div class="auth-input-group">
           <label>Canal de Recebimento dos Ganhos (15% Comissão GIRO) *</label>
           <select id="reg-drv-payout-type" required>
-            <option value="express">Multicaixa Express (Número de Telemóvel)</option>
+            <option value="express" selected>Multicaixa Express (Número de Telemóvel)</option>
             <option value="iban">Transferência Bancária (IBAN Angolano AO06...)</option>
             <option value="unitel_money">Unitel Money</option>
           </select>
         </div>
 
+        <!-- 7. DADO DE RECEBIMENTO -->
         <div class="auth-input-group">
           <label>Dado do Recebimento (Telefone Express ou IBAN) *</label>
-          <input type="text" id="reg-drv-payout-val" placeholder="+244 923 111 222 ou AO06..." required>
+          <input type="text" id="reg-drv-payout-val" placeholder="+244 923 111 222 ou AO06..." value="+244 923 111 222" required>
         </div>
 
+        <!-- 8. DOCUMENTOS -->
         <div class="auth-input-group">
           <label>Comprovativo de Residência / Registo Policial</label>
           <div class="doc-upload-box" id="drv-doc-box" onclick="simulateDocUpload('drv-doc-box', 'Documentos Validados Digitalmente')">
-            <span style="font-size:16px;">📄</span>
-            <div style="font-size:10.5px;color:var(--mut);" id="drv-doc-box-text">Toque para anexar foto do B.I. e Atestado</div>
+            <span style="font-size:18px;">📄</span>
+            <div style="font-size:11px;color:var(--mut);" id="drv-doc-box-text">Toque para anexar foto do B.I. e Registo</div>
           </div>
         </div>
 
-        <button type="submit" class="main-action-btn btn-gold" style="margin-top:12px;">Concluir Cadastro & Ficar Apto</button>
+        <button type="submit" class="main-action-btn btn-gold" style="margin-top:14px;padding:14px;">Concluir Cadastro & Ficar Apto</button>
       </form>
 
       <!-- FORMULÁRIO PASSAGEIRO -->
       <form id="form-pax-auth" style="display:none;" onsubmit="handlePaxRegister(event)">
+        <!-- 1. NOME COMPLETO DO PASSAGEIRO -->
         <div class="auth-input-group">
-          <label>Nome Completo *</label>
-          <input type="text" id="reg-pax-name" placeholder="Ex: Elisabete Carvalho" required>
+          <label>Nome Completo do Passageiro *</label>
+          <input type="text" id="reg-pax-name" placeholder="Ex: Elisabete Carvalho" value="Elisabete Carvalho" required autocomplete="name">
+          <small>O seu nome será apresentado ao condutor para identificação no embarque.</small>
         </div>
 
+        <!-- 2. TELEFONE -->
         <div class="auth-input-group">
           <label>Telefone para Confirmação (+244) *</label>
-          <input type="tel" id="reg-pax-phone" placeholder="+244 924 000 000" required>
+          <input type="tel" id="reg-pax-phone" placeholder="+244 924 000 000" value="+244 924 111 333" required autocomplete="tel">
         </div>
 
+        <!-- 3. BILHETE DE IDENTIDADE -->
         <div class="auth-input-group">
           <label>Número do B.I. (Verificação de Segurança) *</label>
-          <input type="text" id="reg-pax-bi" placeholder="Ex: 005912443LA032" required>
+          <input type="text" id="reg-pax-bi" placeholder="Ex: 005912443LA032" value="005912443LA032" required>
         </div>
 
+        <!-- 4. ENDEREÇO -->
         <div class="auth-input-group">
-          <label>Comprovativo de Endereço / Bairro *</label>
-          <input type="text" id="reg-pax-addr" placeholder="Ex: Talatona, Condomínio das Acácias" required>
+          <label>Comprovativo de Endereço / Bairro de Residência *</label>
+          <input type="text" id="reg-pax-addr" placeholder="Ex: Talatona, Condomínio das Acácias" value="Talatona, Condomínio das Acácias" required>
         </div>
 
+        <!-- 5. DOCUMENTO OPCIONAL -->
         <div class="auth-input-group">
           <label>Foto do B.I. ou Comprovativo (Opcional no registo rápido)</label>
           <div class="doc-upload-box" id="pax-doc-box" onclick="simulateDocUpload('pax-doc-box', 'B.I. Anexado com Sucesso')">
-            <span style="font-size:16px;">🪪</span>
-            <div style="font-size:10.5px;color:var(--mut);" id="pax-doc-box-text">Toque para carregar foto do B.I.</div>
+            <span style="font-size:18px;">🪪</span>
+            <div style="font-size:11px;color:var(--mut);" id="pax-doc-box-text">Toque para carregar foto do B.I.</div>
           </div>
         </div>
 
-        <button type="submit" class="main-action-btn btn-gold" style="margin-top:12px;">Salvar Perfil de Passageiro</button>
+        <button type="submit" class="main-action-btn btn-gold" style="margin-top:14px;padding:14px;">Salvar Perfil de Passageiro</button>
       </form>
     </div>
   </div>
@@ -1704,7 +1834,11 @@ function toggleThemePalette() {
    7. CADASTRO & VERIFICAÇÃO DE DOCUMENTOS (B.I., CARTA, PAGAMENTO)
    ========================================================================== */
 function openAuthModal(role) {
-  document.getElementById('auth-modal-el').classList.add('on');
+  const modalEl = document.getElementById('auth-modal-el');
+  modalEl.classList.add('on');
+  modalEl.scrollTop = 0;
+  const win = modalEl.querySelector('.modal-window');
+  if (win) win.scrollTop = 0;
   switchAuthRole(role || 'driver');
 }
 
@@ -1716,9 +1850,15 @@ function switchAuthRole(role) {
   const isDrv = (role === 'driver');
   document.getElementById('auth-tab-driver').className = 'mode-tab' + (isDrv ? ' on' : '');
   document.getElementById('auth-tab-pax').className = 'mode-tab' + (!isDrv ? ' on' : '');
-  document.getElementById('auth-modal-title').textContent = isDrv ? 'Cadastro de Parceiro GIRO' : 'Cadastro de Passageiro';
+  document.getElementById('auth-modal-title').innerHTML = isDrv ? '<span style="color:var(--gold);">🚗</span> Cadastro de Motorista' : '<span style="color:var(--gold);">👤</span> Cadastro de Passageiro';
   document.getElementById('form-driver-auth').style.display = isDrv ? 'block' : 'none';
   document.getElementById('form-pax-auth').style.display = !isDrv ? 'block' : 'none';
+
+  const modalEl = document.getElementById('auth-modal-el');
+  if (modalEl) modalEl.scrollTop = 0;
+  const win = modalEl ? modalEl.querySelector('.modal-window') : null;
+  if (win) win.scrollTop = 0;
+
   playHapticSound('beep');
 }
 
@@ -1840,7 +1980,7 @@ function acceptPeerSupport() {
    ========================================================================== */
 function switchView(view) {
   activeView = view;
-  document.querySelectorAll('.role-btn').forEach(b => b.classList.toggle('on', b.id === 'nav-btn-' + view));
+  document.querySelectorAll('.role-btn, .role-nav-btn').forEach(b => b.classList.toggle('on', b.id === 'nav-btn-' + view));
   document.querySelectorAll('.view-section').forEach(v => v.classList.toggle('on', v.id === 'view-' + view));
   playHapticSound('beep');
 }
