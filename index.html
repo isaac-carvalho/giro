@@ -266,6 +266,23 @@ html, body{
 .map-pin.stop .pin-label{background:var(--amb);color:#070907;}
 .map-pin.stop .pin-label::after{border-top-color:var(--amb);}
 
+/* BOTÕES DE ESCOLHA DE NAVEGADOR GPS (GOOGLE MAPS / WAZE) */
+.nav-app-choice-btn{
+  display:flex;align-items:center;gap:12px;
+  background:var(--ink3);border:1.5px solid var(--line);
+  border-radius:14px;padding:12px 14px;cursor:pointer;
+  transition:.15s;font-family:var(--f);width:100%;outline:none;
+}
+.nav-app-choice-btn:hover, .nav-app-choice-btn:active{
+  border-color:var(--gold);background:var(--ink1);
+  box-shadow:0 4px 15px rgba(212,175,55,0.25);
+}
+.nav-app-icon{
+  width:38px;height:38px;border-radius:10px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:18px;flex-shrink:0;
+}
+
 /* CHIPS FLUTUANTES NO MAPA */
 .floating-chip{
   position:absolute;top:12px;z-index:45;background:rgba(19,22,19,0.92);
@@ -1267,7 +1284,7 @@ html, body{
 
           <div class="two-btn-row" style="margin-bottom:9px;">
             <button class="main-action-btn btn-ghost" style="padding:10px;font-size:12px;" onclick="alert('Chat com o cliente aberto.')">💬 Chat</button>
-            <button class="main-action-btn btn-ghost" style="padding:10px;font-size:12px;" onclick="alert('Navegação GPS Waze/Maps iniciada.')">🧭 Navegar</button>
+            <button class="main-action-btn btn-ghost" style="padding:10px;font-size:12px;" onclick="openGPSNavModal()">🧭 Navegar (Maps/Waze)</button>
           </div>
 
           <button class="main-action-btn btn-gold" id="drv-step-action-btn" onclick="advanceDriverTrip()" style="margin-bottom:9px;">Cheguei ao local</button>
@@ -1371,6 +1388,60 @@ html, body{
   <!-- ==========================================================================
        MODAIS DE AUTENTICAÇÃO, CADASTRO, DOCUMENTOS & LEVANTAMENTO
        ========================================================================== -->
+  <!-- MODAL DE ESCOLHA DE NAVEGAÇÃO GPS (GOOGLE MAPS / WAZE / APPLE) -->
+  <div class="modal-backdrop" id="nav-gps-modal-el">
+    <div class="modal-window" style="max-width:370px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(--line);">
+        <div>
+          <h3 style="font-size:16px;font-weight:900;color:#fff;display:flex;align-items:center;gap:6px;">
+            <span style="color:var(--gold);">🧭</span> Navegação GPS
+          </h3>
+          <p style="font-size:11px;color:var(--mut);margin-top:2px;">Abrir rota passo a passo no seu telemóvel</p>
+        </div>
+        <button onclick="closeGPSNavModal()" style="background:var(--ink3);border:1px solid var(--line);color:var(--mut);width:32px;height:32px;border-radius:50%;font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;">✕</button>
+      </div>
+
+      <div style="background:var(--ink3);border-radius:10px;padding:10px 12px;margin-bottom:14px;border:1px solid var(--line);">
+        <small style="color:var(--gold);font-weight:700;text-transform:uppercase;font-size:9.5px;letter-spacing:0.04em;display:block;margin-bottom:2px;">Destino seleccionado</small>
+        <b style="font-size:13.5px;color:#fff;display:block;" id="nav-modal-dest-name">Centralidade do Kilamba</b>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:16px;">
+        <!-- GOOGLE MAPS -->
+        <button class="nav-app-choice-btn" onclick="launchExternalGPS('google')">
+          <div class="nav-app-icon" style="background:#1a73e8;">🗺️</div>
+          <div style="flex:1;text-align:left;">
+            <b style="font-size:13px;display:block;color:#fff;">Google Maps <span style="font-size:9px;color:var(--grn);background:#123a1e;border:1px solid var(--grn);padding:1px 5px;border-radius:4px;margin-left:4px;font-weight:800;">Líder em Angola</span></b>
+            <small style="font-size:10.5px;color:var(--mut);display:block;margin-top:1px;">Melhor mapa de ruas, bombas Sonangol e bairros angolanos.</small>
+          </div>
+          <span style="color:var(--gold);font-size:16px;">➔</span>
+        </button>
+
+        <!-- WAZE -->
+        <button class="nav-app-choice-btn" onclick="launchExternalGPS('waze')">
+          <div class="nav-app-icon" style="background:#33ccff;color:#000;">🚙</div>
+          <div style="flex:1;text-align:left;">
+            <b style="font-size:13px;display:block;color:#fff;">Waze GPS</b>
+            <small style="font-size:10.5px;color:var(--mut);display:block;margin-top:1px;">Rotas alternativas e alertas de trânsito em Luanda.</small>
+          </div>
+          <span style="color:var(--gold);font-size:16px;">➔</span>
+        </button>
+
+        <!-- APPLE MAPS -->
+        <button class="nav-app-choice-btn" onclick="launchExternalGPS('apple')">
+          <div class="nav-app-icon" style="background:#3a3a3c;">🍏</div>
+          <div style="flex:1;text-align:left;">
+            <b style="font-size:13px;display:block;color:#fff;">Apple Maps</b>
+            <small style="font-size:10.5px;color:var(--mut);display:block;margin-top:1px;">Navegação nativa para dispositivos iPhone / iOS.</small>
+          </div>
+          <span style="color:var(--gold);font-size:16px;">➔</span>
+        </button>
+      </div>
+
+      <button class="main-action-btn btn-ghost" onclick="closeGPSNavModal()" style="padding:12px;">Fechar</button>
+    </div>
+  </div>
+
   <!-- MODAL DE CADASTRO E LOGIN (MOTORISTA / PASSAGEIRO) -->
   <div class="modal-backdrop" id="auth-modal-el">
     <div class="modal-window">
@@ -1977,12 +2048,53 @@ function dismissPeerSos() {
 
 function acceptPeerSupport() {
   document.getElementById('peer-sos-alert-banner').classList.remove('on');
-  alert('Rota prioritária de apoio traçada no GPS! Viatura a caminho das coordenadas de socorro do colega.');
+  playHapticSound('beep');
+  openGPSNavModal('Emergência SOS Colega - Talatona (Próx. à Bomba Sonangol)');
 }
 
 /* ==========================================================================
    10. NAVEGAÇÃO DE VISTAS (PASSAGEIRO, MOTORISTA, CENTRAL)
    ========================================================================== */
+let customNavTarget = '';
+
+function openGPSNavModal(customDest) {
+  customNavTarget = customDest || destName || 'Destino';
+  const labelEl = document.getElementById('nav-modal-dest-name');
+  if (labelEl) labelEl.textContent = customNavTarget;
+  const modalEl = document.getElementById('nav-gps-modal-el');
+  if (modalEl) {
+    modalEl.classList.add('on');
+    modalEl.scrollTop = 0;
+  }
+  playHapticSound('beep');
+}
+
+function closeGPSNavModal() {
+  const modalEl = document.getElementById('nav-gps-modal-el');
+  if (modalEl) modalEl.classList.remove('on');
+}
+
+function launchExternalGPS(service) {
+  const target = customNavTarget || destName || 'Luanda, Angola';
+  const provText = (currentProv || 'luanda').toUpperCase();
+  const query = encodeURIComponent(target + ', ' + provText + ', Angola');
+  let url = '';
+
+  if (service === 'google') {
+    // Protocolo oficial Google Maps turn-by-turn navigation
+    url = 'https://www.google.com/maps/dir/?api=1&destination=' + query + '&travelmode=driving';
+  } else if (service === 'waze') {
+    // Protocolo oficial Waze direct navigation
+    url = 'https://waze.com/ul?q=' + query + '&navigate=yes';
+  } else if (service === 'apple') {
+    // Protocolo oficial Apple Maps
+    url = 'https://maps.apple.com/?daddr=' + query + '&dirflg=d';
+  }
+
+  closeGPSNavModal();
+  if (url) window.open(url, '_blank');
+}
+
 function switchView(view) {
   activeView = view;
   document.querySelectorAll('.role-btn, .role-nav-btn').forEach(b => b.classList.toggle('on', b.id === 'nav-btn-' + view));
