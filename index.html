@@ -549,8 +549,8 @@ html, body{
 
         <!-- LISTA DE VEÍCULOS UBER TIERS -->
         <div style="display:flex;justify-content:space-between;align-items:center;margin:8px 0 6px;">
-          <span style="font-size:12px;font-weight:800;color:var(--wht);">Opções de Viagem</span>
-          <span style="font-size:11px;color:var(--grn);font-weight:700;">10% mais barato que Heetch</span>
+          <span id="tier-section-title" style="font-size:12px;font-weight:800;color:var(--wht);">Opções de Viagem</span>
+          <span id="tier-section-badge" style="font-size:11px;color:var(--grn);font-weight:700;">Até 12% mais barato que a concorrência</span>
         </div>
 
         <div class="tier-list-wrap" id="tier-list-container">
@@ -693,14 +693,32 @@ html, body{
 const T_PAX = { base: 50, km: 243, min: 1, minimo: 900, comissao: 0.10 };
 
 const TIERS_PAX = [
-  { id: 'moto', nome: 'GIRO Moto (Kupapata)', desc: '1 lugar · rápido no trânsito · o mais barato', mult: 0.47, eta: 3, cap: '1 lug',
+  { id: 'moto', nome: 'GIRO Moto (Kupapata)', desc: '1 lugar · rápido no trânsito · tarifa económica', mult: 0.47, eta: 3, cap: '1 lug',
     svg: '<svg viewBox="0 0 40 26"><circle cx="8" cy="19" r="5" fill="none" stroke="#f0b429" stroke-width="2.4"/><circle cx="32" cy="19" r="5" fill="none" stroke="#f0b429" stroke-width="2.4"/><path d="M8 19l7-8h9l4 8M17 11l-3-4h-4" stroke="#f0b429" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>' },
-  { id: 'eco', nome: 'GIRO Económico', desc: '4 lugares · ar condicionado · 10% mais barato que Yango', mult: 1.0, eta: 4, cap: '4 lug', pop: true,
+  { id: 'eco', nome: 'GIRO Económico', desc: '4 lugares · ar condicionado · o mais pedido', mult: 1.0, eta: 4, cap: '4 lug', pop: true,
     svg: '<svg viewBox="0 0 40 26"><path d="M3 19v-5l3-6.6A1.9 1.9 0 0 1 7.8 6h24.4a1.9 1.9 0 0 1 1.8 1.4L37 14v5a1.3 1.3 0 0 1-1.3 1.3h-1.9A1.3 1.3 0 0 1 32.5 19v-1h-25v1a1.3 1.3 0 0 1-1.3 1.3H4.3A1.3 1.3 0 0 1 3 19Z" fill="#f4f6f1"/></svg>' },
-  { id: 'conf', nome: 'GIRO Conforto', desc: 'Viatura recente · espaço extra · 10% abaixo da concorrência', mult: 1.14, eta: 6, cap: '4 lug',
+  { id: 'conf', nome: 'GIRO Conforto', desc: 'Viatura recente · espaço extra · climatizado', mult: 1.14, eta: 6, cap: '4 lug',
     svg: '<svg viewBox="0 0 40 26"><path d="M2 20v-6l3.2-7.2A2 2 0 0 1 7.1 5h25.8a2 2 0 0 1 1.9 1.3L38 14v6a1.4 1.4 0 0 1-1.4 1.4h-2.1A1.4 1.4 0 0 1 33.1 20v-1.2H6.9V20a1.4 1.4 0 0 1-1.4 1.4H3.4A1.4 1.4 0 0 1 2 20Z" fill="#d4af37"/></svg>' },
-  { id: 'sete', nome: 'GIRO 7', desc: '7 lugares · família ou malas para o aeroporto', mult: 1.40, eta: 9, cap: '7 lug',
+  { id: 'sete', nome: 'GIRO 7 (Familiar)', desc: '7 lugares · família ou malas para o aeroporto', mult: 1.40, eta: 9, cap: '7 lug',
     svg: '<svg viewBox="0 0 40 26"><path d="M1 21v-7l3.4-8A2.1 2.1 0 0 1 6.4 4h27.2a2.1 2.1 0 0 1 2 1.7L39 14v7a1.5 1.5 0 0 1-1.5 1.5h-2.3A1.5 1.5 0 0 1 33.7 21v-1.3H6.3V21A1.5 1.5 0 0 1 4.8 22.5H2.5A1.5 1.5 0 0 1 1 21Z" fill="#8d968a"/></svg>' }
+];
+
+const TIERS_DELIVERY = [
+  { id: 'deliv_moto', nome: 'GIRO Flash Moto', desc: 'Até 10 kg · encomendas, refeições e documentos', mult: 0.48, eta: 3, cap: '10 kg', pop: true,
+    svg: '<svg viewBox="0 0 40 26"><circle cx="8" cy="19" r="5" fill="none" stroke="#2ec4b6" stroke-width="2.4"/><circle cx="32" cy="19" r="5" fill="none" stroke="#2ec4b6" stroke-width="2.4"/><path d="M8 19l7-8h9l4 8M17 11l-3-4h-4" stroke="#2ec4b6" stroke-width="2.4" fill="none"/><rect x="18" y="5" width="8" height="7" rx="1" fill="#2ec4b6" opacity="0.8"/></svg>' },
+  { id: 'deliv_car', nome: 'GIRO Express Carro', desc: 'Até 60 kg · caixas médias, compras de mercado', mult: 1.05, eta: 5, cap: '60 kg',
+    svg: '<svg viewBox="0 0 40 26"><path d="M3 19v-5l3-6.6A1.9 1.9 0 0 1 7.8 6h24.4a1.9 1.9 0 0 1 1.8 1.4L37 14v5a1.3 1.3 0 0 1-1.3 1.3h-1.9A1.3 1.3 0 0 1 32.5 19v-1h-25v1a1.3 1.3 0 0 1-1.3 1.3H4.3A1.3 1.3 0 0 1 3 19Z" fill="#2ec4b6"/></svg>' },
+  { id: 'deliv_van', nome: 'GIRO Van Encomendas', desc: 'Até 300 kg · volumes comerciais e mercadorias', mult: 1.35, eta: 8, cap: '300 kg',
+    svg: '<svg viewBox="0 0 40 26"><path d="M1 21v-7l3.4-8A2.1 2.1 0 0 1 6.4 4h27.2a2.1 2.1 0 0 1 2 1.7L39 14v7a1.5 1.5 0 0 1-1.5 1.5h-2.3A1.5 1.5 0 0 1 33.7 21v-1.3H6.3V21A1.5 1.5 0 0 1 4.8 22.5H2.5A1.5 1.5 0 0 1 1 21Z" fill="#2ec4b6"/></svg>' }
+];
+
+const TIERS_CARGO = [
+  { id: 'cargo_pickup', nome: 'GIRO Pick-Up / Carrinha (+50%)', desc: 'Até 1 Tonelada · mobília, materiais e eletrodomésticos', mult: 1.50, eta: 8, cap: '1 Ton', pop: true,
+    svg: '<svg viewBox="0 0 40 26"><path d="M2 19v-5l3-6.6A1.9 1.9 0 0 1 6.8 6h15.2v8h14v5a1.3 1.3 0 0 1-1.3 1.3H4.3A1.3 1.3 0 0 1 2 19Z" fill="#ffb703"/><line x1="22" y1="9" x2="36" y2="9" stroke="#ffb703" stroke-width="2"/></svg>' },
+  { id: 'cargo_canter', nome: 'GIRO Camião Canter (3.5T)', desc: 'Até 3.5 Toneladas · obras, comércio e grandes cargas', mult: 2.25, eta: 12, cap: '3.5 Ton',
+    svg: '<svg viewBox="0 0 40 26"><rect x="2" y="5" width="22" height="14" rx="2" fill="#ffb703"/><path d="M25 10h6l4 4v5h-10v-9z" fill="#ffb703" opacity="0.8"/><circle cx="8" cy="20" r="3" fill="#121212"/><circle cx="30" cy="20" r="3" fill="#121212"/></svg>' },
+  { id: 'cargo_heavy', nome: 'GIRO Camião Pesado (Mudanças)', desc: 'Até 10 Toneladas · mudanças residenciais e industriais', mult: 3.50, eta: 15, cap: '10 Ton',
+    svg: '<svg viewBox="0 0 40 26"><rect x="2" y="3" width="24" height="16" rx="2" fill="#ffb703"/><path d="M27 8h7l4 5v6h-11V8z" fill="#ffb703"/><circle cx="7" cy="20" r="3" fill="#121212"/><circle cx="16" cy="20" r="3" fill="#121212"/><circle cx="33" cy="20" r="3" fill="#121212"/></svg>' }
 ];
 
 const DESTINOS = {
@@ -747,9 +765,18 @@ let payMethod = 'Multicaixa Express';
 let couponDiscount = 0.0; // 10% quando cupom válido
 let appliedCouponCode = '';
 
+function getActiveTiers() {
+  if (appMode === 'delivery') return TIERS_DELIVERY;
+  if (appMode === 'cargo') return TIERS_CARGO;
+  return TIERS_PAX;
+}
+
 function calculatePrice(t) {
+  const isMoto = (t.id === 'moto' || t.id === 'deliv_moto');
+  const isCargo = (appMode === 'cargo');
+  const baseMin = isCargo ? (T_PAX.minimo * 1.5) : (T_PAX.minimo * (isMoto ? 0.85 : 1.0));
   const bruto = (T_PAX.base + T_PAX.km * tripKm + T_PAX.min * tripMins) * provMult * t.mult;
-  let finalFare = Math.max(T_PAX.minimo * provMult * (t.id === 'moto' ? 0.85 : 1.0), bruto);
+  let finalFare = Math.max(baseMin * provMult, bruto);
   if (couponDiscount > 0) {
     finalFare *= (1 - couponDiscount);
   }
@@ -757,8 +784,10 @@ function calculatePrice(t) {
 }
 
 function renderTiers() {
+  const tiers = getActiveTiers();
+  if (tierIdx >= tiers.length) tierIdx = 0;
   const container = document.getElementById('tier-list-container');
-  container.innerHTML = TIERS_PAX.map((t, i) => {
+  container.innerHTML = tiers.map((t, i) => {
     const isSel = (i === tierIdx);
     const fare = calculatePrice(t);
     const oldFare = (couponDiscount > 0) ? Math.round(calculatePrice(t) / (1 - couponDiscount)) : null;
@@ -781,8 +810,10 @@ function renderTiers() {
     `;
   }).join('');
   
-  const chosen = TIERS_PAX[tierIdx];
-  document.getElementById('btn-confirm-tier').textContent = `Confirmar ${chosen.nome} · ${kz(calculatePrice(chosen))}`;
+  const chosen = tiers[tierIdx];
+  if (chosen) {
+    document.getElementById('btn-confirm-tier').textContent = `Confirmar ${chosen.nome} · ${kz(calculatePrice(chosen))}`;
+  }
 }
 
 function selectTierIndex(idx) {
@@ -879,9 +910,21 @@ function setAppMode(mode) {
   document.getElementById('tab-pax-mode').className = 'u-tab' + (mode === 'pax' ? ' on' : '');
   document.getElementById('tab-deliv-mode').className = 'u-tab' + (mode === 'delivery' ? ' on delivery' : '');
   document.getElementById('tab-cargo-mode').className = 'u-tab' + (mode === 'cargo' ? ' on cargo' : '');
-  if (mode === 'delivery') tierIdx = 0;
-  else if (mode === 'cargo') tierIdx = 2;
-  else tierIdx = 1;
+  
+  const titleEl = document.getElementById('tier-section-title');
+  const badgeEl = document.getElementById('tier-section-badge');
+  if (titleEl) {
+    if (mode === 'delivery') titleEl.textContent = 'Opções de Entrega';
+    else if (mode === 'cargo') titleEl.textContent = 'Opções de Carga & Frete';
+    else titleEl.textContent = 'Opções de Viagem';
+  }
+  if (badgeEl) {
+    if (mode === 'cargo') badgeEl.textContent = 'Carga Pesada & Fretes (+50%)';
+    else if (mode === 'delivery') badgeEl.textContent = 'Entregas Rápidas 24/7';
+    else badgeEl.textContent = 'Até 12% mais barato que a concorrência';
+  }
+
+  tierIdx = (mode === 'pax') ? 1 : 0;
   renderTiers();
 }
 
