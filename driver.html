@@ -1036,11 +1036,11 @@
       const modal = document.getElementById('request-modal');
       const timerFill = document.getElementById('req-timer-fill');
       
-      // Random route in Luanda
+      // Random route in Luanda with real coordinates
       const routes = [
-        { from: "Mutamba (Largo)", to: "Talatona (Belas Shopping)", price: 3000, dist: "8.2 km" },
-        { from: "Maianga (Av. Revolução)", to: "Kilamba (Bloco B)", price: 4500, dist: "16.5 km" },
-        { from: "Aeroporto 4 de Fevereiro", to: "Ilha de Luanda", price: 2800, dist: "6.4 km" }
+        { from: "Mutamba (Largo), Luanda", to: "Talatona (Belas Shopping), Luanda", price: 3000, dist: "8.2 km", destCoords: [-8.9147, 13.1893], originCoords: [-8.8383, 13.2344] },
+        { from: "Maianga (Av. Revolução), Luanda", to: "Kilamba (Bloco B), Luanda", price: 4500, dist: "16.5 km", destCoords: [-8.9400, 13.1600], originCoords: [-8.8310, 13.2370] },
+        { from: "Aeroporto 4 de Fevereiro, Luanda", to: "Ilha de Luanda", price: 2800, dist: "6.4 km", destCoords: [-8.7950, 13.2590], originCoords: [-8.8575, 13.2310] }
       ];
       const selected = routes[Math.floor(Math.random() * routes.length)];
 
@@ -1050,6 +1050,10 @@
       document.getElementById('req-price-display').innerText = net.toLocaleString('pt-AO') + ' Kz';
       document.getElementById('req-pickup-name').innerText = selected.from;
       document.getElementById('req-dest-name').innerText = selected.to;
+
+      // Store coordinates for navigation links when accepted
+      driverState._lastRouteDestCoords = selected.destCoords;
+      driverState._lastRouteOriginCoords = selected.originCoords;
 
       modal.classList.add('active');
       timerFill.style.transition = 'none';
@@ -1079,14 +1083,22 @@
     function acceptRequest() {
       dismissRequest();
       
+      // Get pickup and destination names from the request card
+      const pickupName = document.getElementById('req-pickup-name').innerText;
+      const destName = document.getElementById('req-dest-name').innerText;
+
       driverState.activeTrip = {
-        dest: [-8.9167, 13.1833], // Talatona coordinates
-        destName: document.getElementById('req-dest-name').innerText,
+        origin: driverState.coords,
+        originName: pickupName,
+        dest: driverState._lastRouteDestCoords || [-8.9147, 13.1893],
+        destName: destName,
         price: 3000
       };
 
-      // Show Active Trip Overlay
+      // Show Active Trip Overlay with passenger info
       document.getElementById('trip-overlay').style.display = 'block';
+      document.getElementById('trip-passenger-info').innerText = `De: ${pickupName} → Destino: ${destName}`;
+      document.getElementById('nav-instruction-text').innerText = `A caminho de ${destName}`;
 
       // Draw route on map
       if (tripRouteLayer) map.removeLayer(tripRouteLayer);
@@ -1106,11 +1118,16 @@
 
       map.fitBounds(tripRouteLayer.getBounds(), { padding: [80, 80] });
 
-      // Update Navigation links
+      // Build navigation links with full addresses (origin → destination)
+      const originEnc = encodeURIComponent(pickupName + ', Angola');
+      const destEnc = encodeURIComponent(destName + ', Angola');
       const destLat = driverState.activeTrip.dest[0];
       const destLng = driverState.activeTrip.dest[1];
-      document.getElementById('waze-btn').href = `https://waze.com/ul?ll=${destLat},${destLng}&navigate=yes`;
-      document.getElementById('gmaps-btn').href = `https://www.google.com/maps/dir/?api=1&destination=${destLat},${destLng}`;
+
+      // Waze: navigate to destination address
+      document.getElementById('waze-btn').href = `https://waze.com/ul?q=${destEnc}&ll=${destLat},${destLng}&navigate=yes`;
+      // Google Maps: full route from pickup to destination
+      document.getElementById('gmaps-btn').href = `https://www.google.com/maps/dir/?api=1&origin=${originEnc}&destination=${destEnc}&travelmode=driving`;
     }
 
     function completeTrip() {

@@ -690,16 +690,16 @@ html, body{
 /* ==========================================================================
    CONFIGURAÇÃO TARIFÁRIA & ESTADO DO PASSAGEIRO
    ========================================================================== */
-const T_PAX = { base: 495, km: 216, min: 29, minimo: 1080, comissao: 0.10 };
+const T_PAX = { base: 50, km: 243, min: 1, minimo: 900, comissao: 0.10 };
 
 const TIERS_PAX = [
-  { id: 'moto', nome: 'GIRO Moto (Kupapata)', desc: '1 lugar · rápido no trânsito (−15%)', mult: 0.4675, eta: 3, cap: '1 lug',
+  { id: 'moto', nome: 'GIRO Moto (Kupapata)', desc: '1 lugar · rápido no trânsito · o mais barato', mult: 0.47, eta: 3, cap: '1 lug',
     svg: '<svg viewBox="0 0 40 26"><circle cx="8" cy="19" r="5" fill="none" stroke="#f0b429" stroke-width="2.4"/><circle cx="32" cy="19" r="5" fill="none" stroke="#f0b429" stroke-width="2.4"/><path d="M8 19l7-8h9l4 8M17 11l-3-4h-4" stroke="#f0b429" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>' },
-  { id: 'eco', nome: 'GIRO Económico', desc: '4 lugares · ar condicionado · o mais pedido', mult: 1.0, eta: 4, cap: '4 lug', pop: true,
+  { id: 'eco', nome: 'GIRO Económico', desc: '4 lugares · ar condicionado · 10% mais barato que Yango', mult: 1.0, eta: 4, cap: '4 lug', pop: true,
     svg: '<svg viewBox="0 0 40 26"><path d="M3 19v-5l3-6.6A1.9 1.9 0 0 1 7.8 6h24.4a1.9 1.9 0 0 1 1.8 1.4L37 14v5a1.3 1.3 0 0 1-1.3 1.3h-1.9A1.3 1.3 0 0 1 32.5 19v-1h-25v1a1.3 1.3 0 0 1-1.3 1.3H4.3A1.3 1.3 0 0 1 3 19Z" fill="#f4f6f1"/></svg>' },
-  { id: 'conf', nome: 'GIRO Conforto', desc: 'Viatura recente · espaço extra · ar no máx.', mult: 1.45, eta: 6, cap: '4 lug',
+  { id: 'conf', nome: 'GIRO Conforto', desc: 'Viatura recente · espaço extra · 10% abaixo da concorrência', mult: 1.14, eta: 6, cap: '4 lug',
     svg: '<svg viewBox="0 0 40 26"><path d="M2 20v-6l3.2-7.2A2 2 0 0 1 7.1 5h25.8a2 2 0 0 1 1.9 1.3L38 14v6a1.4 1.4 0 0 1-1.4 1.4h-2.1A1.4 1.4 0 0 1 33.1 20v-1.2H6.9V20a1.4 1.4 0 0 1-1.4 1.4H3.4A1.4 1.4 0 0 1 2 20Z" fill="#d4af37"/></svg>' },
-  { id: 'sete', nome: 'GIRO 7', desc: '7 lugares · família ou malas para o aeroporto', mult: 1.9, eta: 9, cap: '7 lug',
+  { id: 'sete', nome: 'GIRO 7', desc: '7 lugares · família ou malas para o aeroporto', mult: 1.40, eta: 9, cap: '7 lug',
     svg: '<svg viewBox="0 0 40 26"><path d="M1 21v-7l3.4-8A2.1 2.1 0 0 1 6.4 4h27.2a2.1 2.1 0 0 1 2 1.7L39 14v7a1.5 1.5 0 0 1-1.5 1.5h-2.3A1.5 1.5 0 0 1 33.7 21v-1.3H6.3V21A1.5 1.5 0 0 1 4.8 22.5H2.5A1.5 1.5 0 0 1 1 21Z" fill="#8d968a"/></svg>' }
 ];
 
