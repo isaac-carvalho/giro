@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>GIRO Central 24h | Monitoramento Tático Luanda</title>
+  
+  <!-- PWA & Android Meta -->
+  <link rel="manifest" href="./manifest.json">
+  <meta name="theme-color" content="#000000">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <link rel="apple-touch-icon" href="./icons/icon-192.png">
+  <link rel="icon" type="image/x-icon" href="./favicon.ico">
+
+  <!-- Google Fonts & Leaflet -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+
+    body {
+      background: #000000;
+      color: #ffffff;
+      height: 100vh;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Top Navigation Header */
+    header {
+      background: #0d0d0d;
+      border-bottom: 1px solid #1f1f1f;
+      padding: 12px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      z-index: 100;
+    }
+
+    .brand-section {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand-logo {
+      font-size: 20px;
+      font-weight: 900;
+      letter-spacing: -0.5px;
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .badge-live {
+      background: rgba(239, 68, 68, 0.15);
+      border: 1px solid #ef4444;
+      color: #ef4444;
+      font-size: 11px;
+      font-weight: 800;
+      padding: 3px 8px;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .badge-live::before {
+      content: "";
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #ef4444;
+      box-shadow: 0 0 8px #ef4444;
+      animation: blink 1.2s infinite;
+    }
+
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.3; }
+    }
+
+    .header-metrics {
+      display: flex;
+      gap: 20px;
+      align-items: center;
+    }
+
+    .metric-pill {
+      display: flex;
+      flex-direction: column;
+      text-align: right;
+    }
+
+    .metric-val {
+      font-weight: 800;
+      font-size: 15px;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .metric-sub {
+      font-size: 10px;
+      color: #6b7280;
+      text-transform: uppercase;
+      font-weight: 700;
+    }
+
+    .nav-apps-btn {
+      display: flex;
+      gap: 8px;
+    }
+
+    .link-app {
+      padding: 7px 12px;
+      background: #1a1a1a;
+      border: 1px solid #2d2d2d;
+      border-radius: 8px;
+      color: #d1d5db;
+      text-decoration: none;
+      font-size: 12px;
+      font-weight: 600;
+      transition: all 0.2s;
+    }
+
+    .link-app:hover {
+      background: #ffffff;
+      color: #000000;
+      border-color: #ffffff;
+    }
+
+    /* Main Operations Dashboard Grid */
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: 320px 1fr 340px;
+      flex: 1;
+      height: calc(100vh - 61px);
+      overflow: hidden;
+    }
+
+    @media (max-width: 1024px) {
+      .dashboard-grid {
+        grid-template-columns: 1fr;
+        overflow-y: auto;
+      }
+    }
+
+    /* Left Sidebar: Live Emergency & SOS Desk */
+    .panel-left {
+      background: #0a0a0a;
+      border-right: 1px solid #1a1a1a;
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+    }
+
+    .panel-title {
+      padding: 14px 16px;
+      border-bottom: 1px solid #1a1a1a;
+      font-size: 13px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: #9ca3af;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .sos-card {
+      margin: 12px 14px;
+      background: linear-gradient(145deg, #1c0a0a, #2a0e0e);
+      border: 1px solid #ef4444;
+      border-radius: 12px;
+      padding: 14px;
+      box-shadow: 0 4px 20px rgba(239, 68, 68, 0.2);
+    }
+
+    .sos-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+
+    .sos-driver-name {
+      font-weight: 800;
+      font-size: 14px;
+      color: #ffffff;
+    }
+
+    .sos-radius-tag {
+      font-size: 11px;
+      font-weight: 800;
+      background: #dc2626;
+      padding: 2px 8px;
+      border-radius: 10px;
+      color: #fff;
+    }
+
+    .sos-loc {
+      font-size: 12px;
+      color: #fca5a5;
+      margin-bottom: 10px;
+      line-height: 1.4;
+    }
+
+    .sos-actions-row {
+      display: flex;
+      gap: 6px;
+    }
+
+    .btn-pna {
+      flex: 1;
+      padding: 8px;
+      background: #ef4444;
+      border: none;
+      border-radius: 8px;
+      color: #ffffff;
+      font-weight: 800;
+      font-size: 11px;
+      cursor: pointer;
+    }
+
+    .btn-p2p {
+      flex: 1;
+      padding: 8px;
+      background: #1f1f1f;
+      border: 1px solid #333;
+      border-radius: 8px;
+      color: #ffffff;
+      font-weight: 700;
+      font-size: 11px;
+      cursor: pointer;
+    }
+
+    /* Middle Section: Full Map */
+    .panel-center {
+      position: relative;
+      background: #121212;
+    }
+
+    #map {
+      width: 100%;
+      height: 100%;
+      background: #121212;
+    }
+
+    .map-floating-bar {
+      position: absolute;
+      top: 14px;
+      left: 14px;
+      right: 14px;
+      z-index: 10;
+      display: flex;
+      justify-content: space-between;
+      pointer-events: none;
+    }
+
+    .map-pill {
+      pointer-events: auto;
+      background: rgba(13, 13, 13, 0.88);
+      backdrop-filter: blur(10px);
+      border: 1px solid #2a2a2a;
+      border-radius: 20px;
+      padding: 8px 14px;
+      font-size: 12px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* Right Sidebar: Commission & Budget Audit */
+    .panel-right {
+      background: #0a0a0a;
+      border-left: 1px solid #1a1a1a;
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+    }
+
+    .audit-box {
+      margin: 14px;
+      background: #121212;
+      border: 1px solid #222222;
+      border-radius: 12px;
+      padding: 16px;
+    }
+
+    .audit-title {
+      font-size: 13px;
+      font-weight: 800;
+      color: #ffffff;
+      margin-bottom: 4px;
+    }
+
+    .audit-desc {
+      font-size: 11px;
+      color: #9ca3af;
+      margin-bottom: 12px;
+      line-height: 1.4;
+    }
+
+    .stat-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 8px 0;
+      border-bottom: 1px solid #1c1c1c;
+      font-size: 12px;
+    }
+
+    .stat-row:last-child {
+      border-bottom: none;
+    }
+
+    .fleet-item {
+      padding: 10px 14px;
+      border-bottom: 1px solid #161616;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 12px;
+    }
+
+    .fleet-item:hover {
+      background: #141414;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Navigation Header -->
+  <header>
+    <div class="brand-section">
+      <div class="brand-logo">
+        <span>GIRO</span>
+        <span style="font-size: 12px; background: #ffffff; color: #000; padding: 2px 6px; border-radius: 4px; font-weight: 900;">CENTRAL 24H</span>
+      </div>
+      <div class="badge-live">RADAR LUANDA EM TEMPO REAL</div>
+    </div>
+
+    <div class="header-metrics">
+      <div class="metric-pill">
+        <span class="metric-val" style="color: #22c55e;">142</span>
+        <span class="metric-sub">Motoristas Online</span>
+      </div>
+      <div class="metric-pill">
+        <span class="metric-val" style="color: #3b82f6;">89</span>
+        <span class="metric-sub">Corridas em Curso</span>
+      </div>
+      <div class="metric-pill">
+        <span class="metric-val" style="color: #ef4444;">1</span>
+        <span class="metric-sub">Alerta SOS Ativo</span>
+      </div>
+    </div>
+
+    <div class="nav-apps-btn">
+      <a href="./index.html" class="link-app">👤 App Passageiro</a>
+      <a href="./driver.html" class="link-app">🚖 App Motorista</a>
+      <a href="./landing.html" class="link-app">🌐 Apresentação</a>
+    </div>
+  </header>
+
+  <!-- Main Grid -->
+  <div class="dashboard-grid">
+    
+    <!-- Left: SOS & Dispatch -->
+    <div class="panel-left">
+      <div class="panel-title">
+        <span>🚨 Ocorrências Críticas (SOS)</span>
+        <span style="color: #ef4444;">1 Pendente</span>
+      </div>
+
+      <div class="sos-card">
+        <div class="sos-card-header">
+          <span class="sos-driver-name">Carlos Silveira (Toyota Vitz)</span>
+          <span class="sos-radius-tag">5 KM RADAR</span>
+        </div>
+        <div class="sos-loc">
+          📍 <strong>Av. 21 de Janeiro (junto ao Rocha Pinto)</strong><br>
+          Coordenadas: -8.8540, 13.2180 • Disparo: há 2 min
+        </div>
+        <div class="sos-actions-row">
+          <button class="btn-pna" onclick="dispatchPNA('7ª Esquadra Talatona')">Acionar 7ª Esquadra PNA</button>
+          <button class="btn-p2p" onclick="broadcastPeerHelp()">Alerta Solidário 5km</button>
+        </div>
+      </div>
+
+      <div class="panel-title" style="margin-top: 10px;">
+        <span>🚔 Postos da Polícia Nacional (PNA)</span>
+      </div>
+      <div style="padding: 10px 14px; font-size: 12px; color: #9ca3af; display: flex; flex-direction: column; gap: 8px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; background:#121212; padding:8px 10px; border-radius:8px;">
+          <span>7ª Esquadra (Talatona)</span>
+          <span style="color:#22c55e; font-weight:700;">Pronta (1.4 km)</span>
+        </div>
+        <div style="display:flex; justify-content:space-between; align-items:center; background:#121212; padding:8px 10px; border-radius:8px;">
+          <span>14ª Esquadra (Kilamba)</span>
+          <span style="color:#22c55e; font-weight:700;">Pronta (6.8 km)</span>
+        </div>
+        <div style="display:flex; justify-content:space-between; align-items:center; background:#121212; padding:8px 10px; border-radius:8px;">
+          <span>1ª Esquadra (Mutamba)</span>
+          <span style="color:#22c55e; font-weight:700;">Pronta (3.2 km)</span>
+        </div>
+        <div style="display:flex; justify-content:space-between; align-items:center; background:#121212; padding:8px 10px; border-radius:8px;">
+          <span>12ª Esquadra (Cazenga)</span>
+          <span style="color:#22c55e; font-weight:700;">Pronta (5.1 km)</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Center: Live Tactical Map -->
+    <div class="panel-center">
+      <div class="map-floating-bar">
+        <div class="map-pill">
+          <span>📡 Radar Ativo: Toda a Província de Luanda</span>
+        </div>
+        <div class="map-pill">
+          <span style="color:#10b981;">● 10% Taxa de Plataforma</span>
+        </div>
+      </div>
+      <div id="map"></div>
+    </div>
+
+    <!-- Right: Financial & Sustainability Audit -->
+    <div class="panel-right">
+      <div class="panel-title">
+        <span>📊 Auditoria Orçamentária</span>
+        <span style="color:#10b981;">100% Sustentável</span>
+      </div>
+
+      <div class="audit-box">
+        <div class="audit-title">Desafio Diário 30K (Motoristas)</div>
+        <div class="audit-desc">
+          O motorista ganha +1.500 Kz ao atingir 30.000 Kz no dia. A comissão GIRO de 10% sobre 30.000 Kz é 3.000 Kz. A GIRO reinveste metade (1.500 Kz) no motorista e retém 1.500 Kz de lucro líquido sem estouro orçamentário.
+        </div>
+        <div class="stat-row">
+          <span style="color:#9ca3af;">Meta por Motorista</span>
+          <span style="font-weight:700;">30.000 Kz / dia</span>
+        </div>
+        <div class="stat-row">
+          <span style="color:#9ca3af;">Comissão GIRO (10%)</span>
+          <span style="color:#3b82f6; font-weight:700;">+3.000 Kz</span>
+        </div>
+        <div class="stat-row">
+          <span style="color:#9ca3af;">Bônus Concedido</span>
+          <span style="color:#ef4444; font-weight:700;">-1.500 Kz</span>
+        </div>
+        <div class="stat-row" style="background:#161616; padding:8px; border-radius:6px; margin-top:6px;">
+          <span style="font-weight:800; color:#fff;">Lucro Líquido GIRO</span>
+          <span style="color:#10b981; font-weight:900;">+1.500 Kz (50% Margem)</span>
+        </div>
+      </div>
+
+      <div class="audit-box">
+        <div class="audit-title">Clube Passageiro (10% Cupom)</div>
+        <div class="audit-desc">
+          Cupom de 10% desbloqueado a cada 5 corridas concluídas. O impacto médio por corrida é de apenas 2% do faturamento, respeitando rigorosamente o teto de 10%.
+        </div>
+        <div class="stat-row">
+          <span style="color:#9ca3af;">Frequência Cupom</span>
+          <span style="font-weight:700;">1 a cada 5 viagens</span>
+        </div>
+        <div class="stat-row">
+          <span style="color:#9ca3af;">Impacto Médio Receita</span>
+          <span style="color:#10b981; font-weight:700;">~2.0% (Teto máx: 10%)</span>
+        </div>
+      </div>
+
+      <div class="panel-title">
+        <span>🚖 Amostra da Frota em Tempo Real</span>
+      </div>
+      <div id="fleet-list">
+        <!-- Injected via JS -->
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    // Fleet simulation
+    const fleet = [
+      { name: "Carlos Silveira", car: "Toyota Vitz", plate: "LD-44-89-GG", status: "SOS ALERTA", lat: -8.8540, lng: 13.2180, sos: true },
+      { name: "António Mateus", car: "Hyundai i10", plate: "LD-12-34-AB", status: "Em Corrida", lat: -8.8383, lng: 13.2344, sos: false },
+      { name: "Manuel Domingos", car: "Kia Picanto", plate: "LD-88-21-CX", status: "Disponível", lat: -8.8200, lng: 13.2500, sos: false },
+      { name: "Francisco Costa", car: "Toyota Hiace (Carga)", plate: "LD-90-11-FA", status: "Em Corrida", lat: -8.8700, lng: 13.2100, sos: false },
+      { name: "João Pedro", car: "Moto TVS Apache", plate: "LD-05-99-MT", status: "Disponível", lat: -8.8450, lng: 13.2280, sos: false }
+    ];
+
+    let map;
+
+    function initCentralMap() {
+      map = L.map('map', {
+        zoomControl: true,
+        attributionControl: false
+      }).setView([-8.8450, 13.2300], 13);
+
+      L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+        maxZoom: 19
+      }).addTo(map);
+
+      // Render Fleet Markers
+      fleet.forEach(driver => {
+        const isSos = driver.sos;
+        const iconHtml = isSos ? 
+          '<div style="background:#dc2626; color:#fff; width:34px; height:34px; border-radius:50%; display:flex; align-items:center; justify-content:center; border:2px solid #fff; box-shadow:0 0 15px #dc2626; font-size:16px;">🚨</div>' :
+          '<div style="background:#000000; color:#fff; width:30px; height:30px; border-radius:50%; display:flex; align-items:center; justify-content:center; border:2px solid #fff; box-shadow:0 2px 8px rgba(0,0,0,0.5); font-size:14px;">🚖</div>';
+
+        const customIcon = L.divIcon({
+          className: 'central-marker',
+          html: iconHtml,
+          iconSize: [34, 34],
+          iconAnchor: [17, 17]
+        });
+
+        const marker = L.marker([driver.lat, driver.lng], { icon: customIcon }).addTo(map);
+        marker.bindPopup(`
+          <div style="color:#000; font-family:sans-serif; padding:4px;">
+            <strong>${driver.name}</strong><br>
+            Veículo: ${driver.car} (${driver.plate})<br>
+            Status: <span style="color:${isSos ? 'red' : 'green'}; font-weight:bold;">${driver.status}</span>
+          </div>
+        `);
+
+        if (isSos) {
+          // Draw 5km radius circle
+          L.circle([driver.lat, driver.lng], {
+            color: '#ef4444',
+            fillColor: '#ef4444',
+            fillOpacity: 0.12,
+            radius: 5000
+          }).addTo(map);
+        }
+      });
+
+      renderFleetList();
+    }
+
+    function renderFleetList() {
+      const container = document.getElementById('fleet-list');
+      container.innerHTML = '';
+
+      fleet.forEach(f => {
+        const item = document.createElement('div');
+        item.className = 'fleet-item';
+        item.innerHTML = `
+          <div>
+            <div style="font-weight:700; color:#fff;">${f.name}</div>
+            <div style="color:#9ca3af; font-size:11px;">${f.car} • ${f.plate}</div>
+          </div>
+          <span style="font-weight:700; color:${f.sos ? '#ef4444' : (f.status === 'Disponível' ? '#22c55e' : '#3b82f6')};">
+            ${f.status}
+          </span>
+        `;
+        container.appendChild(item);
+      });
+    }
+
+    function dispatchPNA(stationName) {
+      alert(`🚔 DESPACHO PNA ACIONADO!
+
+Alerta prioritário enviado com telemetria e coordenadas para ${stationName}.
+Unidade de patrulha mais próxima acionada via canal policial.`);
+    }
+
+    function broadcastPeerHelp() {
+      alert(`📡 TRANSMISSÃO P2P DISPARADA!
+
+Todos os condutores parceiros da GIRO num raio de 5 km receberam a localização do colega Carlos Silveira para socorro imediato.`);
+    }
+
+    // PWA SW
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./service-worker.js').catch(err => {
+          console.log('SW note:', err);
+        });
+      });
+    }
+
+    window.addEventListener('DOMContentLoaded', initCentralMap);
+  </script>
+</body>
+</html>

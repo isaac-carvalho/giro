@@ -1,0 +1,14 @@
+[
+  {
+    "relation": [
+      "delegate_permission/common.handle_all_urls"
+    ],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "ao.gov.giro.app",
+      "sha256_cert_fingerprints": [
+        "14:6D:E9:7D:0F:52:AB:FC:25:3F:B4:4D:23:4B:91:DE:3C:79:B2:D9:8A:2A:7E:6D:0B:42:0E:44:03:7E:28:B4"
+      ]
+    }
+  }
+]

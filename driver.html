@@ -1,0 +1,1241 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>GIRO Motorista Parceiro | Luanda</title>
+  
+  <!-- PWA & Android Meta -->
+  <link rel="manifest" href="./manifest.json">
+  <meta name="theme-color" content="#000000">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="apple-touch-icon" href="./icons/icon-192.png">
+  <link rel="icon" type="image/x-icon" href="./favicon.ico">
+
+  <!-- Google Fonts & Leaflet -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+      font-family: 'Plus Jakarta Sans', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+    
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: #000000;
+      color: #ffffff;
+    }
+
+    #driver-app {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+    }
+
+    #map {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 1;
+      background: #121212;
+    }
+
+    /* Top Bar - Uber Driver style */
+    .top-bar {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 10;
+      padding: 16px 18px 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: linear-gradient(180deg, rgba(0,0,0,0.88) 0%, rgba(0,0,0,0.4) 75%, transparent 100%);
+      pointer-events: none;
+    }
+
+    .top-bar > * {
+      pointer-events: auto;
+    }
+
+    .driver-pill {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: #1e1e1e;
+      border: 1px solid #333333;
+      padding: 8px 14px;
+      border-radius: 28px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+      cursor: pointer;
+    }
+
+    .status-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #ef4444;
+      transition: background 0.3s;
+    }
+
+    .status-dot.online {
+      background: #22c55e;
+      box-shadow: 0 0 10px #22c55e;
+    }
+
+    .driver-earnings-top {
+      font-weight: 700;
+      font-size: 15px;
+      letter-spacing: -0.2px;
+    }
+
+    .top-actions {
+      display: flex;
+      gap: 8px;
+    }
+
+    .icon-btn {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      background: #1e1e1e;
+      border: 1px solid #333333;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+      font-size: 18px;
+      transition: all 0.2s;
+    }
+
+    .icon-btn:active {
+      transform: scale(0.92);
+      background: #2a2a2a;
+    }
+
+    .sos-btn {
+      background: #dc2626 !important;
+      border-color: #ef4444 !important;
+      color: white !important;
+      font-weight: 800;
+      font-size: 13px;
+      letter-spacing: 0.5px;
+    }
+
+    /* Incentive Banner (Uber Quest style) */
+    .quest-banner {
+      position: absolute;
+      top: 72px;
+      left: 16px;
+      right: 16px;
+      z-index: 10;
+      background: #161616;
+      border: 1px solid #2a2a2a;
+      border-radius: 14px;
+      padding: 12px 14px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+
+    .quest-banner:active {
+      transform: scale(0.98);
+    }
+
+    .quest-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 6px;
+    }
+
+    .quest-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .quest-reward {
+      font-size: 13px;
+      font-weight: 800;
+      color: #10b981;
+      background: rgba(16, 185, 129, 0.15);
+      padding: 2px 8px;
+      border-radius: 12px;
+    }
+
+    .progress-bar-bg {
+      width: 100%;
+      height: 7px;
+      background: #262626;
+      border-radius: 4px;
+      overflow: hidden;
+      margin-bottom: 5px;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      width: 60%;
+      background: linear-gradient(90deg, #10b981, #059669);
+      border-radius: 4px;
+      transition: width 0.5s ease;
+    }
+
+    .quest-sub {
+      display: flex;
+      justify-content: space-between;
+      font-size: 11px;
+      color: #9ca3af;
+      font-weight: 500;
+    }
+
+    /* Solidarity Alert Banner (5km) */
+    .solidarity-banner {
+      position: absolute;
+      top: 156px;
+      left: 16px;
+      right: 16px;
+      z-index: 10;
+      background: linear-gradient(135deg, #7f1d1d, #991b1b);
+      border: 1px solid #ef4444;
+      border-radius: 14px;
+      padding: 12px 14px;
+      box-shadow: 0 8px 24px rgba(220, 38, 38, 0.4);
+      animation: alertPulse 1.8s infinite;
+      display: none;
+    }
+
+    @keyframes alertPulse {
+      0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.6); }
+      70% { box-shadow: 0 0 0 12px rgba(239, 68, 68, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+    }
+
+    .solidarity-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-weight: 800;
+      font-size: 13px;
+      color: #fff;
+    }
+
+    .solidarity-desc {
+      font-size: 12px;
+      margin-top: 4px;
+      color: #fecaca;
+    }
+
+    .solidarity-actions {
+      display: flex;
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    .btn-solidarity {
+      flex: 1;
+      padding: 7px;
+      font-size: 12px;
+      font-weight: 700;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+    }
+
+    /* Driver Bottom Sheet & GO Button */
+    .bottom-section {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      z-index: 10;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 16px;
+      pointer-events: none;
+    }
+
+    .bottom-section > * {
+      pointer-events: auto;
+    }
+
+    /* Big Uber GO Button */
+    .go-btn-container {
+      margin-bottom: 14px;
+      position: relative;
+    }
+
+    .go-btn {
+      width: 84px;
+      height: 84px;
+      border-radius: 50%;
+      background: #0052cc;
+      border: 4px solid #ffffff;
+      color: #ffffff;
+      font-size: 22px;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 8px 28px rgba(0, 82, 204, 0.5);
+      cursor: pointer;
+      transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .go-btn.online {
+      background: #dc2626;
+      box-shadow: 0 8px 28px rgba(220, 38, 38, 0.5);
+    }
+
+    .go-btn:active {
+      transform: scale(0.92);
+    }
+
+    .radar-ring {
+      position: absolute;
+      top: -10px;
+      left: -10px;
+      right: -10px;
+      bottom: -10px;
+      border: 2px solid #0052cc;
+      border-radius: 50%;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .radar-ring.active {
+      animation: ripple 2s infinite ease-out;
+    }
+
+    @keyframes ripple {
+      0% { transform: scale(0.9); opacity: 0.8; }
+      100% { transform: scale(1.6); opacity: 0; }
+    }
+
+    /* Driver Bottom Panel */
+    .driver-panel {
+      width: 100%;
+      max-width: 480px;
+      background: #121212;
+      border: 1px solid #262626;
+      border-radius: 20px 20px 0 0;
+      padding: 16px 18px 22px;
+      box-shadow: 0 -8px 30px rgba(0,0,0,0.6);
+    }
+
+    .panel-header-drag {
+      width: 38px;
+      height: 4px;
+      background: #333;
+      border-radius: 2px;
+      margin: 0 auto 12px;
+    }
+
+    .driver-stats-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 10px;
+      text-align: center;
+      margin-bottom: 14px;
+    }
+
+    .stat-card {
+      background: #1c1c1c;
+      border: 1px solid #2a2a2a;
+      border-radius: 12px;
+      padding: 10px 6px;
+    }
+
+    .stat-num {
+      font-size: 16px;
+      font-weight: 800;
+      color: #ffffff;
+    }
+
+    .stat-label {
+      font-size: 10px;
+      color: #9ca3af;
+      margin-top: 2px;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+
+    .quick-actions-row {
+      display: flex;
+      gap: 8px;
+    }
+
+    .btn-quick {
+      flex: 1;
+      padding: 12px;
+      border-radius: 12px;
+      font-size: 13px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      cursor: pointer;
+      border: none;
+      transition: opacity 0.2s;
+    }
+
+    .btn-quick:active { opacity: 0.8; }
+
+    .btn-wallet {
+      background: #262626;
+      color: #ffffff;
+      border: 1px solid #3a3a3a;
+    }
+
+    .btn-sim-request {
+      background: #ffffff;
+      color: #000000;
+    }
+
+    /* Incoming Request Card (Uber Radar) */
+    .request-modal {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: #121212;
+      border-top: 2px solid #2563eb;
+      border-radius: 24px 24px 0 0;
+      padding: 20px;
+      z-index: 20;
+      box-shadow: 0 -12px 40px rgba(0,0,0,0.8);
+      display: none;
+      transform: translateY(100%);
+      transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .request-modal.active {
+      display: block;
+      transform: translateY(0);
+    }
+
+    .req-timer-bar {
+      width: 100%;
+      height: 5px;
+      background: #262626;
+      border-radius: 3px;
+      overflow: hidden;
+      margin-bottom: 16px;
+    }
+
+    .req-timer-fill {
+      height: 100%;
+      width: 100%;
+      background: #2563eb;
+      transition: width 15s linear;
+    }
+
+    .req-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: 12px;
+    }
+
+    .req-price {
+      font-size: 26px;
+      font-weight: 800;
+      color: #10b981;
+    }
+
+    .req-commission-tag {
+      font-size: 11px;
+      color: #9ca3af;
+      font-weight: 600;
+    }
+
+    .req-route-info {
+      background: #1a1a1a;
+      border-radius: 12px;
+      padding: 12px;
+      margin-bottom: 16px;
+    }
+
+    .route-node {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .node-icon {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+    }
+
+    .node-line {
+      width: 2px;
+      height: 16px;
+      background: #333;
+      margin-left: 4px;
+    }
+
+    .req-actions {
+      display: flex;
+      gap: 10px;
+    }
+
+    .btn-reject {
+      flex: 1;
+      padding: 15px;
+      background: #262626;
+      color: #ef4444;
+      font-weight: 700;
+      border: 1px solid #383838;
+      border-radius: 14px;
+      cursor: pointer;
+    }
+
+    .btn-accept {
+      flex: 2;
+      padding: 15px;
+      background: #000000;
+      color: #ffffff;
+      font-weight: 800;
+      border: 2px solid #ffffff;
+      border-radius: 14px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    /* Active Trip Overlay */
+    .trip-overlay {
+      position: absolute;
+      top: 16px;
+      left: 16px;
+      right: 16px;
+      background: #161616;
+      border: 1px solid #2a2a2a;
+      border-radius: 16px;
+      padding: 14px;
+      z-index: 15;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.7);
+      display: none;
+    }
+
+    .trip-turn-instruction {
+      font-size: 15px;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .trip-sub {
+      font-size: 12px;
+      color: #9ca3af;
+      margin-top: 4px;
+    }
+
+    .nav-apps-row {
+      display: flex;
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .btn-nav-app {
+      flex: 1;
+      padding: 8px;
+      font-size: 12px;
+      font-weight: 700;
+      background: #262626;
+      border: 1px solid #3b3b3b;
+      color: #fff;
+      border-radius: 8px;
+      cursor: pointer;
+      text-align: center;
+      text-decoration: none;
+      display: inline-block;
+    }
+
+    /* Navigation Drawer / Menu */
+    .drawer {
+      position: fixed;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      width: 290px;
+      background: #0f0f0f;
+      border-right: 1px solid #222;
+      z-index: 100;
+      transform: translateX(-100%);
+      transition: transform 0.3s ease;
+      display: flex;
+      flex-direction: column;
+      padding: 24px 18px;
+    }
+
+    .drawer.active {
+      transform: translateX(0);
+    }
+
+    .drawer-backdrop {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0,0,0,0.7);
+      z-index: 99;
+      display: none;
+    }
+
+    .drawer-backdrop.active {
+      display: block;
+    }
+
+    .drawer-profile {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid #222;
+      margin-bottom: 20px;
+    }
+
+    .driver-avatar {
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      background: #262626;
+      border: 2px solid #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+    }
+
+    .drawer-link {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 14px;
+      color: #e5e7eb;
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 600;
+      border-radius: 10px;
+      margin-bottom: 6px;
+      transition: background 0.2s;
+    }
+
+    .drawer-link:hover, .drawer-link:active {
+      background: #1c1c1c;
+      color: #ffffff;
+    }
+
+    /* Modals (Wallet, SOS) */
+    .modal-sheet {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0,0,0,0.85);
+      z-index: 150;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+
+    .modal-sheet.active {
+      display: flex;
+    }
+
+    .modal-card {
+      width: 100%;
+      max-width: 420px;
+      background: #141414;
+      border: 1px solid #2a2a2a;
+      border-radius: 20px;
+      padding: 22px;
+      position: relative;
+    }
+
+    .modal-close {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      background: #262626;
+      border: none;
+      color: #9ca3af;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      font-size: 18px;
+      cursor: pointer;
+    }
+
+    .vehicle-icon-div {
+      background: #ffffff;
+      border: 2px solid #000000;
+      border-radius: 50%;
+      width: 36px;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+      font-size: 18px;
+    }
+  </style>
+</head>
+<body>
+
+  <div id="driver-app">
+    <!-- Map Container -->
+    <div id="map"></div>
+
+    <!-- Top Navigation & Earnings Bar -->
+    <div class="top-bar">
+      <button class="icon-btn" onclick="toggleDrawer(true)">☰</button>
+      
+      <div class="driver-pill" onclick="openWalletModal()">
+        <span class="status-dot" id="top-status-dot"></span>
+        <span class="driver-earnings-top" id="top-earnings">18.200 Kz</span>
+        <span style="font-size: 11px; color:#10b981; font-weight:700;">Hoje</span>
+      </div>
+
+      <div class="top-actions">
+        <button class="icon-btn sos-btn" onclick="triggerSosEmergency()" title="Botão do Pânico 5km">SOS</button>
+      </div>
+    </div>
+
+    <!-- Incentive Banner: 30K Challenge -->
+    <div class="quest-banner" onclick="showQuestDetails()">
+      <div class="quest-header">
+        <div class="quest-title">
+          <span>⚡ Desafio Diário 30K</span>
+        </div>
+        <div class="quest-reward">+1.500 Kz BÔNUS</div>
+      </div>
+      <div class="progress-bar-bg">
+        <div class="progress-bar-fill" id="quest-progress-fill" style="width: 60.6%;"></div>
+      </div>
+      <div class="quest-sub">
+        <span id="quest-text-status">18.200 Kz / 30.000 Kz (60%)</span>
+        <span style="color:#10b981; font-weight:700;" id="quest-rem-text">Faltam 11.800 Kz</span>
+      </div>
+    </div>
+
+    <!-- Solidarity SOS Banner (5km radius) -->
+    <div class="solidarity-banner" id="solidarity-banner">
+      <div class="solidarity-header">
+        <span>🚨 ALERTA SOLIDÁRIO (2.1 km)</span>
+        <span style="font-size:11px; background:#000; padding:2px 6px; border-radius:4px;">HÁ 1 MIN</span>
+      </div>
+      <div class="solidarity-desc">
+        Motorista Carlos (Toyota Vitz) acionou SOS na Av. 21 de Janeiro (junto ao Rocha). Central já acionou 7ª Esquadra.
+      </div>
+      <div class="solidarity-actions">
+        <button class="btn-solidarity" style="background:#fff; color:#000;" onclick="viewSolidarityRoute()">Ver Rota Solidária</button>
+        <button class="btn-solidarity" style="background:rgba(0,0,0,0.5); color:#fff;" onclick="dismissSolidarity()">Dispensar</button>
+      </div>
+    </div>
+
+    <!-- Active Trip Navigation Overlay -->
+    <div class="trip-overlay" id="trip-overlay">
+      <div class="trip-turn-instruction">
+        <span style="font-size:20px;">↗️</span>
+        <span id="nav-instruction-text">Em 300m vire à direita para Av. Deolinda Rodrigues</span>
+      </div>
+      <div class="trip-sub" id="trip-passenger-info">
+        Passageira: Maria Silva ★ 4.9 • Destino: Talatona Shopping
+      </div>
+      <div class="nav-apps-row">
+        <a id="waze-btn" class="btn-nav-app" href="https://waze.com/ul?ll=-8.8383,13.2344&navigate=yes" target="_blank">🚙 Abrir no Waze</a>
+        <a id="gmaps-btn" class="btn-nav-app" href="https://www.google.com/maps/dir/?api=1&destination=-8.8383,13.2344" target="_blank">🗺️ Google Maps</a>
+        <button class="btn-nav-app" style="background:#10b981; border-color:#10b981; color:#000; font-weight:800;" onclick="completeTrip()">✓ Concluir</button>
+      </div>
+    </div>
+
+    <!-- Bottom Controls & Go Button -->
+    <div class="bottom-section">
+      <div class="go-btn-container">
+        <div class="radar-ring" id="radar-ring"></div>
+        <button class="go-btn" id="go-btn" onclick="toggleOnlineStatus()">
+          GO
+        </button>
+      </div>
+
+      <div class="driver-panel">
+        <div class="panel-header-drag"></div>
+        
+        <div class="driver-stats-grid">
+          <div class="stat-card">
+            <div class="stat-num" id="stat-rides">7</div>
+            <div class="stat-label">Corridas</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-num" style="color:#10b981;">10%</div>
+            <div class="stat-label">Taxa Giro</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-num">★ 4.96</div>
+            <div class="stat-label">Avaliação</div>
+          </div>
+        </div>
+
+        <div class="quick-actions-row">
+          <button class="btn-quick btn-wallet" onclick="openWalletModal()">
+            💳 Carteira Express
+          </button>
+          <button class="btn-quick btn-sim-request" onclick="simulateIncomingRequest()">
+            ⚡ Simular Corrida
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Incoming Ride Request Sheet (Uber Style) -->
+    <div class="request-modal" id="request-modal">
+      <div class="req-timer-bar">
+        <div class="req-timer-fill" id="req-timer-fill"></div>
+      </div>
+      
+      <div class="req-header">
+        <div>
+          <div style="font-size: 13px; color: #9ca3af; font-weight: 600;">NOVA CORRIDA DISPONÍVEL</div>
+          <div class="req-price" id="req-price-display">2.700 Kz</div>
+        </div>
+        <div style="text-align: right;">
+          <div class="req-commission-tag">GIRO 10%: -300 Kz</div>
+          <div style="font-size: 14px; font-weight: 700; color: #fff;">Líquido: 2.700 Kz</div>
+        </div>
+      </div>
+
+      <div class="req-route-info">
+        <div class="route-node">
+          <div class="node-icon" style="background:#22c55e;"></div>
+          <div>
+            <div style="font-size:11px; color:#9ca3af;">PONTO DE RECOLHA (1.2 km • 3 min)</div>
+            <div id="req-pickup-name">Mutamba, Luanda</div>
+          </div>
+        </div>
+        <div class="node-line"></div>
+        <div class="route-node">
+          <div class="node-icon" style="background:#ef4444;"></div>
+          <div>
+            <div style="font-size:11px; color:#9ca3af;">DESTINO (7.5 km • 18 min)</div>
+            <div id="req-dest-name">Talatona (Belas Shopping)</div>
+          </div>
+        </div>
+      </div>
+
+      <div style="display:flex; justify-content:space-between; font-size:12px; color:#9ca3af; margin-bottom:14px;">
+        <span>Passageiro: João Manuel (★ 4.9)</span>
+        <span>Pagamento: Multicaixa Express</span>
+      </div>
+
+      <div class="req-actions">
+        <button class="btn-reject" onclick="rejectRequest()">Recusar</button>
+        <button class="btn-accept" onclick="acceptRequest()">Aceitar Corrida</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Side Navigation Drawer -->
+  <div class="drawer-backdrop" id="drawer-backdrop" onclick="toggleDrawer(false)"></div>
+  <div class="drawer" id="drawer">
+    <div class="drawer-profile">
+      <div class="driver-avatar">🚖</div>
+      <div>
+        <div style="font-weight: 800; font-size: 16px;">António Mateus</div>
+        <div style="font-size: 12px; color: #9ca3af;">Toyota Vitz • LD-44-89-GG</div>
+        <div style="font-size: 11px; color: #10b981; font-weight: 700;">Comissão GIRO: 10%</div>
+      </div>
+    </div>
+
+    <a href="javascript:void(0)" onclick="openWalletModal(); toggleDrawer(false)" class="drawer-link">
+      <span>💳</span> Carteira & Levantamento
+    </a>
+    <a href="javascript:void(0)" onclick="showQuestDetails(); toggleDrawer(false)" class="drawer-link">
+      <span>⚡</span> Desafio Diário 30K (+1.500 Kz)
+    </a>
+    <a href="javascript:void(0)" onclick="triggerSolidarityAlertDemo(); toggleDrawer(false)" class="drawer-link">
+      <span>🚨</span> Testar Alerta Solidário (5km)
+    </a>
+    
+    <div style="border-top: 1px solid #222; margin: 16px 0; padding-top: 16px;">
+      <div style="font-size: 11px; color: #6b7280; text-transform: uppercase; font-weight: 700; margin-bottom: 8px; padding-left: 14px;">
+        Outras Plataformas
+      </div>
+      <a href="./index.html" class="drawer-link">
+        <span>👤</span> App do Passageiro
+      </a>
+      <a href="./central.html" class="drawer-link">
+        <span>🛡️</span> Central de Operações 24h
+      </a>
+      <a href="./landing.html" class="drawer-link">
+        <span>🌐</span> Página de Apresentação
+      </a>
+    </div>
+
+    <div style="margin-top: auto; font-size: 11px; color: #4b5563; text-align: center;">
+      GIRO Angola Driver v2.4 • Feito para Luanda
+    </div>
+  </div>
+
+  <!-- Wallet & Multicaixa Express Modal -->
+  <div class="modal-sheet" id="wallet-modal">
+    <div class="modal-card">
+      <button class="modal-close" onclick="closeWalletModal()">✕</button>
+      <h3 style="font-size: 18px; font-weight: 800; margin-bottom: 4px;">Carteira do Motorista</h3>
+      <p style="font-size: 12px; color: #9ca3af; margin-bottom: 16px;">Comissão retida: apenas 10% (Você fica com 90%)</p>
+
+      <div style="background: #1e1e1e; border: 1px solid #333; border-radius: 14px; padding: 16px; margin-bottom: 16px; text-align: center;">
+        <div style="font-size: 12px; color: #9ca3af; text-transform: uppercase; font-weight: 700;">Saldo Disponível</div>
+        <div style="font-size: 28px; font-weight: 800; color: #10b981; margin: 4px 0;" id="wallet-balance-val">18.200 Kz</div>
+        <div style="font-size: 11px; color: #6b7280;" id="wallet-bonus-note">Bônus 30K acumulado: +0 Kz (Faltam 11.800 Kz para desbloquear)</div>
+      </div>
+
+      <div style="margin-bottom: 16px;">
+        <label style="display: block; font-size: 12px; font-weight: 700; color: #9ca3af; margin-bottom: 6px;">Número de Telefone Multicaixa Express</label>
+        <input type="tel" value="923 456 789" style="width: 100%; padding: 12px; background: #0a0a0a; border: 1px solid #333; border-radius: 10px; color: #fff; font-size: 14px; font-weight: 600;">
+      </div>
+
+      <button style="width: 100%; padding: 14px; background: #10b981; color: #000; font-weight: 800; border: none; border-radius: 12px; font-size: 14px; cursor: pointer;" onclick="withdrawEarnings()">
+        Transferir Imediatamente via Express
+      </button>
+    </div>
+  </div>
+
+  <!-- SOS Emergency Modal -->
+  <div class="modal-sheet" id="sos-modal">
+    <div class="modal-card" style="border-color: #ef4444;">
+      <button class="modal-close" onclick="closeSosModal()">✕</button>
+      <div style="text-align: center;">
+        <div style="font-size: 44px; margin-bottom: 8px;">🚨</div>
+        <h3 style="font-size: 20px; font-weight: 800; color: #ef4444; margin-bottom: 6px;">BOTÃO DO PÂNICO ACIONADO</h3>
+        <p style="font-size: 13px; color: #d1d5db; line-height: 1.5; margin-bottom: 16px;">
+          As coordenadas GPS do seu veículo foram transmitidas com prioridade máxima para a <strong>Central 24h da GIRO</strong> e para todos os <strong>motoristas parceiros num raio de 5 km</strong>.
+        </p>
+      </div>
+
+      <div style="background: #2a1212; border: 1px solid #ef4444; border-radius: 12px; padding: 12px; font-size: 12px; color: #fca5a5; margin-bottom: 16px;">
+        🚔 A esquadra mais próxima (7ª Esquadra Talatona) está sendo notificada automaticamente pelo protocolo de socorro rápido.
+      </div>
+
+      <button style="width: 100%; padding: 14px; background: #ef4444; color: #fff; font-weight: 800; border: none; border-radius: 12px; font-size: 14px; cursor: pointer;" onclick="closeSosModal()">
+        Entendido / Manter Alerta Ativo
+      </button>
+    </div>
+  </div>
+
+  <script>
+    // Driver State
+    const driverState = {
+      isOnline: false,
+      dailyGross: 18200,
+      dailyTarget: 30000,
+      dailyBonus: 1500,
+      bonusAwarded: false,
+      completedRides: 7,
+      coords: [-8.8383, 13.2344], // Luanda Centro
+      activeTrip: null
+    };
+
+    // Initialize Map
+    let map, driverMarker, tripRouteLayer;
+
+    function initDriverMap() {
+      map = L.map('map', {
+        zoomControl: false,
+        attributionControl: false
+      }).setView(driverState.coords, 14);
+
+      L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+        maxZoom: 19
+      }).addTo(map);
+
+      // Driver custom icon
+      const carIcon = L.divIcon({
+        className: 'custom-car-marker',
+        html: '<div class="vehicle-icon-div">🚖</div>',
+        iconSize: [36, 36],
+        iconAnchor: [18, 18]
+      });
+
+      driverMarker = L.marker(driverState.coords, { icon: carIcon }).addTo(map);
+
+      // Try device geolocation
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition((pos) => {
+          driverState.coords = [pos.coords.latitude, pos.coords.longitude];
+          map.setView(driverState.coords, 15);
+          driverMarker.setLatLng(driverState.coords);
+        }, (err) => {
+          console.log('GPS default Luanda');
+        }, { enableHighAccuracy: true });
+      }
+    }
+
+    // Toggle Online / Offline
+    function toggleOnlineStatus() {
+      driverState.isOnline = !driverState.isOnline;
+      const goBtn = document.getElementById('go-btn');
+      const radar = document.getElementById('radar-ring');
+      const dot = document.getElementById('top-status-dot');
+
+      if (driverState.isOnline) {
+        goBtn.innerText = 'OFF';
+        goBtn.classList.add('online');
+        radar.classList.add('active');
+        dot.classList.add('online');
+        
+        // Auto simulate incoming ride after 3.5 seconds
+        setTimeout(() => {
+          if (driverState.isOnline && !driverState.activeTrip) {
+            simulateIncomingRequest();
+          }
+        }, 3500);
+      } else {
+        goBtn.innerText = 'GO';
+        goBtn.classList.remove('online');
+        radar.classList.remove('active');
+        dot.classList.remove('online');
+        dismissRequest();
+      }
+    }
+
+    // Simulate incoming request
+    let timerInterval = null;
+    function simulateIncomingRequest() {
+      const modal = document.getElementById('request-modal');
+      const timerFill = document.getElementById('req-timer-fill');
+      
+      // Random route in Luanda
+      const routes = [
+        { from: "Mutamba (Largo)", to: "Talatona (Belas Shopping)", price: 3000, dist: "8.2 km" },
+        { from: "Maianga (Av. Revolução)", to: "Kilamba (Bloco B)", price: 4500, dist: "16.5 km" },
+        { from: "Aeroporto 4 de Fevereiro", to: "Ilha de Luanda", price: 2800, dist: "6.4 km" }
+      ];
+      const selected = routes[Math.floor(Math.random() * routes.length)];
+
+      const gross = selected.price;
+      const net = Math.round(gross * 0.9); // 10% commission
+
+      document.getElementById('req-price-display').innerText = net.toLocaleString('pt-AO') + ' Kz';
+      document.getElementById('req-pickup-name').innerText = selected.from;
+      document.getElementById('req-dest-name').innerText = selected.to;
+
+      modal.classList.add('active');
+      timerFill.style.transition = 'none';
+      timerFill.style.width = '100%';
+
+      setTimeout(() => {
+        timerFill.style.transition = 'width 15s linear';
+        timerFill.style.width = '0%';
+      }, 50);
+
+      // Auto dismiss after 15s
+      clearTimeout(timerInterval);
+      timerInterval = setTimeout(() => {
+        dismissRequest();
+      }, 15000);
+    }
+
+    function dismissRequest() {
+      clearTimeout(timerInterval);
+      document.getElementById('request-modal').classList.remove('active');
+    }
+
+    function rejectRequest() {
+      dismissRequest();
+    }
+
+    function acceptRequest() {
+      dismissRequest();
+      
+      driverState.activeTrip = {
+        dest: [-8.9167, 13.1833], // Talatona coordinates
+        destName: document.getElementById('req-dest-name').innerText,
+        price: 3000
+      };
+
+      // Show Active Trip Overlay
+      document.getElementById('trip-overlay').style.display = 'block';
+
+      // Draw route on map
+      if (tripRouteLayer) map.removeLayer(tripRouteLayer);
+      
+      const tripCoords = [
+        driverState.coords,
+        [-8.8500, 13.2200],
+        [-8.8800, 13.2000],
+        driverState.activeTrip.dest
+      ];
+
+      tripRouteLayer = L.polyline(tripCoords, {
+        color: '#000000',
+        weight: 6,
+        opacity: 0.9
+      }).addTo(map);
+
+      map.fitBounds(tripRouteLayer.getBounds(), { padding: [80, 80] });
+
+      // Update Navigation links
+      const destLat = driverState.activeTrip.dest[0];
+      const destLng = driverState.activeTrip.dest[1];
+      document.getElementById('waze-btn').href = `https://waze.com/ul?ll=${destLat},${destLng}&navigate=yes`;
+      document.getElementById('gmaps-btn').href = `https://www.google.com/maps/dir/?api=1&destination=${destLat},${destLng}`;
+    }
+
+    function completeTrip() {
+      if (!driverState.activeTrip) return;
+
+      // Add earnings
+      const tripGross = driverState.activeTrip.price;
+      const tripNet = tripGross * 0.9;
+      
+      driverState.dailyGross += tripGross;
+      driverState.completedRides += 1;
+
+      // Check 30K bonus
+      if (driverState.dailyGross >= driverState.dailyTarget && !driverState.bonusAwarded) {
+        driverState.bonusAwarded = true;
+        driverState.dailyGross += driverState.dailyBonus; // award +1500 Kz
+        alert(`🎉 PARABÉNS! Você completou o DESAFIO DIÁRIO 30K!
+
+Bônus de +1.500 Kz creditado imediatamente na sua Carteira Express sem cortes!`);
+      }
+
+      updateUI();
+
+      // Clear trip
+      document.getElementById('trip-overlay').style.display = 'none';
+      if (tripRouteLayer) map.removeLayer(tripRouteLayer);
+      driverState.activeTrip = null;
+
+      alert(`✅ Corrida concluída com sucesso!
+Faturamento bruto: +${tripGross.toLocaleString('pt-AO')} Kz
+Comissão GIRO (10%): -${(tripGross * 0.1).toLocaleString('pt-AO')} Kz
+Líquido na carteira: +${tripNet.toLocaleString('pt-AO')} Kz`);
+    }
+
+    function updateUI() {
+      // Update top bar
+      document.getElementById('top-earnings').innerText = driverState.dailyGross.toLocaleString('pt-AO') + ' Kz';
+      document.getElementById('wallet-balance-val').innerText = driverState.dailyGross.toLocaleString('pt-AO') + ' Kz';
+      document.getElementById('stat-rides').innerText = driverState.completedRides;
+
+      // Update 30K quest
+      const pct = Math.min(100, Math.round((driverState.dailyGross / driverState.dailyTarget) * 100));
+      document.getElementById('quest-progress-fill').style.width = pct + '%';
+      
+      if (driverState.dailyGross >= driverState.dailyTarget) {
+        document.getElementById('quest-text-status').innerText = `${driverState.dailyGross.toLocaleString('pt-AO')} Kz / 30.000 Kz (100%) - BÔNUS ATIVO!`;
+        document.getElementById('quest-rem-text').innerText = 'Meta Atingida!';
+        document.getElementById('wallet-bonus-note').innerText = 'Bônus 30K desbloqueado (+1.500 Kz somados ao saldo)!';
+      } else {
+        const remaining = driverState.dailyTarget - driverState.dailyGross;
+        document.getElementById('quest-text-status').innerText = `${driverState.dailyGross.toLocaleString('pt-AO')} Kz / 30.000 Kz (${pct}%)`;
+        document.getElementById('quest-rem-text').innerText = `Faltam ${remaining.toLocaleString('pt-AO')} Kz`;
+      }
+    }
+
+    // Solidarity SOS (5km)
+    function triggerSosEmergency() {
+      document.getElementById('sos-modal').classList.add('active');
+    }
+
+    function closeSosModal() {
+      document.getElementById('sos-modal').classList.remove('active');
+    }
+
+    function triggerSolidarityAlertDemo() {
+      const banner = document.getElementById('solidarity-banner');
+      banner.style.display = 'block';
+    }
+
+    function dismissSolidarity() {
+      document.getElementById('solidarity-banner').style.display = 'none';
+    }
+
+    function viewSolidarityRoute() {
+      dismissSolidarity();
+      alert('📍 Rota Solidária traçada! Siga para a Av. 21 de Janeiro para apoiar o colega parceiro com segurança.');
+    }
+
+    // Drawer & Modals
+    function toggleDrawer(open) {
+      document.getElementById('drawer').classList.toggle('active', open);
+      document.getElementById('drawer-backdrop').classList.toggle('active', open);
+    }
+
+    function openWalletModal() {
+      document.getElementById('wallet-modal').classList.add('active');
+    }
+
+    function closeWalletModal() {
+      document.getElementById('wallet-modal').classList.remove('active');
+    }
+
+    function withdrawEarnings() {
+      alert(`💸 Transferência de ${driverState.dailyGross.toLocaleString('pt-AO')} Kz solicitada com sucesso para o terminal Multicaixa Express!
+Valor disponível na sua conta em até 2 minutos.`);
+      closeWalletModal();
+    }
+
+    function showQuestDetails() {
+      alert(`⚡ DESAFIO DIÁRIO 30K - GIRO ANGOLA
+
+` +
+            `• Meta do dia: Faturar 30.000 Kz em corridas brutas.
+` +
+            `• Prêmio: +1.500 Kz direto na carteira!
+` +
+            `• Regra Transparente: Como a taxa da GIRO é apenas 10%, a plataforma reinveste 50% da sua receita do dia diretamente no seu bolso, sem comprometer a estabilidade do sistema.
+
+` +
+            `Progresso atual: ${driverState.dailyGross.toLocaleString('pt-AO')} Kz (${Math.round((driverState.dailyGross/driverState.dailyTarget)*100)}%)`);
+    }
+
+    // PWA Service Worker Registration
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./service-worker.js').catch(err => {
+          console.log('SW registration note:', err);
+        });
+      });
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      initDriverMap();
+      updateUI();
+    });
+  </script>
+</body>
+</html>

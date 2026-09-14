@@ -1,0 +1,75 @@
+{
+  "name": "GIRO Angola — Mobilidade, Carga & Segurança",
+  "short_name": "GIRO",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#070907",
+  "theme_color": "#070907",
+  "orientation": "portrait",
+  "description": "App de mobilidade urbana, táxi rápido, entregas e carga em Angola. Preços justos, menor comissão (10%) e segurança 24h com botão de pânico.",
+  "scope": "./",
+  "lang": "pt-AO",
+  "categories": [
+    "travel",
+    "navigation",
+    "transportation"
+  ],
+  "icons": [
+    {
+      "src": "./icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./icons/icon-maskable.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Pedir Táxi",
+      "short_name": "Viagem",
+      "description": "Pedir uma corrida GIRO",
+      "url": "./index.html?view=pax",
+      "icons": [
+        {
+          "src": "./icons/icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "Modo Motorista",
+      "short_name": "Motorista",
+      "description": "Aceder à área do motorista parceiro",
+      "url": "./driver.html",
+      "icons": [
+        {
+          "src": "./icons/icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "Central 24h",
+      "short_name": "Central",
+      "description": "Central de Operações e Monitoramento",
+      "url": "./central.html",
+      "icons": [
+        {
+          "src": "./icons/icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    }
+  ]
+}
