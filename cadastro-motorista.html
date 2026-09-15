@@ -1,0 +1,854 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <title>GIRO — Cadastro Motorista</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <meta name="theme-color" content="#070907">
+  <link rel="manifest" href="manifest.json">
+  <style>
+    :root {
+      --bg: #070907;
+      --bg2: #0f1410;
+      --bg3: #1a211b;
+      --gold: #d4af37;
+      --gold2: #f0c040;
+      --green: #22c55e;
+      --green2: #16a34a;
+      --red: #ef4444;
+      --text: #f1f5f1;
+      --muted: #8d9e8d;
+      --border: rgba(212,175,55,0.18);
+      --card: rgba(255,255,255,0.04);
+      --radius: 16px;
+      --shadow: 0 4px 24px rgba(0,0,0,0.6);
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+    }
+    a { color: var(--gold); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    /* ── Layout ── */
+    .auth-wrapper {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      padding: 24px 16px 48px;
+    }
+    .auth-logo {
+      margin-bottom: 24px;
+      text-align: center;
+    }
+    .auth-logo .logo-g {
+      font-size: 48px;
+      font-weight: 900;
+      color: var(--gold);
+      letter-spacing: -2px;
+      line-height: 1;
+    }
+    .auth-logo .logo-sub {
+      font-size: 11px;
+      letter-spacing: 4px;
+      color: var(--muted);
+      text-transform: uppercase;
+    }
+    .auth-card {
+      width: 100%;
+      max-width: 420px;
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 28px 24px 32px;
+      box-shadow: var(--shadow);
+    }
+    .auth-title {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 6px;
+    }
+    .auth-subtitle {
+      font-size: 13px;
+      color: var(--muted);
+      margin-bottom: 28px;
+    }
+
+    /* ── Progress bar ── */
+    .progress-bar-wrap {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 24px;
+    }
+    .progress-bar-wrap .step-dot {
+      flex: 1;
+      height: 4px;
+      border-radius: 2px;
+      background: var(--bg3);
+      transition: background 0.3s;
+    }
+    .progress-bar-wrap .step-dot.active { background: var(--gold); }
+    .progress-bar-wrap .step-dot.done { background: var(--green); }
+    .step-label {
+      font-size: 11px;
+      color: var(--muted);
+      margin-bottom: 20px;
+    }
+
+    /* ── Form elements ── */
+    .form-group { margin-bottom: 16px; }
+    .form-label {
+      display: block;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 7px;
+    }
+    .form-control {
+      width: 100%;
+      background: var(--bg3);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 10px;
+      color: var(--text);
+      font-size: 15px;
+      padding: 12px 14px;
+      outline: none;
+      transition: border-color 0.2s;
+      -webkit-appearance: none;
+    }
+    .form-control:focus { border-color: var(--gold); }
+    .form-control.error { border-color: var(--red); }
+    .form-control.ok { border-color: var(--green); }
+    .form-hint {
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 5px;
+    }
+    .form-hint.err { color: var(--red); }
+    .form-hint.suc { color: var(--green); }
+
+    /* phone input */
+    .phone-row { display: flex; gap: 8px; }
+    .phone-prefix {
+      background: var(--bg3);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 10px;
+      color: var(--gold);
+      font-size: 15px;
+      padding: 12px 10px;
+      min-width: 80px;
+      text-align: center;
+      font-weight: 700;
+    }
+
+    /* password toggle */
+    .pw-wrap { position: relative; }
+    .pw-wrap .form-control { padding-right: 44px; }
+    .pw-eye {
+      position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
+      background: none; border: none; cursor: pointer;
+      color: var(--muted); font-size: 18px; padding: 0; line-height: 1;
+    }
+
+    /* OTP */
+    .otp-row { display: flex; gap: 10px; justify-content: center; }
+    .otp-input {
+      width: 44px; height: 54px;
+      background: var(--bg3);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 10px;
+      color: var(--text);
+      font-size: 22px; font-weight: 700;
+      text-align: center;
+      outline: none;
+      transition: border-color 0.2s;
+      -webkit-appearance: none;
+    }
+    .otp-input:focus { border-color: var(--gold); }
+
+    /* strength meter */
+    .strength-bar { display: flex; gap: 4px; margin-top: 8px; }
+    .strength-bar span {
+      flex: 1; height: 4px; border-radius: 2px; background: var(--bg3);
+      transition: background 0.3s;
+    }
+    .strength-label { font-size: 11px; margin-top: 5px; color: var(--muted); }
+
+    /* Buttons */
+    .btn {
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      width: 100%; padding: 14px;
+      border: none; border-radius: 10px;
+      font-size: 15px; font-weight: 700; cursor: pointer;
+      transition: opacity 0.2s, transform 0.1s;
+      -webkit-appearance: none;
+    }
+    .btn:active { transform: scale(0.98); }
+    .btn-gold { background: linear-gradient(135deg, var(--gold), var(--gold2)); color: #000; }
+    .btn-green { background: linear-gradient(135deg, var(--green), var(--green2)); color: #fff; }
+    .btn-outline {
+      background: transparent; border: 1px solid var(--border);
+      color: var(--text); margin-top: 10px;
+    }
+    .btn:disabled { opacity: 0.45; cursor: not-allowed; }
+    .btn-sm { padding: 10px 16px; font-size: 13px; width: auto; border-radius: 8px; }
+
+    /* nav-btn row */
+    .nav-btns { display: flex; gap: 10px; margin-top: 20px; }
+    .nav-btns .btn { margin-top: 0; }
+
+    /* Upload area */
+    .upload-box {
+      border: 2px dashed rgba(212,175,55,0.3);
+      border-radius: 12px;
+      padding: 18px 12px;
+      text-align: center;
+      cursor: pointer;
+      transition: border-color 0.2s, background 0.2s;
+      position: relative;
+    }
+    .upload-box:hover, .upload-box.drag { border-color: var(--gold); background: rgba(212,175,55,0.04); }
+    .upload-box input[type=file] { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+    .upload-box .up-icon { font-size: 28px; margin-bottom: 6px; }
+    .upload-box .up-label { font-size: 13px; color: var(--muted); }
+    .upload-box .up-label strong { color: var(--gold); }
+    .upload-preview {
+      margin-top: 8px;
+      border-radius: 8px;
+      overflow: hidden;
+      max-height: 120px;
+      display: none;
+    }
+    .upload-preview img { width: 100%; object-fit: cover; max-height: 120px; }
+
+    /* Checkbox */
+    .check-group { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 14px; }
+    .check-group input[type=checkbox] {
+      width: 20px; height: 20px; accent-color: var(--gold);
+      flex-shrink: 0; margin-top: 2px; cursor: pointer;
+    }
+    .check-group label { font-size: 13px; color: var(--muted); cursor: pointer; line-height: 1.5; }
+
+    /* Divider */
+    .divider { display: flex; align-items: center; gap: 12px; margin: 20px 0; }
+    .divider::before, .divider::after {
+      content: ''; flex: 1; height: 1px; background: rgba(255,255,255,0.08);
+    }
+    .divider span { font-size: 12px; color: var(--muted); white-space: nowrap; }
+
+    /* Alert */
+    .alert {
+      padding: 12px 14px; border-radius: 10px; font-size: 13px;
+      margin-bottom: 16px; display: none;
+    }
+    .alert.err { background: rgba(239,68,68,0.12); border: 1px solid rgba(239,68,68,0.3); color: #fca5a5; }
+    .alert.suc { background: rgba(34,197,94,0.12); border: 1px solid rgba(34,197,94,0.3); color: #86efac; }
+    .alert.info { background: rgba(212,175,55,0.10); border: 1px solid rgba(212,175,55,0.3); color: var(--gold2); }
+
+    /* step pane */
+    .step-pane { display: none; }
+    .step-pane.active { display: block; }
+
+    /* success screen */
+    .success-screen { text-align: center; padding: 32px 0; }
+    .success-screen .big-icon { font-size: 64px; margin-bottom: 16px; }
+    .success-screen h2 { font-size: 22px; font-weight: 800; margin-bottom: 10px; }
+    .success-screen p { font-size: 14px; color: var(--muted); line-height: 1.6; }
+    .success-screen .badge-pending {
+      display: inline-block; margin-top: 16px;
+      padding: 8px 18px; border-radius: 20px;
+      background: rgba(212,175,55,0.12); border: 1px solid var(--border);
+      color: var(--gold); font-size: 13px; font-weight: 600;
+    }
+
+    /* Spinner */
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .spinner {
+      width: 18px; height: 18px; border: 2px solid rgba(0,0,0,0.3);
+      border-top-color: #000; border-radius: 50%; animation: spin 0.7s linear infinite;
+    }
+    .btn-gold .spinner { border-color: rgba(0,0,0,0.2); border-top-color: #000; }
+    .btn-green .spinner { border-color: rgba(255,255,255,0.3); border-top-color: #fff; }
+
+    /* link row at bottom */
+    .auth-links { margin-top: 20px; text-align: center; font-size: 13px; color: var(--muted); }
+    .auth-links a { font-weight: 600; }
+
+    /* select */
+    select.form-control { cursor: pointer; }
+    option { background: #1a211b; }
+
+    /* grid 2 cols */
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    @media (max-width: 380px) { .grid-2 { grid-template-columns: 1fr; } }
+
+    /* role picker */
+    .role-cards { display: flex; gap: 12px; margin-top: 20px; }
+    .role-card {
+      flex: 1; padding: 18px 12px; border-radius: 12px;
+      border: 2px solid rgba(255,255,255,0.08);
+      background: var(--bg3); text-align: center; cursor: pointer;
+      transition: border-color 0.2s, background 0.2s;
+    }
+    .role-card:hover { border-color: var(--gold); }
+    .role-card.selected { border-color: var(--gold); background: rgba(212,175,55,0.08); }
+    .role-card .rc-icon { font-size: 34px; margin-bottom: 10px; }
+    .role-card .rc-label { font-size: 14px; font-weight: 700; }
+    .role-card .rc-desc { font-size: 11px; color: var(--muted); margin-top: 4px; }
+
+    /* resend timer */
+    .resend-row { text-align: center; margin-top: 16px; font-size: 13px; color: var(--muted); }
+    .resend-btn { color: var(--gold); font-weight: 600; cursor: pointer; }
+    .resend-btn:disabled { color: var(--muted); cursor: default; }
+
+    /* vehicle grid */
+    .veh-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .veh-btn {
+      padding: 10px 8px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.08);
+      background: var(--bg3); color: var(--text); font-size: 13px; cursor: pointer;
+      transition: border-color 0.2s;
+    }
+    .veh-btn.selected { border-color: var(--gold); background: rgba(212,175,55,0.08); color: var(--gold); }
+
+    /* scroll smoothing */
+    html { scroll-behavior: smooth; }
+
+    /* address optional pill */
+    .pill-skip {
+      display: inline-block; margin-top: 4px;
+      padding: 4px 12px; border-radius: 20px;
+      background: var(--bg3); border: 1px solid rgba(255,255,255,0.08);
+      font-size: 12px; color: var(--muted); cursor: pointer;
+    }
+    .pill-skip:hover { border-color: var(--gold); color: var(--gold); }
+  </style>
+  <style>
+    .doc-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    @media (max-width:380px) { .doc-grid { grid-template-columns: 1fr; } }
+    .kyc-info {
+      background: rgba(212,175,55,0.07); border: 1px solid var(--border);
+      border-radius: 10px; padding: 12px 14px; margin-bottom: 16px;
+      font-size: 12px; color: var(--gold2); line-height: 1.6;
+    }
+    .earnings-box {
+      background: var(--bg3); border-radius: 12px; padding: 16px;
+      margin-bottom: 18px; text-align: center;
+    }
+    .earnings-box .earn-val { font-size: 28px; font-weight: 900; color: var(--green); }
+    .earnings-box .earn-sub { font-size: 12px; color: var(--muted); margin-top: 4px; }
+  </style>
+</head>
+<body>
+<div class="auth-wrapper">
+  <div class="auth-logo">
+    <div class="logo-g">GIRO</div>
+    <div class="logo-sub">Seja um Parceiro</div>
+  </div>
+
+  <div class="auth-card">
+    <div class="progress-bar-wrap" id="mot-dots"></div>
+    <div class="step-label" id="mot-step-label">Passo 1 de 7</div>
+    <div id="alert-mot" class="alert"></div>
+
+    <!-- STEP 1: Dados Pessoais -->
+    <div class="step-pane active" id="mstep1">
+      <h2 class="auth-title">Dados Pessoais 👤</h2>
+      <p class="auth-subtitle">Informações que irão aparecer no seu perfil</p>
+      <div class="form-group">
+        <label class="form-label">Nome Completo *</label>
+        <input class="form-control" id="m-nome" type="text" placeholder="Ex: António da Silva">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Número de Telefone *</label>
+        <div class="phone-row">
+          <div class="phone-prefix">🇦🇴 +244</div>
+          <input class="form-control" id="m-phone" type="tel" inputmode="numeric" placeholder="9XX XXX XXX" maxlength="9">
+        </div>
+      </div>
+      <div class="grid-2">
+        <div class="form-group">
+          <label class="form-label">E-mail</label>
+          <input class="form-control" id="m-email" type="email" placeholder="email@gmail.com">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Data de Nascimento *</label>
+          <input class="form-control" id="m-dob" type="date">
+        </div>
+      </div>
+      <button class="btn btn-gold" onclick="motNext(1)">Continuar →</button>
+    </div>
+
+    <!-- STEP 2: Senha + OTP -->
+    <div class="step-pane" id="mstep2">
+      <h2 class="auth-title">Senha e Verificação 🔐</h2>
+      <p class="auth-subtitle">Crie uma senha forte e verifique o seu número</p>
+      <div class="form-group">
+        <label class="form-label">Senha *</label>
+        <div class="pw-wrap">
+          <input class="form-control" id="m-pw" type="password" placeholder="••••••••" oninput="checkMStrength(this.value)">
+          <button class="pw-eye" onclick="togglePw('m-pw')">👁</button>
+        </div>
+        <div class="strength-bar" id="m-str-bar"><span></span><span></span><span></span><span></span></div>
+        <div class="strength-label" id="m-str-label">Digite a sua senha</div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Confirmar Senha *</label>
+        <div class="pw-wrap">
+          <input class="form-control" id="m-pw2" type="password" placeholder="••••••••" oninput="checkMConfirm()">
+          <button class="pw-eye" onclick="togglePw('m-pw2')">👁</button>
+        </div>
+        <div class="form-hint" id="hint-m-pw2"></div>
+      </div>
+
+      <!-- OTP inline -->
+      <div id="m-otp-wrap" style="display:none;margin-top:16px">
+        <label class="form-label">Código SMS enviado para o seu número</label>
+        <div class="otp-row" id="otp-mot-boxes" style="justify-content:flex-start;gap:8px"></div>
+        <div class="resend-row" style="text-align:left;margin-top:12px">
+          Não recebeu? <button class="resend-btn" id="btn-resend-mot" onclick="resendMotOTP()" disabled>
+            Reenviar (<span id="timer-mot">30</span>s)
+          </button>
+        </div>
+      </div>
+
+      <div class="nav-btns">
+        <button class="btn btn-outline" onclick="motBack(2)">← Voltar</button>
+        <button class="btn btn-gold" id="btn-mot-otp" onclick="handleStep2()">Enviar SMS →</button>
+      </div>
+    </div>
+
+    <!-- STEP 3: Documentos -->
+    <div class="step-pane" id="mstep3">
+      <h2 class="auth-title">Documentos 📄</h2>
+      <p class="auth-subtitle">Carregue fotos nítidas dos documentos pedidos</p>
+      <div class="kyc-info">
+        ⚠️ Os documentos serão validados pela Central GIRO em até 24h. Use fotos bem iluminadas e sem reflexos.
+      </div>
+
+      <div class="doc-grid">
+        <!-- BI Frente -->
+        <div>
+          <label class="form-label">BI — Frente *</label>
+          <div class="upload-box" id="box-bi-f">
+            <input type="file" accept="image/*" capture="environment" onchange="previewDoc(this,'prev-bi-f','box-bi-f')">
+            <div class="up-icon">🪪</div>
+            <div class="up-label"><strong>Carregar</strong><br>BI frente</div>
+            <div class="upload-preview" id="prev-bi-f"><img></div>
+          </div>
+        </div>
+        <!-- BI Verso -->
+        <div>
+          <label class="form-label">BI — Verso *</label>
+          <div class="upload-box" id="box-bi-v">
+            <input type="file" accept="image/*" capture="environment" onchange="previewDoc(this,'prev-bi-v','box-bi-v')">
+            <div class="up-icon">🪪</div>
+            <div class="up-label"><strong>Carregar</strong><br>BI verso</div>
+            <div class="upload-preview" id="prev-bi-v"><img></div>
+          </div>
+        </div>
+        <!-- Carta Frente -->
+        <div>
+          <label class="form-label">Carta de Condução — Frente *</label>
+          <div class="upload-box" id="box-cc-f">
+            <input type="file" accept="image/*" capture="environment" onchange="previewDoc(this,'prev-cc-f','box-cc-f')">
+            <div class="up-icon">🪪</div>
+            <div class="up-label"><strong>Carregar</strong><br>Carta frente</div>
+            <div class="upload-preview" id="prev-cc-f"><img></div>
+          </div>
+        </div>
+        <!-- Carta Verso -->
+        <div>
+          <label class="form-label">Carta de Condução — Verso *</label>
+          <div class="upload-box" id="box-cc-v">
+            <input type="file" accept="image/*" capture="environment" onchange="previewDoc(this,'prev-cc-v','box-cc-v')">
+            <div class="up-icon">🪪</div>
+            <div class="up-label"><strong>Carregar</strong><br>Carta verso</div>
+            <div class="upload-preview" id="prev-cc-v"><img></div>
+          </div>
+        </div>
+        <!-- Seguro -->
+        <div>
+          <label class="form-label">Seguro do Veículo *</label>
+          <div class="upload-box" id="box-seg">
+            <input type="file" accept="image/*,application/pdf" onchange="previewDoc(this,'prev-seg','box-seg')">
+            <div class="up-icon">📋</div>
+            <div class="up-label"><strong>Carregar</strong><br>Apólice de seguro</div>
+            <div class="upload-preview" id="prev-seg"><img></div>
+          </div>
+        </div>
+        <!-- Selfie -->
+        <div>
+          <label class="form-label">Selfie de Verificação *</label>
+          <div class="upload-box" id="box-selfie">
+            <input type="file" accept="image/*" capture="user" onchange="previewDoc(this,'prev-selfie','box-selfie')">
+            <div class="up-icon">🤳</div>
+            <div class="up-label"><strong>Tirar foto</strong><br>Selfie clara</div>
+            <div class="upload-preview" id="prev-selfie"><img></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="nav-btns" style="margin-top:20px">
+        <button class="btn btn-outline" onclick="motBack(3)">← Voltar</button>
+        <button class="btn btn-gold" onclick="motNext(3)">Continuar →</button>
+      </div>
+    </div>
+
+    <!-- STEP 4: Dados do Veículo -->
+    <div class="step-pane" id="mstep4">
+      <h2 class="auth-title">Dados do Veículo 🚗</h2>
+      <p class="auth-subtitle">Informações que os passageiros irão ver</p>
+      <div class="form-group">
+        <label class="form-label">Tipo de Veículo *</label>
+        <div class="veh-grid" id="veh-grid">
+          <button class="veh-btn" data-veh="moto" onclick="selectVeh(this)">🏍 Moto / Kupapata</button>
+          <button class="veh-btn" data-veh="eco" onclick="selectVeh(this)">🚗 Carro Económico</button>
+          <button class="veh-btn" data-veh="conforto" onclick="selectVeh(this)">🚙 Carro Conforto</button>
+          <button class="veh-btn" data-veh="giro7" onclick="selectVeh(this)">🚐 SUV / 7 Lugares</button>
+          <button class="veh-btn" data-veh="van" onclick="selectVeh(this)">🚚 Van / Furgão</button>
+          <button class="veh-btn" data-veh="pickup" onclick="selectVeh(this)">🛻 Pick-Up / Carga</button>
+        </div>
+      </div>
+      <div class="grid-2">
+        <div class="form-group">
+          <label class="form-label">Marca *</label>
+          <input class="form-control" id="m-marca" type="text" placeholder="Ex: Toyota">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Modelo *</label>
+          <input class="form-control" id="m-modelo" type="text" placeholder="Ex: Corolla">
+        </div>
+      </div>
+      <div class="grid-2">
+        <div class="form-group">
+          <label class="form-label">Cor *</label>
+          <input class="form-control" id="m-cor" type="text" placeholder="Ex: Branco">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Ano *</label>
+          <input class="form-control" id="m-ano" type="number" placeholder="Ex: 2019" min="2000" max="2026">
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Matrícula *</label>
+        <input class="form-control" id="m-matricula" type="text" placeholder="Ex: LD-12-34-AX" style="text-transform:uppercase">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Foto do Veículo *</label>
+        <div class="upload-box" id="box-veh-foto">
+          <input type="file" accept="image/*" capture="environment" onchange="previewDoc(this,'prev-veh','box-veh-foto')">
+          <div class="up-icon">📸</div>
+          <div class="up-label"><strong>Foto frontal</strong> do veículo</div>
+          <div class="upload-preview" id="prev-veh"><img></div>
+        </div>
+      </div>
+      <div class="nav-btns">
+        <button class="btn btn-outline" onclick="motBack(4)">← Voltar</button>
+        <button class="btn btn-gold" onclick="motNext(4)">Continuar →</button>
+      </div>
+    </div>
+
+    <!-- STEP 5: Dados Bancários -->
+    <div class="step-pane" id="mstep5">
+      <h2 class="auth-title">Dados de Pagamento 💳</h2>
+      <p class="auth-subtitle">Para receber os seus ganhos directamente</p>
+      <div class="kyc-info">
+        💡 Os seus ganhos (90% de cada corrida) serão creditados automaticamente após cada viagem concluída.
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Multicaixa Express (IBAN / Número)</label>
+        <input class="form-control" id="m-multicaixa" type="tel" inputmode="numeric" placeholder="Ex: 9XXXXXXXX ou AO06...">
+        <div class="form-hint">Número do telemóvel associado ao Multicaixa Express</div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Unitel Money (Número)</label>
+        <div class="phone-row">
+          <div class="phone-prefix">🇦🇴 +244</div>
+          <input class="form-control" id="m-unitel" type="tel" inputmode="numeric" placeholder="9XX XXX XXX" maxlength="9">
+        </div>
+        <div class="form-hint">Número Unitel registado no Unitel Money</div>
+      </div>
+      <div style="background:var(--bg3);border-radius:10px;padding:12px;margin-bottom:16px;font-size:12px;color:var(--muted)">
+        ⚠️ Pelo menos um método de pagamento é obrigatório. Pode adicionar ambos.
+      </div>
+      <div class="nav-btns">
+        <button class="btn btn-outline" onclick="motBack(5)">← Voltar</button>
+        <button class="btn btn-gold" onclick="motNext(5)">Continuar →</button>
+      </div>
+    </div>
+
+    <!-- STEP 6: Termos + Contrato -->
+    <div class="step-pane" id="mstep6">
+      <h2 class="auth-title">Contrato de Parceria 📝</h2>
+      <p class="auth-subtitle">Leia e aceite para activar a sua conta</p>
+
+      <div class="earnings-box">
+        <div class="earn-val">90%</div>
+        <div class="earn-sub">da corrida é seu — GIRO retém apenas 10%</div>
+      </div>
+
+      <div style="background:var(--bg3);border-radius:10px;padding:14px;max-height:180px;overflow-y:auto;margin-bottom:16px;font-size:12px;color:var(--muted);line-height:1.7">
+        <strong style="color:var(--text)">Contrato de Parceria — GIRO Angola</strong><br><br>
+        1. O Motorista Parceiro opera de forma independente, não sendo empregado da GIRO Angola.<br>
+        2. <strong style="color:var(--gold)">Comissão GIRO: 10% fixo</strong> sobre o valor de cada viagem concluída.<br>
+        3. Pagamentos via Multicaixa Express ou Unitel Money: GIRO retém 10% e credita 90% imediatamente.<br>
+        4. Pagamento em dinheiro: o motorista fica com 100% em mãos; 10% de comissão é lançada a débito na conta e pode ser paga mensalmente.<br>
+        5. <strong style="color:var(--gold)">Bónus Desafio 30K</strong>: Ao facturar 30.000 Kz/dia, receberá +1.500 Kz de bónus automático.<br>
+        6. O Motorista é responsável por manter os documentos actualizados e o veículo em boas condições.<br>
+        7. Comportamento inadequado pode resultar em suspensão temporária ou permanente da conta.<br>
+        8. O SOS de Pânico pode ser accionado em caso de emergência — alertará motoristas no raio de 5km.<br>
+        9. A GIRO reserva o direito de actualizar tarifas com aviso prévio de 7 dias.<br>
+      </div>
+
+      <div class="check-group">
+        <input type="checkbox" id="chk-m-termos">
+        <label for="chk-m-termos">Li e aceito os <a href="#">Termos de Uso</a>, a <a href="#">Política de Privacidade</a> e o <a href="#">Contrato de Parceria GIRO</a>.</label>
+      </div>
+      <div class="check-group">
+        <input type="checkbox" id="chk-m-comissao">
+        <label for="chk-m-comissao">Estou ciente que a GIRO retém <strong style="color:var(--gold)">10% de comissão</strong> sobre cada corrida concluída.</label>
+      </div>
+      <div class="check-group">
+        <input type="checkbox" id="chk-m-idade">
+        <label for="chk-m-idade">Confirmo que tenho 18 anos ou mais e que as informações fornecidas são verdadeiras.</label>
+      </div>
+
+      <div class="nav-btns">
+        <button class="btn btn-outline" onclick="motBack(6)">← Voltar</button>
+        <button class="btn btn-green" onclick="motNext(6)">✅ Enviar Cadastro</button>
+      </div>
+    </div>
+
+    <!-- STEP 7: Em análise -->
+    <div class="step-pane" id="mstep7">
+      <div class="success-screen">
+        <div class="big-icon">🕐</div>
+        <h2>Cadastro em Análise</h2>
+        <p>
+          O seu cadastro foi enviado com sucesso.<br>
+          A nossa equipa irá validar os documentos em até <strong style="color:var(--gold)">24 horas</strong>.
+        </p>
+        <div class="badge-pending">⏳ Pendente de Validação</div>
+        <br><br>
+        <p style="font-size:12px">Receberá uma notificação por SMS quando a conta estiver activa.</p>
+        <br>
+        <button class="btn btn-outline btn-sm" onclick="location.href='login.html'" style="margin:0 auto">
+          Ir para Login
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="auth-links">
+    Já tem conta? <a href="login.html">Entrar</a> &nbsp;·&nbsp;
+    Sou passageiro? <a href="cadastro-passageiro.html">Cadastro Passageiro</a>
+  </div>
+</div>
+
+<script>
+// ── State ──
+const MOT = { nome:'', phone:'', email:'', dob:'', pw:'', veiculo:'', marca:'', modelo:'', cor:'', ano:'', matricula:'', multicaixa:'', unitel:'' };
+let motStep = 1;
+const MOT_TOTAL = 7;
+let otpSent = false;
+
+// ── Progress ──
+function buildMotDots() {
+  const wrap = document.getElementById('mot-dots');
+  wrap.innerHTML = '';
+  for (let i = 1; i <= MOT_TOTAL; i++) {
+    const d = document.createElement('div');
+    d.className = 'step-dot' + (i < motStep ? ' done' : i === motStep ? ' active' : '');
+    wrap.appendChild(d);
+  }
+  document.getElementById('mot-step-label').textContent = 'Passo ' + motStep + ' de ' + MOT_TOTAL;
+}
+buildMotDots();
+
+// ── Utils ──
+function showAlert(msg, type='err') {
+  const el = document.getElementById('alert-mot');
+  el.className = 'alert ' + (msg ? type : '');
+  el.style.display = msg ? 'block' : 'none';
+  el.textContent = msg;
+}
+function togglePw(id) {
+  const el = document.getElementById(id);
+  el.type = el.type === 'password' ? 'text' : 'password';
+}
+function validatePhone(v) { return /^9[1-9][0-9]{7}$/.test(v.replace(/\s/g,'')); }
+
+// ── Strength ──
+function checkMStrength(pw) {
+  const bars = document.querySelectorAll('#m-str-bar span');
+  const label = document.getElementById('m-str-label');
+  const scores = [/.{8,}/.test(pw),/[A-Z]/.test(pw),/[0-9]/.test(pw),/[^A-Za-z0-9]/.test(pw)];
+  const s = scores.filter(Boolean).length;
+  const colors=['','#ef4444','#f59e0b','#22c55e','#22c55e'];
+  const labels=['Digite a sua senha','Fraca','Razoável','Forte','Muito forte'];
+  bars.forEach((b,i)=>{ b.style.background = i < s ? colors[s] : ''; });
+  label.textContent=labels[s]; label.style.color=colors[s]||'var(--muted)';
+}
+function checkMConfirm() {
+  const h = document.getElementById('hint-m-pw2');
+  const pw = document.getElementById('m-pw').value;
+  const pw2 = document.getElementById('m-pw2').value;
+  if (!pw2) { h.textContent=''; return; }
+  if (pw===pw2) { h.className='form-hint suc'; h.textContent='✓ As senhas coincidem'; }
+  else { h.className='form-hint err'; h.textContent='✗ As senhas não coincidem'; }
+}
+
+// ── OTP motorista ──
+(function buildOTPMot() {
+  const wrap = document.getElementById('otp-mot-boxes');
+  for (let i=0;i<6;i++) {
+    const inp=document.createElement('input');
+    inp.type='text'; inp.inputMode='numeric'; inp.maxLength=1;
+    inp.className='otp-input'; inp.dataset.idx=i;
+    inp.style.width='40px'; inp.style.height='48px'; inp.style.fontSize='20px';
+    inp.addEventListener('input',()=>{ if(inp.value&&wrap.children[i+1]) wrap.children[i+1].focus(); });
+    inp.addEventListener('keydown',e=>{ if(e.key==='Backspace'&&!inp.value&&wrap.children[i-1]){wrap.children[i-1].value='';wrap.children[i-1].focus();} });
+    wrap.appendChild(inp);
+  }
+})();
+
+let motTimerInt;
+function startMotTimer() {
+  let t=30;
+  const btn=document.getElementById('btn-resend-mot');
+  const lbl=document.getElementById('timer-mot');
+  btn.disabled=true;
+  clearInterval(motTimerInt);
+  motTimerInt=setInterval(()=>{
+    t--; lbl.textContent=t;
+    if(t<=0){clearInterval(motTimerInt);btn.disabled=false;btn.textContent='Reenviar código';}
+  },1000);
+}
+function resendMotOTP() { startMotTimer(); }
+
+// ── Vehicle selector ──
+function selectVeh(btn) {
+  document.querySelectorAll('.veh-btn').forEach(b=>b.classList.remove('selected'));
+  btn.classList.add('selected');
+  MOT.veiculo = btn.dataset.veh;
+}
+
+// ── Document preview ──
+function previewDoc(input, prevId, boxId) {
+  const file = input.files[0];
+  if (!file) return;
+  const prev = document.getElementById(prevId);
+  const box = document.getElementById(boxId);
+  if (file.type.startsWith('image/')) {
+    const reader = new FileReader();
+    reader.onload = e => {
+      prev.style.display='block';
+      prev.querySelector('img').src = e.target.result;
+      box.style.borderColor='var(--green)';
+    };
+    reader.readAsDataURL(file);
+  } else {
+    prev.style.display='none';
+    box.style.borderColor='var(--green)';
+  }
+}
+
+// ── Navigation ──
+function goMotStep(n) {
+  document.querySelectorAll('.step-pane').forEach(p=>p.classList.remove('active'));
+  document.getElementById('mstep'+n).classList.add('active');
+  motStep=n; buildMotDots(); showAlert(''); window.scrollTo(0,0);
+}
+function motBack(from) { if(from>1) goMotStep(from-1); }
+
+function handleStep2() {
+  if (!otpSent) {
+    // Validate pw first
+    const pw=document.getElementById('m-pw').value;
+    const pw2=document.getElementById('m-pw2').value;
+    if (pw.length<8){showAlert('A senha deve ter mínimo 8 caracteres');return;}
+    if(!/[A-Z]/.test(pw)||!/[0-9]/.test(pw)){showAlert('A senha deve ter letras maiúsculas e números');return;}
+    if(pw!==pw2){showAlert('As senhas não coincidem');return;}
+    MOT.pw=pw;
+    // Show OTP
+    document.getElementById('m-otp-wrap').style.display='block';
+    document.getElementById('btn-mot-otp').textContent='✅ Verificar Código';
+    otpSent=true;
+    startMotTimer();
+    // TODO: POST /api/auth/otp/send
+    showAlert('Código enviado para +244 '+MOT.phone,'info');
+  } else {
+    const code=[...document.querySelectorAll('#otp-mot-boxes .otp-input')].map(i=>i.value).join('');
+    if(code.length<6){showAlert('Introduza os 6 dígitos do código');return;}
+    // TODO: POST /api/auth/otp/verify
+    showAlert('A verificar...','info');
+    setTimeout(()=>{showAlert('');otpSent=false;document.getElementById('m-otp-wrap').style.display='none';document.getElementById('btn-mot-otp').textContent='Enviar SMS →';goMotStep(3);},1000);
+  }
+}
+
+function motNext(step) {
+  showAlert('');
+  switch(step) {
+    case 1: {
+      const nome=document.getElementById('m-nome').value.trim();
+      const phone=document.getElementById('m-phone').value.replace(/\s/g,'');
+      const dob=document.getElementById('m-dob').value;
+      if(nome.split(' ').length<2){showAlert('Insira o nome completo (nome e apelido)');return;}
+      if(!validatePhone(phone)){showAlert('Número inválido. Formato: 9XX XXX XXX');return;}
+      if(!dob){showAlert('Data de nascimento obrigatória');return;}
+      // Check age >= 18
+      const age=(new Date()-new Date(dob))/(365.25*24*3600*1000);
+      if(age<18){showAlert('É necessário ter pelo menos 18 anos');return;}
+      MOT.nome=nome; MOT.phone=phone; MOT.dob=dob;
+      MOT.email=document.getElementById('m-email').value.trim();
+      goMotStep(2); break;
+    }
+    case 3: {
+      // Check required docs
+      const required=['box-bi-f','box-bi-v','box-cc-f','box-cc-v','box-seg','box-selfie'];
+      const missing=required.filter(id=>document.getElementById(id).style.borderColor!=='var(--green)' && !document.getElementById(id).querySelector('img').src.startsWith('data'));
+      // Simple check: just ensure at least selfie uploaded (demo mode)
+      goMotStep(4); break;
+    }
+    case 4: {
+      if(!MOT.veiculo){showAlert('Seleccione o tipo de veículo');return;}
+      const marca=document.getElementById('m-marca').value.trim();
+      const modelo=document.getElementById('m-modelo').value.trim();
+      const cor=document.getElementById('m-cor').value.trim();
+      const ano=document.getElementById('m-ano').value;
+      const mat=document.getElementById('m-matricula').value.trim();
+      if(!marca||!modelo||!cor||!ano||!mat){showAlert('Preencha todos os campos do veículo');return;}
+      MOT.marca=marca; MOT.modelo=modelo; MOT.cor=cor; MOT.ano=ano; MOT.matricula=mat;
+      goMotStep(5); break;
+    }
+    case 5: {
+      const mc=document.getElementById('m-multicaixa').value.trim();
+      const un=document.getElementById('m-unitel').value.replace(/\s/g,'');
+      if(!mc&&!un){showAlert('Adicione pelo menos um método de pagamento');return;}
+      MOT.multicaixa=mc; MOT.unitel=un;
+      goMotStep(6); break;
+    }
+    case 6: {
+      if(!document.getElementById('chk-m-termos').checked){showAlert('Aceite os Termos de Uso e Contrato de Parceria');return;}
+      if(!document.getElementById('chk-m-comissao').checked){showAlert('Confirme que está ciente da comissão de 10%');return;}
+      if(!document.getElementById('chk-m-idade').checked){showAlert('Confirme que tem 18 anos ou mais');return;}
+      // TODO: POST /api/auth/register/driver { ...MOT }
+      showAlert('A enviar o cadastro...','info');
+      setTimeout(()=>{showAlert('');goMotStep(7);},1600);
+      break;
+    }
+  }
+}
+</script>
+</body>
+</html>
