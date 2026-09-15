@@ -3,25 +3,32 @@ import { SocketService } from './socket';
 
 let locationSubscription: Location.LocationSubscription | null = null;
 let lastSentTime = 0;
-const THROTTLE_INTERVAL_MS = 6000; // Throttle: 6 segundos para economizar dados e bateria
+const THROTTLE_INTERVAL_MS = 6000; // 6s: poupa bateria e dados móveis
+
+type OnPosition = (pos: { latitude: number; longitude: number }) => void;
 
 export const LocationService = {
-  async requestPermissions(): Promise<boolean> {
+  async requestForeground(): Promise<boolean> {
     const { status } = await Location.requestForegroundPermissionsAsync();
     return status === 'granted';
   },
 
-  async getCurrentLocation() {
-    return await Location.getCurrentPositionAsync({
-      accuracy: Location.Accuracy.Balanced
-    });
+  // Só pedimos localização em segundo plano depois de o motorista ficar online,
+  // porque a Google exige que o pedido apareça no contexto que o justifica.
+  async requestBackground(): Promise<boolean> {
+    const { status } = await Location.requestBackgroundPermissionsAsync();
+    return status === 'granted';
   },
 
-  // Iniciar telemetria periódica do motorista com throttle
-  async startDriverTracking(categoria: string = 'economico') {
-    const granted = await this.requestPermissions();
-    if (!granted) return;
+  async getCurrentLocation() {
+    return await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Balanced });
+  },
 
+  async startDriverTracking(categoria: string = 'economico', onPosition?: OnPosition): Promise<boolean> {
+    const granted = await this.requestForeground();
+    if (!granted) return false;
+
+    await this.requestBackground();
     const socket = await SocketService.connect();
 
     locationSubscription = await Location.watchPositionAsync(
@@ -31,6 +38,8 @@ export const LocationService = {
         distanceInterval: 10
       },
       (loc) => {
+        onPosition?.({ latitude: loc.coords.latitude, longitude: loc.coords.longitude });
+
         const now = Date.now();
         if (now - lastSentTime >= THROTTLE_INTERVAL_MS) {
           lastSentTime = now;
@@ -45,6 +54,8 @@ export const LocationService = {
         }
       }
     );
+
+    return true;
   },
 
   stopDriverTracking() {

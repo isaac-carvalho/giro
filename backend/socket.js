@@ -78,6 +78,24 @@ function initSocket(io) {
           categoria
         });
 
+        // Espelhar a posição para o passageiro da corrida em curso
+        const activeRide = await pool.query(
+          `SELECT id, passageiro_id FROM corridas
+            WHERE motorista_id = $1
+              AND status IN ('aceita', 'motorista_a_caminho', 'motorista_no_local', 'em_viagem')
+            LIMIT 1`,
+          [user.id]
+        );
+        if (activeRide.rows.length > 0) {
+          const ride = activeRide.rows[0];
+          io.to(`user:${ride.passageiro_id}`).emit('corrida:motorista_posicao', {
+            corridaId: ride.id,
+            lat,
+            lng,
+            bearing: bearing || heading || 0
+          });
+        }
+
       } catch (err) {
         logger.error('Erro ao processar localização do motorista:', err);
       }

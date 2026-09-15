@@ -1,5 +1,5 @@
 // GIRO Angola Service Worker — PWA & Play Store Offline Cache
-const CACHE_NAME = 'giro-cache-v1';
+const CACHE_NAME = 'giro-cache-v2';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
@@ -7,6 +7,13 @@ const ASSETS_TO_CACHE = [
   './driver.html',
   './central.html',
   './landing.html',
+  './login.html',
+  './cadastro-passageiro.html',
+  './cadastro-motorista.html',
+  './termos.html',
+  './privacidade.html',
+  './eliminar-conta.html',
+  './legal.css',
   './manifest.json',
   './icons/icon-192.png',
   './icons/icon-512.png',

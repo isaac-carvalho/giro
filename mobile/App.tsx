@@ -1,85 +1,93 @@
 import React, { useState } from 'react';
-import { View, StyleSheet, SafeAreaView, TouchableOpacity, Text } from 'react-native';
+import { View, StyleSheet, TouchableOpacity, Text, ActivityIndicator } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
+import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
+import { AuthProvider, useAuth } from './src/context/AuthContext';
+import { LoginScreen } from './src/screens/LoginScreen';
+import { RegisterScreen } from './src/screens/RegisterScreen';
 import { RideRequestScreen } from './src/screens/RideRequestScreen';
 import { DriverHomeScreen } from './src/screens/DriverHomeScreen';
 import { CentralDispatchScreen } from './src/screens/CentralDispatchScreen';
+import { ProfileScreen } from './src/screens/ProfileScreen';
+import { theme } from './src/theme';
 
-export default function App() {
-  const [role, setRole] = useState<'pax' | 'driver' | 'central'>('pax');
+type Aba = 'inicio' | 'perfil';
+
+const Shell = () => {
+  const { user, restoring } = useAuth();
+  const [mostrarRegisto, setMostrarRegisto] = useState(false);
+  const [aba, setAba] = useState<Aba>('inicio');
+
+  if (restoring) {
+    return (
+      <View style={styles.splash}>
+        <Text style={styles.splashLogo}>GIRO</Text>
+        <ActivityIndicator color={theme.gold} style={{ marginTop: 20 }} />
+      </View>
+    );
+  }
+
+  if (!user) {
+    return mostrarRegisto
+      ? <RegisterScreen onBack={() => setMostrarRegisto(false)} />
+      : <LoginScreen onGoToRegister={() => setMostrarRegisto(true)} />;
+  }
+
+  const Inicio = user.tipo === 'motorista'
+    ? DriverHomeScreen
+    : (user.tipo === 'central_operador' || user.tipo === 'admin')
+      ? CentralDispatchScreen
+      : RideRequestScreen;
 
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={styles.flex}>
+      <View style={styles.flex}>
+        {aba === 'inicio' ? <Inicio /> : <ProfileScreen />}
+      </View>
+
+      <SafeAreaView edges={['bottom']} style={styles.tabBar}>
+        <TabButton
+          label={user.tipo === 'motorista' ? 'Conduzir' : user.tipo === 'passageiro' ? 'Viajar' : 'Central'}
+          activo={aba === 'inicio'}
+          onPress={() => setAba('inicio')}
+        />
+        <TabButton label="Conta" activo={aba === 'perfil'} onPress={() => setAba('perfil')} />
+      </SafeAreaView>
+    </View>
+  );
+};
+
+const TabButton: React.FC<{ label: string; activo: boolean; onPress: () => void }> = ({ label, activo, onPress }) => (
+  <TouchableOpacity style={styles.tab} onPress={onPress}>
+    <View style={[styles.tabDot, activo && styles.tabDotActive]} />
+    <Text style={[styles.tabText, activo && styles.tabTextActive]}>{label}</Text>
+  </TouchableOpacity>
+);
+
+export default function App() {
+  return (
+    <SafeAreaProvider>
       <StatusBar style="light" />
-
-      {/* Seletor Rápido de Perfil */}
-      <View style={styles.navBar}>
-        <TouchableOpacity 
-          style={[styles.tab, role === 'pax' && styles.tabActive]}
-          onPress={() => setRole('pax')}
-        >
-          <Text style={[styles.tabText, role === 'pax' && styles.tabTextActive]}>Passageiro</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity 
-          style={[styles.tab, role === 'driver' && styles.tabActive]}
-          onPress={() => setRole('driver')}
-        >
-          <Text style={[styles.tabText, role === 'driver' && styles.tabTextActive]}>Motorista (10%)</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity 
-          style={[styles.tab, role === 'central' && styles.tabActive]}
-          onPress={() => setRole('central')}
-        >
-          <Text style={[styles.tabText, role === 'central' && styles.tabTextActive]}>Central 24h</Text>
-        </TouchableOpacity>
-      </View>
-
-      {/* Renderização de Telas */}
-      <View style={styles.content}>
-        {role === 'pax' && <RideRequestScreen />}
-        {role === 'driver' && <DriverHomeScreen />}
-        {role === 'central' && <CentralDispatchScreen />}
-      </View>
-    </SafeAreaView>
+      <AuthProvider>
+        <Shell />
+      </AuthProvider>
+    </SafeAreaProvider>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#000000'
-  },
-  navBar: {
+  flex: { flex: 1, backgroundColor: theme.bg },
+  splash: { flex: 1, backgroundColor: theme.bg, justifyContent: 'center', alignItems: 'center' },
+  splashLogo: { color: theme.gold, fontSize: 48, fontWeight: '900', letterSpacing: 6 },
+  tabBar: {
     flexDirection: 'row',
-    backgroundColor: '#121212',
-    padding: 6,
-    marginHorizontal: 12,
-    marginTop: 40,
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: '#262626'
+    backgroundColor: theme.surface,
+    borderTopWidth: 1,
+    borderTopColor: theme.border
   },
-  tab: {
-    flex: 1,
-    paddingVertical: 8,
-    alignItems: 'center',
-    borderRadius: 8
-  },
-  tabActive: {
-    backgroundColor: '#d4af37'
-  },
-  tabText: {
-    color: '#8d968a',
-    fontSize: 11,
-    fontWeight: '700'
-  },
-  tabTextActive: {
-    color: '#000000',
-    fontWeight: '900'
-  },
-  content: {
-    flex: 1
-  }
+  tab: { flex: 1, alignItems: 'center', paddingVertical: 12 },
+  tabDot: { width: 6, height: 6, borderRadius: 3, backgroundColor: theme.border, marginBottom: 5 },
+  tabDotActive: { backgroundColor: theme.gold },
+  tabText: { color: theme.muted, fontSize: 11, fontWeight: '700' },
+  tabTextActive: { color: theme.gold }
 });

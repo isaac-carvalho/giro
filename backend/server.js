@@ -163,6 +163,149 @@ app.post('/api/v1/auth/login', authLimiter, async (req, res) => {
   }
 });
 
+// A2. AUTENTICAÇÃO — CADASTRO DE PASSAGEIRO E MOTORISTA
+app.post('/api/v1/auth/registar', authLimiter, async (req, res) => {
+  const schema = Joi.object({
+    nome: Joi.string().min(3).max(120).required(),
+    telefone: Joi.string().pattern(/^9\d{8}$/).required(),
+    email: Joi.string().email().allow('', null),
+    senha: Joi.string().min(6).required(),
+    tipo: Joi.string().valid('passageiro', 'motorista').default('passageiro'),
+    biNumero: Joi.string().max(30).allow('', null),
+    veiculo: Joi.object({
+      categoria: Joi.string().valid(...Object.keys(TABELA_TARIFAS.multiplicadores)).required(),
+      marca: Joi.string().max(50).required(),
+      modelo: Joi.string().max(50).required(),
+      ano: Joi.number().integer().min(1990).max(2100),
+      matricula: Joi.string().max(20).required(),
+      cor: Joi.string().max(30).required()
+    })
+  });
+
+  const { error, value } = schema.validate(req.body);
+  if (error) return res.status(400).json({ error: error.details[0].message });
+
+  if (value.tipo === 'motorista' && !value.veiculo) {
+    return res.status(400).json({ error: 'Dados do veículo são obrigatórios para motoristas.' });
+  }
+
+  try {
+    const senhaHash = await bcrypt.hash(value.senha, 12);
+
+    const user = await withTransaction(async (client) => {
+      const inserted = await client.query(
+        `INSERT INTO usuarios (nome, telefone, email, senha_hash, tipo, bi_numero)
+         VALUES ($1, $2, $3, $4, $5, $6)
+         RETURNING id, nome, telefone, tipo`,
+        [value.nome, value.telefone, value.email || null, senhaHash, value.tipo, value.biNumero || null]
+      );
+      const novo = inserted.rows[0];
+
+      await client.query('INSERT INTO carteiras (usuario_id) VALUES ($1)', [novo.id]);
+
+      if (value.tipo === 'motorista') {
+        const v = value.veiculo;
+        await client.query(
+          `INSERT INTO veiculos (motorista_id, categoria, marca, modelo, ano, matricula, cor)
+           VALUES ($1, $2, $3, $4, $5, $6, $7)`,
+          [novo.id, v.categoria, v.marca, v.modelo, v.ano || null, v.matricula, v.cor]
+        );
+      }
+
+      return novo;
+    });
+
+    const payload = { id: user.id, nome: user.nome, telefone: user.telefone, tipo: user.tipo };
+    const accessToken = jwt.sign(payload, process.env.JWT_ACCESS_SECRET || 'ChaveSuperSecretaJWTAccessGiroAngola2026_987654321', { expiresIn: '15m' });
+    const refreshToken = jwt.sign(payload, process.env.JWT_REFRESH_SECRET || 'ChaveSuperSecretaJWTRefreshGiroAngola2026_123456789', { expiresIn: '7d' });
+
+    res.status(201).json({ accessToken, refreshToken, user: payload });
+  } catch (err) {
+    if (err.code === '23505') {
+      return res.status(409).json({ error: 'Já existe uma conta com este telefone, email, BI ou matrícula.' });
+    }
+    logger.error('Erro no cadastro:', err);
+    res.status(500).json({ error: 'Erro interno ao criar conta.' });
+  }
+});
+
+// A3. PERFIL DO UTILIZADOR AUTENTICADO
+app.get('/api/v1/auth/me', authenticateJWT, async (req, res) => {
+  try {
+    const result = await pool.query(
+      `SELECT u.id, u.nome, u.telefone, u.email, u.tipo, u.avaliacao_media, u.total_corridas,
+              c.saldo_disponivel, c.faturamento_hoje, c.comissao_acumulada_a_pagar
+         FROM usuarios u
+         LEFT JOIN carteiras c ON c.usuario_id = u.id
+        WHERE u.id = $1 AND u.ativo = TRUE`,
+      [req.user.id]
+    );
+    if (result.rows.length === 0) return res.status(404).json({ error: 'Conta não encontrada.' });
+    res.json(result.rows[0]);
+  } catch (err) {
+    logger.error('Erro ao carregar perfil:', err);
+    res.status(500).json({ error: 'Erro interno ao carregar perfil.' });
+  }
+});
+
+// A3b. REGISTAR TOKEN DE NOTIFICAÇÕES PUSH
+app.post('/api/v1/auth/push-token', authenticateJWT, async (req, res) => {
+  const { token } = req.body;
+  if (!token) return res.status(400).json({ error: 'token é obrigatório.' });
+  try {
+    await pool.query('UPDATE usuarios SET fcm_token = $1 WHERE id = $2', [token, req.user.id]);
+    res.json({ ok: true });
+  } catch (err) {
+    logger.error('Erro ao guardar push token:', err);
+    res.status(500).json({ error: 'Erro ao registar token.' });
+  }
+});
+
+// A4. EXCLUSÃO DE CONTA — exigida pela Google Play e pela App Store
+app.delete('/api/v1/auth/conta', authenticateJWT, async (req, res) => {
+  const { senha } = req.body;
+  if (!senha) return res.status(400).json({ error: 'Confirme a senha para eliminar a conta.' });
+
+  try {
+    const result = await pool.query('SELECT senha_hash FROM usuarios WHERE id = $1', [req.user.id]);
+    if (result.rows.length === 0) return res.status(404).json({ error: 'Conta não encontrada.' });
+
+    const match = await bcrypt.compare(senha, result.rows[0].senha_hash);
+    if (!match) return res.status(401).json({ error: 'Senha incorrecta.' });
+
+    const pendentes = await pool.query(
+      `SELECT 1 FROM corridas
+        WHERE (passageiro_id = $1 OR motorista_id = $1)
+          AND status NOT IN ('concluida', 'cancelada') LIMIT 1`,
+      [req.user.id]
+    );
+    if (pendentes.rows.length > 0) {
+      return res.status(409).json({ error: 'Termine ou cancele as corridas em curso antes de eliminar a conta.' });
+    }
+
+    // Anonimização: o histórico financeiro é append-only e não pode ser apagado.
+    await pool.query(
+      `UPDATE usuarios
+          SET ativo = FALSE,
+              nome = 'Conta eliminada',
+              email = NULL,
+              bi_numero = NULL,
+              fcm_token = NULL,
+              avatar_url = NULL,
+              telefone = 'eliminado_' || id,
+              senha_hash = '!',
+              atualizado_em = CURRENT_TIMESTAMP
+        WHERE id = $1`,
+      [req.user.id]
+    );
+
+    res.json({ ok: true, mensagem: 'Conta eliminada. Os registos financeiros são retidos de forma anónima por obrigação legal.' });
+  } catch (err) {
+    logger.error('Erro ao eliminar conta:', err);
+    res.status(500).json({ error: 'Erro interno ao eliminar conta.' });
+  }
+});
+
 // B. AUTENTICAÇÃO — REFRESH TOKEN ROTATIVO
 app.post('/api/v1/auth/refresh', async (req, res) => {
   const { refreshToken } = req.body;
@@ -178,6 +321,25 @@ app.post('/api/v1/auth/refresh', async (req, res) => {
   } catch (err) {
     res.status(403).json({ error: 'Refresh Token inválido ou expirado.' });
   }
+});
+
+// B2. ESTIMATIVA DE TARIFA — preço de todas as categorias antes de confirmar
+app.post('/api/v1/corridas/estimativa', authenticateJWT, (req, res) => {
+  const schema = Joi.object({
+    distanciaKm: Joi.number().positive().max(2000).required(),
+    duracaoMin: Joi.number().positive().max(1440).required()
+  });
+  const { error, value } = schema.validate(req.body);
+  if (error) return res.status(400).json({ error: error.details[0].message });
+
+  const estimativas = Object.keys(TABELA_TARIFAS.multiplicadores).map((categoria) => ({
+    categoria,
+    valorKz: calcularEstimativaTarifa(value.distanciaKm, value.duracaoMin, categoria),
+    distanciaKm: value.distanciaKm,
+    duracaoMin: value.duracaoMin
+  }));
+
+  res.json({ estimativas, comissaoPercentual: TABELA_TARIFAS.taxaComissaoGiro * 100 });
 });
 
 // C. MOTORISTAS PRÓXIMOS (ST_DWithin PostGIS + Redis GEO)
@@ -300,6 +462,165 @@ app.post('/api/v1/corridas/solicitar', authenticateJWT, async (req, res) => {
   } catch (err) {
     logger.error('Erro ao solicitar corrida:', err);
     res.status(500).json({ error: 'Erro ao processar pedido de viagem.' });
+  }
+});
+
+// D2. ACEITAR CORRIDA — atómico, o primeiro motorista a aceitar fica com a corrida
+app.post('/api/v1/corridas/aceitar', authenticateJWT, async (req, res) => {
+  if (req.user.tipo !== 'motorista') {
+    return res.status(403).json({ error: 'Apenas motoristas podem aceitar corridas.' });
+  }
+
+  const { corridaId } = req.body;
+  if (!corridaId) return res.status(400).json({ error: 'corridaId é obrigatório.' });
+
+  try {
+    const emCurso = await pool.query(
+      `SELECT 1 FROM corridas WHERE motorista_id = $1
+        AND status IN ('aceita', 'motorista_a_caminho', 'motorista_no_local', 'em_viagem') LIMIT 1`,
+      [req.user.id]
+    );
+    if (emCurso.rows.length > 0) {
+      return res.status(409).json({ error: 'Já tem uma corrida em curso.' });
+    }
+
+    // A cláusula status = 'solicitada' garante que só uma aceitação vence a corrida.
+    const result = await pool.query(
+      `UPDATE corridas
+          SET motorista_id = $1, status = 'motorista_a_caminho'
+        WHERE id = $2 AND status = 'solicitada' AND motorista_id IS NULL
+        RETURNING *`,
+      [req.user.id, corridaId]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(409).json({ error: 'Esta corrida já foi aceite por outro motorista.' });
+    }
+
+    const corrida = result.rows[0];
+    const veiculo = await pool.query(
+      `SELECT marca, modelo, cor, matricula FROM veiculos WHERE motorista_id = $1 LIMIT 1`,
+      [req.user.id]
+    );
+    const v = veiculo.rows[0];
+
+    io.to(`user:${corrida.passageiro_id}`).emit('corrida:aceita', {
+      id: corrida.id,
+      motorista_nome: req.user.nome,
+      motorista_telefone: req.user.telefone,
+      veiculo: v ? `${v.marca} ${v.modelo} ${v.cor} · ${v.matricula}` : 'Viatura GIRO',
+      codigo_embarque: corrida.codigo_embarque
+    });
+
+    // Retira o pedido da lista dos outros motoristas.
+    io.to('drivers:all').emit('ride:request_taken', { corridaId: corrida.id });
+
+    res.json({ success: true, corrida });
+  } catch (err) {
+    logger.error('Erro ao aceitar corrida:', err);
+    res.status(500).json({ error: 'Erro ao aceitar corrida.' });
+  }
+});
+
+// D3. INICIAR VIAGEM — exige o código de embarque de 4 dígitos do passageiro
+app.post('/api/v1/corridas/iniciar', authenticateJWT, async (req, res) => {
+  const { corridaId, codigoEmbarque } = req.body;
+  if (!corridaId || !codigoEmbarque) {
+    return res.status(400).json({ error: 'corridaId e codigoEmbarque são obrigatórios.' });
+  }
+
+  try {
+    const result = await pool.query(
+      `UPDATE corridas
+          SET status = 'em_viagem', iniciada_em = CURRENT_TIMESTAMP
+        WHERE id = $1 AND motorista_id = $2 AND codigo_embarque = $3
+          AND status IN ('motorista_a_caminho', 'motorista_no_local')
+        RETURNING id, passageiro_id`,
+      [corridaId, req.user.id, String(codigoEmbarque)]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(400).json({ error: 'Código de embarque incorrecto ou corrida em estado inválido.' });
+    }
+
+    io.to(`user:${result.rows[0].passageiro_id}`).emit('corrida:iniciada', { id: corridaId });
+    res.json({ success: true });
+  } catch (err) {
+    logger.error('Erro ao iniciar viagem:', err);
+    res.status(500).json({ error: 'Erro ao iniciar viagem.' });
+  }
+});
+
+// D4. CANCELAR CORRIDA — passageiro ou motorista, antes do embarque
+app.post('/api/v1/corridas/cancelar', authenticateJWT, async (req, res) => {
+  const { corridaId, motivo } = req.body;
+  if (!corridaId) return res.status(400).json({ error: 'corridaId é obrigatório.' });
+
+  try {
+    const result = await pool.query(
+      `UPDATE corridas
+          SET status = 'cancelada', cancelada_em = CURRENT_TIMESTAMP, motivo_cancelamento = $3
+        WHERE id = $1
+          AND (passageiro_id = $2 OR motorista_id = $2)
+          AND status IN ('solicitada', 'aceita', 'motorista_a_caminho', 'motorista_no_local')
+        RETURNING id, passageiro_id, motorista_id`,
+      [corridaId, req.user.id, motivo || 'Cancelada pelo utilizador']
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(409).json({ error: 'Não é possível cancelar esta corrida.' });
+    }
+
+    const c = result.rows[0];
+    const payload = { id: c.id, motivo: motivo || 'Cancelada pelo utilizador', porUsuarioId: req.user.id };
+    io.to(`user:${c.passageiro_id}`).emit('corrida:cancelada', payload);
+    if (c.motorista_id) io.to(`user:${c.motorista_id}`).emit('corrida:cancelada', payload);
+    io.to('drivers:all').emit('ride:request_taken', { corridaId: c.id });
+
+    res.json({ success: true });
+  } catch (err) {
+    logger.error('Erro ao cancelar corrida:', err);
+    res.status(500).json({ error: 'Erro ao cancelar corrida.' });
+  }
+});
+
+// D5. CORRIDA ACTIVA — permite retomar o ecrã certo depois de fechar o app
+app.get('/api/v1/corridas/activa', authenticateJWT, async (req, res) => {
+  try {
+    const result = await pool.query(
+      `SELECT c.*, u.nome AS motorista_nome, u.telefone AS motorista_telefone,
+              v.marca, v.modelo, v.cor, v.matricula
+         FROM corridas c
+         LEFT JOIN usuarios u ON u.id = c.motorista_id
+         LEFT JOIN veiculos v ON v.motorista_id = c.motorista_id
+        WHERE (c.passageiro_id = $1 OR c.motorista_id = $1)
+          AND c.status IN ('solicitada', 'aceita', 'motorista_a_caminho', 'motorista_no_local', 'em_viagem')
+        ORDER BY c.criada_em DESC LIMIT 1`,
+      [req.user.id]
+    );
+    res.json({ corrida: result.rows[0] || null });
+  } catch (err) {
+    logger.error('Erro ao carregar corrida activa:', err);
+    res.status(500).json({ error: 'Erro ao carregar corrida activa.' });
+  }
+});
+
+// D6. HISTÓRICO DE CORRIDAS
+app.get('/api/v1/corridas/historico', authenticateJWT, async (req, res) => {
+  const limite = Math.min(parseInt(req.query.limite || '30', 10), 100);
+  try {
+    const result = await pool.query(
+      `SELECT id, origem_nome, destino_nome, categoria, status, valor_estimado, valor_final,
+              metodo_pagamento, distancia_km, criada_em, concluida_em
+         FROM corridas
+        WHERE passageiro_id = $1 OR motorista_id = $1
+        ORDER BY criada_em DESC LIMIT $2`,
+      [req.user.id, limite]
+    );
+    res.json({ corridas: result.rows });
+  } catch (err) {
+    logger.error('Erro ao carregar histórico:', err);
+    res.status(500).json({ error: 'Erro ao carregar histórico.' });
   }
 });
 
