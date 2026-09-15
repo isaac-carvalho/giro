@@ -445,7 +445,7 @@ html, body{
         <span>✦</span> Vantagens
       </a>
     </div>
-  <a href="login.html" id="auth-pill" style="text-decoration:none;display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:20px;background:rgba(212,175,55,0.12);border:1px solid rgba(212,175,55,0.3);color:#d4af37;font-size:13px;font-weight:700;white-space:nowrap;">&#128100; Entrar</a>
+  <div id="auth-pill" style="display:flex;align-items:center;flex-shrink:0;"></div>
 </header>
 
   <!-- 2. VIEWPORT COM MAPA GPS AO VIVO -->
@@ -1124,5 +1124,48 @@ if ('serviceWorker' in navigator) {
 renderTiers();
 </script>
 
+
+<script>
+const GIRO_SESSION_KEY='giro_session';
+const GiroAuth={
+  save(user){localStorage.setItem(GIRO_SESSION_KEY,JSON.stringify({...user,ts:Date.now()}));},
+  get(){
+    try{
+      const raw=localStorage.getItem(GIRO_SESSION_KEY);
+      if(!raw)return null;
+      const s=JSON.parse(raw);
+      if(Date.now()-s.ts>30*24*3600*1000){this.clear();return null;}
+      return s;
+    }catch{return null;}
+  },
+  clear(){localStorage.removeItem(GIRO_SESSION_KEY);},
+  requireAuth(role){
+    const s=this.get();
+    if(!s){window.location.href='login.html';return null;}
+    if(role&&s.role!==role){window.location.href='login.html';return null;}
+    return s;
+  },
+  renderUserPill(containerId){
+    const s=this.get();
+    const el=document.getElementById(containerId);
+    if(!el)return;
+    if(s){
+      const initials=(s.nome||s.phone||'?')[0].toUpperCase();
+      el.innerHTML=`<div style="display:flex;align-items:center;gap:8px;">
+        <div style="width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#d4af37,#f0c040);display:flex;align-items:center;justify-content:center;font-weight:900;font-size:14px;color:#000;">${initials}</div>
+        <div style="line-height:1.2;"><div style="font-size:13px;font-weight:700;color:#f1f5f1;">${s.nome||s.phone}</div><div style="font-size:10px;color:#8d9e8d;text-transform:uppercase;">${s.role==='motorista'?'🚗 Motorista':'🧑 Passageiro'}</div></div>
+        <button onclick="GiroAuth.logout()" style="margin-left:4px;background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.3);border-radius:8px;padding:5px 10px;color:#fca5a5;font-size:12px;cursor:pointer;">Sair</button>
+      </div>`;
+    }else{
+      el.innerHTML='<a href="login.html" style="text-decoration:none;padding:7px 14px;border-radius:20px;background:rgba(212,175,55,.12);border:1px solid rgba(212,175,55,.3);color:#d4af37;font-size:13px;font-weight:700;">&#128100; Entrar</a>';
+    }
+  },
+  logout(){this.clear();window.location.href='login.html';}
+};
+document.addEventListener('DOMContentLoaded',function(){
+  // no role required
+  GiroAuth.renderUserPill('auth-pill');
+});
+</script>
 </body>
 </html>

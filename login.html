@@ -5,331 +5,101 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
   <meta name="theme-color" content="#070907">
-  <link rel="manifest" href="manifest.json">
   <style>
-    :root {
-      --bg: #070907;
-      --bg2: #0f1410;
-      --bg3: #1a211b;
-      --gold: #d4af37;
-      --gold2: #f0c040;
-      --green: #22c55e;
-      --green2: #16a34a;
-      --red: #ef4444;
-      --text: #f1f5f1;
-      --muted: #8d9e8d;
-      --border: rgba(212,175,55,0.18);
-      --card: rgba(255,255,255,0.04);
-      --radius: 16px;
-      --shadow: 0 4px 24px rgba(0,0,0,0.6);
-    }
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    html, body {
-      background: var(--bg);
-      color: var(--text);
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      min-height: 100vh;
-      -webkit-font-smoothing: antialiased;
-    }
-    a { color: var(--gold); text-decoration: none; }
-    a:hover { text-decoration: underline; }
-
-    /* ── Layout ── */
-    .auth-wrapper {
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: flex-start;
-      padding: 24px 16px 48px;
-    }
-    .auth-logo {
-      margin-bottom: 24px;
-      text-align: center;
-    }
-    .auth-logo .logo-g {
-      font-size: 48px;
-      font-weight: 900;
-      color: var(--gold);
-      letter-spacing: -2px;
-      line-height: 1;
-    }
-    .auth-logo .logo-sub {
-      font-size: 11px;
-      letter-spacing: 4px;
-      color: var(--muted);
-      text-transform: uppercase;
-    }
-    .auth-card {
-      width: 100%;
-      max-width: 420px;
-      background: var(--bg2);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 28px 24px 32px;
-      box-shadow: var(--shadow);
-    }
-    .auth-title {
-      font-size: 20px;
-      font-weight: 700;
-      color: var(--text);
-      margin-bottom: 6px;
-    }
-    .auth-subtitle {
-      font-size: 13px;
-      color: var(--muted);
-      margin-bottom: 28px;
-    }
-
-    /* ── Progress bar ── */
-    .progress-bar-wrap {
-      display: flex;
-      gap: 6px;
-      margin-bottom: 24px;
-    }
-    .progress-bar-wrap .step-dot {
-      flex: 1;
-      height: 4px;
-      border-radius: 2px;
-      background: var(--bg3);
-      transition: background 0.3s;
-    }
-    .progress-bar-wrap .step-dot.active { background: var(--gold); }
-    .progress-bar-wrap .step-dot.done { background: var(--green); }
-    .step-label {
-      font-size: 11px;
-      color: var(--muted);
-      margin-bottom: 20px;
-    }
-
-    /* ── Form elements ── */
-    .form-group { margin-bottom: 16px; }
-    .form-label {
-      display: block;
-      font-size: 12px;
-      font-weight: 600;
-      color: var(--muted);
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      margin-bottom: 7px;
-    }
-    .form-control {
-      width: 100%;
-      background: var(--bg3);
-      border: 1px solid rgba(255,255,255,0.1);
-      border-radius: 10px;
-      color: var(--text);
-      font-size: 15px;
-      padding: 12px 14px;
-      outline: none;
-      transition: border-color 0.2s;
-      -webkit-appearance: none;
-    }
-    .form-control:focus { border-color: var(--gold); }
-    .form-control.error { border-color: var(--red); }
-    .form-control.ok { border-color: var(--green); }
-    .form-hint {
-      font-size: 11px;
-      color: var(--muted);
-      margin-top: 5px;
-    }
-    .form-hint.err { color: var(--red); }
-    .form-hint.suc { color: var(--green); }
-
-    /* phone input */
-    .phone-row { display: flex; gap: 8px; }
-    .phone-prefix {
-      background: var(--bg3);
-      border: 1px solid rgba(255,255,255,0.1);
-      border-radius: 10px;
-      color: var(--gold);
-      font-size: 15px;
-      padding: 12px 10px;
-      min-width: 80px;
-      text-align: center;
-      font-weight: 700;
-    }
-
-    /* password toggle */
-    .pw-wrap { position: relative; }
-    .pw-wrap .form-control { padding-right: 44px; }
-    .pw-eye {
-      position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
-      background: none; border: none; cursor: pointer;
-      color: var(--muted); font-size: 18px; padding: 0; line-height: 1;
-    }
-
-    /* OTP */
-    .otp-row { display: flex; gap: 10px; justify-content: center; }
-    .otp-input {
-      width: 44px; height: 54px;
-      background: var(--bg3);
-      border: 1px solid rgba(255,255,255,0.1);
-      border-radius: 10px;
-      color: var(--text);
-      font-size: 22px; font-weight: 700;
-      text-align: center;
-      outline: none;
-      transition: border-color 0.2s;
-      -webkit-appearance: none;
-    }
-    .otp-input:focus { border-color: var(--gold); }
-
-    /* strength meter */
-    .strength-bar { display: flex; gap: 4px; margin-top: 8px; }
-    .strength-bar span {
-      flex: 1; height: 4px; border-radius: 2px; background: var(--bg3);
-      transition: background 0.3s;
-    }
-    .strength-label { font-size: 11px; margin-top: 5px; color: var(--muted); }
-
-    /* Buttons */
-    .btn {
-      display: flex; align-items: center; justify-content: center; gap: 8px;
-      width: 100%; padding: 14px;
-      border: none; border-radius: 10px;
-      font-size: 15px; font-weight: 700; cursor: pointer;
-      transition: opacity 0.2s, transform 0.1s;
-      -webkit-appearance: none;
-    }
-    .btn:active { transform: scale(0.98); }
-    .btn-gold { background: linear-gradient(135deg, var(--gold), var(--gold2)); color: #000; }
-    .btn-green { background: linear-gradient(135deg, var(--green), var(--green2)); color: #fff; }
-    .btn-outline {
-      background: transparent; border: 1px solid var(--border);
-      color: var(--text); margin-top: 10px;
-    }
-    .btn:disabled { opacity: 0.45; cursor: not-allowed; }
-    .btn-sm { padding: 10px 16px; font-size: 13px; width: auto; border-radius: 8px; }
-
-    /* nav-btn row */
-    .nav-btns { display: flex; gap: 10px; margin-top: 20px; }
-    .nav-btns .btn { margin-top: 0; }
-
-    /* Upload area */
-    .upload-box {
-      border: 2px dashed rgba(212,175,55,0.3);
-      border-radius: 12px;
-      padding: 18px 12px;
-      text-align: center;
-      cursor: pointer;
-      transition: border-color 0.2s, background 0.2s;
-      position: relative;
-    }
-    .upload-box:hover, .upload-box.drag { border-color: var(--gold); background: rgba(212,175,55,0.04); }
-    .upload-box input[type=file] { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
-    .upload-box .up-icon { font-size: 28px; margin-bottom: 6px; }
-    .upload-box .up-label { font-size: 13px; color: var(--muted); }
-    .upload-box .up-label strong { color: var(--gold); }
-    .upload-preview {
-      margin-top: 8px;
-      border-radius: 8px;
-      overflow: hidden;
-      max-height: 120px;
-      display: none;
-    }
-    .upload-preview img { width: 100%; object-fit: cover; max-height: 120px; }
-
-    /* Checkbox */
-    .check-group { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 14px; }
-    .check-group input[type=checkbox] {
-      width: 20px; height: 20px; accent-color: var(--gold);
-      flex-shrink: 0; margin-top: 2px; cursor: pointer;
-    }
-    .check-group label { font-size: 13px; color: var(--muted); cursor: pointer; line-height: 1.5; }
-
-    /* Divider */
-    .divider { display: flex; align-items: center; gap: 12px; margin: 20px 0; }
-    .divider::before, .divider::after {
-      content: ''; flex: 1; height: 1px; background: rgba(255,255,255,0.08);
-    }
-    .divider span { font-size: 12px; color: var(--muted); white-space: nowrap; }
-
-    /* Alert */
-    .alert {
-      padding: 12px 14px; border-radius: 10px; font-size: 13px;
-      margin-bottom: 16px; display: none;
-    }
-    .alert.err { background: rgba(239,68,68,0.12); border: 1px solid rgba(239,68,68,0.3); color: #fca5a5; }
-    .alert.suc { background: rgba(34,197,94,0.12); border: 1px solid rgba(34,197,94,0.3); color: #86efac; }
-    .alert.info { background: rgba(212,175,55,0.10); border: 1px solid rgba(212,175,55,0.3); color: var(--gold2); }
-
-    /* step pane */
-    .step-pane { display: none; }
-    .step-pane.active { display: block; }
-
-    /* success screen */
-    .success-screen { text-align: center; padding: 32px 0; }
-    .success-screen .big-icon { font-size: 64px; margin-bottom: 16px; }
-    .success-screen h2 { font-size: 22px; font-weight: 800; margin-bottom: 10px; }
-    .success-screen p { font-size: 14px; color: var(--muted); line-height: 1.6; }
-    .success-screen .badge-pending {
-      display: inline-block; margin-top: 16px;
-      padding: 8px 18px; border-radius: 20px;
-      background: rgba(212,175,55,0.12); border: 1px solid var(--border);
-      color: var(--gold); font-size: 13px; font-weight: 600;
-    }
-
-    /* Spinner */
-    @keyframes spin { to { transform: rotate(360deg); } }
-    .spinner {
-      width: 18px; height: 18px; border: 2px solid rgba(0,0,0,0.3);
-      border-top-color: #000; border-radius: 50%; animation: spin 0.7s linear infinite;
-    }
-    .btn-gold .spinner { border-color: rgba(0,0,0,0.2); border-top-color: #000; }
-    .btn-green .spinner { border-color: rgba(255,255,255,0.3); border-top-color: #fff; }
-
-    /* link row at bottom */
-    .auth-links { margin-top: 20px; text-align: center; font-size: 13px; color: var(--muted); }
-    .auth-links a { font-weight: 600; }
-
-    /* select */
-    select.form-control { cursor: pointer; }
-    option { background: #1a211b; }
-
-    /* grid 2 cols */
-    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-    @media (max-width: 380px) { .grid-2 { grid-template-columns: 1fr; } }
-
-    /* role picker */
-    .role-cards { display: flex; gap: 12px; margin-top: 20px; }
-    .role-card {
-      flex: 1; padding: 18px 12px; border-radius: 12px;
-      border: 2px solid rgba(255,255,255,0.08);
-      background: var(--bg3); text-align: center; cursor: pointer;
-      transition: border-color 0.2s, background 0.2s;
-    }
-    .role-card:hover { border-color: var(--gold); }
-    .role-card.selected { border-color: var(--gold); background: rgba(212,175,55,0.08); }
-    .role-card .rc-icon { font-size: 34px; margin-bottom: 10px; }
-    .role-card .rc-label { font-size: 14px; font-weight: 700; }
-    .role-card .rc-desc { font-size: 11px; color: var(--muted); margin-top: 4px; }
-
-    /* resend timer */
-    .resend-row { text-align: center; margin-top: 16px; font-size: 13px; color: var(--muted); }
-    .resend-btn { color: var(--gold); font-weight: 600; cursor: pointer; }
-    .resend-btn:disabled { color: var(--muted); cursor: default; }
-
-    /* vehicle grid */
-    .veh-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-    .veh-btn {
-      padding: 10px 8px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.08);
-      background: var(--bg3); color: var(--text); font-size: 13px; cursor: pointer;
-      transition: border-color 0.2s;
-    }
-    .veh-btn.selected { border-color: var(--gold); background: rgba(212,175,55,0.08); color: var(--gold); }
-
-    /* scroll smoothing */
-    html { scroll-behavior: smooth; }
-
-    /* address optional pill */
-    .pill-skip {
-      display: inline-block; margin-top: 4px;
-      padding: 4px 12px; border-radius: 20px;
-      background: var(--bg3); border: 1px solid rgba(255,255,255,0.08);
-      font-size: 12px; color: var(--muted); cursor: pointer;
-    }
-    .pill-skip:hover { border-color: var(--gold); color: var(--gold); }
+    :root{--bg:#070907;--bg2:#0f1410;--bg3:#1a211b;--gold:#d4af37;--gold2:#f0c040;--green:#22c55e;--green2:#16a34a;--red:#ef4444;--text:#f1f5f1;--muted:#8d9e8d;--border:rgba(212,175,55,0.18);--card:rgba(255,255,255,0.04);--radius:16px;--shadow:0 4px 24px rgba(0,0,0,0.6);}
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+    html,body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;min-height:100vh;-webkit-font-smoothing:antialiased;}
+    a{color:var(--gold);text-decoration:none;}a:hover{text-decoration:underline;}
+    .auth-wrapper{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding:24px 16px 48px;}
+    .auth-logo{margin-bottom:24px;text-align:center;}
+    .auth-logo .logo-g{font-size:48px;font-weight:900;color:var(--gold);letter-spacing:-2px;line-height:1;}
+    .auth-logo .logo-sub{font-size:11px;letter-spacing:4px;color:var(--muted);text-transform:uppercase;}
+    .auth-card{width:100%;max-width:420px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:28px 24px 32px;box-shadow:var(--shadow);}
+    .auth-title{font-size:20px;font-weight:700;color:var(--text);margin-bottom:6px;}
+    .auth-subtitle{font-size:13px;color:var(--muted);margin-bottom:28px;}
+    .progress-bar-wrap{display:flex;gap:6px;margin-bottom:24px;}
+    .progress-bar-wrap .step-dot{flex:1;height:4px;border-radius:2px;background:var(--bg3);transition:background .3s;}
+    .progress-bar-wrap .step-dot.active{background:var(--gold);}
+    .progress-bar-wrap .step-dot.done{background:var(--green);}
+    .step-label{font-size:11px;color:var(--muted);margin-bottom:20px;}
+    .form-group{margin-bottom:16px;}
+    .form-label{display:block;font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:7px;}
+    .form-control{width:100%;background:var(--bg3);border:1px solid rgba(255,255,255,.1);border-radius:10px;color:var(--text);font-size:15px;padding:12px 14px;outline:none;transition:border-color .2s;-webkit-appearance:none;}
+    .form-control:focus{border-color:var(--gold);}
+    .form-control.error{border-color:var(--red);}
+    .form-control.ok{border-color:var(--green);}
+    .form-hint{font-size:11px;color:var(--muted);margin-top:5px;}
+    .form-hint.err{color:var(--red);}
+    .form-hint.suc{color:var(--green);}
+    .phone-row{display:flex;gap:8px;}
+    .phone-prefix{background:var(--bg3);border:1px solid rgba(255,255,255,.1);border-radius:10px;color:var(--gold);font-size:15px;padding:12px 10px;min-width:80px;text-align:center;font-weight:700;}
+    .pw-wrap{position:relative;}
+    .pw-wrap .form-control{padding-right:44px;}
+    .pw-eye{position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--muted);font-size:18px;padding:0;line-height:1;}
+    .otp-row{display:flex;gap:10px;justify-content:center;}
+    .otp-input{width:44px;height:54px;background:var(--bg3);border:1px solid rgba(255,255,255,.1);border-radius:10px;color:var(--text);font-size:22px;font-weight:700;text-align:center;outline:none;transition:border-color .2s;-webkit-appearance:none;}
+    .otp-input:focus{border-color:var(--gold);}
+    .strength-bar{display:flex;gap:4px;margin-top:8px;}
+    .strength-bar span{flex:1;height:4px;border-radius:2px;background:var(--bg3);transition:background .3s;}
+    .strength-label{font-size:11px;margin-top:5px;color:var(--muted);}
+    .btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:14px;border:none;border-radius:10px;font-size:15px;font-weight:700;cursor:pointer;transition:opacity .2s,transform .1s;-webkit-appearance:none;}
+    .btn:active{transform:scale(.98);}
+    .btn-gold{background:linear-gradient(135deg,var(--gold),var(--gold2));color:#000;}
+    .btn-green{background:linear-gradient(135deg,var(--green),var(--green2));color:#fff;}
+    .btn-outline{background:transparent;border:1px solid var(--border);color:var(--text);margin-top:10px;}
+    .btn:disabled{opacity:.45;cursor:not-allowed;}
+    .btn-sm{padding:10px 16px;font-size:13px;width:auto;border-radius:8px;}
+    .nav-btns{display:flex;gap:10px;margin-top:20px;}
+    .nav-btns .btn{margin-top:0;}
+    .upload-box{border:2px dashed rgba(212,175,55,.3);border-radius:12px;padding:18px 12px;text-align:center;cursor:pointer;transition:border-color .2s,background .2s;position:relative;}
+    .upload-box:hover,.upload-box.drag{border-color:var(--gold);background:rgba(212,175,55,.04);}
+    .upload-box input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;}
+    .upload-box .up-icon{font-size:28px;margin-bottom:6px;}
+    .upload-box .up-label{font-size:13px;color:var(--muted);}
+    .upload-box .up-label strong{color:var(--gold);}
+    .upload-preview{margin-top:8px;border-radius:8px;overflow:hidden;max-height:120px;display:none;}
+    .upload-preview img{width:100%;object-fit:cover;max-height:120px;}
+    .check-group{display:flex;align-items:flex-start;gap:12px;margin-bottom:14px;}
+    .check-group input[type=checkbox]{width:20px;height:20px;accent-color:var(--gold);flex-shrink:0;margin-top:2px;cursor:pointer;}
+    .check-group label{font-size:13px;color:var(--muted);cursor:pointer;line-height:1.5;}
+    .divider{display:flex;align-items:center;gap:12px;margin:20px 0;}
+    .divider::before,.divider::after{content:'';flex:1;height:1px;background:rgba(255,255,255,.08);}
+    .divider span{font-size:12px;color:var(--muted);white-space:nowrap;}
+    .alert{padding:12px 14px;border-radius:10px;font-size:13px;margin-bottom:16px;display:none;}
+    .alert.err{background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.3);color:#fca5a5;}
+    .alert.suc{background:rgba(34,197,94,.12);border:1px solid rgba(34,197,94,.3);color:#86efac;}
+    .alert.info{background:rgba(212,175,55,.10);border:1px solid rgba(212,175,55,.3);color:var(--gold2);}
+    .step-pane{display:none;}
+    .step-pane.active{display:block;}
+    .success-screen{text-align:center;padding:32px 0;}
+    .success-screen .big-icon{font-size:64px;margin-bottom:16px;}
+    .success-screen h2{font-size:22px;font-weight:800;margin-bottom:10px;}
+    .success-screen p{font-size:14px;color:var(--muted);line-height:1.6;}
+    .success-screen .badge-pending{display:inline-block;margin-top:16px;padding:8px 18px;border-radius:20px;background:rgba(212,175,55,.12);border:1px solid var(--border);color:var(--gold);font-size:13px;font-weight:600;}
+    .resend-row{text-align:center;margin-top:16px;font-size:13px;color:var(--muted);}
+    .resend-btn{color:var(--gold);font-weight:600;cursor:pointer;background:none;border:none;font-size:13px;}
+    .resend-btn:disabled{color:var(--muted);cursor:default;}
+    .role-cards{display:flex;gap:12px;margin-top:20px;}
+    .role-card{flex:1;padding:18px 12px;border-radius:12px;border:2px solid rgba(255,255,255,.08);background:var(--bg3);text-align:center;cursor:pointer;transition:border-color .2s,background .2s;}
+    .role-card:hover{border-color:var(--gold);}
+    .role-card .rc-icon{font-size:34px;margin-bottom:10px;}
+    .role-card .rc-label{font-size:14px;font-weight:700;}
+    .role-card .rc-desc{font-size:11px;color:var(--muted);margin-top:4px;}
+    .auth-links{margin-top:20px;text-align:center;font-size:13px;color:var(--muted);}
+    .auth-links a{font-weight:600;}
+    .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+    @media(max-width:380px){.grid-2{grid-template-columns:1fr;}}
+    .pill-skip{display:inline-block;margin-top:4px;padding:4px 12px;border-radius:20px;background:var(--bg3);border:1px solid rgba(255,255,255,.08);font-size:12px;color:var(--muted);cursor:pointer;}
+    .pill-skip:hover{border-color:var(--gold);color:var(--gold);}
+    .veh-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+    .veh-btn{padding:10px 8px;border-radius:8px;border:1px solid rgba(255,255,255,.08);background:var(--bg3);color:var(--text);font-size:13px;cursor:pointer;transition:border-color .2s;}
+    .veh-btn.selected{border-color:var(--gold);background:rgba(212,175,55,.08);color:var(--gold);}
+    .kyc-info{background:rgba(212,175,55,.07);border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-bottom:16px;font-size:12px;color:var(--gold2);line-height:1.6;}
+    .doc-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+    @media(max-width:380px){.doc-grid{grid-template-columns:1fr;}}
+    .earnings-box{background:var(--bg3);border-radius:12px;padding:16px;margin-bottom:18px;text-align:center;}
+    .earnings-box .earn-val{font-size:28px;font-weight:900;color:var(--green);}
+    .earnings-box .earn-sub{font-size:12px;color:var(--muted);margin-top:4px;}
   </style>
 </head>
 <body>
@@ -342,37 +112,31 @@
   <div class="auth-card" id="card-phone">
     <h1 class="auth-title">Bem-vindo de volta 👋</h1>
     <p class="auth-subtitle">Insira o seu número para continuar</p>
-
     <div id="alert-login" class="alert"></div>
 
-    <!-- PHONE STEP -->
+    <!-- PHONE -->
     <div id="pane-phone" class="step-pane active">
       <div class="form-group">
         <label class="form-label">Número de Telefone</label>
         <div class="phone-row">
           <div class="phone-prefix">🇦🇴 +244</div>
-          <input class="form-control" id="inp-phone" type="tel" inputmode="numeric"
-            placeholder="9XX XXX XXX" maxlength="9" autocomplete="tel-national">
+          <input class="form-control" id="inp-phone" type="tel" inputmode="numeric" placeholder="9XX XXX XXX" maxlength="9" autocomplete="tel-national">
         </div>
         <div class="form-hint" id="hint-phone"></div>
       </div>
-      <button class="btn btn-gold" id="btn-send-otp" onclick="sendOTP()">
-        📲 Enviar Código SMS
-      </button>
+      <button class="btn btn-gold" onclick="sendOTP()">📲 Enviar Código SMS</button>
       <div class="divider"><span>ou</span></div>
-      <button class="btn btn-outline" onclick="showPanePassword()">🔑 Entrar com Senha</button>
+      <button class="btn btn-outline" onclick="showPane('pane-password')">🔑 Entrar com Senha</button>
     </div>
 
-    <!-- OTP STEP -->
+    <!-- OTP -->
     <div id="pane-otp" class="step-pane">
       <p style="font-size:13px;color:var(--muted);margin-bottom:20px">
         Código enviado para <strong id="otp-phone-display" style="color:var(--text)"></strong>
       </p>
       <div class="otp-row" id="otp-boxes"></div>
       <div class="resend-row">
-        Não recebeu? <button class="resend-btn" id="btn-resend" onclick="resendOTP()" disabled>
-          Reenviar (<span id="timer">30</span>s)
-        </button>
+        Não recebeu? <button class="resend-btn" id="btn-resend" onclick="resendOTP()" disabled>Reenviar (<span id="timer">30</span>s)</button>
       </div>
       <div class="nav-btns" style="margin-top:24px">
         <button class="btn btn-outline" onclick="showPane('pane-phone')">← Voltar</button>
@@ -380,14 +144,13 @@
       </div>
     </div>
 
-    <!-- PASSWORD STEP -->
+    <!-- PASSWORD -->
     <div id="pane-password" class="step-pane">
       <div class="form-group">
         <label class="form-label">Número de Telefone</label>
         <div class="phone-row">
           <div class="phone-prefix">🇦🇴 +244</div>
-          <input class="form-control" id="inp-phone-pw" type="tel" inputmode="numeric"
-            placeholder="9XX XXX XXX" maxlength="9">
+          <input class="form-control" id="inp-phone-pw" type="tel" inputmode="numeric" placeholder="9XX XXX XXX" maxlength="9">
         </div>
       </div>
       <div class="form-group">
@@ -401,15 +164,13 @@
       <div style="text-align:center;font-size:13px;color:var(--muted)">
         <a href="#" onclick="showPane('pane-phone')">Entrar com SMS</a>
         &nbsp;·&nbsp;
-        <a href="#" onclick="showForgot()">Esqueci a senha</a>
+        <a href="#" onclick="showPane('pane-forgot')">Esqueci a senha</a>
       </div>
     </div>
 
-    <!-- FORGOT PASSWORD -->
+    <!-- FORGOT -->
     <div id="pane-forgot" class="step-pane">
-      <p style="font-size:13px;color:var(--muted);margin-bottom:18px">
-        Enviaremos um código SMS para redefinir a sua senha.
-      </p>
+      <p style="font-size:13px;color:var(--muted);margin-bottom:18px">Enviaremos um código SMS para redefinir a sua senha.</p>
       <div class="form-group">
         <label class="form-label">Número de Telefone</label>
         <div class="phone-row">
@@ -425,10 +186,8 @@
   </div>
 
   <!-- CREATE ACCOUNT -->
-  <div class="auth-card" id="card-create" style="margin-top:16px;padding:20px 24px">
-    <div style="text-align:center;font-size:14px;color:var(--muted)">
-      Não tem conta?
-    </div>
+  <div class="auth-card" style="margin-top:16px;padding:20px 24px">
+    <div style="text-align:center;font-size:14px;color:var(--muted)">Não tem conta?</div>
     <div class="role-cards">
       <div class="role-card" onclick="location.href='cadastro-passageiro.html'">
         <div class="rc-icon">🧑‍💼</div>
@@ -445,120 +204,128 @@
 </div>
 
 <script>
-// ── Utils ──
-function showPane(id) {
-  document.querySelectorAll('.step-pane').forEach(p => p.classList.remove('active'));
+const GIRO_SESSION_KEY='giro_session';
+const GiroAuth={
+  save(user){localStorage.setItem(GIRO_SESSION_KEY,JSON.stringify({...user,ts:Date.now()}));},
+  get(){
+    try{
+      const raw=localStorage.getItem(GIRO_SESSION_KEY);
+      if(!raw)return null;
+      const s=JSON.parse(raw);
+      if(Date.now()-s.ts>30*24*3600*1000){this.clear();return null;}
+      return s;
+    }catch{return null;}
+  },
+  clear(){localStorage.removeItem(GIRO_SESSION_KEY);},
+  requireAuth(role){
+    const s=this.get();
+    if(!s){window.location.href='login.html';return null;}
+    if(role&&s.role!==role){window.location.href='login.html';return null;}
+    return s;
+  },
+  renderUserPill(containerId){
+    const s=this.get();
+    const el=document.getElementById(containerId);
+    if(!el)return;
+    if(s){
+      const initials=(s.nome||s.phone||'?')[0].toUpperCase();
+      el.innerHTML=`<div style="display:flex;align-items:center;gap:8px;">
+        <div style="width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#d4af37,#f0c040);display:flex;align-items:center;justify-content:center;font-weight:900;font-size:14px;color:#000;">${initials}</div>
+        <div style="line-height:1.2;"><div style="font-size:13px;font-weight:700;color:#f1f5f1;">${s.nome||s.phone}</div><div style="font-size:10px;color:#8d9e8d;text-transform:uppercase;">${s.role==='motorista'?'🚗 Motorista':'🧑 Passageiro'}</div></div>
+        <button onclick="GiroAuth.logout()" style="margin-left:4px;background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.3);border-radius:8px;padding:5px 10px;color:#fca5a5;font-size:12px;cursor:pointer;">Sair</button>
+      </div>`;
+    }else{
+      el.innerHTML='<a href="login.html" style="text-decoration:none;padding:7px 14px;border-radius:20px;background:rgba(212,175,55,.12);border:1px solid rgba(212,175,55,.3);color:#d4af37;font-size:13px;font-weight:700;">&#128100; Entrar</a>';
+    }
+  },
+  logout(){this.clear();window.location.href='login.html';}
+};
+
+// Se já logado, redirigir
+(function(){
+  const s=GiroAuth.get();
+  if(s){window.location.href=s.role==='motorista'?'driver.html':'index.html';}
+})();
+
+function showPane(id){
+  document.querySelectorAll('.step-pane').forEach(p=>p.classList.remove('active'));
   document.getElementById(id).classList.add('active');
   showAlert('');
 }
-function showAlert(msg, type='err') {
-  const el = document.getElementById('alert-login');
-  el.className = 'alert ' + (msg ? type : '');
-  el.style.display = msg ? 'block' : 'none';
-  el.textContent = msg;
+function showAlert(msg,type='err'){
+  const el=document.getElementById('alert-login');
+  el.className='alert '+(msg?type:'');
+  el.style.display=msg?'block':'none';
+  el.textContent=msg;
 }
-function togglePw(id) {
-  const el = document.getElementById(id);
-  el.type = el.type === 'password' ? 'text' : 'password';
-}
+function togglePw(id){const el=document.getElementById(id);el.type=el.type==='password'?'text':'password';}
+function validatePhone(v){return /^9[1-9][0-9]{7}$/.test(v.replace(/\s/g,''));}
+function getPhone(id='inp-phone'){return document.getElementById(id).value.replace(/\s/g,'');}
 
-// ── Phone validation ──
-function validatePhone(val) {
-  return /^9[1-9][0-9]{7}$/.test(val.replace(/\s/g,''));
-}
-function getPhone(id='inp-phone') {
-  return document.getElementById(id).value.replace(/\s/g,'');
-}
-
-// ── OTP boxes ──
-(function buildOTP() {
-  const wrap = document.getElementById('otp-boxes');
-  for (let i = 0; i < 6; i++) {
-    const inp = document.createElement('input');
-    inp.type = 'text'; inp.inputMode = 'numeric'; inp.maxLength = 1;
-    inp.className = 'otp-input'; inp.dataset.idx = i;
-    inp.addEventListener('input', e => {
-      if (e.target.value) {
-        const next = wrap.children[i+1];
-        if (next) next.focus();
-      }
-    });
-    inp.addEventListener('keydown', e => {
-      if (e.key === 'Backspace' && !e.target.value) {
-        const prev = wrap.children[i-1];
-        if (prev) { prev.value = ''; prev.focus(); }
-      }
-    });
+// OTP boxes
+(function buildOTP(){
+  const wrap=document.getElementById('otp-boxes');
+  for(let i=0;i<6;i++){
+    const inp=document.createElement('input');
+    inp.type='text';inp.inputMode='numeric';inp.maxLength=1;inp.className='otp-input';inp.dataset.idx=i;
+    inp.addEventListener('input',()=>{if(inp.value&&wrap.children[i+1])wrap.children[i+1].focus();});
+    inp.addEventListener('keydown',e=>{if(e.key==='Backspace'&&!inp.value&&wrap.children[i-1]){wrap.children[i-1].value='';wrap.children[i-1].focus();}});
     wrap.appendChild(inp);
   }
 })();
 
-function getOTPValue() {
-  return [...document.querySelectorAll('.otp-input')].map(i => i.value).join('');
-}
-
-// ── Timer ──
+let _loginPhone='';
 let timerInterval;
-function startTimer() {
-  let t = 30;
-  const btn = document.getElementById('btn-resend');
-  const lbl = document.getElementById('timer');
-  btn.disabled = true;
+function startTimer(){
+  let t=30;
+  const btn=document.getElementById('btn-resend');
+  const lbl=document.getElementById('timer');
+  btn.disabled=true;
   clearInterval(timerInterval);
-  timerInterval = setInterval(() => {
-    t--;
-    lbl.textContent = t;
-    if (t <= 0) { clearInterval(timerInterval); btn.disabled = false; lbl.textContent = ''; btn.textContent = 'Reenviar código'; }
-  }, 1000);
+  timerInterval=setInterval(()=>{t--;lbl.textContent=t;if(t<=0){clearInterval(timerInterval);btn.disabled=false;btn.textContent='Reenviar código';}},1000);
 }
 
-// ── Send OTP ──
-function sendOTP() {
-  const phone = getPhone();
-  if (!validatePhone(phone)) {
-    showAlert('Número inválido. Formato: 9XX XXX XXX (9 dígitos)');
-    return;
-  }
-  document.getElementById('otp-phone-display').textContent = '+244 ' + phone;
+function sendOTP(){
+  const phone=getPhone();
+  if(!validatePhone(phone)){showAlert('Número inválido. Formato: 9XX XXX XXX (9 dígitos)');return;}
+  _loginPhone=phone;
+  document.getElementById('otp-phone-display').textContent='+244 '+phone;
   showPane('pane-otp');
   startTimer();
-  // TODO: POST /api/auth/otp/send { phone: '+244' + phone }
-  console.log('OTP enviado para +244' + phone);
 }
 
-function resendOTP() {
-  startTimer();
-  console.log('OTP reenviado');
+function resendOTP(){startTimer();}
+
+function verifyOTP(){
+  const code=[...document.querySelectorAll('#otp-boxes .otp-input')].map(i=>i.value).join('');
+  if(code.length<6){showAlert('Introduza os 6 dígitos do código');return;}
+  showAlert('A verificar...','info');
+  // Demo: qualquer código de 6 dígitos é aceite
+  // Prod: POST /api/auth/otp/verify
+  setTimeout(()=>{
+    GiroAuth.save({phone:'+244'+_loginPhone,nome:'Utilizador GIRO',role:'passageiro'});
+    window.location.href='index.html';
+  },800);
 }
 
-// ── Verify OTP ──
-function verifyOTP() {
-  const code = getOTPValue();
-  if (code.length < 6) { showAlert('Introduza os 6 dígitos do código'); return; }
-  // TODO: POST /api/auth/otp/verify { phone, code }
-  // On success → redirect
-  showAlert('A verificar...', 'info');
-  setTimeout(() => { window.location.href = 'index.html'; }, 1200);
+function loginPassword(){
+  const phone=getPhone('inp-phone-pw');
+  const pw=document.getElementById('inp-password').value;
+  if(!validatePhone(phone)){showAlert('Número inválido');return;}
+  if(pw.length<6){showAlert('Senha demasiado curta (mínimo 6 caracteres)');return;}
+  showAlert('A entrar...','info');
+  // Demo: aceita qualquer senha com >=6 chars
+  // Prod: POST /api/auth/login
+  setTimeout(()=>{
+    GiroAuth.save({phone:'+244'+phone,nome:'Utilizador GIRO',role:'passageiro'});
+    window.location.href='index.html';
+  },800);
 }
 
-// ── Password login ──
-function loginPassword() {
-  const phone = getPhone('inp-phone-pw');
-  const pw = document.getElementById('inp-password').value;
-  if (!validatePhone(phone)) { showAlert('Número inválido'); return; }
-  if (pw.length < 6) { showAlert('Senha demasiado curta'); return; }
-  // TODO: POST /api/auth/login { phone: '+244'+phone, password: pw }
-  showAlert('A entrar...', 'info');
-  setTimeout(() => { window.location.href = 'index.html'; }, 1200);
-}
-
-// ── Forgot password ──
-function showPanePassword() { showPane('pane-password'); }
-function showForgot() { showPane('pane-forgot'); }
-function sendForgotOTP() {
-  const phone = getPhone('inp-forgot-phone');
-  if (!validatePhone(phone)) { showAlert('Número inválido'); return; }
-  showAlert('Código enviado para +244 ' + phone, 'suc');
+function sendForgotOTP(){
+  const phone=getPhone('inp-forgot-phone');
+  if(!validatePhone(phone)){showAlert('Número inválido');return;}
+  showAlert('Código enviado para +244 '+phone,'suc');
 }
 </script>
 </body>

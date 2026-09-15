@@ -5,331 +5,101 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
   <meta name="theme-color" content="#070907">
-  <link rel="manifest" href="manifest.json">
   <style>
-    :root {
-      --bg: #070907;
-      --bg2: #0f1410;
-      --bg3: #1a211b;
-      --gold: #d4af37;
-      --gold2: #f0c040;
-      --green: #22c55e;
-      --green2: #16a34a;
-      --red: #ef4444;
-      --text: #f1f5f1;
-      --muted: #8d9e8d;
-      --border: rgba(212,175,55,0.18);
-      --card: rgba(255,255,255,0.04);
-      --radius: 16px;
-      --shadow: 0 4px 24px rgba(0,0,0,0.6);
-    }
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    html, body {
-      background: var(--bg);
-      color: var(--text);
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      min-height: 100vh;
-      -webkit-font-smoothing: antialiased;
-    }
-    a { color: var(--gold); text-decoration: none; }
-    a:hover { text-decoration: underline; }
-
-    /* ── Layout ── */
-    .auth-wrapper {
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: flex-start;
-      padding: 24px 16px 48px;
-    }
-    .auth-logo {
-      margin-bottom: 24px;
-      text-align: center;
-    }
-    .auth-logo .logo-g {
-      font-size: 48px;
-      font-weight: 900;
-      color: var(--gold);
-      letter-spacing: -2px;
-      line-height: 1;
-    }
-    .auth-logo .logo-sub {
-      font-size: 11px;
-      letter-spacing: 4px;
-      color: var(--muted);
-      text-transform: uppercase;
-    }
-    .auth-card {
-      width: 100%;
-      max-width: 420px;
-      background: var(--bg2);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 28px 24px 32px;
-      box-shadow: var(--shadow);
-    }
-    .auth-title {
-      font-size: 20px;
-      font-weight: 700;
-      color: var(--text);
-      margin-bottom: 6px;
-    }
-    .auth-subtitle {
-      font-size: 13px;
-      color: var(--muted);
-      margin-bottom: 28px;
-    }
-
-    /* ── Progress bar ── */
-    .progress-bar-wrap {
-      display: flex;
-      gap: 6px;
-      margin-bottom: 24px;
-    }
-    .progress-bar-wrap .step-dot {
-      flex: 1;
-      height: 4px;
-      border-radius: 2px;
-      background: var(--bg3);
-      transition: background 0.3s;
-    }
-    .progress-bar-wrap .step-dot.active { background: var(--gold); }
-    .progress-bar-wrap .step-dot.done { background: var(--green); }
-    .step-label {
-      font-size: 11px;
-      color: var(--muted);
-      margin-bottom: 20px;
-    }
-
-    /* ── Form elements ── */
-    .form-group { margin-bottom: 16px; }
-    .form-label {
-      display: block;
-      font-size: 12px;
-      font-weight: 600;
-      color: var(--muted);
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      margin-bottom: 7px;
-    }
-    .form-control {
-      width: 100%;
-      background: var(--bg3);
-      border: 1px solid rgba(255,255,255,0.1);
-      border-radius: 10px;
-      color: var(--text);
-      font-size: 15px;
-      padding: 12px 14px;
-      outline: none;
-      transition: border-color 0.2s;
-      -webkit-appearance: none;
-    }
-    .form-control:focus { border-color: var(--gold); }
-    .form-control.error { border-color: var(--red); }
-    .form-control.ok { border-color: var(--green); }
-    .form-hint {
-      font-size: 11px;
-      color: var(--muted);
-      margin-top: 5px;
-    }
-    .form-hint.err { color: var(--red); }
-    .form-hint.suc { color: var(--green); }
-
-    /* phone input */
-    .phone-row { display: flex; gap: 8px; }
-    .phone-prefix {
-      background: var(--bg3);
-      border: 1px solid rgba(255,255,255,0.1);
-      border-radius: 10px;
-      color: var(--gold);
-      font-size: 15px;
-      padding: 12px 10px;
-      min-width: 80px;
-      text-align: center;
-      font-weight: 700;
-    }
-
-    /* password toggle */
-    .pw-wrap { position: relative; }
-    .pw-wrap .form-control { padding-right: 44px; }
-    .pw-eye {
-      position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
-      background: none; border: none; cursor: pointer;
-      color: var(--muted); font-size: 18px; padding: 0; line-height: 1;
-    }
-
-    /* OTP */
-    .otp-row { display: flex; gap: 10px; justify-content: center; }
-    .otp-input {
-      width: 44px; height: 54px;
-      background: var(--bg3);
-      border: 1px solid rgba(255,255,255,0.1);
-      border-radius: 10px;
-      color: var(--text);
-      font-size: 22px; font-weight: 700;
-      text-align: center;
-      outline: none;
-      transition: border-color 0.2s;
-      -webkit-appearance: none;
-    }
-    .otp-input:focus { border-color: var(--gold); }
-
-    /* strength meter */
-    .strength-bar { display: flex; gap: 4px; margin-top: 8px; }
-    .strength-bar span {
-      flex: 1; height: 4px; border-radius: 2px; background: var(--bg3);
-      transition: background 0.3s;
-    }
-    .strength-label { font-size: 11px; margin-top: 5px; color: var(--muted); }
-
-    /* Buttons */
-    .btn {
-      display: flex; align-items: center; justify-content: center; gap: 8px;
-      width: 100%; padding: 14px;
-      border: none; border-radius: 10px;
-      font-size: 15px; font-weight: 700; cursor: pointer;
-      transition: opacity 0.2s, transform 0.1s;
-      -webkit-appearance: none;
-    }
-    .btn:active { transform: scale(0.98); }
-    .btn-gold { background: linear-gradient(135deg, var(--gold), var(--gold2)); color: #000; }
-    .btn-green { background: linear-gradient(135deg, var(--green), var(--green2)); color: #fff; }
-    .btn-outline {
-      background: transparent; border: 1px solid var(--border);
-      color: var(--text); margin-top: 10px;
-    }
-    .btn:disabled { opacity: 0.45; cursor: not-allowed; }
-    .btn-sm { padding: 10px 16px; font-size: 13px; width: auto; border-radius: 8px; }
-
-    /* nav-btn row */
-    .nav-btns { display: flex; gap: 10px; margin-top: 20px; }
-    .nav-btns .btn { margin-top: 0; }
-
-    /* Upload area */
-    .upload-box {
-      border: 2px dashed rgba(212,175,55,0.3);
-      border-radius: 12px;
-      padding: 18px 12px;
-      text-align: center;
-      cursor: pointer;
-      transition: border-color 0.2s, background 0.2s;
-      position: relative;
-    }
-    .upload-box:hover, .upload-box.drag { border-color: var(--gold); background: rgba(212,175,55,0.04); }
-    .upload-box input[type=file] { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
-    .upload-box .up-icon { font-size: 28px; margin-bottom: 6px; }
-    .upload-box .up-label { font-size: 13px; color: var(--muted); }
-    .upload-box .up-label strong { color: var(--gold); }
-    .upload-preview {
-      margin-top: 8px;
-      border-radius: 8px;
-      overflow: hidden;
-      max-height: 120px;
-      display: none;
-    }
-    .upload-preview img { width: 100%; object-fit: cover; max-height: 120px; }
-
-    /* Checkbox */
-    .check-group { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 14px; }
-    .check-group input[type=checkbox] {
-      width: 20px; height: 20px; accent-color: var(--gold);
-      flex-shrink: 0; margin-top: 2px; cursor: pointer;
-    }
-    .check-group label { font-size: 13px; color: var(--muted); cursor: pointer; line-height: 1.5; }
-
-    /* Divider */
-    .divider { display: flex; align-items: center; gap: 12px; margin: 20px 0; }
-    .divider::before, .divider::after {
-      content: ''; flex: 1; height: 1px; background: rgba(255,255,255,0.08);
-    }
-    .divider span { font-size: 12px; color: var(--muted); white-space: nowrap; }
-
-    /* Alert */
-    .alert {
-      padding: 12px 14px; border-radius: 10px; font-size: 13px;
-      margin-bottom: 16px; display: none;
-    }
-    .alert.err { background: rgba(239,68,68,0.12); border: 1px solid rgba(239,68,68,0.3); color: #fca5a5; }
-    .alert.suc { background: rgba(34,197,94,0.12); border: 1px solid rgba(34,197,94,0.3); color: #86efac; }
-    .alert.info { background: rgba(212,175,55,0.10); border: 1px solid rgba(212,175,55,0.3); color: var(--gold2); }
-
-    /* step pane */
-    .step-pane { display: none; }
-    .step-pane.active { display: block; }
-
-    /* success screen */
-    .success-screen { text-align: center; padding: 32px 0; }
-    .success-screen .big-icon { font-size: 64px; margin-bottom: 16px; }
-    .success-screen h2 { font-size: 22px; font-weight: 800; margin-bottom: 10px; }
-    .success-screen p { font-size: 14px; color: var(--muted); line-height: 1.6; }
-    .success-screen .badge-pending {
-      display: inline-block; margin-top: 16px;
-      padding: 8px 18px; border-radius: 20px;
-      background: rgba(212,175,55,0.12); border: 1px solid var(--border);
-      color: var(--gold); font-size: 13px; font-weight: 600;
-    }
-
-    /* Spinner */
-    @keyframes spin { to { transform: rotate(360deg); } }
-    .spinner {
-      width: 18px; height: 18px; border: 2px solid rgba(0,0,0,0.3);
-      border-top-color: #000; border-radius: 50%; animation: spin 0.7s linear infinite;
-    }
-    .btn-gold .spinner { border-color: rgba(0,0,0,0.2); border-top-color: #000; }
-    .btn-green .spinner { border-color: rgba(255,255,255,0.3); border-top-color: #fff; }
-
-    /* link row at bottom */
-    .auth-links { margin-top: 20px; text-align: center; font-size: 13px; color: var(--muted); }
-    .auth-links a { font-weight: 600; }
-
-    /* select */
-    select.form-control { cursor: pointer; }
-    option { background: #1a211b; }
-
-    /* grid 2 cols */
-    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-    @media (max-width: 380px) { .grid-2 { grid-template-columns: 1fr; } }
-
-    /* role picker */
-    .role-cards { display: flex; gap: 12px; margin-top: 20px; }
-    .role-card {
-      flex: 1; padding: 18px 12px; border-radius: 12px;
-      border: 2px solid rgba(255,255,255,0.08);
-      background: var(--bg3); text-align: center; cursor: pointer;
-      transition: border-color 0.2s, background 0.2s;
-    }
-    .role-card:hover { border-color: var(--gold); }
-    .role-card.selected { border-color: var(--gold); background: rgba(212,175,55,0.08); }
-    .role-card .rc-icon { font-size: 34px; margin-bottom: 10px; }
-    .role-card .rc-label { font-size: 14px; font-weight: 700; }
-    .role-card .rc-desc { font-size: 11px; color: var(--muted); margin-top: 4px; }
-
-    /* resend timer */
-    .resend-row { text-align: center; margin-top: 16px; font-size: 13px; color: var(--muted); }
-    .resend-btn { color: var(--gold); font-weight: 600; cursor: pointer; }
-    .resend-btn:disabled { color: var(--muted); cursor: default; }
-
-    /* vehicle grid */
-    .veh-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-    .veh-btn {
-      padding: 10px 8px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.08);
-      background: var(--bg3); color: var(--text); font-size: 13px; cursor: pointer;
-      transition: border-color 0.2s;
-    }
-    .veh-btn.selected { border-color: var(--gold); background: rgba(212,175,55,0.08); color: var(--gold); }
-
-    /* scroll smoothing */
-    html { scroll-behavior: smooth; }
-
-    /* address optional pill */
-    .pill-skip {
-      display: inline-block; margin-top: 4px;
-      padding: 4px 12px; border-radius: 20px;
-      background: var(--bg3); border: 1px solid rgba(255,255,255,0.08);
-      font-size: 12px; color: var(--muted); cursor: pointer;
-    }
-    .pill-skip:hover { border-color: var(--gold); color: var(--gold); }
+    :root{--bg:#070907;--bg2:#0f1410;--bg3:#1a211b;--gold:#d4af37;--gold2:#f0c040;--green:#22c55e;--green2:#16a34a;--red:#ef4444;--text:#f1f5f1;--muted:#8d9e8d;--border:rgba(212,175,55,0.18);--card:rgba(255,255,255,0.04);--radius:16px;--shadow:0 4px 24px rgba(0,0,0,0.6);}
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+    html,body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;min-height:100vh;-webkit-font-smoothing:antialiased;}
+    a{color:var(--gold);text-decoration:none;}a:hover{text-decoration:underline;}
+    .auth-wrapper{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding:24px 16px 48px;}
+    .auth-logo{margin-bottom:24px;text-align:center;}
+    .auth-logo .logo-g{font-size:48px;font-weight:900;color:var(--gold);letter-spacing:-2px;line-height:1;}
+    .auth-logo .logo-sub{font-size:11px;letter-spacing:4px;color:var(--muted);text-transform:uppercase;}
+    .auth-card{width:100%;max-width:420px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:28px 24px 32px;box-shadow:var(--shadow);}
+    .auth-title{font-size:20px;font-weight:700;color:var(--text);margin-bottom:6px;}
+    .auth-subtitle{font-size:13px;color:var(--muted);margin-bottom:28px;}
+    .progress-bar-wrap{display:flex;gap:6px;margin-bottom:24px;}
+    .progress-bar-wrap .step-dot{flex:1;height:4px;border-radius:2px;background:var(--bg3);transition:background .3s;}
+    .progress-bar-wrap .step-dot.active{background:var(--gold);}
+    .progress-bar-wrap .step-dot.done{background:var(--green);}
+    .step-label{font-size:11px;color:var(--muted);margin-bottom:20px;}
+    .form-group{margin-bottom:16px;}
+    .form-label{display:block;font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:7px;}
+    .form-control{width:100%;background:var(--bg3);border:1px solid rgba(255,255,255,.1);border-radius:10px;color:var(--text);font-size:15px;padding:12px 14px;outline:none;transition:border-color .2s;-webkit-appearance:none;}
+    .form-control:focus{border-color:var(--gold);}
+    .form-control.error{border-color:var(--red);}
+    .form-control.ok{border-color:var(--green);}
+    .form-hint{font-size:11px;color:var(--muted);margin-top:5px;}
+    .form-hint.err{color:var(--red);}
+    .form-hint.suc{color:var(--green);}
+    .phone-row{display:flex;gap:8px;}
+    .phone-prefix{background:var(--bg3);border:1px solid rgba(255,255,255,.1);border-radius:10px;color:var(--gold);font-size:15px;padding:12px 10px;min-width:80px;text-align:center;font-weight:700;}
+    .pw-wrap{position:relative;}
+    .pw-wrap .form-control{padding-right:44px;}
+    .pw-eye{position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--muted);font-size:18px;padding:0;line-height:1;}
+    .otp-row{display:flex;gap:10px;justify-content:center;}
+    .otp-input{width:44px;height:54px;background:var(--bg3);border:1px solid rgba(255,255,255,.1);border-radius:10px;color:var(--text);font-size:22px;font-weight:700;text-align:center;outline:none;transition:border-color .2s;-webkit-appearance:none;}
+    .otp-input:focus{border-color:var(--gold);}
+    .strength-bar{display:flex;gap:4px;margin-top:8px;}
+    .strength-bar span{flex:1;height:4px;border-radius:2px;background:var(--bg3);transition:background .3s;}
+    .strength-label{font-size:11px;margin-top:5px;color:var(--muted);}
+    .btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:14px;border:none;border-radius:10px;font-size:15px;font-weight:700;cursor:pointer;transition:opacity .2s,transform .1s;-webkit-appearance:none;}
+    .btn:active{transform:scale(.98);}
+    .btn-gold{background:linear-gradient(135deg,var(--gold),var(--gold2));color:#000;}
+    .btn-green{background:linear-gradient(135deg,var(--green),var(--green2));color:#fff;}
+    .btn-outline{background:transparent;border:1px solid var(--border);color:var(--text);margin-top:10px;}
+    .btn:disabled{opacity:.45;cursor:not-allowed;}
+    .btn-sm{padding:10px 16px;font-size:13px;width:auto;border-radius:8px;}
+    .nav-btns{display:flex;gap:10px;margin-top:20px;}
+    .nav-btns .btn{margin-top:0;}
+    .upload-box{border:2px dashed rgba(212,175,55,.3);border-radius:12px;padding:18px 12px;text-align:center;cursor:pointer;transition:border-color .2s,background .2s;position:relative;}
+    .upload-box:hover,.upload-box.drag{border-color:var(--gold);background:rgba(212,175,55,.04);}
+    .upload-box input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;}
+    .upload-box .up-icon{font-size:28px;margin-bottom:6px;}
+    .upload-box .up-label{font-size:13px;color:var(--muted);}
+    .upload-box .up-label strong{color:var(--gold);}
+    .upload-preview{margin-top:8px;border-radius:8px;overflow:hidden;max-height:120px;display:none;}
+    .upload-preview img{width:100%;object-fit:cover;max-height:120px;}
+    .check-group{display:flex;align-items:flex-start;gap:12px;margin-bottom:14px;}
+    .check-group input[type=checkbox]{width:20px;height:20px;accent-color:var(--gold);flex-shrink:0;margin-top:2px;cursor:pointer;}
+    .check-group label{font-size:13px;color:var(--muted);cursor:pointer;line-height:1.5;}
+    .divider{display:flex;align-items:center;gap:12px;margin:20px 0;}
+    .divider::before,.divider::after{content:'';flex:1;height:1px;background:rgba(255,255,255,.08);}
+    .divider span{font-size:12px;color:var(--muted);white-space:nowrap;}
+    .alert{padding:12px 14px;border-radius:10px;font-size:13px;margin-bottom:16px;display:none;}
+    .alert.err{background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.3);color:#fca5a5;}
+    .alert.suc{background:rgba(34,197,94,.12);border:1px solid rgba(34,197,94,.3);color:#86efac;}
+    .alert.info{background:rgba(212,175,55,.10);border:1px solid rgba(212,175,55,.3);color:var(--gold2);}
+    .step-pane{display:none;}
+    .step-pane.active{display:block;}
+    .success-screen{text-align:center;padding:32px 0;}
+    .success-screen .big-icon{font-size:64px;margin-bottom:16px;}
+    .success-screen h2{font-size:22px;font-weight:800;margin-bottom:10px;}
+    .success-screen p{font-size:14px;color:var(--muted);line-height:1.6;}
+    .success-screen .badge-pending{display:inline-block;margin-top:16px;padding:8px 18px;border-radius:20px;background:rgba(212,175,55,.12);border:1px solid var(--border);color:var(--gold);font-size:13px;font-weight:600;}
+    .resend-row{text-align:center;margin-top:16px;font-size:13px;color:var(--muted);}
+    .resend-btn{color:var(--gold);font-weight:600;cursor:pointer;background:none;border:none;font-size:13px;}
+    .resend-btn:disabled{color:var(--muted);cursor:default;}
+    .role-cards{display:flex;gap:12px;margin-top:20px;}
+    .role-card{flex:1;padding:18px 12px;border-radius:12px;border:2px solid rgba(255,255,255,.08);background:var(--bg3);text-align:center;cursor:pointer;transition:border-color .2s,background .2s;}
+    .role-card:hover{border-color:var(--gold);}
+    .role-card .rc-icon{font-size:34px;margin-bottom:10px;}
+    .role-card .rc-label{font-size:14px;font-weight:700;}
+    .role-card .rc-desc{font-size:11px;color:var(--muted);margin-top:4px;}
+    .auth-links{margin-top:20px;text-align:center;font-size:13px;color:var(--muted);}
+    .auth-links a{font-weight:600;}
+    .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+    @media(max-width:380px){.grid-2{grid-template-columns:1fr;}}
+    .pill-skip{display:inline-block;margin-top:4px;padding:4px 12px;border-radius:20px;background:var(--bg3);border:1px solid rgba(255,255,255,.08);font-size:12px;color:var(--muted);cursor:pointer;}
+    .pill-skip:hover{border-color:var(--gold);color:var(--gold);}
+    .veh-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+    .veh-btn{padding:10px 8px;border-radius:8px;border:1px solid rgba(255,255,255,.08);background:var(--bg3);color:var(--text);font-size:13px;cursor:pointer;transition:border-color .2s;}
+    .veh-btn.selected{border-color:var(--gold);background:rgba(212,175,55,.08);color:var(--gold);}
+    .kyc-info{background:rgba(212,175,55,.07);border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-bottom:16px;font-size:12px;color:var(--gold2);line-height:1.6;}
+    .doc-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+    @media(max-width:380px){.doc-grid{grid-template-columns:1fr;}}
+    .earnings-box{background:var(--bg3);border-radius:12px;padding:16px;margin-bottom:18px;text-align:center;}
+    .earnings-box .earn-val{font-size:28px;font-weight:900;color:var(--green);}
+    .earnings-box .earn-sub{font-size:12px;color:var(--muted);margin-top:4px;}
   </style>
 </head>
 <body>
@@ -338,21 +108,18 @@
     <div class="logo-g">GIRO</div>
     <div class="logo-sub">Novo Passageiro</div>
   </div>
-
   <div class="auth-card">
-    <!-- Progress -->
     <div class="progress-bar-wrap" id="progress-dots"></div>
     <div class="step-label" id="step-label">Passo 1 de 6</div>
     <div id="alert-pax" class="alert"></div>
 
-    <!-- STEP 1: Dados pessoais -->
+    <!-- STEP 1 -->
     <div class="step-pane active" id="step1">
       <h2 class="auth-title">Dados Pessoais</h2>
       <p class="auth-subtitle">Informações básicas da sua conta</p>
       <div class="form-group">
         <label class="form-label">Nome Completo *</label>
         <input class="form-control" id="pax-nome" type="text" placeholder="Ex: António da Silva" autocomplete="name">
-        <div class="form-hint" id="hint-nome"></div>
       </div>
       <div class="form-group">
         <label class="form-label">Número de Telefone *</label>
@@ -360,28 +127,25 @@
           <div class="phone-prefix">🇦🇴 +244</div>
           <input class="form-control" id="pax-phone" type="tel" inputmode="numeric" placeholder="9XX XXX XXX" maxlength="9">
         </div>
-        <div class="form-hint" id="hint-pax-phone"></div>
       </div>
       <div class="form-group">
         <label class="form-label">E-mail <span style="color:var(--muted);font-weight:400">(opcional)</span></label>
-        <input class="form-control" id="pax-email" type="email" placeholder="exemplo@gmail.com" autocomplete="email">
+        <input class="form-control" id="pax-email" type="email" placeholder="exemplo@gmail.com">
       </div>
       <button class="btn btn-gold" onclick="paxNext(1)">Continuar →</button>
     </div>
 
-    <!-- STEP 2: Senha -->
+    <!-- STEP 2 -->
     <div class="step-pane" id="step2">
       <h2 class="auth-title">Criar Senha</h2>
-      <p class="auth-subtitle">Mínimo 8 caracteres com letras e números</p>
+      <p class="auth-subtitle">Mínimo 8 caracteres com letras maiúsculas e números</p>
       <div class="form-group">
         <label class="form-label">Senha *</label>
         <div class="pw-wrap">
           <input class="form-control" id="pax-pw" type="password" placeholder="••••••••" oninput="checkStrength(this.value)">
           <button class="pw-eye" onclick="togglePw('pax-pw')">👁</button>
         </div>
-        <div class="strength-bar" id="str-bar">
-          <span></span><span></span><span></span><span></span>
-        </div>
+        <div class="strength-bar" id="str-bar"><span></span><span></span><span></span><span></span></div>
         <div class="strength-label" id="str-label">Digite a sua senha</div>
       </div>
       <div class="form-group">
@@ -404,9 +168,7 @@
       <p class="auth-subtitle" id="otp-pax-desc">Código enviado para o seu número</p>
       <div class="otp-row" id="otp-pax-boxes"></div>
       <div class="resend-row">
-        Não recebeu? <button class="resend-btn" id="btn-resend-pax" onclick="resendPaxOTP()" disabled>
-          Reenviar (<span id="timer-pax">30</span>s)
-        </button>
+        Não recebeu? <button class="resend-btn" id="btn-resend-pax" onclick="resendPaxOTP()" disabled>Reenviar (<span id="timer-pax">30</span>s)</button>
       </div>
       <div class="nav-btns" style="margin-top:24px">
         <button class="btn btn-outline" onclick="paxBack(3)">← Voltar</button>
@@ -414,10 +176,10 @@
       </div>
     </div>
 
-    <!-- STEP 4: Endereços frequentes (opcional) -->
+    <!-- STEP 4: Endereços -->
     <div class="step-pane" id="step4">
       <h2 class="auth-title">Endereços Frequentes 🏠</h2>
-      <p class="auth-subtitle">Guardar endereços para viagens mais rápidas</p>
+      <p class="auth-subtitle">Para viagens mais rápidas no futuro</p>
       <div class="form-group">
         <label class="form-label">🏠 Casa</label>
         <input class="form-control" id="pax-casa" type="text" placeholder="Ex: Av. Lenin, Maianga, Luanda">
@@ -448,7 +210,6 @@
         5. O GIRO Clube oferece desconto de 10% a cada 5 viagens concluídas.<br>
         6. Dados pessoais são tratados conforme a Política de Privacidade.<br>
         7. O uso abusivo da plataforma resultará em suspensão da conta.<br>
-        8. Tarifas podem variar conforme procura e distância.<br>
       </div>
       <div class="check-group">
         <input type="checkbox" id="chk-termos">
@@ -469,159 +230,164 @@
       <div class="success-screen">
         <div class="big-icon">🎉</div>
         <h2>Conta Criada!</h2>
-        <p>Bem-vindo à GIRO Angola.<br>A sua conta de passageiro está activa e pronta a usar.</p>
+        <p>Bem-vindo à GIRO Angola.<br>A sua conta de passageiro está activa.</p>
         <br>
-        <button class="btn btn-gold" onclick="location.href='index.html'" style="width:auto;padding:12px 28px">
-          🚀 Solicitar Viagem
-        </button>
+        <button class="btn btn-gold" onclick="location.href='index.html'" style="width:auto;padding:12px 28px">🚀 Solicitar Viagem</button>
       </div>
     </div>
   </div>
-
-  <div class="auth-links">
-    Já tem conta? <a href="login.html">Entrar</a>
-  </div>
+  <div class="auth-links">Já tem conta? <a href="login.html">Entrar</a></div>
 </div>
 
 <script>
-// ── State ──
-const PAX = { nome:'', phone:'', email:'', pw:'', casa:'', trabalho:'' };
-let paxStep = 1;
-const TOTAL_STEPS = 6;
+const GIRO_SESSION_KEY='giro_session';
+const GiroAuth={
+  save(user){localStorage.setItem(GIRO_SESSION_KEY,JSON.stringify({...user,ts:Date.now()}));},
+  get(){
+    try{
+      const raw=localStorage.getItem(GIRO_SESSION_KEY);
+      if(!raw)return null;
+      const s=JSON.parse(raw);
+      if(Date.now()-s.ts>30*24*3600*1000){this.clear();return null;}
+      return s;
+    }catch{return null;}
+  },
+  clear(){localStorage.removeItem(GIRO_SESSION_KEY);},
+  requireAuth(role){
+    const s=this.get();
+    if(!s){window.location.href='login.html';return null;}
+    if(role&&s.role!==role){window.location.href='login.html';return null;}
+    return s;
+  },
+  renderUserPill(containerId){
+    const s=this.get();
+    const el=document.getElementById(containerId);
+    if(!el)return;
+    if(s){
+      const initials=(s.nome||s.phone||'?')[0].toUpperCase();
+      el.innerHTML=`<div style="display:flex;align-items:center;gap:8px;">
+        <div style="width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#d4af37,#f0c040);display:flex;align-items:center;justify-content:center;font-weight:900;font-size:14px;color:#000;">${initials}</div>
+        <div style="line-height:1.2;"><div style="font-size:13px;font-weight:700;color:#f1f5f1;">${s.nome||s.phone}</div><div style="font-size:10px;color:#8d9e8d;text-transform:uppercase;">${s.role==='motorista'?'🚗 Motorista':'🧑 Passageiro'}</div></div>
+        <button onclick="GiroAuth.logout()" style="margin-left:4px;background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.3);border-radius:8px;padding:5px 10px;color:#fca5a5;font-size:12px;cursor:pointer;">Sair</button>
+      </div>`;
+    }else{
+      el.innerHTML='<a href="login.html" style="text-decoration:none;padding:7px 14px;border-radius:20px;background:rgba(212,175,55,.12);border:1px solid rgba(212,175,55,.3);color:#d4af37;font-size:13px;font-weight:700;">&#128100; Entrar</a>';
+    }
+  },
+  logout(){this.clear();window.location.href='login.html';}
+};
 
-// ── Progress ──
-function buildDots() {
-  const wrap = document.getElementById('progress-dots');
-  wrap.innerHTML = '';
-  for (let i = 1; i <= TOTAL_STEPS; i++) {
-    const d = document.createElement('div');
-    d.className = 'step-dot' + (i < paxStep ? ' done' : i === paxStep ? ' active' : '');
+// Redirigir se já logado
+(function(){const s=GiroAuth.get();if(s&&s.role==='passageiro')window.location.href='index.html';})();
+
+const PAX={nome:'',phone:'',email:'',pw:'',casa:'',trabalho:''};
+let paxStep=1;
+const TOTAL_STEPS=6;
+
+function buildDots(){
+  const wrap=document.getElementById('progress-dots');
+  wrap.innerHTML='';
+  for(let i=1;i<=TOTAL_STEPS;i++){
+    const d=document.createElement('div');
+    d.className='step-dot'+(i<paxStep?' done':i===paxStep?' active':'');
     wrap.appendChild(d);
   }
-  document.getElementById('step-label').textContent = 'Passo ' + paxStep + ' de ' + TOTAL_STEPS;
+  document.getElementById('step-label').textContent='Passo '+paxStep+' de '+TOTAL_STEPS;
 }
 buildDots();
 
-// ── Utils ──
-function showAlert(msg, type='err') {
-  const el = document.getElementById('alert-pax');
-  el.className = 'alert ' + (msg ? type : '');
-  el.style.display = msg ? 'block' : 'none';
-  el.textContent = msg;
-}
-function togglePw(id) {
-  const el = document.getElementById(id);
-  el.type = el.type === 'password' ? 'text' : 'password';
-}
-function validatePhone(v) { return /^9[1-9][0-9]{7}$/.test(v.replace(/\s/g,'')); }
+function showAlert(msg,type='err'){const el=document.getElementById('alert-pax');el.className='alert '+(msg?type:'');el.style.display=msg?'block':'none';el.textContent=msg;}
+function togglePw(id){const el=document.getElementById(id);el.type=el.type==='password'?'text':'password';}
+function validatePhone(v){return /^9[1-9][0-9]{7}$/.test(v.replace(/\s/g,''));}
 
-// ── Password strength ──
-function checkStrength(pw) {
-  const bars = document.querySelectorAll('#str-bar span');
-  const label = document.getElementById('str-label');
-  const scores = [/.{8,}/.test(pw), /[A-Z]/.test(pw), /[0-9]/.test(pw), /[^A-Za-z0-9]/.test(pw)];
-  const s = scores.filter(Boolean).length;
-  const colors = ['','#ef4444','#f59e0b','#22c55e','#22c55e'];
-  const labels = ['Digite a sua senha','Fraca','Razoável','Forte','Muito forte'];
-  bars.forEach((b, i) => { b.style.background = i < s ? colors[s] : ''; });
-  label.textContent = labels[s];
-  label.style.color = colors[s] || 'var(--muted)';
+function checkStrength(pw){
+  const bars=document.querySelectorAll('#str-bar span');
+  const label=document.getElementById('str-label');
+  const scores=[/.{8,}/.test(pw),/[A-Z]/.test(pw),/[0-9]/.test(pw),/[^A-Za-z0-9]/.test(pw)];
+  const s=scores.filter(Boolean).length;
+  const colors=['','#ef4444','#f59e0b','#22c55e','#22c55e'];
+  const labels=['Digite a sua senha','Fraca','Razoável','Forte','Muito forte'];
+  bars.forEach((b,i)=>{b.style.background=i<s?colors[s]:'';});
+  label.textContent=labels[s];label.style.color=colors[s]||'var(--muted)';
 }
-function checkConfirm() {
-  const h = document.getElementById('hint-pw2');
-  const pw = document.getElementById('pax-pw').value;
-  const pw2 = document.getElementById('pax-pw2').value;
-  if (!pw2) { h.textContent=''; return; }
-  if (pw === pw2) { h.className='form-hint suc'; h.textContent='✓ As senhas coincidem'; }
-  else { h.className='form-hint err'; h.textContent='✗ As senhas não coincidem'; }
+function checkConfirm(){
+  const h=document.getElementById('hint-pw2');
+  const pw=document.getElementById('pax-pw').value;
+  const pw2=document.getElementById('pax-pw2').value;
+  if(!pw2){h.textContent='';return;}
+  if(pw===pw2){h.className='form-hint suc';h.textContent='✓ As senhas coincidem';}
+  else{h.className='form-hint err';h.textContent='✗ As senhas não coincidem';}
 }
 
-// ── OTP (passageiro) ──
-(function buildOTPPax() {
-  const wrap = document.getElementById('otp-pax-boxes');
-  for (let i = 0; i < 6; i++) {
-    const inp = document.createElement('input');
-    inp.type = 'text'; inp.inputMode = 'numeric'; inp.maxLength = 1;
-    inp.className = 'otp-input'; inp.dataset.idx = i;
-    inp.addEventListener('input', () => { if (inp.value && wrap.children[i+1]) wrap.children[i+1].focus(); });
-    inp.addEventListener('keydown', e => { if (e.key==='Backspace'&&!inp.value&&wrap.children[i-1]) { wrap.children[i-1].value=''; wrap.children[i-1].focus(); }});
+// OTP
+(function buildOTPPax(){
+  const wrap=document.getElementById('otp-pax-boxes');
+  for(let i=0;i<6;i++){
+    const inp=document.createElement('input');
+    inp.type='text';inp.inputMode='numeric';inp.maxLength=1;inp.className='otp-input';
+    inp.addEventListener('input',()=>{if(inp.value&&wrap.children[i+1])wrap.children[i+1].focus();});
+    inp.addEventListener('keydown',e=>{if(e.key==='Backspace'&&!inp.value&&wrap.children[i-1]){wrap.children[i-1].value='';wrap.children[i-1].focus();}});
     wrap.appendChild(inp);
   }
 })();
 
 let paxTimerInt;
-function startPaxTimer() {
-  let t = 30;
-  const btn = document.getElementById('btn-resend-pax');
-  const lbl = document.getElementById('timer-pax');
-  btn.disabled = true;
+function startPaxTimer(){
+  let t=30;
+  const btn=document.getElementById('btn-resend-pax');
+  const lbl=document.getElementById('timer-pax');
+  btn.disabled=true;
   clearInterval(paxTimerInt);
-  paxTimerInt = setInterval(() => {
-    t--; lbl.textContent = t;
-    if (t <= 0) { clearInterval(paxTimerInt); btn.disabled=false; btn.textContent='Reenviar código'; }
-  }, 1000);
+  paxTimerInt=setInterval(()=>{t--;lbl.textContent=t;if(t<=0){clearInterval(paxTimerInt);btn.disabled=false;btn.textContent='Reenviar código';}},1000);
 }
-function resendPaxOTP() { startPaxTimer(); console.log('OTP reenviado'); }
-function verifyPaxOTP() {
-  const code = [...document.querySelectorAll('#otp-pax-boxes .otp-input')].map(i=>i.value).join('');
-  if (code.length < 6) { showAlert('Introduza os 6 dígitos do código'); return; }
+function resendPaxOTP(){startPaxTimer();}
+function verifyPaxOTP(){
+  const code=[...document.querySelectorAll('#otp-pax-boxes .otp-input')].map(i=>i.value).join('');
+  if(code.length<6){showAlert('Introduza os 6 dígitos do código');return;}
   showAlert('A verificar...','info');
-  // TODO: POST /api/auth/otp/verify
-  setTimeout(() => { showAlert(''); goToStep(4); }, 1000);
+  setTimeout(()=>{showAlert('');goToStep(4);},900);
 }
 
-// ── Navigation ──
-function goToStep(n) {
-  document.querySelectorAll('.step-pane').forEach(p => p.classList.remove('active'));
-  document.getElementById('step' + n).classList.add('active');
-  paxStep = n;
-  buildDots();
+function goToStep(n){
+  document.querySelectorAll('.step-pane').forEach(p=>p.classList.remove('active'));
+  document.getElementById('step'+n).classList.add('active');
+  paxStep=n;buildDots();showAlert('');window.scrollTo(0,0);
+}
+function paxBack(from){if(from>1)goToStep(from-1);}
+
+function paxNext(step){
   showAlert('');
-  window.scrollTo(0,0);
-}
-
-function paxBack(from) {
-  if (from > 1) goToStep(from - 1);
-}
-
-function paxNext(step) {
-  showAlert('');
-  switch(step) {
-    case 1: {
-      const nome = document.getElementById('pax-nome').value.trim();
-      const phone = document.getElementById('pax-phone').value.replace(/\s/g,'');
-      if (nome.split(' ').length < 2) { showAlert('Insira o nome completo (nome e apelido)'); return; }
-      if (!validatePhone(phone)) { showAlert('Número inválido. Formato: 9XX XXX XXX'); return; }
-      PAX.nome=nome; PAX.phone=phone;
-      PAX.email=document.getElementById('pax-email').value.trim();
-      goToStep(2); break;
-    }
-    case 2: {
-      const pw = document.getElementById('pax-pw').value;
-      const pw2 = document.getElementById('pax-pw2').value;
-      if (pw.length < 8) { showAlert('A senha deve ter mínimo 8 caracteres'); return; }
-      if (!/[A-Z]/.test(pw)||!/[0-9]/.test(pw)) { showAlert('A senha deve ter letras maiúsculas e números'); return; }
-      if (pw !== pw2) { showAlert('As senhas não coincidem'); return; }
-      PAX.pw = pw;
-      // trigger OTP send
-      document.getElementById('otp-pax-desc').textContent = 'Código enviado para +244 ' + PAX.phone;
-      startPaxTimer();
-      // TODO: POST /api/auth/otp/send
-      goToStep(3); break;
-    }
-    case 4: {
-      PAX.casa = document.getElementById('pax-casa').value.trim();
-      PAX.trabalho = document.getElementById('pax-trabalho').value.trim();
-      goToStep(5); break;
-    }
-    case 5: {
-      if (!document.getElementById('chk-termos').checked) { showAlert('Aceite os Termos de Uso para continuar'); return; }
-      if (!document.getElementById('chk-idade').checked) { showAlert('Confirme que tem 18 anos ou mais'); return; }
-      // TODO: POST /api/auth/register/passenger { ...PAX }
-      showAlert('A criar a sua conta...','info');
-      setTimeout(() => { showAlert(''); goToStep(6); }, 1400);
-      break;
-    }
+  if(step===1){
+    const nome=document.getElementById('pax-nome').value.trim();
+    const phone=document.getElementById('pax-phone').value.replace(/\s/g,'');
+    if(nome.split(' ').length<2){showAlert('Insira o nome completo (nome e apelido)');return;}
+    if(!validatePhone(phone)){showAlert('Número inválido. Formato: 9XX XXX XXX');return;}
+    PAX.nome=nome;PAX.phone=phone;PAX.email=document.getElementById('pax-email').value.trim();
+    goToStep(2);
+  } else if(step===2){
+    const pw=document.getElementById('pax-pw').value;
+    const pw2=document.getElementById('pax-pw2').value;
+    if(pw.length<8){showAlert('A senha deve ter mínimo 8 caracteres');return;}
+    if(!/[A-Z]/.test(pw)||!/[0-9]/.test(pw)){showAlert('A senha deve ter letras maiúsculas e números');return;}
+    if(pw!==pw2){showAlert('As senhas não coincidem');return;}
+    PAX.pw=pw;
+    document.getElementById('otp-pax-desc').textContent='Código enviado para +244 '+PAX.phone;
+    startPaxTimer();
+    goToStep(3);
+  } else if(step===4){
+    PAX.casa=document.getElementById('pax-casa').value.trim();
+    PAX.trabalho=document.getElementById('pax-trabalho').value.trim();
+    goToStep(5);
+  } else if(step===5){
+    if(!document.getElementById('chk-termos').checked){showAlert('Aceite os Termos de Uso para continuar');return;}
+    if(!document.getElementById('chk-idade').checked){showAlert('Confirme que tem 18 anos ou mais');return;}
+    showAlert('A criar a sua conta...','info');
+    setTimeout(()=>{
+      showAlert('');
+      // SALVAR SESSÃO — utilizador fica logado após cadastro
+      GiroAuth.save({phone:'+244'+PAX.phone,nome:PAX.nome,email:PAX.email,role:'passageiro'});
+      goToStep(6);
+    },1200);
   }
 }
 </script>
