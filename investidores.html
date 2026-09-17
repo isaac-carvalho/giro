@@ -261,7 +261,7 @@
       <div class="hero-pill">🛡️ Modelo de Lucro Sustentável com Teto de Segurança</div>
       <h1>Escala Exponencial com <span>Pool de Lucro Protegido</span></h1>
       <p>
-        A GIRO opera com um modelo unit economics matematicamente blindado: distribuição de no máximo <b>20% a 30% do lucro líquido mensal</b> entre parceiros e investidores, garantindo que a empresa <b>SEMPRE retém 70% a 80% do lucro em caixa</b> para expansão e solidez.
+        A GIRO opera com um modelo unit economics matematicamente blindado: distribuição de no máximo <b>25% do lucro líquido mensal</b> entre parceiros e investidores, garantindo que a empresa <b>SEMPRE retém 75% do lucro em caixa</b> para expansão e solidez.
       </p>
     </section>
 
@@ -285,9 +285,9 @@
 
       <div class="card">
         <span class="card-icon">🔒</span>
-        <h3>Pool Teto de 20% a 30%</h3>
+        <h3>Pool Teto de 25%</h3>
         <p>
-          O total distribuído a TODOS os investidores/ajudadores soma no máximo 20% a 30% do lucro. A empresa retém no mínimo 70% a 80% de lucro líquido. Risco zero de falência por excesso de comissões.
+          O total distribuído a TODOS os investidores/ajudadores soma no máximo 25% do lucro. A empresa retém no mínimo 75% de lucro líquido. Risco zero de falência por excesso de comissões.
         </p>
       </div>
     </section>
@@ -303,8 +303,8 @@
       </div>
 
       <div class="pool-split-visual">
-        <div class="ps-company">70% a 80% — Retido pela GIRO (Caixa, Expansão & Fundadores)</div>
-        <div class="ps-pool">20% a 30% — Pool de Parceiros</div>
+        <div class="ps-company">75% — Retido pela GIRO (Caixa, Expansão & Fundadores)</div>
+        <div class="ps-pool">25% — Pool de Parceiros</div>
       </div>
 
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;font-size:13px;color:var(--muted);">
@@ -354,14 +354,14 @@
           </select>
         </div>
 
-        <!-- Teto do Pool -->
-        <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:14px;padding:16px;">
+        <!-- Teto do Pool Fixo 25% -->
+        <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:14px;padding:16px;display:flex;flex-direction:column;justify-content:center;">
           <div style="font-size:12px;color:var(--muted);margin-bottom:6px;">Teto Global do Pool de Lucro:</div>
-          <select id="select-pool-pct" onchange="calculateModel()" style="width:100%;background:#162017;border:1px solid var(--gold);color:var(--gold);padding:8px;border-radius:8px;font-size:14px;font-weight:700;outline:none;">
-            <option value="0.20">20% do Lucro (Empresa retém 80%)</option>
-            <option value="0.25" selected>25% do Lucro (Empresa retém 75%)</option>
-            <option value="0.30">30% do Lucro (Empresa retém 70%)</option>
-          </select>
+          <div style="background:#162017;border:1px solid var(--gold);color:var(--gold);padding:10px 14px;border-radius:8px;font-size:14px;font-weight:900;display:flex;justify-content:space-between;align-items:center;">
+            <span>25% Fixo para Parceiros</span>
+            <span style="font-size:11px;background:rgba(212,175,55,0.15);padding:2px 8px;border-radius:4px;color:#fff;">GIRO retém 75%</span>
+          </div>
+          <input type="hidden" id="select-pool-pct" value="0.25">
         </div>
 
         <!-- Nº de Investidores / Parceiros -->
