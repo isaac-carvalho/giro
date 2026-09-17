@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>GIRO Angola — Apresentação Executiva para Investidores & Parceiros Estratégicos</title>
+  <title>GIRO Angola — Apresentação Executiva & Modelo Financeiro Sustentável</title>
   <link rel="icon" type="image/x-icon" href="favicon.ico">
 
   <style>
@@ -50,9 +50,7 @@
     .brand-text b { font-size: 20px; font-weight: 900; letter-spacing: -0.5px; display: block; line-height: 1; }
     .brand-text span { font-size: 10px; color: var(--gold); letter-spacing: 3px; text-transform: uppercase; font-weight: 700; }
 
-    .header-cta {
-      display: flex; gap: 12px; align-items: center;
-    }
+    .header-cta { display: flex; gap: 12px; align-items: center; }
     .btn-gold {
       background: linear-gradient(135deg, var(--gold), #f0c040);
       color: #000; font-weight: 800; font-size: 13px;
@@ -70,16 +68,11 @@
 
     /* ── Container ── */
     .container {
-      max-width: 1160px;
-      margin: 0 auto;
-      padding: 48px 24px 80px;
+      max-width: 1160px; margin: 0 auto; padding: 48px 24px 80px;
     }
 
-    /* ── Hero Section ── */
-    .hero {
-      text-align: center;
-      padding: 40px 0 60px;
-    }
+    /* ── Hero ── */
+    .hero { text-align: center; padding: 30px 0 50px; }
     .hero-pill {
       display: inline-flex; align-items: center; gap: 8px;
       padding: 6px 16px; border-radius: 20px;
@@ -88,15 +81,15 @@
       text-transform: uppercase; letter-spacing: 1px; margin-bottom: 20px;
     }
     .hero h1 {
-      font-size: 46px; font-weight: 900; line-height: 1.15;
-      letter-spacing: -1px; margin-bottom: 18px; max-width: 920px; margin-left: auto; margin-right: auto;
+      font-size: 44px; font-weight: 900; line-height: 1.15;
+      letter-spacing: -1px; margin-bottom: 18px; max-width: 960px; margin-left: auto; margin-right: auto;
     }
     .hero h1 span {
       background: linear-gradient(135deg, #fff 30%, var(--gold) 100%);
       -webkit-background-clip: text; -webkit-text-fill-color: transparent;
     }
     .hero p {
-      font-size: 18px; color: var(--muted); max-width: 760px; margin: 0 auto 32px;
+      font-size: 17px; color: var(--muted); max-width: 780px; margin: 0 auto 30px;
     }
 
     /* ── Grid Cards ── */
@@ -108,101 +101,95 @@
       background: var(--bg-card);
       border: 1px solid var(--border);
       border-radius: 16px;
-      padding: 28px 24px;
+      padding: 26px 22px;
       position: relative;
-      overflow: hidden;
     }
     .card.highlight {
       border-color: rgba(212,175,55,0.4);
       background: linear-gradient(145deg, #141c15, #0a0e0a);
-      box-shadow: 0 12px 36px rgba(0,0,0,0.5);
     }
-    .card-icon {
-      font-size: 32px; margin-bottom: 14px; display: inline-block;
-    }
-    .card h3 {
-      font-size: 20px; font-weight: 800; color: #fff; margin-bottom: 10px;
-    }
-    .card p {
-      font-size: 14px; color: var(--muted); line-height: 1.6;
-    }
+    .card-icon { font-size: 30px; margin-bottom: 12px; display: inline-block; }
+    .card h3 { font-size: 19px; font-weight: 800; color: #fff; margin-bottom: 8px; }
+    .card p { font-size: 13.5px; color: var(--muted); line-height: 1.6; }
 
-    /* ── Financial Simulator (The Engine) ── */
+    /* ── Architecture of Profit Pool ── */
+    .pool-architecture-box {
+      background: var(--bg-card2);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 28px;
+      margin-bottom: 48px;
+    }
+    .pool-split-visual {
+      display: flex; height: 44px; border-radius: 10px; overflow: hidden; margin: 20px 0 14px;
+      border: 1px solid var(--border); font-size: 12px; font-weight: 800; text-align: center; line-height: 44px;
+    }
+    .ps-company { background: #1b4324; color: #4fe36a; flex: 7.5; }
+    .ps-pool { background: linear-gradient(135deg, var(--gold), #b89018); color: #000; flex: 2.5; }
+
+    /* ── Financial Simulator (The Core Engine) ── */
     .sim-box {
       background: linear-gradient(135deg, #101711 0%, #080c09 100%);
       border: 2px solid var(--gold);
       border-radius: 20px;
-      padding: 40px 36px;
+      padding: 36px 32px;
       margin-bottom: 60px;
       box-shadow: 0 20px 60px rgba(0,0,0,0.7);
     }
-    .sim-header {
-      text-align: center; margin-bottom: 36px;
-    }
-    .sim-header h2 {
-      font-size: 32px; font-weight: 900; color: #fff; margin-bottom: 8px;
-    }
-    .sim-header p { font-size: 15px; color: var(--muted); }
+    .sim-header { text-align: center; margin-bottom: 30px; }
+    .sim-header h2 { font-size: 30px; font-weight: 900; color: #fff; margin-bottom: 6px; }
+    .sim-header p { font-size: 14px; color: var(--muted); }
 
     .slider-group {
-      margin-bottom: 32px;
-      background: var(--bg-card2);
+      margin-bottom: 24px;
+      background: var(--bg-card);
       border: 1px solid var(--border);
       border-radius: 14px;
-      padding: 20px 24px;
+      padding: 18px 22px;
     }
     .slider-title-row {
-      display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;
+      display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;
     }
-    .slider-label { font-size: 14px; font-weight: 700; color: #fff; }
+    .slider-label { font-size: 13.5px; font-weight: 700; color: #fff; }
     .slider-val-badge {
-      font-size: 20px; font-weight: 900; color: var(--gold);
-      background: rgba(212,175,55,0.12); padding: 4px 14px; border-radius: 8px; border: 1px solid rgba(212,175,55,0.3);
+      font-size: 18px; font-weight: 900; color: var(--gold);
+      background: rgba(212,175,55,0.12); padding: 4px 12px; border-radius: 8px; border: 1px solid rgba(212,175,55,0.3);
     }
     input[type=range] {
       width: 100%; height: 8px; border-radius: 4px; background: #263327;
       outline: none; -webkit-appearance: none; accent-color: var(--gold); cursor: pointer;
     }
 
-    /* Results Dashboard */
+    /* Results Grid */
     .results-grid {
       display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 16px; margin-top: 24px;
+      gap: 14px; margin-top: 24px;
     }
     .res-card {
-      background: rgba(0,0,0,0.4);
+      background: rgba(0,0,0,0.45);
       border: 1px solid var(--border);
       border-radius: 12px;
-      padding: 18px 20px;
+      padding: 16px 18px;
       text-align: center;
     }
-    .res-card.primary {
-      border-color: var(--green);
-      background: rgba(34,197,94,0.06);
-    }
-    .res-card.gold-border {
-      border-color: var(--gold);
-      background: rgba(212,175,55,0.06);
-    }
-    .res-label { font-size: 11px; text-transform: uppercase; color: var(--muted); letter-spacing: 1px; font-weight: 700; }
-    .res-num { font-size: 24px; font-weight: 900; color: #fff; margin: 6px 0; }
+    .res-card.green-border { border-color: var(--green); background: rgba(34,197,94,0.06); }
+    .res-card.gold-border { border-color: var(--gold); background: rgba(212,175,55,0.08); }
+    .res-label { font-size: 11px; text-transform: uppercase; color: var(--muted); letter-spacing: 0.5px; font-weight: 700; }
+    .res-num { font-size: 22px; font-weight: 900; color: #fff; margin: 4px 0; }
     .res-num.green { color: var(--green); }
     .res-num.gold { color: var(--gold); }
     .res-sub { font-size: 11px; color: var(--muted); }
 
-    /* Partner Split Calculator */
-    .partner-share-box {
-      margin-top: 32px;
+    /* Partner Pool Distribution Box */
+    .pool-calc-box {
+      margin-top: 28px;
       padding: 24px;
-      background: rgba(212,175,55,0.05);
+      background: rgba(212,175,55,0.06);
       border: 1px dashed var(--gold);
       border-radius: 14px;
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
     }
-    .partner-share-row {
-      display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px;
+    .pool-calc-row {
+      display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px; margin-bottom: 16px;
     }
 
     /* ── Comparison Table ── */
@@ -213,38 +200,24 @@
       overflow: hidden;
       margin-bottom: 60px;
     }
-    .table-title-bar {
-      padding: 20px 24px; border-bottom: 1px solid var(--border);
-    }
+    .table-title-bar { padding: 20px 24px; border-bottom: 1px solid var(--border); }
     table { width: 100%; border-collapse: collapse; text-align: left; }
     th {
       background: rgba(0,0,0,0.3); color: var(--muted); font-size: 11px; text-transform: uppercase;
-      letter-spacing: 1px; padding: 14px 20px; border-bottom: 1px solid var(--border);
+      letter-spacing: 1px; padding: 14px 18px; border-bottom: 1px solid var(--border);
     }
-    td { padding: 16px 20px; border-bottom: 1px solid var(--border); font-size: 13.5px; }
+    td { padding: 15px 18px; border-bottom: 1px solid var(--border); font-size: 13px; }
     tr:last-child td { border-bottom: none; }
     tr.highlight-row { background: rgba(212,175,55,0.05); }
 
-    /* ── Advantage List ── */
-    .adv-grid {
-      display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-      gap: 16px; margin-bottom: 60px;
-    }
-    .adv-card {
-      background: var(--bg-card); border: 1px solid var(--border);
-      border-radius: 14px; padding: 22px;
-    }
-    .adv-card b { font-size: 15px; color: #fff; display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
-    .adv-card p { font-size: 13px; color: var(--muted); }
-
-    /* ── Influencer & Partner Deal ── */
+    /* ── Affiliate Referral Model ── */
     .deal-box {
       background: linear-gradient(135deg, #162217 0%, #0e160f 100%);
       border: 1px solid var(--gold);
       border-radius: 20px;
-      padding: 36px 32px;
+      padding: 32px 28px;
       margin-bottom: 60px;
-      display: grid; grid-template-columns: 1fr 1fr; gap: 32px; align-items: center;
+      display: grid; grid-template-columns: 1fr 1fr; gap: 28px; align-items: center;
     }
     @media (max-width: 800px) { .deal-box { grid-template-columns: 1fr; } }
 
@@ -254,10 +227,10 @@
       background: var(--bg-card);
       border: 1px solid var(--border);
       border-radius: 20px;
-      padding: 48px 24px;
+      padding: 44px 24px;
     }
-    .cta-final h2 { font-size: 32px; font-weight: 900; color: #fff; margin-bottom: 12px; }
-    .cta-final p { font-size: 16px; color: var(--muted); max-width: 600px; margin: 0 auto 28px; }
+    .cta-final h2 { font-size: 30px; font-weight: 900; color: #fff; margin-bottom: 10px; }
+    .cta-final p { font-size: 15px; color: var(--muted); max-width: 620px; margin: 0 auto 26px; }
     .cta-actions { display: flex; justify-content: center; gap: 14px; flex-wrap: wrap; }
   </style>
 </head>
@@ -269,14 +242,14 @@
       <div class="logo-badge">G</div>
       <div class="brand-text">
         <b>GIRO ANGOLA</b>
-        <span>Pitch Deck Executivo</span>
+        <span>Modelo de Investimento & Parceria</span>
       </div>
     </div>
     <div class="header-cta">
-      <a href="https://wa.me/244923000000?text=Ol%C3%A1%20Isaac%2C%20gostaria%20de%20agendar%20uma%20reuni%C3%A3o%20sobre%20a%20parceria%2Finvestimento%20na%20GIRO." target="_blank" class="btn-gold">
+      <a href="https://wa.me/244923000000?text=Ol%C3%A1%20Isaac%2C%20quero%20agendar%20uma%20reuni%C3%A3o%20sobre%20a%20parceria%20na%20GIRO." target="_blank" class="btn-gold">
         📲 Agendar Reunião
       </a>
-      <a href="crm.html" class="btn-outline">Abrir CRM Operacional</a>
+      <a href="crm.html" class="btn-outline">Ver CRM ao Vivo</a>
     </div>
   </header>
 
@@ -285,20 +258,20 @@
 
     <!-- HERO -->
     <section class="hero">
-      <div class="hero-pill">💼 Oportunidade de Alto Rendimento Recorrente</div>
-      <h1>A Revolução da Mobilidade em Angola com <span>Margem Líquida Real</span></h1>
+      <div class="hero-pill">🛡️ Modelo de Lucro Sustentável com Teto de Segurança</div>
+      <h1>Escala Exponencial com <span>Pool de Lucro Protegido</span></h1>
       <p>
-        Uma plataforma desenhada especificamente para a realidade de Angola. Menor comissão para motoristas (10%), tarifas 12% mais acessíveis, retenção comprovada e unit economics altamente rentáveis.
+        A GIRO opera com um modelo unit economics matematicamente blindado: distribuição de no máximo <b>20% a 30% do lucro líquido mensal</b> entre parceiros e investidores, garantindo que a empresa <b>SEMPRE retém 70% a 80% do lucro em caixa</b> para expansão e solidez.
       </p>
     </section>
 
-    <!-- 3 PILARES -->
+    <!-- 3 PILARES UNIT ECONOMICS -->
     <section class="grid-3">
       <div class="card">
         <span class="card-icon">🚗</span>
         <h3>300.000 Kz / mês</h3>
         <p>
-          Faturamento médio mensal gerado por cada motorista ativo trabalhando no ecossistema GIRO em Luanda e capitais provinciais.
+          Média mensal gerada por cada motorista ativo (10.000 Kz/dia em ~12 a 15 corridas urbanas em Angola).
         </p>
       </div>
 
@@ -306,52 +279,107 @@
         <span class="card-icon">💰</span>
         <h3>10% Comissão GIRO</h3>
         <p>
-          Enquanto a concorrência cobra 20% a 25%, a GIRO cobra apenas 10%, atraindo os melhores motoristas em massa por retenção de 90%.
+          Retemos 10% bruto (= 30.000 Kz/motorista). 3% é reinvestido em bónus (Desafio 30K) e cupões (GIRO Clube), gerando <b>7% de margem líquida real (= 21.000 Kz/motorista)</b>.
         </p>
       </div>
 
       <div class="card">
-        <span class="card-icon">🎁</span>
-        <h3>3% Reinvestimento & Bónus</h3>
+        <span class="card-icon">🔒</span>
+        <h3>Pool Teto de 20% a 30%</h3>
         <p>
-          3% é devolvido em incentivos de crescimento: Desafio 30K (+1.500 Kz/dia) e cupões de 10% no GIRO Clube, garantindo fidelidade de passageiros e motoristas.
+          O total distribuído a TODOS os investidores/ajudadores soma no máximo 20% a 30% do lucro. A empresa retém no mínimo 70% a 80% de lucro líquido. Risco zero de falência por excesso de comissões.
         </p>
       </div>
     </section>
 
-    <!-- SIMULADOR INTERATIVO -->
+    <!-- ARQUITETURA DO POOL DE DISTRIBUIÇÃO -->
+    <section class="pool-architecture-box">
+      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">
+        <div>
+          <b style="font-size:16px;color:#fff;">Estrutura de Repartição do Lucro Líquido da GIRO (7% do GMV)</b>
+          <div style="font-size:12px;color:var(--muted);margin-top:2px;">Regra de Ouro: O fundo de distribuição a parceiros nunca ultrapassa o teto pré-fixado.</div>
+        </div>
+        <span class="hero-pill" style="margin:0;">Modelo Blindado</span>
+      </div>
+
+      <div class="pool-split-visual">
+        <div class="ps-company">70% a 80% — Retido pela GIRO (Caixa, Expansão & Fundadores)</div>
+        <div class="ps-pool">20% a 30% — Pool de Parceiros</div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;font-size:13px;color:var(--muted);">
+        <div>
+          <b style="color:var(--green);">✓ Empresa Segura e Capitalizada:</b> A empresa mantém o controlo e a maior parte do lucro líquido para reinvestimento em tecnologia e segurança operacional.
+        </div>
+        <div>
+          <b style="color:var(--gold);">✓ Divisão Pro-Rata entre Parceiros:</b> Se tiver 5, 10 ou 20 investidores, o Pool total é rateado entre eles pela quota de participação ou motoristas ativos trazidos.
+        </div>
+      </div>
+    </section>
+
+    <!-- SIMULADOR FINANCEIRO INTERATIVO -->
     <section class="sim-box" id="simulador">
       <div class="sim-header">
-        <span style="font-size:12px;color:var(--gold);font-weight:800;letter-spacing:2px;text-transform:uppercase;">Calculadora em Tempo Real</span>
-        <h2>Simulador Financeiro de Escala GIRO</h2>
-        <p>Ajuste o número de motoristas ativos para projetar o faturamento bruto, receita retida e margens.</p>
+        <span style="font-size:12px;color:var(--gold);font-weight:800;letter-spacing:2px;text-transform:uppercase;">Calculadora Executiva em Tempo Real</span>
+        <h2>Simulador de Escala com Rateio Pro-Rata</h2>
+        <p>Ajuste o número de motoristas, o teto do pool e o número de investidores/influenciadores na mesa.</p>
       </div>
 
-      <!-- Slider 1: Motoristas -->
+      <!-- Slider 1: Motoristas Ativos -->
       <div class="slider-group">
         <div class="slider-title-row">
-          <span class="slider-label">Motoristas Ativos Onboardados:</span>
+          <span class="slider-label">Total de Motoristas Ativos:</span>
           <span class="slider-val-badge" id="val-drivers">1.000 Motoristas</span>
         </div>
-        <input type="range" id="input-drivers" min="50" max="15000" step="50" value="1000" oninput="calculateModel()">
+        <input type="range" id="input-drivers" min="50" max="10000" step="50" value="1000" oninput="calculateModel()">
         <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-top:6px;">
           <span>50 motoristas</span>
-          <span>1.000 (Fase 1)</span>
-          <span>5.000 (Fase 2)</span>
-          <span>15.000 (Nacional)</span>
+          <span>500</span>
+          <span>1.000 (Meta Ano 1)</span>
+          <span>5.000</span>
+          <span>10.000 (Nacional)</span>
         </div>
       </div>
 
-      <!-- Slider 2: Faturamento Médio -->
-      <div class="slider-group">
-        <div class="slider-title-row">
-          <span class="slider-label">Faturamento Médio / Motorista / Mês:</span>
-          <span class="slider-val-badge" id="val-ticket">300.000 Kz</span>
+      <!-- Controls Row: Faturamento + Teto Pool + Nº de Parceiros -->
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px;margin-bottom:24px;">
+        
+        <!-- Faturamento / motorista -->
+        <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:14px;padding:16px;">
+          <div style="font-size:12px;color:var(--muted);margin-bottom:6px;">Faturamento / Motorista / Mês:</div>
+          <select id="select-ticket" onchange="calculateModel()" style="width:100%;background:#162017;border:1px solid var(--border);color:#fff;padding:8px;border-radius:8px;font-size:14px;font-weight:700;outline:none;">
+            <option value="200000">200.000 Kz (Conservador)</option>
+            <option value="300000" selected>300.000 Kz (Padrão de Mercado)</option>
+            <option value="450000">450.000 Kz (Alta Demanda)</option>
+          </select>
         </div>
-        <input type="range" id="input-ticket" min="150000" max="600000" step="25000" value="300000" oninput="calculateModel()">
+
+        <!-- Teto do Pool -->
+        <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:14px;padding:16px;">
+          <div style="font-size:12px;color:var(--muted);margin-bottom:6px;">Teto Global do Pool de Lucro:</div>
+          <select id="select-pool-pct" onchange="calculateModel()" style="width:100%;background:#162017;border:1px solid var(--gold);color:var(--gold);padding:8px;border-radius:8px;font-size:14px;font-weight:700;outline:none;">
+            <option value="0.20">20% do Lucro (Empresa retém 80%)</option>
+            <option value="0.25" selected>25% do Lucro (Empresa retém 75%)</option>
+            <option value="0.30">30% do Lucro (Empresa retém 70%)</option>
+          </select>
+        </div>
+
+        <!-- Nº de Investidores / Parceiros -->
+        <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:14px;padding:16px;">
+          <div style="font-size:12px;color:var(--muted);margin-bottom:6px;">Nº de Parceiros / Investidores no Grupo:</div>
+          <select id="select-partners-count" onchange="calculateModel()" style="width:100%;background:#162017;border:1px solid var(--blue);color:var(--blue);padding:8px;border-radius:8px;font-size:14px;font-weight:700;outline:none;">
+            <option value="1">1 Parceiro (100% do pool)</option>
+            <option value="3">3 Parceiros</option>
+            <option value="5">5 Parceiros</option>
+            <option value="10" selected>10 Parceiros (Exemplo da Reunião)</option>
+            <option value="15">15 Parceiros</option>
+            <option value="20">20 Parceiros</option>
+          </select>
+        </div>
+
       </div>
 
-      <!-- Dashboard Resultados -->
+      <!-- Resultados Consolidados da Plataforma -->
       <div class="results-grid">
         <div class="res-card">
           <div class="res-label">Volume Total (GMV Mensal)</div>
@@ -359,185 +387,149 @@
           <div class="res-sub" id="res-gmv-year">3,60 Bilhões Kz / ano</div>
         </div>
 
-        <div class="res-card gold-border">
-          <div class="res-label">Comissão Bruta (10%)</div>
-          <div class="res-num gold" id="res-gross">30.000.000 Kz</div>
-          <div class="res-sub" id="res-gross-year">360 Milhões Kz / ano</div>
-        </div>
-
         <div class="res-card">
-          <div class="res-label">Incentivos & Bónus (3%)</div>
-          <div class="res-num" style="color:var(--blue);" id="res-bonus">9.000.000 Kz</div>
-          <div class="res-sub">Desafio 30K + GIRO Clube</div>
+          <div class="res-label">Comissão 10% (Bruto)</div>
+          <div class="res-num" id="res-gross">30.000.000 Kz</div>
+          <div class="res-sub">Menos 3% de bónus = 7% líquido</div>
         </div>
 
-        <div class="res-card primary">
-          <div class="res-label">Margem Líquida (7%)</div>
+        <div class="res-card green-border">
+          <div class="res-label">Lucro Líquido GIRO (7%)</div>
           <div class="res-num green" id="res-net">21.000.000 Kz</div>
           <div class="res-sub green" id="res-net-year">252 Milhões Kz / ano</div>
         </div>
+
+        <div class="res-card green-border">
+          <div class="res-label" id="res-company-label">Caixa Retido GIRO (75%)</div>
+          <div class="res-num green" id="res-company-retained">15.750.000 Kz</div>
+          <div class="res-sub">100% seguro para a empresa</div>
+        </div>
       </div>
 
-      <!-- Calculadora de Comissão para o Parceiro / Influenciador -->
-      <div class="partner-share-box">
-        <div class="partner-share-row">
+      <!-- Caixa do Pool & Repartição por Parceiro -->
+      <div class="pool-calc-box">
+        <div class="pool-calc-row">
           <div>
-            <b style="font-size:16px;color:#fff;display:block;">🤝 Proposta de Remuneração para o Parceiro / Influenciador</b>
-            <span style="font-size:13px;color:var(--muted);">Defina a percentagem ou valor de comissão recorrente que negociará na reunião:</span>
+            <b style="font-size:16px;color:#fff;display:block;" id="pool-title-desc">Fundo Global de Parcerias (25% do Lucro Líquido)</b>
+            <span style="font-size:13px;color:var(--muted);">Valor total distribuído entre todos os investidores/influenciadores cadastrados:</span>
           </div>
-          <div style="display:flex;align-items:center;gap:10px;">
-            <span style="font-size:13px;color:#fff;">Sua Fatia (% sobre a receita líquida):</span>
-            <select id="partner-share-pct" onchange="calculateModel()" style="background:#1b241c;border:1px solid var(--gold);color:var(--gold);font-weight:900;padding:8px 14px;border-radius:8px;font-size:15px;outline:none;cursor:pointer;">
-              <option value="0.10">10% da Margem</option>
-              <option value="0.15">15% da Margem</option>
-              <option value="0.20" selected>20% da Margem</option>
-              <option value="0.25">25% da Margem</option>
-              <option value="0.30">30% da Margem</option>
-            </select>
+          <div style="text-align:right;">
+            <div style="font-size:11px;color:var(--muted);">Total do Pool Mensal:</div>
+            <div style="font-size:24px;font-weight:900;color:var(--gold);" id="res-pool-total">5.250.000 Kz / mês</div>
           </div>
         </div>
 
-        <div style="display:flex;justify-content:space-between;align-items:center;border-top:1px dashed var(--border);padding-top:14px;flex-wrap:wrap;gap:10px;">
+        <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:18px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:14px;">
           <div>
-            <div style="font-size:12px;color:var(--muted);">Ganhos Recorrentes Estimados para Você / Seu Grupo:</div>
-            <div style="font-size:26px;font-weight:900;color:var(--gold);" id="partner-payout-month">4.200.000 Kz / mês</div>
+            <div style="font-size:12px;color:var(--gold);font-weight:700;text-transform:uppercase;">Ganhos por Cada 1 dos <span id="partner-count-span">10</span> Parceiros:</div>
+            <div style="font-size:26px;font-weight:900;color:#fff;" id="res-per-partner-month">525.000 Kz / mês</div>
+            <div style="font-size:11px;color:var(--muted);">Projeção Anual por Parceiro: <b style="color:var(--gold);" id="res-per-partner-year">6.300.000 Kz / ano</b></div>
           </div>
-          <div style="text-align:right;">
-            <div style="font-size:12px;color:var(--muted);">Projeção Anual Recorrente:</div>
-            <div style="font-size:20px;font-weight:900;color:#fff;" id="partner-payout-year">50.400.000 Kz / ano</div>
+
+          <div style="font-size:12px;color:var(--muted);max-width:340px;line-height:1.5;">
+            💡 <b>Para a sua Reunião:</b> «Vocês 10 juntos recebem <span id="share-sum-desc">5.250.000 Kz/mês</span> fixados em teto de 25%. A empresa fica sólida com 75% e ninguém quebra!»
           </div>
         </div>
       </div>
     </section>
 
-    <!-- TABELA COMPARATIVA DE ESCALA -->
+    <!-- TABELA COMPARATIVA DE ESCALA COM TETO DE 25% -->
     <section class="table-box">
       <div class="table-title-bar">
-        <h3 style="font-size:18px;font-weight:800;color:#fff;">Cenários de Crescimento & Faturamento Consolidado</h3>
-        <p style="font-size:13px;color:var(--muted);">Base de cálculo: faturamento padrão de 300.000 Kz / motorista / mês</p>
+        <h3 style="font-size:18px;font-weight:800;color:#fff;">Demonstração de Resultados nos Cenários de Escala</h3>
+        <p style="font-size:13px;color:var(--muted);">Modelo calibrado com Teto de 25% do Lucro Líquido para o Pool de Parceiros (Exemplo com 10 participantes)</p>
       </div>
       <table>
         <thead>
           <tr>
-            <th>Cenário de Escala</th>
-            <th>Motoristas Ativos</th>
-            <th>Volume Transacionado (GMV)</th>
-            <th>Receita Bruta (10%)</th>
-            <th>Incentivos (3%)</th>
-            <th>Receita Líquida (7%)</th>
+            <th>Cenário</th>
+            <th>Motoristas</th>
+            <th>Lucro Líquido GIRO (7%)</th>
+            <th>Caixa Empresa (75%)</th>
+            <th>Pool de Parceiros (25%)</th>
+            <th>Cada Parceiro (1 de 10)</th>
           </tr>
         </thead>
         <tbody>
           <tr>
-            <td><b>Fase Piloto</b></td>
-            <td>100 motoristas</td>
-            <td>30.000.000 Kz / mês</td>
-            <td>3.000.000 Kz</td>
-            <td>900.000 Kz</td>
-            <td><b style="color:var(--green);">2.100.000 Kz / mês</b></td>
+            <td><b>Fase Inicial</b></td>
+            <td>100</td>
+            <td>2.100.000 Kz / mês</td>
+            <td><b style="color:var(--green);">1.575.000 Kz</b></td>
+            <td>525.000 Kz</td>
+            <td><b>52.500 Kz / mês</b></td>
           </tr>
           <tr>
-            <td><b>Expansão Luanda</b></td>
-            <td>500 motoristas</td>
-            <td>150.000.000 Kz / mês</td>
-            <td>15.000.000 Kz</td>
-            <td>4.500.000 Kz</td>
-            <td><b style="color:var(--green);">10.500.000 Kz / mês</b></td>
+            <td><b>Expansão</b></td>
+            <td>500</td>
+            <td>10.500.000 Kz / mês</td>
+            <td><b style="color:var(--green);">7.875.000 Kz</b></td>
+            <td>2.625.000 Kz</td>
+            <td><b>262.500 Kz / mês</b></td>
           </tr>
           <tr class="highlight-row">
             <td><b style="color:var(--gold);">★ Meta Ano 1</b></td>
-            <td><b style="color:var(--gold);">1.000 motoristas</b></td>
-            <td><b style="color:#fff;">300.000.000 Kz / mês</b></td>
-            <td><b style="color:var(--gold);">30.000.000 Kz</b></td>
-            <td>9.000.000 Kz</td>
-            <td><b style="color:var(--green);font-size:15px;">21.000.000 Kz / mês</b></td>
+            <td><b style="color:var(--gold);">1.000</b></td>
+            <td><b style="color:var(--green);">21.000.000 Kz / mês</b></td>
+            <td><b style="color:var(--green);font-size:15px;">15.750.000 Kz</b></td>
+            <td><b style="color:var(--gold);">5.250.000 Kz</b></td>
+            <td><b style="color:var(--gold);font-size:15px;">525.000 Kz / mês</b></td>
           </tr>
           <tr>
-            <td><b>Consolidação Nacional</b></td>
-            <td>5.000 motoristas</td>
-            <td>1.500.000.000 Kz / mês</td>
-            <td>150.000.000 Kz</td>
-            <td>45.000.000 Kz</td>
-            <td><b style="color:var(--green);">105.000.000 Kz / mês</b></td>
+            <td><b>Consolidação</b></td>
+            <td>5.000</td>
+            <td>105.000.000 Kz / mês</td>
+            <td><b style="color:var(--green);">78.750.000 Kz</b></td>
+            <td>26.250.000 Kz</td>
+            <td><b>2.625.000 Kz / mês</b></td>
           </tr>
           <tr>
-            <td><b>Liderança Absoluta</b></td>
-            <td>10.000 motoristas</td>
-            <td>3.000.000.000 Kz / mês</td>
-            <td>300.000.000 Kz</td>
-            <td>90.000.000 Kz</td>
-            <td><b style="color:var(--green);font-size:16px;">210.000.000 Kz / mês</b></td>
+            <td><b>Liderança Nacional</b></td>
+            <td>10.000</td>
+            <td>210.000.000 Kz / mês</td>
+            <td><b style="color:var(--green);font-size:16px;">157.500.000 Kz</b></td>
+            <td>52.500.000 Kz</td>
+            <td><b style="color:var(--gold);font-size:16px;">5.250.000 Kz / mês</b></td>
           </tr>
         </tbody>
       </table>
     </section>
 
-    <!-- PORQUÊ O GIRO VENCE (DIFERENCIAIS) -->
-    <section>
-      <div style="text-align:center;margin-bottom:32px;">
-        <h2 style="font-size:28px;font-weight:900;color:#fff;">Por que o GIRO é Imbatível em Angola</h2>
-        <p style="font-size:15px;color:var(--muted);">Tecnologia adaptada ao mercado local com retenção orgânica brutal.</p>
-      </div>
-
-      <div class="adv-grid">
-        <div class="adv-card">
-          <b><span>⚡</span> PWA Leve (&lt; 1MB)</b>
-          <p>Instalação instantânea sem consumir dados móveis caros. Funciona em aparelhos Android com 2GB de RAM e redes 3G lentas.</p>
-        </div>
-        <div class="adv-card">
-          <b><span>💳</span> Multicaixa & Unitel Money</b>
-          <p>Split financeiro automático e imediato. O motorista recebe direto na conta bancária ou carteira móvel sem fricção.</p>
-        </div>
-        <div class="adv-card">
-          <b><span>🛡️</span> Radar SOS 5 km</b>
-          <p>Sistema exclusivo de segurança comunitária. Botão de pânico aciona viaturas no raio de 5km e conecta à Polícia Nacional.</p>
-        </div>
-        <div class="adv-card">
-          <b><span>🤖</span> CRM com IA Multi-Agente</b>
-          <p>Orquestrador inteligente para resolução de disputas, validação de documentos KYC e atendimento 24/7 de alta velocidade.</p>
-        </div>
-      </div>
-    </section>
-
-    <!-- PROPOSTA IRRECUSÁVEL PARA INFLUENCIADORES & PARCEIROS -->
+    <!-- ALTERNATIVA: MODELO POR MOTORISTA ATIVO TRAZIDO (PAY-PER-ACTIVE-DRIVER) -->
     <section class="deal-box">
       <div>
-        <span style="font-size:11px;color:var(--gold);font-weight:800;letter-spacing:2px;text-transform:uppercase;">Para Influenciadores & Conectores</span>
-        <h2 style="font-size:26px;font-weight:900;color:#fff;margin:6px 0 14px;">A Proposta de Parceria Irrecusável</h2>
-        <p style="font-size:14px;color:var(--muted);line-height:1.7;">
-          Você não ganha apenas um cachê único. Você constrói um <b>fluxo de renda passiva mensal</b> para cada motorista ativo que trouxer para a plataforma GIRO.
+        <span style="font-size:11px;color:var(--gold);font-weight:800;letter-spacing:2px;text-transform:uppercase;">Alternativa: Modelo por Indicação Direta</span>
+        <h2 style="font-size:24px;font-weight:900;color:#fff;margin:6px 0 12px;">Comissão Direta por Motorista Ativo</h2>
+        <p style="font-size:13.5px;color:var(--muted);line-height:1.7;">
+          Se preferir pagar ao influenciador/parceiro <b>apenas pelo que ele produzir diretamente</b>:
         </p>
-        <ul style="margin-top:14px;padding-left:18px;font-size:13.5px;color:#fff;line-height:1.8;">
-          <li>Código de indicação exclusivo e rastreamento em tempo real no CRM.</li>
-          <li>Comissão recorrente paga todos os meses via transferência bancária.</li>
-          <li>Apoio total da equipe operacional para homologar os motoristas trazidos.</li>
+        <ul style="margin-top:12px;padding-left:18px;font-size:13px;color:#fff;line-height:1.8;">
+          <li>Cada motorista fatura 300.000 Kz → Gera 21.000 Kz de lucro líquido GIRO.</li>
+          <li>Você paga <b>15% a 20% do lucro daquele motorista</b> (= ~3.150 Kz a 4.200 Kz/mês por motorista ativo).</li>
+          <li>Se o parceiro trouxer <b>50 motoristas ativos</b>, ele recebe <b>~210.000 Kz/mês</b> de forma recorrente enquanto os motoristas rodarem.</li>
         </ul>
       </div>
 
       <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:16px;padding:24px;text-align:center;">
-        <div style="font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;">Simulação de 250 Motoristas Ativos Trazidos</div>
-        <div style="font-size:36px;font-weight:900;color:var(--gold);margin:8px 0;">1.050.000 Kz</div>
-        <div style="font-size:13px;color:var(--green);font-weight:700;">Recorrentes todos os meses na sua conta</div>
-        <div style="margin-top:20px;">
-          <a href="https://wa.me/244923000000?text=Ol%C3%A1%20Isaac%2C%20quero%20fechar%20a%20parceria%20de%20indica%C3%A7%C3%A3o%20de%20motoristas%20com%20a%20GIRO." target="_blank" class="btn-gold" style="width:100%;justify-content:center;">
-            Fechar Acordo de Parceria
-          </a>
-        </div>
+        <div style="font-size:12px;color:var(--muted);text-transform:uppercase;">Exemplo de Influenciador que traz 100 Motoristas</div>
+        <div style="font-size:34px;font-weight:900;color:var(--gold);margin:8px 0;">420.000 Kz</div>
+        <div style="font-size:13px;color:var(--green);font-weight:700;">Mensais na conta do influenciador</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:6px;">A GIRO retém 1.680.000 Kz líquidos desses mesmos 100 motoristas. Lucro mútuo 100% sustentável!</div>
       </div>
     </section>
 
     <!-- CTA FINAL -->
     <section class="cta-final">
-      <h2>Pronto para Liderar o Mercado de Mobilidade?</h2>
+      <h2>Pronto para Agendar a Reunião com os Investidores?</h2>
       <p>
-        Entre em contacto directo para agendamento de reunião executiva com o fundador, demonstração do CRM ao vivo e assinatura do memorando de entendimento (MOU).
+        Use esta apresentação interativa durante a sua conversa. Todos os números são ajustáveis ao vivo na frente deles para fechar a parceria na hora.
       </p>
       <div class="cta-actions">
-        <a href="https://wa.me/244923000000?text=Ol%C3%A1%20Isaac%2C%20quero%20agendar%20uma%20reuni%C3%A3o%20executiva%20sobre%20a%20GIRO." target="_blank" class="btn-gold" style="font-size:15px;padding:14px 28px;">
+        <a href="https://wa.me/244923000000?text=Ol%C3%A1%20Isaac%2C%20estou%20pronto%20para%20a%20reuni%C3%A3o%20executiva%20da%20GIRO." target="_blank" class="btn-gold" style="font-size:15px;padding:14px 28px;">
           📲 Falar no WhatsApp com o Fundador
         </a>
         <a href="crm.html" class="btn-outline" style="font-size:15px;padding:14px 24px;">
-          Ver Painel CRM & IA ao Vivo
+          Ver CRM & IA Operacional
         </a>
       </div>
     </section>
@@ -549,44 +541,50 @@
 
     function calculateModel() {
       const drivers = parseInt(document.getElementById('input-drivers').value);
-      const ticket = parseInt(document.getElementById('input-ticket').value);
-      const partnerPct = parseFloat(document.getElementById('partner-share-pct').value);
+      const ticket = parseInt(document.getElementById('select-ticket').value);
+      const poolPct = parseFloat(document.getElementById('select-pool-pct').value);
+      const partnersCount = parseInt(document.getElementById('select-partners-count').value);
 
       document.getElementById('val-drivers').textContent = drivers.toLocaleString('pt-AO') + ' Motoristas';
-      document.getElementById('val-ticket').textContent = kz(ticket);
 
-      // Model calculations
+      // Platform unit economics
       const gmvMonth = drivers * ticket;
       const gmvYear = gmvMonth * 12;
 
       const grossMonth = gmvMonth * 0.10; // 10%
-      const grossYear = grossMonth * 12;
-
-      const bonusMonth = gmvMonth * 0.03; // 3%
-
-      const netMonth = gmvMonth * 0.07; // 7%
+      const netMonth = gmvMonth * 0.07;   // 7% líquido
       const netYear = netMonth * 12;
 
-      const partnerMonth = netMonth * partnerPct;
-      const partnerYear = partnerMonth * 12;
+      // Pool split
+      const poolTotalMonth = netMonth * poolPct;
+      const companyRetainedMonth = netMonth * (1 - poolPct);
+
+      // Per partner
+      const perPartnerMonth = poolTotalMonth / partnersCount;
+      const perPartnerYear = perPartnerMonth * 12;
 
       // Update UI
       document.getElementById('res-gmv').textContent = kz(gmvMonth);
       document.getElementById('res-gmv-year').textContent = (gmvYear / 1000000000 >= 1) ? (gmvYear / 1000000000).toFixed(2) + ' Bilhões Kz / ano' : (gmvYear / 1000000).toFixed(1) + ' Milhões Kz / ano';
 
       document.getElementById('res-gross').textContent = kz(grossMonth);
-      document.getElementById('res-gross-year').textContent = (grossYear / 1000000000 >= 1) ? (grossYear / 1000000000).toFixed(2) + ' Bilhões Kz / ano' : (grossYear / 1000000).toFixed(1) + ' Milhões Kz / ano';
-
-      document.getElementById('res-bonus').textContent = kz(bonusMonth);
 
       document.getElementById('res-net').textContent = kz(netMonth);
       document.getElementById('res-net-year').textContent = (netYear / 1000000000 >= 1) ? (netYear / 1000000000).toFixed(2) + ' Bilhões Kz / ano' : (netYear / 1000000).toFixed(1) + ' Milhões Kz / ano';
 
-      document.getElementById('partner-payout-month').textContent = kz(partnerMonth) + ' / mês';
-      document.getElementById('partner-payout-year').textContent = kz(partnerYear) + ' / ano';
+      document.getElementById('res-company-label').textContent = `Caixa Retido GIRO (${Math.round((1 - poolPct)*100)}%)`;
+      document.getElementById('res-company-retained').textContent = kz(companyRetainedMonth);
+
+      document.getElementById('pool-title-desc').textContent = `Fundo Global de Parcerias (${Math.round(poolPct * 100)}% do Lucro Líquido)`;
+      document.getElementById('res-pool-total').textContent = kz(poolTotalMonth) + ' / mês';
+
+      document.getElementById('partner-count-span').textContent = partnersCount;
+      document.getElementById('res-per-partner-month').textContent = kz(perPartnerMonth) + ' / mês';
+      document.getElementById('res-per-partner-year').textContent = kz(perPartnerYear) + ' / ano';
+
+      document.getElementById('share-sum-desc').textContent = kz(poolTotalMonth) + '/mês';
     }
 
-    // Initialize calculation on load
     calculateModel();
   </script>
 </body>
