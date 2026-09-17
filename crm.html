@@ -1,0 +1,1150 @@
+<!DOCTYPE html>
+<html lang="pt-AO">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GIRO Angola — CRM & Painel de Administração Central</title>
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+  <style>
+    :root {
+      --bg: #070907;
+      --bg-side: #0b0f0b;
+      --card: #121712;
+      --card-inner: #1a221b;
+      --border: #222c23;
+      --gold: #d4af37;
+      --gold-glow: #f5d77f;
+      --green: #22c55e;
+      --red: #ef4444;
+      --blue: #38bdf8;
+      --text: #f1f5f1;
+      --muted: #8d9e8d;
+      --font: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, system-ui, sans-serif;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font);
+      display: flex;
+      height: 100vh;
+      overflow: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── Sidebar ── */
+    #sidebar {
+      width: 250px;
+      background: var(--bg-side);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+      z-index: 100;
+    }
+    .side-brand {
+      padding: 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      border-bottom: 1px solid var(--border);
+    }
+    .side-logo-g {
+      width: 36px; height: 36px;
+      background: linear-gradient(135deg, var(--gold), #f0c040);
+      color: #000;
+      font-weight: 900;
+      font-size: 18px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 0 16px rgba(212,175,55,0.3);
+    }
+    .side-brand-title b { font-size: 17px; letter-spacing: -0.5px; display: block; }
+    .side-brand-title span { font-size: 10px; color: var(--gold); letter-spacing: 2px; text-transform: uppercase; }
+
+    .side-nav {
+      flex: 1;
+      padding: 16px 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      overflow-y: auto;
+    }
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 11px 14px;
+      border-radius: 10px;
+      color: var(--muted);
+      font-size: 13.5px;
+      font-weight: 600;
+      cursor: pointer;
+      border: 1px solid transparent;
+      transition: all 0.15s ease;
+      background: none;
+      width: 100%;
+      text-align: left;
+    }
+    .nav-item:hover { color: #fff; background: rgba(255,255,255,0.04); }
+    .nav-item.active {
+      color: #000;
+      background: linear-gradient(135deg, var(--gold), #f0c040);
+      font-weight: 700;
+    }
+    .nav-badge {
+      margin-left: auto;
+      font-size: 10px;
+      padding: 2px 7px;
+      border-radius: 10px;
+      background: rgba(239,68,68,0.2);
+      color: var(--red);
+      font-weight: 800;
+    }
+    .nav-item.active .nav-badge {
+      background: #000;
+      color: var(--gold);
+    }
+
+    .side-footer {
+      padding: 16px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: rgba(0,0,0,0.2);
+    }
+    .admin-avatar {
+      width: 34px; height: 34px; border-radius: 50%;
+      background: #2a362c; border: 1px solid var(--gold);
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 800; font-size: 13px; color: var(--gold);
+    }
+
+    /* ── Main Workspace ── */
+    #workspace {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* Top Bar */
+    #topbar {
+      height: 64px;
+      background: var(--bg-side);
+      border-bottom: 1px solid var(--border);
+      padding: 0 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-shrink: 0;
+    }
+    .top-title { font-size: 18px; font-weight: 800; display: flex; align-items: center; gap: 8px; }
+    .top-stats { display: flex; align-items: center; gap: 18px; }
+    .stat-pill {
+      background: var(--card-inner);
+      border: 1px solid var(--border);
+      padding: 6px 14px;
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+    }
+    .stat-pill b { color: #fff; font-size: 13px; }
+
+    /* Content Area */
+    #content-area {
+      flex: 1;
+      overflow-y: auto;
+      padding: 24px;
+    }
+
+    .tab-view { display: none; }
+    .tab-view.active { display: block; }
+
+    /* ── Dashboard Grid ── */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    .kpi-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 18px 20px;
+      position: relative;
+      overflow: hidden;
+    }
+    .kpi-card::after {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+      background: var(--gold);
+    }
+    .kpi-card.green::after { background: var(--green); }
+    .kpi-card.red::after { background: var(--red); }
+    .kpi-card.blue::after { background: var(--blue); }
+    .kpi-label { font-size: 11px; text-transform: uppercase; color: var(--muted); letter-spacing: 1px; font-weight: 700; }
+    .kpi-value { font-size: 26px; font-weight: 900; color: #fff; margin: 6px 0 4px; }
+    .kpi-sub { font-size: 12px; color: var(--muted); }
+
+    /* ── Tables & Lists ── */
+    .data-table-wrap {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      overflow: hidden;
+      margin-bottom: 24px;
+    }
+    .table-head-bar {
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+    .search-input {
+      background: var(--card-inner);
+      border: 1px solid var(--border);
+      color: #fff;
+      padding: 8px 14px;
+      border-radius: 8px;
+      font-size: 13px;
+      outline: none;
+      width: 240px;
+    }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; text-align: left; }
+    th {
+      background: rgba(0,0,0,0.3);
+      color: var(--muted);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      padding: 12px 18px;
+      border-bottom: 1px solid var(--border);
+    }
+    td { padding: 14px 18px; border-bottom: 1px solid rgba(255,255,255,0.04); color: #fff; vertical-align: middle; }
+    tr:hover td { background: rgba(255,255,255,0.02); }
+
+    /* Status Badges */
+    .badge {
+      display: inline-flex; align-items: center; gap: 4px;
+      padding: 4px 10px; border-radius: 12px; font-size: 11px; font-weight: 700;
+    }
+    .badge.green { background: rgba(34,197,94,0.15); color: var(--green); }
+    .badge.gold { background: rgba(212,175,55,0.15); color: var(--gold); }
+    .badge.red { background: rgba(239,68,68,0.15); color: var(--red); }
+    .badge.blue { background: rgba(56,189,248,0.15); color: var(--blue); }
+
+    /* Buttons */
+    .btn-action {
+      padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: 700;
+      border: none; cursor: pointer; transition: opacity 0.15s;
+    }
+    .btn-action:hover { opacity: 0.85; }
+    .btn-action.gold { background: var(--gold); color: #000; }
+    .btn-action.green { background: var(--green); color: #000; }
+    .btn-action.red { background: rgba(239,68,68,0.2); color: var(--red); border: 1px solid rgba(239,68,68,0.4); }
+    .btn-action.outline { background: transparent; border: 1px solid var(--border); color: #fff; }
+
+    /* ── AI Multi-Agent Console ── */
+    .ai-console-grid {
+      display: grid;
+      grid-template-columns: 320px 1fr 340px;
+      gap: 16px;
+      height: calc(100vh - 140px);
+    }
+    .ai-box {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    .ai-box-head {
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: rgba(0,0,0,0.2);
+    }
+    .ai-box-head b { font-size: 13px; display: flex; align-items: center; gap: 6px; }
+    .ai-msg-list {
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .msg-bubble {
+      max-width: 85%;
+      padding: 10px 14px;
+      border-radius: 12px;
+      font-size: 12.5px;
+      line-height: 1.4;
+    }
+    .msg-bubble.in {
+      background: var(--card-inner);
+      border: 1px solid var(--border);
+      align-self: flex-start;
+      border-bottom-left-radius: 2px;
+    }
+    .msg-bubble.out {
+      background: linear-gradient(135deg, rgba(212,175,55,0.2), rgba(212,175,55,0.1));
+      border: 1px solid rgba(212,175,55,0.3);
+      color: #fff;
+      align-self: flex-end;
+      border-bottom-right-radius: 2px;
+    }
+    .msg-bubble.system {
+      background: rgba(56,189,248,0.1);
+      border: 1px dashed var(--blue);
+      color: var(--blue);
+      align-self: center;
+      font-size: 11px;
+      text-align: center;
+    }
+    .ai-input-bar {
+      padding: 12px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      gap: 8px;
+      background: rgba(0,0,0,0.2);
+    }
+    .ai-input {
+      flex: 1;
+      background: var(--card-inner);
+      border: 1px solid var(--border);
+      color: #fff;
+      padding: 10px 14px;
+      border-radius: 8px;
+      font-size: 13px;
+      outline: none;
+    }
+
+    /* ── Modal Document Viewer ── */
+    .modal-backdrop {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.85);
+      display: none; align-items: center; justify-content: center; z-index: 1000;
+    }
+    .modal-backdrop.open { display: flex; }
+    .modal-box {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 16px; width: 90%; max-width: 860px; max-height: 90vh;
+      display: flex; flex-direction: column; overflow: hidden;
+      box-shadow: 0 16px 48px rgba(0,0,0,0.8);
+    }
+    .modal-head {
+      padding: 18px 24px; border-bottom: 1px solid var(--border);
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .modal-body { padding: 24px; overflow-y: auto; flex: 1; }
+    .doc-preview-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 14px; margin-bottom: 20px;
+    }
+    .doc-card {
+      background: var(--card-inner); border: 1px solid var(--border);
+      border-radius: 10px; padding: 12px; text-align: center;
+    }
+    .doc-card-img {
+      width: 100%; height: 110px; background: #070907; border-radius: 6px;
+      display: flex; align-items: center; justify-content: center;
+      margin-bottom: 8px; font-size: 32px; border: 1px dashed #333;
+    }
+
+    /* Map container */
+    #live-radar-map {
+      height: 480px; width: 100%; border-radius: 14px; border: 1px solid var(--border);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 1. SIDEBAR -->
+  <aside id="sidebar">
+    <div class="side-brand">
+      <div class="side-logo-g">G</div>
+      <div class="side-brand-title">
+        <b>GIRO CRM</b>
+        <span>Angola Central</span>
+      </div>
+    </div>
+
+    <nav class="side-nav">
+      <button class="nav-item active" onclick="switchNav('overview')">
+        <span>📊</span> Visão Geral
+      </button>
+      <button class="nav-item" onclick="switchNav('drivers')">
+        <span>🚗</span> Motoristas & KYC
+        <span class="nav-badge" id="badge-pending-kyc">3</span>
+      </button>
+      <button class="nav-item" onclick="switchNav('passengers')">
+        <span>🧑‍💼</span> Passageiros
+      </button>
+      <button class="nav-item" onclick="switchNav('disputes')">
+        <span>⚖️</span> Corridas & Disputas
+        <span class="nav-badge" style="background:rgba(212,175,55,0.2);color:var(--gold);">2</span>
+      </button>
+      <button class="nav-item" onclick="switchNav('sos')">
+        <span>🚨</span> Monitor SOS (5km)
+        <span class="nav-badge" style="background:rgba(34,197,94,0.2);color:var(--green);">0</span>
+      </button>
+      <button class="nav-item" onclick="switchNav('financial')">
+        <span>💰</span> Comissões (10%)
+      </button>
+      <button class="nav-item" onclick="switchNav('ai-support')">
+        <span>🤖</span> Atendimento IA Multi-Agente
+      </button>
+    </nav>
+
+    <div class="side-footer">
+      <div class="admin-avatar">ADM</div>
+      <div>
+        <div style="font-size:13px;font-weight:700;color:#fff;">Administrador Central</div>
+        <div style="font-size:10px;color:var(--green);">● Online (Luanda HQ)</div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- 2. MAIN WORKSPACE -->
+  <main id="workspace">
+    <!-- Topbar -->
+    <header id="topbar">
+      <div class="top-title" id="page-title">
+        <span>📊</span> Visão Geral Operacional
+      </div>
+
+      <div class="top-stats">
+        <div class="stat-pill">
+          <span>Corridas Hoje:</span> <b id="stat-trips-today">1.428</b>
+        </div>
+        <div class="stat-pill">
+          <span>Faturação Bruta:</span> <b style="color:var(--gold);" id="stat-gross-rev">4.890.000 Kz</b>
+        </div>
+        <div class="stat-pill">
+          <span>Comissão GIRO (10%):</span> <b style="color:var(--green);" id="stat-net-rev">489.000 Kz</b>
+        </div>
+        <div class="stat-pill">
+          <span>Motoristas Online:</span> <b style="color:var(--blue);" id="stat-drivers-online">342</b>
+        </div>
+      </div>
+    </header>
+
+    <!-- Content Area -->
+    <div id="content-area">
+
+      <!-- ═════════════════════════════════════════════════════════════
+           ABA 1: VISÃO GERAL (OVERVIEW)
+           ═════════════════════════════════════════════════════════════ -->
+      <section id="view-overview" class="tab-view active">
+        <div class="kpi-grid">
+          <div class="kpi-card green">
+            <div class="kpi-label">Receita Retida (10% GIRO)</div>
+            <div class="kpi-value">489.000 Kz</div>
+            <div class="kpi-sub">↑ 18% em relação a ontem</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-label">Volume Total de Corridas</div>
+            <div class="kpi-value">1.428</div>
+            <div class="kpi-sub">94% concluídas com sucesso</div>
+          </div>
+          <div class="kpi-card blue">
+            <div class="kpi-label">Frotas em Circulação</div>
+            <div class="kpi-value">342 viaturas</div>
+            <div class="kpi-sub">Luanda, Benguela, Huambo, Lubango</div>
+          </div>
+          <div class="kpi-card red">
+            <div class="kpi-label">Alertas SOS / Segurança</div>
+            <div class="kpi-value">0 ativos</div>
+            <div class="kpi-sub">Tempo médio de socorro: 3.2 min</div>
+          </div>
+        </div>
+
+        <!-- Live Operations Table -->
+        <div class="data-table-wrap">
+          <div class="table-head-bar">
+            <b style="font-size:15px;color:#fff;">Corridas em Tempo Real (Últimas Transações)</b>
+            <input type="text" class="search-input" placeholder="Filtrar por condutor, passageiro...">
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th>Código</th>
+                <th>Passageiro</th>
+                <th>Motorista & Viatura</th>
+                <th>Trajeto</th>
+                <th>Valor (Kz)</th>
+                <th>Comissão 10%</th>
+                <th>Método</th>
+                <th>Estado</th>
+              </tr>
+            </thead>
+            <tbody id="overview-trips-tbody">
+              <tr>
+                <td><b>#GR-9842</b></td>
+                <td>António Silva</td>
+                <td>Domingos M. (Toyota Corolla · LD-23-45-AA)</td>
+                <td>Talatona → Kilamba</td>
+                <td>2.450 Kz</td>
+                <td><b style="color:var(--green);">+245 Kz</b></td>
+                <td><span class="badge gold">Multicaixa</span></td>
+                <td><span class="badge green">Em Curso</span></td>
+              </tr>
+              <tr>
+                <td><b>#GR-9841</b></td>
+                <td>Marta Bento</td>
+                <td>Mateus K. (Kupapata Moto)</td>
+                <td>Maianga → Mutamba</td>
+                <td>1.150 Kz</td>
+                <td><b style="color:var(--green);">+115 Kz</b></td>
+                <td><span class="badge blue">Dinheiro</span></td>
+                <td><span class="badge green">Concluída</span></td>
+              </tr>
+              <tr>
+                <td><b>#GR-9840</b></td>
+                <td>Carlos Neves</td>
+                <td>André F. (Van Carga)</td>
+                <td>Belas Business → Viana</td>
+                <td>7.800 Kz</td>
+                <td><b style="color:var(--green);">+780 Kz</b></td>
+                <td><span class="badge gold">Unitel Money</span></td>
+                <td><span class="badge green">Concluída</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ═════════════════════════════════════════════════════════════
+           ABA 2: MOTORISTAS & VALIDAÇÃO KYC
+           ═════════════════════════════════════════════════════════════ -->
+      <section id="view-drivers" class="tab-view">
+        <div class="data-table-wrap">
+          <div class="table-head-bar">
+            <div>
+              <b style="font-size:16px;color:#fff;">Aprovações Pendentes & Gestão de Motoristas</b>
+              <div style="font-size:12px;color:var(--muted);margin-top:2px;">Analise os documentos KYC (BI, Carta, Seguro, Selfie e Viatura)</div>
+            </div>
+            <div style="display:flex;gap:10px;">
+              <select class="search-input" style="width:160px;" onchange="filterDrivers(this.value)">
+                <option value="all">Todos os Estados</option>
+                <option value="pending" selected>Pendentes (3)</option>
+                <option value="active">Aprovados</option>
+                <option value="blocked">Suspensos</option>
+              </select>
+              <input type="text" class="search-input" placeholder="Pesquisar por nome, tel, matrícula...">
+            </div>
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th>Motorista</th>
+                <th>Telefone</th>
+                <th>Viatura & Categoria</th>
+                <th>Matrícula</th>
+                <th>Documentos KYC</th>
+                <th>Saldo Acumulado</th>
+                <th>Estado</th>
+                <th>Ações</th>
+              </tr>
+            </thead>
+            <tbody id="drivers-tbody">
+              <!-- Pending 1 -->
+              <tr>
+                <td><b>João Baptista Afonso</b><br><small style="color:var(--muted);">Cadastrado há 2h</small></td>
+                <td>+244 923 888 111</td>
+                <td>🚗 Carro Económico (Hyundai i10)</td>
+                <td><span style="font-family:monospace;background:#222;padding:2px 6px;border-radius:4px;">LD-88-21-BH</span></td>
+                <td><span class="badge gold">6 Docs Enviados</span></td>
+                <td>0 Kz</td>
+                <td><span class="badge gold">Pendente KYC</span></td>
+                <td>
+                  <button class="btn-action gold" onclick="openKycModal('João Baptista Afonso', 'LD-88-21-BH', '+244 923 888 111', 'Hyundai i10 Prata (2020)')">Validar Docs</button>
+                </td>
+              </tr>
+              <!-- Pending 2 -->
+              <tr>
+                <td><b>Manuel Gaspar Ndala</b><br><small style="color:var(--muted);">Cadastrado há 4h</small></td>
+                <td>+244 912 334 556</td>
+                <td>🏍️ Moto Kupapata (Lingken 125)</td>
+                <td><span style="font-family:monospace;background:#222;padding:2px 6px;border-radius:4px;">LD-10-99-MK</span></td>
+                <td><span class="badge gold">6 Docs Enviados</span></td>
+                <td>0 Kz</td>
+                <td><span class="badge gold">Pendente KYC</span></td>
+                <td>
+                  <button class="btn-action gold" onclick="openKycModal('Manuel Gaspar Ndala', 'LD-10-99-MK', '+244 912 334 556', 'Lingken 125 Vermelha (2022)')">Validar Docs</button>
+                </td>
+              </tr>
+              <!-- Active 1 -->
+              <tr>
+                <td><b>Domingos Manuel</b><br><small style="color:var(--green);">★ 4.9 (412 viagens)</small></td>
+                <td>+244 923 456 789</td>
+                <td>🚙 Conforto (Toyota Corolla)</td>
+                <td><span style="font-family:monospace;background:#222;padding:2px 6px;border-radius:4px;">LD-23-45-AA</span></td>
+                <td><span class="badge green">Verificado ✓</span></td>
+                <td><b style="color:var(--green);">+24.500 Kz</b></td>
+                <td><span class="badge green">Ativo</span></td>
+                <td>
+                  <button class="btn-action red" onclick="toggleBlockDriver('Domingos Manuel')">Suspender</button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ═════════════════════════════════════════════════════════════
+           ABA 3: PASSAGEIROS & FIDELIDADE
+           ═════════════════════════════════════════════════════════════ -->
+      <section id="view-passengers" class="tab-view">
+        <div class="data-table-wrap">
+          <div class="table-head-bar">
+            <div>
+              <b style="font-size:16px;color:#fff;">Gestão de Passageiros</b>
+              <div style="font-size:12px;color:var(--muted);margin-top:2px;">Histórico, GIRO Clube e gestão de confiança</div>
+            </div>
+            <input type="text" class="search-input" placeholder="Pesquisar passageiro...">
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th>Nome</th>
+                <th>Telefone</th>
+                <th>Total de Viagens</th>
+                <th>GIRO Clube (Cupão)</th>
+                <th>Classificação</th>
+                <th>Gasto Total</th>
+                <th>Estado</th>
+                <th>Ações</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><b>António Silva</b></td>
+                <td>+244 924 112 233</td>
+                <td>18 corridas</td>
+                <td><span class="badge gold">Cupom 10% Ativo</span></td>
+                <td>★ 5.0</td>
+                <td>48.200 Kz</td>
+                <td><span class="badge green">Ativo</span></td>
+                <td><button class="btn-action outline" onclick="alert('Histórico de viagens do passageiro aberto.')">Ver Histórico</button></td>
+              </tr>
+              <tr>
+                <td><b>Marta Bento</b></td>
+                <td>+244 931 556 778</td>
+                <td>9 corridas</td>
+                <td><span class="badge blue">4/5 Corridas</span></td>
+                <td>★ 4.8</td>
+                <td>22.100 Kz</td>
+                <td><span class="badge green">Ativo</span></td>
+                <td><button class="btn-action outline" onclick="alert('Histórico de viagens do passageiro aberto.')">Ver Histórico</button></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ═════════════════════════════════════════════════════════════
+           ABA 4: CORRIDAS & DISPUTAS
+           ═════════════════════════════════════════════════════════════ -->
+      <section id="view-disputes" class="tab-view">
+        <div class="data-table-wrap">
+          <div class="table-head-bar">
+            <div>
+              <b style="font-size:16px;color:#fff;">Resolução de Disputas & Ocorrências</b>
+              <div style="font-size:12px;color:var(--muted);margin-top:2px;">Reembolsos, objetos esquecidos e diferenças de tarifa</div>
+            </div>
+            <span class="badge gold">2 Casos Pendentes</span>
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th>Ticket</th>
+                <th>Tipo</th>
+                <th>Envolvidos</th>
+                <th>Descrição do Problema</th>
+                <th>Valor Disputado</th>
+                <th>Ação Recomendada (IA)</th>
+                <th>Decisão do Operador</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><b>#TK-401</b></td>
+                <td><span class="badge red">Cobrança Extra</span></td>
+                <td>Passageiro: António S.<br>Motorista: Paulo K.</td>
+                <td>Motorista fez desvio sem concordância por conta de obras na Samba.</td>
+                <td>800 Kz</td>
+                <td><span style="color:var(--green);font-size:12px;">Reembolsar 800 Kz na Carteira</span></td>
+                <td>
+                  <button class="btn-action green" onclick="resolveDispute(401, 'refund')">Reembolsar 800 Kz</button>
+                  <button class="btn-action outline" onclick="resolveDispute(401, 'dismiss')">Manter Tarifa</button>
+                </td>
+              </tr>
+              <tr>
+                <td><b>#TK-402</b></td>
+                <td><span class="badge blue">Item Perdido</span></td>
+                <td>Passageira: Clara M.<br>Motorista: Domingos M.</td>
+                <td>Mochila preta com documentos esquecida no banco de trás da viatura.</td>
+                <td>—</td>
+                <td><span style="color:var(--blue);font-size:12px;">Conectar partes via chamada</span></td>
+                <td>
+                  <button class="btn-action gold" onclick="alert('Chamada de ligação segura iniciada entre Clara M. e Domingos M.')">Conectar Partes</button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ═════════════════════════════════════════════════════════════
+           ABA 5: MONITOR SOS & PÂNICO (5KM)
+           ═════════════════════════════════════════════════════════════ -->
+      <section id="view-sos" class="tab-view">
+        <div style="display:grid;grid-template-columns:1fr 360px;gap:20px;">
+          <div>
+            <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px;margin-bottom:14px;display:flex;justify-content:space-between;align-items:center;">
+              <div>
+                <b style="font-size:16px;color:#fff;">Radar Tático de Emergência (5 km)</b>
+                <div style="font-size:12px;color:var(--muted);margin-top:2px;">Monitoramento geoespacial de condutores e alertas de socorro mútuo</div>
+              </div>
+              <button class="btn-action red" onclick="simulateSosAlert()">Simular Alerta SOS</button>
+            </div>
+            <div id="live-radar-map"></div>
+          </div>
+
+          <!-- SOS Incident Card -->
+          <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:20px;">
+            <b style="font-size:15px;color:#fff;display:block;margin-bottom:12px;">Protocolo de Segurança Central</b>
+            <div style="background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.3);border-radius:10px;padding:14px;margin-bottom:16px;" id="sos-hud-status">
+              <div style="font-weight:700;color:var(--red);font-size:13px;">🛡️ Nenhuma Emergência Ativa</div>
+              <div style="font-size:11px;color:var(--muted);margin-top:4px;">Frotas em patrulha e monitoramento normal em Luanda.</div>
+            </div>
+
+            <div style="font-size:12px;color:var(--muted);line-height:1.6;margin-bottom:18px;">
+              <b>Ações Automáticas em caso de Pânico:</b><br>
+              1. Notificação push imediata para todos os motoristas no raio de 5km.<br>
+              2. Gravação de áudio ambiente criptografada de 60s.<br>
+              3. Telemetria GPS com envio direto ao piquete da PNA.
+            </div>
+
+            <button class="btn-action red" style="width:100%;padding:12px;font-size:14px;" onclick="callPnaEmergency()">
+              🚨 Contactar PNA (Polícia 111)
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ═════════════════════════════════════════════════════════════
+           ABA 6: FINANCEIRO & COMISSÕES (10%)
+           ═════════════════════════════════════════════════════════════ -->
+      <section id="view-financial" class="tab-view">
+        <div class="kpi-grid">
+          <div class="kpi-card green">
+            <div class="kpi-label">Comissão Retida GIRO (10%)</div>
+            <div class="kpi-value">489.000 Kz</div>
+            <div class="kpi-sub">Faturação acumulada hoje</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-label">Créditos dos Motoristas (90%)</div>
+            <div class="kpi-value">4.401.000 Kz</div>
+            <div class="kpi-sub">Split automático processado</div>
+          </div>
+          <div class="kpi-card gold">
+            <div class="kpi-label">Bónus Desafio 30K Pagos</div>
+            <div class="kpi-value">42.000 Kz</div>
+            <div class="kpi-sub">28 motoristas atingiram a meta (+1.500 Kz)</div>
+          </div>
+        </div>
+
+        <div class="data-table-wrap">
+          <div class="table-head-bar">
+            <b style="font-size:15px;color:#fff;">Liquidações & Repasses Multicaixa / Unitel Money</b>
+            <button class="btn-action green" onclick="alert('Lote de liquidação enviado para o Banco/Multicaixa Express.')">Processar Lote de Saques</button>
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th>Motorista</th>
+                <th>Canal de Pagamento</th>
+                <th>IBAN / Conta</th>
+                <th>Valor a Transferir (90%)</th>
+                <th>Comissão Retida (10%)</th>
+                <th>Estado</th>
+                <th>Ação</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><b>Domingos Manuel</b></td>
+                <td><span class="badge gold">Multicaixa Express</span></td>
+                <td>AO06.0040.0000.1234.5678.9012.3</td>
+                <td><b style="color:var(--green);">24.500 Kz</b></td>
+                <td>2.450 Kz</td>
+                <td><span class="badge gold">Aguardando Envio</span></td>
+                <td><button class="btn-action green" onclick="alert('Repasse de 24.500 Kz enviado com sucesso.')">Liquidar</button></td>
+              </tr>
+              <tr>
+                <td><b>Mateus K.</b></td>
+                <td><span class="badge blue">Unitel Money</span></td>
+                <td>+244 923 111 222</td>
+                <td><b style="color:var(--green);">14.200 Kz</b></td>
+                <td>1.420 Kz</td>
+                <td><span class="badge gold">Aguardando Envio</span></td>
+                <td><button class="btn-action green" onclick="alert('Repasse Unitel Money enviado com sucesso.')">Liquidar</button></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ═════════════════════════════════════════════════════════════
+           ABA 7: ATENDIMENTO IA MULTI-AGENTE (ORQUESTRADOR INTELIGENTE)
+           ═════════════════════════════════════════════════════════════ -->
+      <section id="view-ai-support" class="tab-view">
+        <div class="ai-console-grid">
+
+          <!-- Coluna 1: Fila de Entrada / Router IA -->
+          <div class="ai-box">
+            <div class="ai-box-head">
+              <b><span>🔀</span> Orquestrador de Chamados</b>
+              <span class="badge blue">Ativo</span>
+            </div>
+            <div style="padding:12px;border-bottom:1px solid var(--border);font-size:11px;color:var(--muted);">
+              Analisa mensagens recebidas via WhatsApp/App e encaminha para o agente especializado.
+            </div>
+            <div class="ai-msg-list" id="incoming-tickets-list">
+              <div style="background:var(--card-inner);border:1px solid var(--gold);border-radius:10px;padding:12px;cursor:pointer;" onclick="loadConversation('pax-1')">
+                <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:4px;">
+                  <b style="color:var(--gold);">Passageiro: António</b>
+                  <span style="color:var(--muted);">há 2 min</span>
+                </div>
+                <div style="font-size:12px;color:#fff;">«Como uso o meu cupom do GIRO Clube?»</div>
+                <span class="badge gold" style="margin-top:6px;">→ Agente Passageiro</span>
+              </div>
+
+              <div style="background:var(--card-inner);border:1px solid var(--border);border-radius:10px;padding:12px;cursor:pointer;" onclick="loadConversation('driver-1')">
+                <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:4px;">
+                  <b style="color:var(--green);">Motorista: Paulo K.</b>
+                  <span style="color:var(--muted);">há 5 min</span>
+                </div>
+                <div style="font-size:12px;color:#fff;">«Quando recebo o bónus do Desafio 30K?»</div>
+                <span class="badge green" style="margin-top:6px;">→ Agente Motorista</span>
+              </div>
+
+              <div style="background:var(--card-inner);border:1px solid var(--border);border-radius:10px;padding:12px;cursor:pointer;" onclick="loadConversation('pax-2')">
+                <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:4px;">
+                  <b style="color:var(--blue);">Passageira: Sofia</b>
+                  <span style="color:var(--muted);">há 8 min</span>
+                </div>
+                <div style="font-size:12px;color:#fff;">«Esqueci o meu telemóvel no carro.»</div>
+                <span class="badge red" style="margin-top:6px;">→ Agente Disputas</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Coluna 2: Chat com o Utilizador (Canal IA Autônomo) -->
+          <div class="ai-box">
+            <div class="ai-box-head">
+              <b id="active-chat-header"><span>🤖</span> Agente IA de Atendimento ao Passageiro</b>
+              <span class="badge green">Resposta em < 1s</span>
+            </div>
+            <div class="ai-msg-list" id="chat-conversation-flow">
+              <div class="msg-bubble in">
+                <b>António:</b> Olá, completei 5 viagens na semana passada. Como faço para ter o desconto de 10% do GIRO Clube?
+              </div>
+              <div class="msg-bubble system">
+                🔀 <b>Orquestrador IA:</b> Intenção classificada como "Fidelidade / Cupom". Encaminhado para Agente Passageiro.
+              </div>
+              <div class="msg-bubble out">
+                <b>GIRO IA (Passageiro):</b> Olá António! Parabéns pelas 5 corridas. O seu cupão de 10% já está ativo. Basta inserir o código <b>GIRO10</b> no campo de promoção antes de confirmar a sua próxima viagem. O desconto é aplicado de imediato! 🚗💨
+              </div>
+            </div>
+            <div class="ai-input-bar">
+              <input type="text" class="ai-input" id="inp-operator-msg" placeholder="Digitar resposta ou deixar a IA responder...">
+              <button class="btn-action gold" onclick="sendAiChatResponse()">Enviar</button>
+            </div>
+          </div>
+
+          <!-- Coluna 3: Copiloto do Administrador (Central IA Assistant) -->
+          <div class="ai-box" style="border-color:rgba(212,175,55,0.3);">
+            <div class="ai-box-head" style="background:rgba(212,175,55,0.08);">
+              <b style="color:var(--gold);"><span>🧠</span> Copiloto Central (Admin IA)</b>
+              <span class="badge gold">Operador HQ</span>
+            </div>
+            <div style="padding:12px;border-bottom:1px solid var(--border);font-size:11px;color:var(--muted);">
+              Tire dúvidas da operação, peça relatórios instantâneos e sugestões de tomada de decisão.
+            </div>
+            <div class="ai-msg-list" id="copilot-msg-list">
+              <div class="msg-bubble out" style="background:var(--card-inner);border-color:var(--border);">
+                <b>Você:</b> Qual foi a província com maior faturamento hoje?
+              </div>
+              <div class="msg-bubble in" style="border-color:var(--gold);">
+                <b>Copiloto IA:</b> <b>Luanda</b> lidera com <b>3.420.000 Kz</b> (70% do total), seguida de <b>Benguela</b> (890.000 Kz). A categoria mais pedida foi o <b>GIRO Económico</b>.
+              </div>
+            </div>
+            <div class="ai-input-bar">
+              <input type="text" class="ai-input" id="inp-copilot" placeholder="Pergunte à IA do CRM (ex: Como resolver o ticket 401?)..." onkeydown="if(event.key==='Enter')askAdminCopilot()">
+              <button class="btn-action gold" onclick="askAdminCopilot()">Perguntar</button>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <!-- 3. MODAL DE VALIDAÇÃO KYC DE MOTORISTAS -->
+  <div class="modal-backdrop" id="kyc-modal">
+    <div class="modal-box">
+      <div class="modal-head">
+        <div>
+          <b style="font-size:17px;color:#fff;" id="modal-driver-name">Validação de Documentos</b>
+          <div style="font-size:12px;color:var(--gold);" id="modal-driver-meta">Matrícula: LD-88-21-BH</div>
+        </div>
+        <button class="btn-action outline" onclick="closeKycModal()">✕ Fechar</button>
+      </div>
+      <div class="modal-body">
+        <div class="doc-preview-grid">
+          <div class="doc-card">
+            <div class="doc-card-img">🪪</div>
+            <b>BI (Frente)</b>
+            <div style="font-size:10px;color:var(--green);margin-top:2px;">Ilegibilidade: 0% (Nítido)</div>
+          </div>
+          <div class="doc-card">
+            <div class="doc-card-img">🪪</div>
+            <b>BI (Verso)</b>
+            <div style="font-size:10px;color:var(--green);margin-top:2px;">Nº BI Válido</div>
+          </div>
+          <div class="doc-card">
+            <div class="doc-card-img">📜</div>
+            <b>Carta de Condução</b>
+            <div style="font-size:10px;color:var(--green);margin-top:2px;">Categoria Ligeiro B</div>
+          </div>
+          <div class="doc-card">
+            <div class="doc-card-img">📋</div>
+            <b>Seguro Automóvel</b>
+            <div style="font-size:10px;color:var(--green);margin-top:2px;">Válido até Out/2026</div>
+          </div>
+          <div class="doc-card">
+            <div class="doc-card-img">🤳</div>
+            <b>Selfie Facial</b>
+            <div style="font-size:10px;color:var(--green);margin-top:2px;">Match 98% com BI</div>
+          </div>
+          <div class="doc-card">
+            <div class="doc-card-img">🚗</div>
+            <b>Foto da Viatura</b>
+            <div style="font-size:10px;color:var(--green);margin-top:2px;">Matrícula Confere</div>
+          </div>
+        </div>
+
+        <div style="background:rgba(34,197,94,0.08);border:1px solid rgba(34,197,94,0.3);border-radius:10px;padding:14px;margin-bottom:18px;">
+          <b style="color:var(--green);font-size:13px;">✓ Parecer da IA de Pré-Validação:</b>
+          <div style="font-size:12px;color:#fff;margin-top:4px;">
+            Todos os 6 documentos atendem aos critérios de conformidade da República de Angola. O motorista está apto para aprovação e início imediato de corridas.
+          </div>
+        </div>
+
+        <div style="display:flex;justify-content:flex-end;gap:12px;">
+          <button class="btn-action red" style="padding:12px 20px;" onclick="rejectKyc()">✕ Rejeitar & Notificar</button>
+          <button class="btn-action green" style="padding:12px 24px;font-size:14px;" onclick="approveKyc()">✓ Aprovar Motorista</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ── Navigation ──
+    const NAV_TITLES = {
+      overview: '📊 Visão Geral Operacional',
+      drivers: '🚗 Motoristas & Validação KYC',
+      passengers: '🧑‍💼 Gestão de Passageiros',
+      disputes: '⚖️ Corridas & Disputas',
+      sos: '🚨 Monitor de Segurança & Pânico (5 km)',
+      financial: '💰 Módulo Financeiro & Repasses (10%)',
+      'ai-support': '🤖 Central de Atendimento IA Multi-Agente'
+    };
+
+    function switchNav(view) {
+      document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
+      const activeBtn = Array.from(document.querySelectorAll('.nav-item')).find(b => b.getAttribute('onclick').includes(view));
+      if (activeBtn) activeBtn.classList.add('active');
+
+      document.querySelectorAll('.tab-view').forEach(v => v.classList.remove('active'));
+      const target = document.getElementById('view-' + view);
+      if (target) target.classList.add('active');
+
+      document.getElementById('page-title').innerHTML = NAV_TITLES[view] || 'GIRO CRM';
+
+      if (view === 'sos') {
+        setTimeout(initRadarMap, 100);
+      }
+    }
+
+    // ── KYC Modal ──
+    let currentKycDriver = '';
+    function openKycModal(name, plate, phone, car) {
+      currentKycDriver = name;
+      document.getElementById('modal-driver-name').textContent = name + ' (' + car + ')';
+      document.getElementById('modal-driver-meta').textContent = 'Matrícula: ' + plate + ' · Tel: ' + phone;
+      document.getElementById('kyc-modal').classList.add('open');
+    }
+    function closeKycModal() {
+      document.getElementById('kyc-modal').classList.remove('open');
+    }
+    function approveKyc() {
+      alert('✓ Motorista ' + currentKycDriver + ' APROVADO com sucesso! Conta ativa e SMS de notificação enviado.');
+      closeKycModal();
+      const badge = document.getElementById('badge-pending-kyc');
+      if (badge) badge.textContent = Math.max(0, parseInt(badge.textContent || '1') - 1);
+    }
+    function rejectKyc() {
+      const motivo = prompt('Insira o motivo da rejeição para enviar por SMS ao motorista:', 'Documento ilegível. Por favor reenvie a foto da Carta de Condução.');
+      if (motivo) {
+        alert('✕ Motorista notificado sobre a pendência: "' + motivo + '"');
+        closeKycModal();
+      }
+    }
+
+    // ── Dispute Resolution ──
+    function resolveDispute(ticketId, action) {
+      if (action === 'refund') {
+        alert('✓ Ticket #' + ticketId + ' resolvido: Reembolso de 800 Kz creditado na carteira do passageiro.');
+      } else {
+        alert('✓ Ticket #' + ticketId + ' concluído: Tarifa mantida.');
+      }
+    }
+
+    // ── Live Radar Map ──
+    let radarMap = null;
+    function initRadarMap() {
+      if (radarMap) return;
+      radarMap = L.map('live-radar-map').setView([-8.8383, 13.2344], 13);
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap'
+      }).addTo(radarMap);
+
+      // Add fleet markers
+      const fleet = [
+        [-8.8383, 13.2344, 'Toyota Corolla · Domingos M.'],
+        [-8.8450, 13.2410, 'Hyundai i10 · Paulo K.'],
+        [-8.8310, 13.2370, 'Kupapata · Mateus K.'],
+        [-8.8575, 13.2310, 'Pick-Up Carga · André F.']
+      ];
+      fleet.forEach(f => {
+        L.circleMarker([f[0], f[1]], {
+          radius: 8, fillColor: '#22c55e', color: '#fff', weight: 2, fillOpacity: 0.9
+        }).bindPopup('<b>' + f[2] + '</b><br>Estado: Livre / Em patrulha').addTo(radarMap);
+      });
+    }
+
+    function simulateSosAlert() {
+      alert('🚨 ALERTA SOS SIMULADO: Pânico acionado em Talatona. Raio de 5km traçado e 14 viaturas notificadas.');
+      document.getElementById('sos-hud-status').innerHTML = `
+        <div style="font-weight:800;color:var(--red);font-size:14px;">🚨 PÂNICO ACIONADO EM TALATONA</div>
+        <div style="font-size:12px;color:#fff;margin-top:4px;">Condutor: Paulo K. (LD-44-12-BB) · 14 viaturas a caminho no raio de 5km.</div>
+      `;
+      if (radarMap) {
+        L.circle([-8.8383, 13.2344], { radius: 5000, color: '#ef4444', fillColor: '#ef4444', fillOpacity: 0.15 }).addTo(radarMap);
+      }
+    }
+
+    function callPnaEmergency() {
+      alert('Ligação para o Piquete Central da Polícia Nacional de Angola (111) estabelecida com transmissão de telemetria.');
+    }
+
+    // ── AI Multi-Agent Conversations ──
+    const CONVERSATIONS = {
+      'pax-1': {
+        header: '🤖 Agente IA de Atendimento ao Passageiro',
+        msgs: [
+          { type: 'in', sender: 'António', text: 'Olá, completei 5 viagens na semana passada. Como faço para ter o desconto de 10% do GIRO Clube?' },
+          { type: 'system', text: '🔀 Orquestrador IA: Intenção classificada como "Fidelidade / Cupom". Encaminhado para Agente Passageiro.' },
+          { type: 'out', sender: 'GIRO IA (Passageiro)', text: 'Olá António! Parabéns pelas 5 corridas. O seu cupão de 10% já está ativo. Basta inserir o código GIRO10 no campo de promoção antes de confirmar a sua próxima viagem. O desconto é aplicado de imediato! 🚗💨' }
+        ]
+      },
+      'driver-1': {
+        header: '🤖 Agente IA de Atendimento ao Motorista',
+        msgs: [
+          { type: 'in', sender: 'Paulo K.', text: 'Boa tarde, hoje faturei 31.500 Kz. Quando é que entra o bónus do Desafio 30K na minha carteira?' },
+          { type: 'system', text: '🔀 Orquestrador IA: Intenção classificada como "Financeiro / Bónus Motorista". Encaminhado para Agente Motorista.' },
+          { type: 'out', sender: 'GIRO IA (Motorista)', text: 'Olá parceiro Paulo! Parabéns por atingir a meta! O bónus de +1.500 Kz é creditado automaticamente no fecho diário da meia-noite e fica disponível para saque imediato via Multicaixa Express. Excelente trabalho hoje! 👏' }
+        ]
+      },
+      'pax-2': {
+        header: '⚖️ Agente IA de Disputas & Objetos Perdidos',
+        msgs: [
+          { type: 'in', sender: 'Sofia', text: 'Esqueci a minha mochila preta no carro do Domingos que me deixou no Kilamba.' },
+          { type: 'system', text: '🔀 Orquestrador IA: Intenção classificada como "Objeto Perdido (Alta Prioridade)". Encaminhado para Agente Disputas.' },
+          { type: 'out', sender: 'GIRO IA (Disputas)', text: 'Olá Sofia! Já localizamos a sua corrida #GR-9842 com o condutor Domingos M. (Toyota Corolla). Já enviamos um alerta seguro ao motorista para verificar o banco de trás e conectaremos vocês por chamada protegida em instantes.' }
+        ]
+      }
+    };
+
+    function loadConversation(id) {
+      const data = CONVERSATIONS[id];
+      if (!data) return;
+      document.getElementById('active-chat-header').innerHTML = '<span>🤖</span> ' + data.header;
+      const list = document.getElementById('chat-conversation-flow');
+      list.innerHTML = data.msgs.map(m => {
+        if (m.type === 'system') return `<div class="msg-bubble system">${m.text}</div>`;
+        return `<div class="msg-bubble ${m.type}"><b>${m.sender}:</b> ${m.text}</div>`;
+      }).join('');
+    }
+
+    function sendAiChatResponse() {
+      const inp = document.getElementById('inp-operator-msg');
+      const val = inp.value.trim();
+      if (!val) return;
+      const list = document.getElementById('chat-conversation-flow');
+      list.innerHTML += `<div class="msg-bubble out"><b>Operador Central:</b> ${val}</div>`;
+      inp.value = '';
+      list.scrollTop = list.scrollHeight;
+    }
+
+    // ── Admin Copilot ──
+    const COPILOT_KNOWLEDGE = {
+      'faturamento': 'O faturamento bruto de hoje é de 4.890.000 Kz, gerando 489.000 Kz líquidos de comissão (10%) para a GIRO.',
+      'motorista': 'O motorista com maior volume hoje é Domingos Manuel (LD-23-45-AA) com 14 corridas e 24.500 Kz faturados.',
+      'ticket 401': 'Para o Ticket #401 (António S.), a recomendação da IA é aprovar o reembolso de 800 Kz devido ao desvio não acordado na Samba.',
+      'desafio': 'Hoje 28 motoristas já bateram a meta do Desafio 30K (+1.500 Kz), totalizando 42.000 Kz em incentivos distribuídos.',
+      'comissao': 'A comissão GIRO é fixa em 10%. Motoristas retêm 90% dos ganhos.',
+      'sos': 'Não há nenhum chamado SOS de pânico aberto no momento. O sistema realizou 1 simulação de teste com sucesso.'
+    };
+
+    function askAdminCopilot() {
+      const inp = document.getElementById('inp-copilot');
+      const q = inp.value.trim();
+      if (!q) return;
+      const list = document.getElementById('copilot-msg-list');
+      list.innerHTML += `<div class="msg-bubble out" style="background:var(--card-inner);border-color:var(--border);"><b>Você:</b> ${q}</div>`;
+      inp.value = '';
+
+      // Find answer
+      let answer = 'Entendido. Para essa solicitação operacional, a recomendação é verificar os dados de telemetria da corrida e validar o saldo da carteira.';
+      for (const [k, a] of Object.entries(COPILOT_KNOWLEDGE)) {
+        if (q.toLowerCase().includes(k)) { answer = a; break; }
+      }
+
+      setTimeout(() => {
+        list.innerHTML += `<div class="msg-bubble in" style="border-color:var(--gold);"><b>Copiloto IA:</b> ${answer}</div>`;
+        list.scrollTop = list.scrollHeight;
+      }, 300);
+    }
+  </script>
+</body>
+</html>

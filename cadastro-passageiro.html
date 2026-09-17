@@ -161,12 +161,11 @@
 </head>
 <body>
 <div class="auth-wrapper">
-    <div style="padding: calc(env(safe-area-inset-top,0px) + 20px) 20px 0; text-align:center;">
-    <div style="font-size:36px;font-weight:900;color:#d4af37;letter-spacing:-2px;">GIRO</div>
-    <div style="font-size:10px;letter-spacing:4px;color:#8d9e8d;text-transform:uppercase;">Novo Passageiro</div>
+  <div style="padding: calc(env(safe-area-inset-top,0px) + 24px) 20px 12px; text-align:center;">
+    <div style="font-size:38px;font-weight:900;color:#d4af37;letter-spacing:-2px;line-height:1;">GIRO</div>
+    <div style="font-size:10px;letter-spacing:4px;color:#8d9e8d;text-transform:uppercase;margin-top:5px;">Novo Passageiro · Angola</div>
   </div>
-    <div class="logo-sub">Novo Passageiro</div>
-  </div>
+
   <div class="auth-card">
     <div class="progress-bar-wrap" id="progress-dots"></div>
   <div class="step-dot-row" id="dot-circles-row"><span class="step-dot-circle" id="sdot-1">●</span><span class="step-dot-circle" id="sdot-2">○</span><span class="step-dot-circle" id="sdot-3">○</span><span class="step-dot-circle" id="sdot-4">○</span><span class="step-dot-circle" id="sdot-5">○</span><span class="step-dot-circle" id="sdot-6">○</span></div>
@@ -345,13 +344,16 @@ let paxStep=1;
 const TOTAL_STEPS=6;
 
 function buildDots(){
-  const wrap=document.getElementById('progress-dots');
-  wrap.innerHTML='';
   for(let i=1;i<=TOTAL_STEPS;i++){
-    const d=document.createElement('div');
-    d.className='step-dot'+(i<paxStep?' done':i===paxStep?' active':'');
-    wrap.appendChild(d);
+    const d = document.getElementById('sdot-'+i);
+    if(d){
+      d.textContent = (i < paxStep) ? '●' : (i === paxStep ? '●' : '○');
+      d.className = 'step-dot-circle' + (i < paxStep ? ' done' : (i === paxStep ? ' active' : ''));
+    }
   }
+  const lbl = document.getElementById('step-label');
+  if(lbl) lbl.textContent = 'Passo ' + paxStep + ' de ' + TOTAL_STEPS;
+}
   document.getElementById('step-label').textContent='Passo '+paxStep+' de '+TOTAL_STEPS;
 }
 buildDots();
