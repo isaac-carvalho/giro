@@ -2,7 +2,7 @@
 <html lang="pt">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>GIRO Motorista Parceiro | Luanda</title>
   
   <!-- PWA & Android Meta -->
@@ -13,11 +13,7 @@
   <link rel="apple-touch-icon" href="./icons/icon-192.png">
   <link rel="icon" type="image/x-icon" href="./favicon.ico">
 
-  <!-- Google Fonts & Leaflet -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+  <!-- Google Fonts & Leaflet -->  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 
   <style>
@@ -26,7 +22,7 @@
       margin: 0;
       padding: 0;
       -webkit-tap-highlight-color: transparent;
-      font-family: 'Plus Jakarta Sans', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, system-ui, sans-serif;
     }
     
     html, body {
@@ -222,7 +218,7 @@
       border-radius: 14px;
       padding: 12px 14px;
       box-shadow: 0 8px 24px rgba(220, 38, 38, 0.4);
-      animation: alertPulse 1.8s infinite;
+      box-shadow: 0 8px 24px rgba(220, 38, 38, 0.4);
       display: none;
     }
 
@@ -274,6 +270,7 @@
       flex-direction: column;
       align-items: center;
       padding: 16px;
+      padding-bottom: calc(54px + env(safe-area-inset-bottom, 0px));
       pointer-events: none;
     }
 
@@ -327,7 +324,7 @@
     }
 
     .radar-ring.active {
-      animation: ripple 2s infinite ease-out;
+      opacity: 0.5;
     }
 
     @keyframes ripple {
@@ -764,9 +761,39 @@
         padding: 18px 14px;
       }
     }
+
+    /* ── PWA Angola-first injected ── */
+    html, body {
+      overscroll-behavior: none;
+    }
+    * {
+      scrollbar-width: none;
+      user-select: none;
+    }
+    *::-webkit-scrollbar { display: none; }
+    input, textarea, select { user-select: text; }
+    button:active,
+    .btn-quick:active,
+    .icon-btn:active,
+    .go-btn:active,
+    .btn-reject:active,
+    .btn-accept:active,
+    .btn-nav-app:active,
+    .btn-solidarity:active,
+    .tab-btn:active {
+      opacity: 0.7 !important;
+      transform: scale(0.97) !important;
+      transition: .15s ease !important;
+    }
   </style>
 </head>
 <body>
+
+<div id="giro-splash" style="position:fixed;inset:0;background:#070907;z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;transition:opacity 0.2s ease;">
+  <div style="font-size:48px;font-weight:900;color:#d4af37;letter-spacing:-2px;line-height:1;">GIRO</div>
+  <div style="font-size:11px;letter-spacing:4px;color:#8d9e8d;text-transform:uppercase;margin-top:6px;">Motorista Parceiro · Angola</div>
+</div>
+
 <div id="auth-pill" style="display:flex;align-items:center;flex-shrink:0;"></div>
 
   <div id="driver-app">
@@ -942,22 +969,6 @@
     <a href="javascript:void(0)" onclick="triggerSolidarityAlertDemo(); toggleDrawer(false)" class="drawer-link">
       <span>🚨</span> Testar Alerta Solidário (5km)
     </a>
-    
-    <div style="border-top: 1px solid #222; margin: 16px 0; padding-top: 16px;">
-      <div style="font-size: 11px; color: #6b7280; text-transform: uppercase; font-weight: 700; margin-bottom: 8px; padding-left: 14px;">
-        Outras Plataformas
-      </div>
-      <a href="./index.html" class="drawer-link">
-        <span>👤</span> App do Passageiro
-      </a>
-      <a href="./central.html" class="drawer-link">
-        <span>🛡️</span> Central de Operações 24h
-      </a>
-      <a href="./landing.html" class="drawer-link">
-        <span>🌐</span> Página de Apresentação
-      </a>
-    </div>
-
     <div style="margin-top: auto; font-size: 11px; color: #4b5563; text-align: center;">
       GIRO Angola Driver v2.4 • Feito para Luanda
     </div>
@@ -1351,6 +1362,158 @@ document.addEventListener('DOMContentLoaded',function(){
   const _s=GiroAuth.requireAuth('motorista');if(!_s)throw new Error('not auth');
   GiroAuth.renderUserPill('auth-pill');
 });
+</script>
+
+
+  <!-- DRIVER NATIVE TAB SECTIONS -->
+  
+  <!-- TAB: VIAGENS DO MOTORISTA -->
+  <section id="driver-tab-trips" style="display:none;position:fixed;top:60px;bottom:54px;left:0;right:0;overflow-y:auto;padding:16px;background:#070907;z-index:150;">
+    <h2 style="font-size:20px;font-weight:800;color:#fff;margin-bottom:14px;">Histórico de Viagens</h2>
+    
+    <div style="background:#121612;border:1px solid #262626;border-radius:14px;padding:14px;margin-bottom:12px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+        <span style="font-size:11px;font-weight:700;color:#4fe36a;background:rgba(79,227,106,0.12);padding:3px 8px;border-radius:6px;">Concluída</span>
+        <span style="font-size:11px;color:#8d9e8d;">Hoje, 15:30</span>
+      </div>
+      <div style="font-size:14px;font-weight:700;color:#fff;margin-bottom:4px;">🧑‍💼 Passageiro: Manuel João</div>
+      <div style="font-size:12px;color:#a6a6a6;margin-bottom:10px;">Mutamba → Talatona (Belas Shopping) · 8,2 km</div>
+      <div style="display:flex;justify-content:space-between;align-items:center;border-top:1px solid #1f241f;padding-top:10px;">
+        <span style="font-size:11px;color:#8d9e8d;">Comissão GIRO (10%): −300 Kz</span>
+        <b style="font-size:15px;color:#4fe36a;">+2.700 Kz líquido</b>
+      </div>
+    </div>
+
+    <div style="background:#121612;border:1px solid #262626;border-radius:14px;padding:14px;margin-bottom:12px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+        <span style="font-size:11px;font-weight:700;color:#4fe36a;background:rgba(79,227,106,0.12);padding:3px 8px;border-radius:6px;">Concluída</span>
+        <span style="font-size:11px;color:#8d9e8d;">Hoje, 11:15</span>
+      </div>
+      <div style="font-size:14px;font-weight:700;color:#fff;margin-bottom:4px;">🧑‍💼 Passageiro: Teresa Bento</div>
+      <div style="font-size:12px;color:#a6a6a6;margin-bottom:10px;">Maianga → Kilamba (Bloco B) · 16,5 km</div>
+      <div style="display:flex;justify-content:space-between;align-items:center;border-top:1px solid #1f241f;padding-top:10px;">
+        <span style="font-size:11px;color:#8d9e8d;">Comissão GIRO (10%): −450 Kz</span>
+        <b style="font-size:15px;color:#4fe36a;">+4.050 Kz líquido</b>
+      </div>
+    </div>
+  </section>
+
+  <!-- TAB: GANHOS DO MOTORISTA & DESAFIO 30K -->
+  <section id="driver-tab-earnings" style="display:none;position:fixed;top:60px;bottom:54px;left:0;right:0;overflow-y:auto;padding:16px;background:#070907;z-index:150;">
+    <h2 style="font-size:20px;font-weight:800;color:#fff;margin-bottom:14px;">Ganhos do Motorista</h2>
+
+    <!-- Card Saldo Líquido -->
+    <div style="background:linear-gradient(135deg, #1b241c 0%, #0d140e 100%);border:1px solid #4fe36a;border-radius:16px;padding:20px;margin-bottom:18px;">
+      <div style="font-size:11px;text-transform:uppercase;letter-spacing:1px;color:#4fe36a;font-weight:700;">Ganhos de Hoje (90% seu)</div>
+      <div style="font-size:32px;font-weight:900;color:#fff;margin:6px 0 14px;">24.500 <span style="font-size:18px;color:#4fe36a;">Kz</span></div>
+      <button onclick="withdrawEarnings()" style="width:100%;background:#4fe36a;color:#000;border:none;border-radius:10px;padding:12px;font-weight:800;font-size:14px;cursor:pointer;">
+        💳 Transferir para Multicaixa Express
+      </button>
+    </div>
+
+    <!-- Desafio 30K Bónus -->
+    <div style="background:rgba(212,175,55,0.08);border:1px solid rgba(212,175,55,0.3);border-radius:14px;padding:16px;margin-bottom:14px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+        <b style="font-size:13px;color:#d4af37;">🎯 Desafio Diário 30K</b>
+        <span style="font-size:11px;background:#d4af37;color:#000;padding:2px 6px;border-radius:4px;font-weight:800;">+1.500 Kz BÓNUS</span>
+      </div>
+      <p style="font-size:12px;color:#a6a6a6;margin-bottom:8px;">Fature 30.000 Kz hoje e receba +1.500 Kz de bónus direto na sua conta!</p>
+      <div style="height:8px;background:#222;border-radius:4px;overflow:hidden;margin-bottom:6px;">
+        <div style="width:81%;height:100%;background:linear-gradient(90deg,#d4af37,#4fe36a);"></div>
+      </div>
+      <div style="display:flex;justify-content:space-between;font-size:11px;color:#8d9e8d;">
+        <span>24.500 Kz faturados</span>
+        <span>Faltam 5.500 Kz</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- TAB: PERFIL DO MOTORISTA (STORE COMPLIANT) -->
+  <section id="driver-tab-profile" style="display:none;position:fixed;top:60px;bottom:54px;left:0;right:0;overflow-y:auto;padding:16px;background:#070907;z-index:150;">
+    <h2 style="font-size:20px;font-weight:800;color:#fff;margin-bottom:14px;">Perfil do Motorista</h2>
+
+    <div style="background:#121612;border:1px solid #262626;border-radius:14px;padding:16px;margin-bottom:14px;display:flex;align-items:center;gap:14px;">
+      <div style="width:50px;height:50px;border-radius:50%;background:linear-gradient(135deg,#d4af37,#f0c040);display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:900;color:#000;">D</div>
+      <div>
+        <div style="font-size:16px;font-weight:700;color:#fff;">Domingos Manuel</div>
+        <div style="font-size:12px;color:#8d9e8d;">+244 923 456 789</div>
+        <div style="font-size:11px;color:#4fe36a;margin-top:2px;">★ 4.9 · Motorista Verificado KYC ✓</div>
+      </div>
+    </div>
+
+    <!-- Veículo -->
+    <div style="background:#121612;border:1px solid #262626;border-radius:14px;padding:16px;margin-bottom:14px;">
+      <div style="font-size:13px;font-weight:700;color:#fff;margin-bottom:10px;">Viatura Registada</div>
+      <div style="font-size:13px;color:#fff;font-weight:600;">Toyota Corolla (Cinzento)</div>
+      <div style="font-size:12px;color:#d4af37;margin-top:2px;">Matrícula: LD-23-45-AA</div>
+      <div style="font-size:11px;color:#8d9e8d;margin-top:4px;">Seguro & Inspecção válidos até Nov/2026</div>
+    </div>
+
+    <!-- Documentação Legal & Eliminação de Conta -->
+    <div style="background:#121612;border:1px solid #262626;border-radius:14px;padding:16px;margin-bottom:14px;">
+      <div style="font-size:13px;font-weight:700;color:#fff;margin-bottom:10px;">Legal & Contrato</div>
+      <a href="termos.html" style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid #1f241f;color:#fff;text-decoration:none;">
+        <span style="font-size:13px;">Contrato de Parceria & Termos</span>
+        <span style="color:#8d9e8d;">›</span>
+      </a>
+      <a href="privacidade.html" style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid #1f241f;color:#fff;text-decoration:none;">
+        <span style="font-size:13px;">Política de Privacidade</span>
+        <span style="color:#8d9e8d;">›</span>
+      </a>
+      <a href="eliminar-conta.html" style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;color:#ef4444;text-decoration:none;">
+        <span style="font-size:13px;font-weight:600;">Eliminar Conta de Motorista</span>
+        <span style="color:#ef4444;">›</span>
+      </a>
+    </div>
+
+    <button onclick="GiroAuth.logout()" style="width:100%;padding:14px;border-radius:10px;background:rgba(239,68,68,0.12);border:1px solid rgba(239,68,68,0.3);color:#fca5a5;font-size:14px;font-weight:700;cursor:pointer;">
+      Sair da Conta
+    </button>
+  </section>
+
+<nav id="bottom-tab-bar" style="position:fixed;bottom:0;left:0;right:0;height:54px;background:#111;border-top:1px solid #262626;display:flex;align-items:stretch;z-index:200;padding-bottom:env(safe-area-inset-bottom,0px);">
+  <button class="tab-btn active" data-tab="home" onclick="driverSwitchTab('home')" style="flex:1;background:none;border:none;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;cursor:pointer;color:#d4af37;font-size:20px;padding:0;">&#127968;<span style="font-size:10px;font-weight:600;">In&#237;cio</span></button>
+  <button class="tab-btn" data-tab="trips" onclick="driverSwitchTab('trips')" style="flex:1;background:none;border:none;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;cursor:pointer;color:#666;font-size:20px;padding:0;">&#128204;<span style="font-size:10px;font-weight:600;">Viagens</span></button>
+  <button class="tab-btn" data-tab="earnings" onclick="driverSwitchTab('earnings')" style="flex:1;background:none;border:none;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;cursor:pointer;color:#666;font-size:20px;padding:0;">&#128176;<span style="font-size:10px;font-weight:600;">Ganhos</span></button>
+  <button class="tab-btn" data-tab="profile" onclick="driverSwitchTab('profile')" style="flex:1;background:none;border:none;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;cursor:pointer;color:#666;font-size:20px;padding:0;">&#128100;<span style="font-size:10px;font-weight:600;">Perfil</span></button>
+</nav>
+<script>
+
+function driverSwitchTab(tab) {
+  document.querySelectorAll('#bottom-tab-bar .tab-btn').forEach(b => {
+    b.style.color = (b.dataset.tab === tab) ? '#d4af37' : '#666';
+  });
+
+  const mapEl = document.getElementById('map');
+  const bottomSec = document.querySelector('.bottom-section');
+
+  if (tab === 'home') {
+    if (mapEl) mapEl.style.display = 'block';
+    if (bottomSec) bottomSec.style.display = 'block';
+    const t = document.getElementById('driver-tab-trips'); if (t) t.style.display = 'none';
+    const e = document.getElementById('driver-tab-earnings'); if (e) e.style.display = 'none';
+    const p = document.getElementById('driver-tab-profile'); if (p) p.style.display = 'none';
+  } else {
+    if (mapEl) mapEl.style.display = 'none';
+    if (bottomSec) bottomSec.style.display = 'none';
+    const t = document.getElementById('driver-tab-trips'); if (t) t.style.display = (tab === 'trips') ? 'block' : 'none';
+    const e = document.getElementById('driver-tab-earnings'); if (e) e.style.display = (tab === 'earnings') ? 'block' : 'none';
+    const p = document.getElementById('driver-tab-profile'); if (p) p.style.display = (tab === 'profile') ? 'block' : 'none';
+  }
+}
+
+// Dismiss splash screen on load
+window.addEventListener('DOMContentLoaded', () => {
+  const splash = document.getElementById('giro-splash');
+  if (splash) {
+    setTimeout(() => {
+      splash.style.opacity = '0';
+      setTimeout(() => splash.style.display = 'none', 200);
+    }, 150);
+  }
+});
+
+
 </script>
 </body>
 </html>

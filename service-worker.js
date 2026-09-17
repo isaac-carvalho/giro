@@ -1,62 +1,62 @@
-// GIRO Angola Service Worker — PWA & Play Store Offline Cache
-const CACHE_NAME = 'giro-cache-v2';
+// GIRO Angola Service Worker — PWA Ultra-Leve Angola-First
+// Cache First strategy: serve from cache immediately, update in background
+const CACHE_NAME = 'giro-cache-v3';
+
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
-  './passenger.html',
   './driver.html',
   './central.html',
-  './landing.html',
   './login.html',
   './cadastro-passageiro.html',
   './cadastro-motorista.html',
-  './termos.html',
-  './privacidade.html',
-  './eliminar-conta.html',
-  './legal.css',
   './manifest.json',
   './icons/icon-192.png',
   './icons/icon-512.png',
-  './icons/icon-maskable.png',
-  './favicon.ico'
+  './icons/icon-maskable.png'
 ];
 
+// Install — pre-cache core assets
 self.addEventListener('install', event => {
   event.waitUntil(
-    caches.open(CACHE_NAME).then(cache => {
-      return cache.addAll(ASSETS_TO_CACHE);
-    }).then(() => self.skipWaiting())
+    caches.open(CACHE_NAME)
+      .then(cache => cache.addAll(ASSETS_TO_CACHE))
+      .then(() => self.skipWaiting())
+      .catch(() => self.skipWaiting()) // Don't block install on missing icons
   );
 });
 
+// Activate — delete old caches
 self.addEventListener('activate', event => {
   event.waitUntil(
-    caches.keys().then(keys => {
-      return Promise.all(
-        keys.filter(key => key !== CACHE_NAME).map(key => caches.delete(key))
-      );
-    }).then(() => self.clients.claim())
+    caches.keys().then(keys =>
+      Promise.all(keys.filter(k => k !== CACHE_NAME).map(k => caches.delete(k)))
+    ).then(() => self.clients.claim())
   );
 });
 
+// Fetch — Cache First for HTML/assets, Network First for API calls
 self.addEventListener('fetch', event => {
-  // Network first with cache fallback
+  const url = new URL(event.request.url);
+
+  // Skip cross-origin, non-GET, and API requests
+  if (event.request.method !== 'GET') return;
+  if (url.origin !== self.location.origin) return;
+  if (url.pathname.startsWith('/api/')) return;
+
+  // Cache First: respond immediately from cache, update in background
   event.respondWith(
-    fetch(event.request).then(response => {
-      if (response && response.status === 200 && event.request.method === 'GET') {
-        const responseClone = response.clone();
-        caches.open(CACHE_NAME).then(cache => {
-          cache.put(event.request, responseClone);
-        });
-      }
-      return response;
-    }).catch(() => {
-      return caches.match(event.request).then(cachedResponse => {
-        if (cachedResponse) return cachedResponse;
-        if (event.request.headers.get('accept').includes('text/html')) {
-          return caches.match('./index.html');
+    caches.match(event.request).then(cached => {
+      const fetchPromise = fetch(event.request).then(response => {
+        if (response && response.status === 200) {
+          const clone = response.clone();
+          caches.open(CACHE_NAME).then(cache => cache.put(event.request, clone));
         }
-      });
+        return response;
+      }).catch(() => null);
+
+      // Return cache immediately if available, else wait for network
+      return cached || fetchPromise || caches.match('./index.html');
     })
   );
 });
