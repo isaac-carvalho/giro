@@ -873,6 +873,31 @@
               </tbody>
             </table>
           </div>
+
+          <!-- AUDITORIA DO VIGIA ALERTA 24H (RONDA ANTI-SONO) -->
+          <div class="data-table-wrap" style="margin-top:24px;">
+            <div class="table-head-bar" style="background:#1a1010;border-bottom:1px solid rgba(239,68,68,0.3);">
+              <div>
+                <b style="font-size:16px;color:#ef4444;">🚨 Auditoria do Sistema Vigia Alerta 24h (Ronda Anti-Sono)</b>
+                <div style="font-size:12px;color:var(--muted);">Histórico de operadores que adormeceram ou não responderam ao sinal alternado (15m / 45m)</div>
+              </div>
+              <button class="btn-action outline" onclick="clearVigiaLogs()" style="font-size:11px;">Limpar Registos</button>
+            </div>
+            <table>
+              <thead>
+                <tr>
+                  <th>Operador Notificado</th>
+                  <th>Data e Hora</th>
+                  <th>Tempo Excedido</th>
+                  <th>Gravidade</th>
+                  <th>Ocorrência Registada</th>
+                </tr>
+              </thead>
+              <tbody id="vigia-failures-tbody">
+                <!-- Preenchido dinamicamente via JS -->
+              </tbody>
+            </table>
+          </div>
         </section>
 
         <!-- ABA 3: REPASSES & SAQUES -->
@@ -1396,6 +1421,7 @@
 
       if (view === 'sos') setTimeout(initRadarMap, 150);
       if (view === 'fleet') setTimeout(initFleetMap, 150);
+      if (view === 'operators') renderVigiaFailuresTable();
     }
 
     // ── Maps ──
@@ -1669,6 +1695,7 @@
     function saveOperators(list) {
       localStorage.setItem(STORAGE_OPERATORS, JSON.stringify(list));
       renderOperatorsTable();
+      renderVigiaFailuresTable();
     }
 
     function renderOperatorsTable() {
@@ -1778,7 +1805,41 @@
       renderDriversTable();
       renderPassengersTable();
       renderOperatorsTable();
+      renderVigiaFailuresTable();
     });
+
+
+    function renderVigiaFailuresTable() {
+      const tbody = document.getElementById('vigia-failures-tbody');
+      if (!tbody) return;
+
+      let fails = [];
+      try {
+        fails = JSON.parse(localStorage.getItem('giro_vigia_failures') || '[]');
+      } catch(e) { fails = []; }
+
+      if (fails.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--green);padding:22px;">🛡️ Nenhuma falha de vigília registrada. Todos os operadores responderam dentro dos 60 segundos nos seus turnos!</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = fails.map(f => `
+        <tr>
+          <td><b style="color:#fff;">${f.operador || 'Operador'}</b></td>
+          <td>${f.data || 'Recente'}</td>
+          <td><span class="badge red">${f.tempoExcedido || '60s sem resposta'}</span></td>
+          <td><b style="color:#ef4444;">Crítica (Dormência / Posto Abandonado)</b></td>
+          <td style="color:#fca5a5;">${f.motivo || 'Alarme não respondido'}</td>
+        </tr>
+      `).join('');
+    }
+
+    function clearVigiaLogs() {
+      if (confirm('Deseja limpar o histórico de falhas do Vigia Alerta?')) {
+        localStorage.removeItem('giro_vigia_failures');
+        renderVigiaFailuresTable();
+      }
+    }
 
   </script>
 </body>

@@ -494,6 +494,19 @@
       </div>
     </div>
 
+    <!-- WIDGET VIGIA ALERTA 24H (ANTI-SONO / RONDA) -->
+    <div id="vigia-hud" style="display:flex;align-items:center;gap:10px;background:#141a15;border:1.5px solid rgba(212,175,55,0.3);border-radius:12px;padding:6px 12px;flex-shrink:0;">
+      <div style="font-size:18px;">⏰</div>
+      <div>
+        <div style="font-size:9.5px;color:#8d9e8d;text-transform:uppercase;font-weight:700;letter-spacing:0.5px;">Vigia Anti-Sono 24h</div>
+        <div id="vigia-timer-display" style="font-size:13px;font-weight:800;color:#f0c040;font-family:monospace;">Próximo: 15:00</div>
+      </div>
+      <button onclick="triggerVigiaAlert(true)" style="background:rgba(212,175,55,0.15);border:1px solid rgba(212,175,55,0.4);color:#d4af37;padding:5px 9px;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;transition:all 0.15s;" title="Testar disparo do alarme vigia imediatamente">
+        ⚡ Testar Alarme
+      </button>
+    </div>
+
+
     <!-- Operador Autenticado & Logout -->
     <div style="display:flex;align-items:center;gap:12px;margin-left:auto;">
       <div style="text-align:right;">
@@ -753,7 +766,229 @@ Todos os condutores parceiros da GIRO num raio de 5 km receberam a localização
       });
     }
 
+    
+    // ═════════════════════════════════════════════════════════════════
+    // SISTEMA VIGIA ALERTA 24H (ANTI-SONO / RONDA INTERMITENTE)
+    // Alterna entre 15 e 45 minutos (ou tempos pré-definidos)
+    // ═════════════════════════════════════════════════════════════════
+    const VIGIA_STORAGE_FAILURES = 'giro_vigia_failures';
+    const VIGIA_STORAGE_LOGS = 'giro_vigia_logs';
+
+    // Ciclo de intervalos em segundos: 15min, 45min, 20min, 35min, 15min, 45min...
+    const VIGIA_INTERVALS = [15 * 60, 45 * 60, 20 * 60, 35 * 60, 15 * 60, 45 * 60];
+    let vigiaIntervalIdx = 0;
+    let vigiaSecondsRemaining = VIGIA_INTERVALS[0];
+    let vigiaTimerInterval = null;
+    let vigiaCountdownInterval = null;
+    let vigiaAlertActive = false;
+    let vigiaDeadlineSeconds = 60;
+
+    // Web Audio Synthesizer (Zero ficheiros externos, 100% nativo)
+    let audioCtx = null;
+    let alarmOsc = null;
+    let alarmGain = null;
+    let isBeeping = false;
+    let beepInterval = null;
+
+    function getAudioContext() {
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+      return audioCtx;
+    }
+
+    function startBuzzerSound(emergency = false) {
+      try {
+        const ctx = getAudioContext();
+        if (ctx.state === 'suspended') ctx.resume();
+
+        stopBuzzerSound();
+        isBeeping = true;
+
+        const freqHigh = emergency ? 950 : 800;
+        const freqLow = emergency ? 400 : 500;
+        const speed = emergency ? 200 : 350;
+
+        let high = false;
+        beepInterval = setInterval(() => {
+          if (!isBeeping) return;
+          try {
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.type = emergency ? 'sawtooth' : 'square';
+            osc.frequency.setValueAtTime(high ? freqHigh : freqLow, ctx.currentTime);
+            high = !high;
+
+            gain.gain.setValueAtTime(0.35, ctx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.18);
+
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+            osc.start();
+            osc.stop(ctx.currentTime + 0.19);
+          } catch(e) {}
+        }, speed);
+      } catch(err) {
+        console.log('Audio init notice:', err);
+      }
+    }
+
+    function stopBuzzerSound() {
+      isBeeping = false;
+      if (beepInterval) {
+        clearInterval(beepInterval);
+        beepInterval = null;
+      }
+    }
+
+    function formatTimeMinSec(sec) {
+      const m = Math.floor(sec / 60);
+      const s = sec % 60;
+      return (m < 10 ? '0' : '') + m + ':' + (s < 10 ? '0' : '') + s;
+    }
+
+    function updateVigiaHudDisplay() {
+      const el = document.getElementById('vigia-timer-display');
+      if (el) {
+        const intervalMins = Math.round(VIGIA_INTERVALS[vigiaIntervalIdx] / 60);
+        el.textContent = formatTimeMinSec(vigiaSecondsRemaining) + ' (' + intervalMins + 'm)';
+      }
+    }
+
+    function startVigiaTicker() {
+      if (vigiaTimerInterval) clearInterval(vigiaTimerInterval);
+      vigiaTimerInterval = setInterval(() => {
+        if (!vigiaAlertActive) {
+          vigiaSecondsRemaining--;
+          updateVigiaHudDisplay();
+          if (vigiaSecondsRemaining <= 0) {
+            triggerVigiaAlert(false);
+          }
+        }
+      }, 1000);
+    }
+
+    function triggerVigiaAlert(isManualTest = false) {
+      vigiaAlertActive = true;
+      vigiaDeadlineSeconds = 60;
+
+      const modal = document.getElementById('vigia-modal');
+      const box = document.getElementById('vigia-modal-box');
+      const head = document.getElementById('vigia-head-text');
+      const desc = document.getElementById('vigia-desc-text');
+      const btn = document.getElementById('btn-vigia-confirm');
+      const failBanner = document.getElementById('vigia-fail-banner');
+      const countEl = document.getElementById('vigia-countdown-circle');
+
+      box.style.borderColor = '#ef4444';
+      box.style.boxShadow = '0 0 90px rgba(239,68,68,0.75)';
+      failBanner.style.display = 'none';
+      btn.style.display = 'block';
+      countEl.style.display = 'flex';
+      countEl.style.color = '#ef4444';
+      countEl.style.borderColor = '#ef4444';
+      countEl.textContent = '60';
+
+      const opName = currentOperator ? (currentOperator.nome || currentOperator.username) : 'Operador';
+      head.textContent = isManualTest ? 'TESTE DE VIGÍLIA ANTI-SONO!' : 'CHECAGEM OBRIGATÓRIA DE PRESENÇA!';
+      desc.innerHTML = `Atenção <strong>${opName}</strong>! Desative o sinal para comprovar que se encontra <strong>acordado, vigilante e em operação no posto</strong>.`;
+
+      modal.style.display = 'flex';
+      startBuzzerSound(false);
+
+      if (vigiaCountdownInterval) clearInterval(vigiaCountdownInterval);
+      vigiaCountdownInterval = setInterval(() => {
+        vigiaDeadlineSeconds--;
+        countEl.textContent = vigiaDeadlineSeconds;
+
+        if (vigiaDeadlineSeconds <= 15) {
+          countEl.style.color = '#ff2222';
+          startBuzzerSound(true); // som mais agressivo
+        }
+
+        if (vigiaDeadlineSeconds <= 0) {
+          clearInterval(vigiaCountdownInterval);
+          onVigiaFailed(opName);
+        }
+      }, 1000);
+    }
+
+    function confirmVigiaPresence() {
+      stopBuzzerSound();
+      if (vigiaCountdownInterval) clearInterval(vigiaCountdownInterval);
+      vigiaAlertActive = false;
+
+      document.getElementById('vigia-modal').style.display = 'none';
+
+      // Log success
+      const opName = currentOperator ? (currentOperator.nome || currentOperator.username) : 'Operador';
+      const log = {
+        id: 'vigia-ok-' + Date.now(),
+        operador: opName,
+        data: new Date().toLocaleString('pt-AO'),
+        tipo: 'Presença Confirmada (Operador Atento)'
+      };
+      try {
+        const logs = JSON.parse(localStorage.getItem(VIGIA_STORAGE_LOGS) || '[]');
+        logs.unshift(log);
+        if (logs.length > 50) logs.pop();
+        localStorage.setItem(VIGIA_STORAGE_LOGS, JSON.stringify(logs));
+      } catch(e) {}
+
+      // Rotate to next interval (alternating 15 min <-> 45 min)
+      vigiaIntervalIdx = (vigiaIntervalIdx + 1) % VIGIA_INTERVALS.length;
+      vigiaSecondsRemaining = VIGIA_INTERVALS[vigiaIntervalIdx];
+      updateVigiaHudDisplay();
+
+      const nextMin = Math.round(vigiaSecondsRemaining / 60);
+      alert(`✓ Presença confirmada às ${new Date().toLocaleTimeString('pt-AO')}!\nPróxima checagem programada para daqui a ${nextMin} minutos.`);
+    }
+
+    function onVigiaFailed(opName) {
+      stopBuzzerSound();
+      startBuzzerSound(true); // Alarme crítico de emergência
+
+      const btn = document.getElementById('btn-vigia-confirm');
+      const failBanner = document.getElementById('vigia-fail-banner');
+      const head = document.getElementById('vigia-head-text');
+      const box = document.getElementById('vigia-modal-box');
+
+      btn.style.display = 'none';
+      failBanner.style.display = 'block';
+      head.textContent = '🚨 OPERADOR ADORMECIDO OU POSTO ABANDONADO!';
+      box.style.borderColor = '#ff0000';
+      box.style.boxShadow = '0 0 120px rgba(255,0,0,0.9)';
+
+      // Gravar falha crítica no localStorage para auditoria do Isaac
+      const failure = {
+        id: 'falha-' + Date.now(),
+        operador: opName,
+        data: new Date().toLocaleString('pt-AO'),
+        tempoExcedido: '60 segundos sem resposta',
+        motivo: 'Alarme de Vigília não desligado a tempo (Possível sono / abandono)'
+      };
+
+      try {
+        const failures = JSON.parse(localStorage.getItem(VIGIA_STORAGE_FAILURES) || '[]');
+        failures.unshift(failure);
+        localStorage.setItem(VIGIA_STORAGE_FAILURES, JSON.stringify(failures));
+      } catch(e) {}
+    }
+
+    function resetVigiaAfterFail() {
+      stopBuzzerSound();
+      vigiaAlertActive = false;
+      document.getElementById('vigia-modal').style.display = 'none';
+
+      // Redefine para o próximo intervalo
+      vigiaIntervalIdx = (vigiaIntervalIdx + 1) % VIGIA_INTERVALS.length;
+      vigiaSecondsRemaining = VIGIA_INTERVALS[vigiaIntervalIdx];
+      updateVigiaHudDisplay();
+    }
+
     window.addEventListener('DOMContentLoaded', () => {
+      startVigiaTicker();
+      updateVigiaHudDisplay();
       initCentralMap();
       if (currentOperator) {
         const nameEl = document.getElementById('operator-name-disp');
@@ -762,5 +997,44 @@ Todos os condutores parceiros da GIRO num raio de 5 km receberam a localização
         if (roleEl) roleEl.textContent = '● ' + (currentOperator.role || 'Posto Activo');
       }
     });
+
+  <!-- ═════════════════════════════════════════════════════════════════
+       MODAL SISTEMA VIGIA ALERTA 24H (ANTI-SONO / CONTROLO DE RONDA)
+       ═════════════════════════════════════════════════════════════════ -->
+  <div id="vigia-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);z-index:99999;align-items:center;justify-content:center;padding:20px;">
+    <div id="vigia-modal-box" style="background:#0e130f;border:3px solid #ef4444;border-radius:24px;width:100%;max-width:540px;padding:34px 26px;text-align:center;box-shadow:0 0 90px rgba(239,68,68,0.75);position:relative;">
+      <div style="font-size:56px;margin-bottom:12px;animation:pulse 0.8s infinite alternate;">🚨</div>
+      <div style="display:inline-block;background:rgba(239,68,68,0.2);border:1.5px solid #ef4444;color:#fca5a5;padding:4px 14px;border-radius:20px;font-size:11px;font-weight:800;letter-spacing:1px;margin-bottom:14px;text-transform:uppercase;">
+        Sistema de Ronda & Vigília Anti-Sono 24h
+      </div>
+      <h2 style="font-size:23px;font-weight:900;color:#fff;margin-bottom:10px;" id="vigia-head-text">CHECAGEM OBRIGATÓRIA DE PRESENÇA!</h2>
+      <p style="font-size:13.5px;color:#d1d5db;line-height:1.6;margin-bottom:20px;" id="vigia-desc-text">
+        Atenção operador no posto de comando! Desative o sinal de alerta para comprovar que se encontra <strong>acordado, vigilante e em operação na Central</strong>.
+      </p>
+      
+      <!-- Contador regressivo -->
+      <div style="margin-bottom:24px;">
+        <div id="vigia-countdown-circle" style="width:96px;height:96px;border-radius:50%;background:#180f0f;border:4px solid #ef4444;margin:0 auto;display:flex;align-items:center;justify-content:center;font-size:38px;font-weight:900;color:#ef4444;font-family:monospace;box-shadow:0 0 30px rgba(239,68,68,0.4);">
+          60
+        </div>
+        <div style="font-size:11.5px;color:#9ca3af;margin-top:8px;">segundos para registo de dormência ou ausência</div>
+      </div>
+
+      <!-- Botão de Confirmação -->
+      <button id="btn-vigia-confirm" onclick="confirmVigiaPresence()" style="width:100%;padding:18px;background:linear-gradient(135deg,#22c55e,#16a34a);border:none;border-radius:14px;color:#fff;font-size:16.5px;font-weight:900;letter-spacing:0.5px;cursor:pointer;box-shadow:0 8px 30px rgba(34,197,94,0.45);transition:transform 0.1s;">
+        ✋ ESTOU ACORDADO E NO POSTO
+      </button>
+
+      <!-- Banner de Falha Registada -->
+      <div id="vigia-fail-banner" style="display:none;margin-top:20px;background:#2d0a0a;border:1.5px solid #ef4444;border-radius:12px;padding:16px;color:#fca5a5;font-size:13px;line-height:1.5;text-align:left;">
+        <strong style="color:#fff;font-size:14px;">❌ FALHA DE VIGÍLIA REGISTADA NO SISTEMA!</strong><br>
+        O prazo limite de 60 segundos expirou sem confirmação. Ocorrência de <strong style="color:#ef4444;">operador adormecido ou posto abandonado</strong> foi gravada com carimbo de tempo e enviada para o relatório da Administração Geral.
+        <div style="margin-top:12px;text-align:right;">
+          <button onclick="resetVigiaAfterFail()" style="background:#ef4444;color:#fff;border:none;padding:9px 18px;border-radius:8px;font-weight:700;cursor:pointer;font-size:13px;">Retomar Operação do Turno</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
 </body>
 </html>

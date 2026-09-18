@@ -308,8 +308,12 @@
 
     <div class="notice-box">
       <p>
-        🔒 <strong>Acesso Estritamente Restrito:</strong> Não é permitido auto-cadastro nesta página. As credenciais de operador são criadas e autorizadas exclusivamente pelo Administrador Geral no Painel Master.
+        🔒 <strong>Acesso Restrito:</strong> Não há auto-cadastro nesta página. Credenciais emitidas pelo Administrador no Painel Master.
       </p>
+      <div style="margin-top:10px;padding-top:10px;border-top:1px solid rgba(255,255,255,0.06);display:flex;gap:8px;justify-content:center;flex-wrap:wrap;">
+        <button type="button" onclick="quickFill('isaac','181818')" style="background:rgba(212,175,55,0.15);border:1px solid rgba(212,175,55,0.4);color:var(--gold);padding:6px 12px;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;">🔑 Testar como Dono (isaac / 181818)</button>
+        <button type="button" onclick="quickFill('operador1','giro2026central')" style="background:rgba(34,197,94,0.15);border:1px solid rgba(34,197,94,0.4);color:var(--green);padding:6px 12px;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;">👤 Testar como Operador</button>
+      </div>
     </div>
 
     <div class="footer-links">
@@ -334,6 +338,16 @@
       if (!ops || ops.length === 0) {
         ops = [
           {
+            id: 'op-admin-isaac',
+            nome: 'Isaac Carvalho (Administrador)',
+            username: 'isaac',
+            phone: '+244 923 000 000',
+            password: '181818',
+            role: 'Administrador Geral',
+            status: 'ativo',
+            createdAt: new Date().toISOString()
+          },
+          {
             id: 'op-default-1',
             nome: 'Operador Padrão (Central 24h)',
             username: 'operador1',
@@ -355,6 +369,21 @@
           }
         ];
         localStorage.setItem(CENTRAL_OPERATORS_KEY, JSON.stringify(ops));
+      } else {
+        // Ensure isaac / 181818 is always present
+        if (!ops.some(o => o.username.toLowerCase() === 'isaac')) {
+          ops.unshift({
+            id: 'op-admin-isaac',
+            nome: 'Isaac Carvalho (Administrador)',
+            username: 'isaac',
+            phone: '+244 923 000 000',
+            password: '181818',
+            role: 'Administrador Geral',
+            status: 'ativo',
+            createdAt: new Date().toISOString()
+          });
+          localStorage.setItem(CENTRAL_OPERATORS_KEY, JSON.stringify(ops));
+        }
       }
     }
     ensureInitialOperators();
@@ -372,6 +401,12 @@
     function togglePw() {
       const el = document.getElementById('op-password');
       el.type = el.type === 'password' ? 'text' : 'password';
+    }
+
+    function quickFill(u, p) {
+      document.getElementById('op-username').value = u;
+      document.getElementById('op-password').value = p;
+      showAlert('Credenciais preenchidas. Clique em "Aceder à Central Táctica"!', 'success');
     }
 
     function showAlert(msg, type = 'error') {
