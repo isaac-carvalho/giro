@@ -878,6 +878,52 @@
 
         <!-- ABA 2.2: GESTÃO DE OPERADORES CENTRAL 24H -->
         <section id="view-operators" class="tab-view">
+
+          <!-- PAINEL DE TELEMETRIA AO VIVO DO VIGIA ANTI-SONO 24H -->
+          <div style="background:#0e130f;border:2px solid rgba(212,175,55,0.3);border-radius:16px;padding:20px;margin-bottom:24px;box-shadow:0 8px 32px rgba(0,0,0,0.6);">
+            <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:18px;border-bottom:1px solid rgba(255,255,255,0.08);padding-bottom:14px;">
+              <div>
+                <div style="display:flex;align-items:center;gap:8px;">
+                  <span style="font-size:22px;">📡</span>
+                  <b style="font-size:17px;color:#fff;">Monitor de Vigília Anti-Sono em Tempo Real</b>
+                </div>
+                <div style="font-size:12px;color:var(--muted);margin-top:2px;">Acompanhamento contínuo da presença física e atenção do operador na Central</div>
+              </div>
+              <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+                <button class="btn-action red" onclick="triggerRemoteVigiaTest()" style="padding:10px 16px;font-size:12.5px;font-weight:800;display:flex;align-items:center;gap:6px;" title="Dispara o alarme de teste imediatamente na tela do operador para checar se ele está acordado">
+                  🚨 Disparar Teste Surpresa na Central
+                </button>
+                <button class="btn-action outline" onclick="refreshVigiaLiveMetrics()" style="font-size:12px;padding:9px 12px;">🔄 Actualizar</button>
+              </div>
+            </div>
+
+            <!-- Cartões de Telemetria ao Vivo -->
+            <div class="kpi-grid" style="margin-bottom:0;">
+              <div class="kpi-card" id="card-vigia-operator">
+                <div class="kpi-label">Operador no Posto</div>
+                <div class="kpi-value" id="disp-live-op-name" style="font-size:19px;color:#fff;">A conectar…</div>
+                <div class="kpi-sub" id="disp-live-op-role">Central de Rastreamento</div>
+              </div>
+
+              <div class="kpi-card" id="card-vigia-status">
+                <div class="kpi-label">Estado de Vigília</div>
+                <div class="kpi-value" id="disp-live-state" style="font-size:19px;color:var(--green);">● Vigilante</div>
+                <div class="kpi-sub" id="disp-live-state-sub">Dentro do ciclo seguro</div>
+              </div>
+
+              <div class="kpi-card gold" id="card-vigia-countdown">
+                <div class="kpi-label">Próxima Checagem (Ciclo 15/45m)</div>
+                <div class="kpi-value" id="disp-live-countdown" style="font-family:monospace;font-size:22px;color:var(--gold);">--:--</div>
+                <div class="kpi-sub" id="disp-live-cycle">Alternância automática 24h</div>
+              </div>
+
+              <div class="kpi-card red" id="card-vigia-fails">
+                <div class="kpi-label">Falhas / Dormência Registadas</div>
+                <div class="kpi-value" id="disp-live-fails-count" style="font-size:22px;color:#ef4444;">0</div>
+                <div class="kpi-sub">Auditoria permanente do Dono</div>
+              </div>
+            </div>
+          </div>
           <div style="background:rgba(212,175,55,0.08);border:1px solid var(--border);border-radius:12px;padding:14px 18px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
             <div>
               <div style="font-weight:700;color:var(--gold);font-size:14px;">🔒 Acesso Restrito à Central de Monitoramento</div>
@@ -909,6 +955,31 @@
                 </tr>
               </thead>
               <tbody id="operators-tbody">
+                <!-- Preenchido dinamicamente via JS -->
+              </tbody>
+            </table>
+          </div>
+
+          
+          <!-- HISTÓRICO DE CHECAGENS BEM-SUCEDIDAS (CONFIRMAÇÕES DE PRESENÇA) -->
+          <div class="data-table-wrap" style="margin-top:20px;">
+            <div class="table-head-bar" style="background:#0e1710;border-bottom:1px solid rgba(34,197,94,0.25);">
+              <div>
+                <b style="font-size:15px;color:var(--green);">✓ Histórico de Checagens Concluídas com Sucesso (Operador Atento)</b>
+                <div style="font-size:12px;color:var(--muted);">Registo de todas as vezes em que o operador desligou o alarme dentro dos 60 segundos</div>
+              </div>
+              <button class="btn-action outline" onclick="clearVigiaLogsSuccess()" style="font-size:11px;">Limpar</button>
+            </div>
+            <table>
+              <thead>
+                <tr>
+                  <th>Operador de Serviço</th>
+                  <th>Data e Hora da Confirmação</th>
+                  <th>Resultado da Checagem</th>
+                  <th>Estado do Posto</th>
+                </tr>
+              </thead>
+              <tbody id="vigia-success-tbody">
                 <!-- Preenchido dinamicamente via JS -->
               </tbody>
             </table>
@@ -1462,6 +1533,8 @@
       if (view === 'sos') setTimeout(initRadarMap, 150);
       if (view === 'fleet') setTimeout(initFleetMap, 150);
       if (view === 'operators') renderVigiaFailuresTable();
+      renderVigiaSuccessTable();
+      refreshVigiaLiveMetrics();
     }
 
     // ── Maps ──
@@ -1628,6 +1701,8 @@
               renderPassengersTable();
               renderOperatorsTable();
               renderVigiaFailuresTable();
+      renderVigiaSuccessTable();
+      refreshVigiaLiveMetrics();
 
               alert('✓ Base de dados restaurada com sucesso!');
             }
@@ -1860,6 +1935,8 @@
       localStorage.setItem(STORAGE_OPERATORS, JSON.stringify(list));
       renderOperatorsTable();
       renderVigiaFailuresTable();
+      renderVigiaSuccessTable();
+      refreshVigiaLiveMetrics();
     }
 
     function renderOperatorsTable() {
@@ -1973,8 +2050,107 @@
       renderPassengersTable();
       renderOperatorsTable();
       renderVigiaFailuresTable();
+      renderVigiaSuccessTable();
+      refreshVigiaLiveMetrics();
     });
 
+
+    
+    // ═════════════════════════════════════════════════════════════════
+    // CONTROLO E MONITORAMENTO REMOTO DO VIGIA ANTI-SONO 24H
+    // ═════════════════════════════════════════════════════════════════
+    function triggerRemoteVigiaTest() {
+      if (!verifyAdminAuthorized()) return;
+      if (confirm('🚨 Confirmar disparo remoto de teste na Central?\n\nO alarme sonoro e visual começará a tocar IMEDIATAMENTE na tela do operador de serviço para comprovar a presença e vigília dele.')) {
+        localStorage.setItem('giro_vigia_force_trigger', Date.now().toString());
+        alert('⚡ Comando de disparo enviado! O alarme está tocando na Central. O operador tem 60 segundos para responder.');
+        refreshVigiaLiveMetrics();
+      }
+    }
+
+    function refreshVigiaLiveMetrics() {
+      try {
+        const raw = localStorage.getItem('giro_vigia_live_telemetry');
+        const telemetry = raw ? JSON.parse(raw) : null;
+
+        const nameEl = document.getElementById('disp-live-op-name');
+        const roleEl = document.getElementById('disp-live-op-role');
+        const stateEl = document.getElementById('disp-live-state');
+        const stateSubEl = document.getElementById('disp-live-state-sub');
+        const countdownEl = document.getElementById('disp-live-countdown');
+        const cycleEl = document.getElementById('disp-live-cycle');
+        const failsEl = document.getElementById('disp-live-fails-count');
+
+        const failsList = JSON.parse(localStorage.getItem('giro_vigia_failures') || '[]');
+        if (failsEl) failsEl.textContent = failsList.length;
+
+        if (!telemetry || (Date.now() - telemetry.lastHeartbeat > 60000)) {
+          if (nameEl) nameEl.textContent = 'Posto Desconectado';
+          if (roleEl) roleEl.textContent = 'Nenhuma sessão de operador ativa';
+          if (stateEl) { stateEl.textContent = '⚪ Desconectado'; stateEl.style.color = 'var(--muted)'; }
+          if (countdownEl) countdownEl.textContent = '--:--';
+          return;
+        }
+
+        if (nameEl) nameEl.textContent = telemetry.operatorName || 'Operador';
+        if (roleEl) roleEl.textContent = telemetry.operatorRole || 'Central 24h';
+
+        if (telemetry.state === 'CHECANDO') {
+          if (stateEl) { stateEl.textContent = '🟡 ALARME A TOCAR!'; stateEl.style.color = '#f59e0b'; }
+          if (stateSubEl) stateSubEl.textContent = 'Aguardando confirmação (' + (telemetry.deadlineRemaining || 60) + 's restantes)';
+        } else if (telemetry.state === 'DORMENCIA') {
+          if (stateEl) { stateEl.textContent = '🔴 DORMÊNCIA!'; stateEl.style.color = '#ef4444'; }
+          if (stateSubEl) stateSubEl.textContent = 'Tempo expirou sem resposta do operador!';
+        } else {
+          if (stateEl) { stateEl.textContent = '● Vigilante (OK)'; stateEl.style.color = 'var(--green)'; }
+          if (stateSubEl) stateSubEl.textContent = 'Posto ativo e atento';
+        }
+
+        if (countdownEl && telemetry.secondsRemaining !== undefined) {
+          const m = Math.floor(telemetry.secondsRemaining / 60);
+          const s = telemetry.secondsRemaining % 60;
+          countdownEl.textContent = (m < 10 ? '0' : '') + m + ':' + (s < 10 ? '0' : '') + s;
+        }
+
+        if (cycleEl && telemetry.intervalTotal) {
+          cycleEl.textContent = 'Ciclo alternado de ' + Math.round(telemetry.intervalTotal / 60) + ' min';
+        }
+      } catch(e) {}
+    }
+
+    function renderVigiaSuccessTable() {
+      const tbody = document.getElementById('vigia-success-tbody');
+      if (!tbody) return;
+
+      let logs = [];
+      try {
+        logs = JSON.parse(localStorage.getItem('giro_vigia_logs') || '[]');
+      } catch(e) { logs = []; }
+
+      if (logs.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:var(--muted);padding:18px;">Aguardando primeira checagem concluída do turno.</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = logs.map(l => `
+        <tr>
+          <td><b style="color:#fff;">${escapeHtml(l.operador || 'Operador')}</b></td>
+          <td>${escapeHtml(l.data || 'Hoje')}</td>
+          <td><span class="badge green">✓ Confirmado dentro do prazo</span></td>
+          <td><span style="color:var(--green);font-weight:700;">● Acordado / Posto Ativo</span></td>
+        </tr>
+      `).join('');
+    }
+
+    function clearVigiaLogsSuccess() {
+      if (confirm('Deseja limpar o histórico de checagens concluídas?')) {
+        localStorage.removeItem('giro_vigia_logs');
+        renderVigiaSuccessTable();
+      }
+    }
+
+    // Auto-refresh da telemetria a cada 1.5s
+    setInterval(refreshVigiaLiveMetrics, 1500);
 
     function renderVigiaFailuresTable() {
       const tbody = document.getElementById('vigia-failures-tbody');
@@ -2005,6 +2181,8 @@
       if (confirm('Deseja limpar o histórico de falhas do Vigia Alerta?')) {
         localStorage.removeItem('giro_vigia_failures');
         renderVigiaFailuresTable();
+      renderVigiaSuccessTable();
+      refreshVigiaLiveMetrics();
       }
     }
 

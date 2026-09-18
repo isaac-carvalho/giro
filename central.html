@@ -855,12 +855,47 @@ Todos os condutores parceiros da GIRO num raio de 5 km receberam a localização
       }
     }
 
+    
+    function broadcastVigiaTelemetry(state = 'NORMAL') {
+      try {
+        const payload = {
+          operatorName: currentOperator ? (currentOperator.nome || currentOperator.username) : 'Operador de Turno',
+          operatorRole: currentOperator ? currentOperator.role : 'Radar 24h',
+          state: state, // 'NORMAL', 'CHECANDO' (tocando alarme), 'DORMENCIA'
+          secondsRemaining: vigiaSecondsRemaining,
+          intervalTotal: VIGIA_INTERVALS[vigiaIntervalIdx],
+          deadlineRemaining: vigiaDeadlineSeconds,
+          lastHeartbeat: Date.now()
+        };
+        localStorage.setItem('giro_vigia_live_telemetry', JSON.stringify(payload));
+      } catch(e) {}
+    }
+
+    // Listener para o Dono disparar teste surpresa remotamente a partir do Admin
+    window.addEventListener('storage', (e) => {
+      if (e.key === 'giro_vigia_force_trigger') {
+        triggerVigiaAlert(false);
+      }
+    });
+
+    setInterval(() => {
+      const forceCmd = localStorage.getItem('giro_vigia_force_trigger');
+      if (forceCmd) {
+        const cmdTime = parseInt(forceCmd, 10);
+        if (Date.now() - cmdTime < 5000 && !vigiaAlertActive) {
+          localStorage.removeItem('giro_vigia_force_trigger');
+          triggerVigiaAlert(false);
+        }
+      }
+    }, 1000);
+
     function startVigiaTicker() {
       if (vigiaTimerInterval) clearInterval(vigiaTimerInterval);
       vigiaTimerInterval = setInterval(() => {
         if (!vigiaAlertActive) {
           vigiaSecondsRemaining--;
           updateVigiaHudDisplay();
+          broadcastVigiaTelemetry('NORMAL');
           if (vigiaSecondsRemaining <= 0) {
             triggerVigiaAlert(false);
           }
@@ -895,6 +930,7 @@ Todos os condutores parceiros da GIRO num raio de 5 km receberam a localização
 
       modal.style.display = 'flex';
       startBuzzerSound(false);
+      broadcastVigiaTelemetry('CHECANDO');
 
       if (vigiaCountdownInterval) clearInterval(vigiaCountdownInterval);
       vigiaCountdownInterval = setInterval(() => {
@@ -909,6 +945,7 @@ Todos os condutores parceiros da GIRO num raio de 5 km receberam a localização
         if (vigiaDeadlineSeconds <= 0) {
           clearInterval(vigiaCountdownInterval);
           onVigiaFailed(opName);
+      broadcastVigiaTelemetry('DORMENCIA');
         }
       }, 1000);
     }
@@ -941,6 +978,7 @@ Todos os condutores parceiros da GIRO num raio de 5 km receberam a localização
       updateVigiaHudDisplay();
 
       const nextMin = Math.round(vigiaSecondsRemaining / 60);
+      broadcastVigiaTelemetry('NORMAL');
       alert(`✓ Presença confirmada às ${new Date().toLocaleTimeString('pt-AO')}!\nPróxima checagem programada para daqui a ${nextMin} minutos.`);
     }
 
