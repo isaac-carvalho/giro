@@ -2,7 +2,7 @@
 <html lang="pt-AO">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>GIRO Angola — CRM & Painel de Administração Central</title>
   <link rel="icon" type="image/x-icon" href="favicon.ico">
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
@@ -369,18 +369,191 @@
     #live-radar-map {
       height: 480px; width: 100%; border-radius: 14px; border: 1px solid var(--border);
     }
+
+    /* ── Mobile Responsive Overhaul (Drawer, Touch Tables, Adaptive Grids) ── */
+    .menu-toggle-btn { display: none; }
+    .side-close-btn { display: none; }
+    #sidebar-overlay { display: none; }
+    .topbar-main-row { display: flex; align-items: center; gap: 12px; }
+
+    @media (max-width: 992px) {
+      body {
+        display: block;
+        height: 100vh;
+        overflow: hidden;
+        position: relative;
+      }
+      #sidebar {
+        position: fixed;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        width: 280px;
+        max-width: 84vw;
+        z-index: 1050;
+        transform: translateX(-100%);
+        transition: transform 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 4px 0 28px rgba(0,0,0,0.85);
+      }
+      #sidebar.open {
+        transform: translateX(0);
+      }
+      #sidebar-overlay {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,0.72);
+        backdrop-filter: blur(3px);
+        -webkit-backdrop-filter: blur(3px);
+        z-index: 1040;
+      }
+      #sidebar-overlay.active {
+        display: block;
+      }
+      .side-brand {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      .side-close-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 32px;
+        height: 32px;
+        border-radius: 8px;
+        background: rgba(255,255,255,0.08);
+        border: 1px solid var(--border);
+        color: #fff;
+        font-size: 14px;
+        cursor: pointer;
+      }
+      .menu-toggle-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 38px;
+        height: 38px;
+        border-radius: 8px;
+        background: rgba(212,175,55,0.15);
+        border: 1px solid rgba(212,175,55,0.35);
+        color: var(--gold);
+        font-size: 20px;
+        cursor: pointer;
+        flex-shrink: 0;
+      }
+      #workspace {
+        width: 100%;
+        height: 100vh;
+        min-width: 0;
+        display: flex;
+        flex-direction: column;
+      }
+      #topbar {
+        height: auto;
+        min-height: 56px;
+        padding: 10px 14px;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+      }
+      .top-title {
+        font-size: 15px;
+        font-weight: 800;
+      }
+      .top-stats {
+        width: 100%;
+        overflow-x: auto;
+        white-space: nowrap;
+        gap: 8px;
+        scrollbar-width: none;
+        padding-bottom: 2px;
+      }
+      .top-stats::-webkit-scrollbar {
+        display: none;
+      }
+      .stat-pill {
+        padding: 5px 10px;
+        font-size: 11px;
+        flex-shrink: 0;
+      }
+      #content-area {
+        padding: 14px 12px 60px;
+        overflow-x: hidden;
+      }
+      .kpi-grid {
+        grid-template-columns: 1fr;
+        gap: 10px;
+        margin-bottom: 18px;
+      }
+      .kpi-card {
+        padding: 14px 16px;
+      }
+      .kpi-value {
+        font-size: 22px;
+      }
+      .data-table-wrap {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        border-radius: 10px;
+      }
+      .table-head-bar {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+        padding: 12px 14px;
+      }
+      .search-input {
+        width: 100% !important;
+      }
+      table th, table td {
+        white-space: nowrap;
+        padding: 10px 12px;
+        font-size: 12px;
+      }
+      #view-sos > div {
+        grid-template-columns: 1fr !important;
+        gap: 14px;
+      }
+      #live-radar-map {
+        height: 300px;
+      }
+      .ai-console-grid {
+        display: flex !important;
+        flex-direction: column !important;
+        height: auto !important;
+        gap: 14px;
+      }
+      .ai-box {
+        height: 420px;
+      }
+      .modal-box {
+        width: 95%;
+        max-height: 92vh;
+      }
+      .doc-preview-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 8px;
+      }
+    }
   </style>
 </head>
 <body>
 
+  <!-- OVERLAY MOBILE -->
+  <div id="sidebar-overlay" onclick="toggleSidebar(false)"></div>
+
   <!-- 1. SIDEBAR -->
   <aside id="sidebar">
     <div class="side-brand">
-      <div class="side-logo-g">G</div>
-      <div class="side-brand-title">
-        <b>GIRO CRM</b>
-        <span>Angola Central</span>
+      <div style="display:flex;align-items:center;gap:10px;">
+        <div class="side-logo-g">G</div>
+        <div class="side-brand-title">
+          <b>GIRO CRM</b>
+          <span>Angola Central</span>
+        </div>
       </div>
+      <button class="side-close-btn" onclick="toggleSidebar(false)" aria-label="Fechar Menu">✕</button>
     </div>
 
     <nav class="side-nav">
@@ -423,8 +596,11 @@
   <main id="workspace">
     <!-- Topbar -->
     <header id="topbar">
-      <div class="top-title" id="page-title">
-        <span>📊</span> Visão Geral Operacional
+      <div class="topbar-main-row">
+        <button id="btn-menu-toggle" class="menu-toggle-btn" onclick="toggleSidebar()" aria-label="Menu Principal">☰</button>
+        <div class="top-title" id="page-title">
+          <span>📊</span> Visão Geral Operacional
+        </div>
       </div>
 
       <div class="top-stats">
@@ -968,6 +1144,16 @@
   </div>
 
   <script>
+    // ── Mobile Drawer Toggle ──
+    function toggleSidebar(open) {
+      const sidebar = document.getElementById('sidebar');
+      const overlay = document.getElementById('sidebar-overlay');
+      if (!sidebar || !overlay) return;
+      const shouldOpen = open !== undefined ? open : !sidebar.classList.contains('open');
+      sidebar.classList.toggle('open', shouldOpen);
+      overlay.classList.toggle('active', shouldOpen);
+    }
+
     // ── Navigation ──
     const NAV_TITLES = {
       overview: '📊 Visão Geral Operacional',
@@ -980,6 +1166,7 @@
     };
 
     function switchNav(view) {
+      toggleSidebar(false);
       document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
       const activeBtn = Array.from(document.querySelectorAll('.nav-item')).find(b => b.getAttribute('onclick').includes(view));
       if (activeBtn) activeBtn.classList.add('active');
