@@ -1,15 +1,24 @@
-﻿# GIRO — App de Mobilidade Urbana e Carga para Angola (v5)
+﻿# ⚡ GIRO Angola — Mobilidade Urbana & Logística Inteligente
 
-Plataforma angolana de mobilidade urbana e logística de carga com foco em segurança activa.
+> Plataforma completa de mobilidade urbana, transporte de passageiros, entregas expressas e logística de carga adaptada à realidade de Angola.
 
-- **Slogan:** *GIRO — Táxi que te leva. Segurança que te acompanha.*
-- **Âmbito:** Cobertura nacional em 10 províncias de Angola.
-- **Diferenciais:**
-  - Botão de Pânico (SOS) 24h conectado à central de operações e esquadras da Polícia Nacional.
-  - Vertical GIRO Carga & Mudanças (Moto Carga, Van, Camião Ligeiro, Camião Médio, Mudanças).
-  - GIRO Entrega de encomendas com PIN de verificação.
-  - Multi-paragem e Agendamento de viagens.
-  - Central 24h com fila de operadores e monitorização de desvios de rota.
+---
 
-## Teste Online
-Aceda directamente pelo GitHub Pages: [https://isaac-carvalho.github.io/giro-angola/](https://isaac-carvalho.github.io/giro-angola/)
+## 🚀 Demonstrações & Apresentações Online
+
+- 📈 **Apresentação Executiva & Modelo para Investidores:** [Aceder ao Pitch Deck Interativo](https://isaac-carvalho.github.io/giro/investidores.html)
+- 🚖 **App de Passageiro (Demo Web):** [Abrir App Passageiro](https://isaac-carvalho.github.io/giro/)
+- 🚗 **App de Motorista (Comissão 10%):** [Abrir App Motorista](https://isaac-carvalho.github.io/giro/driver.html)
+- 🖥️ **Central Operacional & Despacho 24/7:** [Abrir Central](https://isaac-carvalho.github.io/giro/central.html)
+- 📊 **Painel Administrativo & CRM Multi-Agente:** [Abrir CRM GIRO](https://isaac-carvalho.github.io/giro/crm.html)
+- 📝 **Cadastro de Motoristas:** [Formulário de Cadastro](https://isaac-carvalho.github.io/giro/cadastro-motorista.html)
+
+---
+
+## 🔒 Propriedade Intelectual & Proteção de Código
+
+O código-fonte do backend em produção, bases de dados, microserviços de localização por satélite e o aplicativo móvel nativo são propriedade reservada e protegida da **Oaken Technologies**.
+
+Para parcerias, licenciamento de tecnologia ou desenvolvimento de projetos sob medida:
+- 🌐 **Website Oficial:** [https://n8noaken.cloud/](https://n8noaken.cloud/)
+- 💼 **Fundador:** Isaac Oaken (Isaac Carvalho)

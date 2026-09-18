@@ -1,9 +1,0 @@
-node_modules/
-.expo/
-dist/
-android/
-ios/
-*.keystore
-play-service-account.json
-.env
-.env.local

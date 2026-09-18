@@ -1,0 +1,24 @@
+﻿# ==============================================================================
+# GIRO ANGOLA — PROPRIETARY SOURCE PROTECTION
+# Core backend, database schemas, and mobile app code are excluded from public git
+# ==============================================================================
+
+# Proprietary Backend & API
+backend/
+*.sql
+*.env*
+*.log
+
+# Proprietary Mobile Source Code (React Native / TypeScript / Expo)
+mobile/
+*.apk
+*.aab
+*.ipa
+
+# Temporary & Local Backups
+*.bak
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+node_modules/
