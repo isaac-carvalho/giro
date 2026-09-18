@@ -455,6 +455,18 @@
       display: flex; flex-direction: column; overflow: hidden;
       box-shadow: 0 20px 60px rgba(0,0,0,0.9);
     }
+    
+    .form-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    @media (max-width: 500px) { .form-grid-2 { grid-template-columns: 1fr; } }
+    .form-row { margin-bottom: 14px; }
+    .form-row label { display: block; font-size: 11.5px; font-weight: 700; color: var(--muted); text-transform: uppercase; margin-bottom: 6px; }
+    .form-row input, .form-row select { width: 100%; background: var(--card-inner); border: 1.5px solid var(--border); border-radius: 8px; color: #fff; padding: 10px 12px; font-size: 14px; outline: none; box-sizing: border-box; }
+    .form-row input:focus, .form-row select:focus { border-color: var(--gold); }
+    .btn-delete { background: rgba(239,68,68,0.15); border: 1px solid rgba(239,68,68,0.35); color: #fca5a5; padding: 6px 10px; border-radius: 6px; font-size: 11px; font-weight: 700; cursor: pointer; }
+    .btn-delete:hover { background: rgba(239,68,68,0.3); color: #fff; }
+    .btn-toggle-status { background: rgba(212,175,55,0.12); border: 1px solid rgba(212,175,55,0.35); color: var(--gold); padding: 6px 10px; border-radius: 6px; font-size: 11px; font-weight: 700; cursor: pointer; margin-right: 4px; }
+    .btn-copy-wa { background: rgba(34,197,94,0.12); border: 1px solid rgba(34,197,94,0.35); color: var(--green); padding: 6px 10px; border-radius: 6px; font-size: 11px; font-weight: 700; cursor: pointer; margin-right: 4px; }
+
     .modal-head {
       padding: 18px 24px; border-bottom: 1px solid var(--border);
       display: flex; justify-content: space-between; align-items: center;
@@ -610,8 +622,16 @@
           <span>📊</span> Visão Geral & Faturação
         </button>
         <button class="nav-item" onclick="switchNav('drivers')">
-          <span>🚗</span> Aprovação de Motoristas (KYC)
-          <span class="nav-badge" id="badge-pending-kyc">3</span>
+          <span>🚗</span> Gestão de Motoristas
+          <span class="nav-badge" id="badge-drivers-count">0</span>
+        </button>
+        <button class="nav-item" onclick="switchNav('passengers')">
+          <span>🧑</span> Gestão de Passageiros
+          <span class="nav-badge" id="badge-passengers-count">0</span>
+        </button>
+        <button class="nav-item" onclick="switchNav('operators')">
+          <span>🛡️</span> Operadores Central 24h
+          <span class="nav-badge" id="badge-operators-count">0</span>
         </button>
         <button class="nav-item" onclick="switchNav('payouts')">
           <span>💰</span> Repasses Multicaixa / Unitel
@@ -753,44 +773,103 @@
           </div>
         </section>
 
-        <!-- ABA 2: APROVAÇÃO MOTORISTAS (KYC) -->
+        <!-- ABA 2: GESTÃO & CADASTRO DE MOTORISTAS -->
         <section id="view-drivers" class="tab-view">
           <div class="data-table-wrap">
             <div class="table-head-bar">
               <div>
-                <b style="font-size:16px;color:#fff;">Fila de Aprovação de Motoristas (Conformidade KYC)</b>
-                <div style="font-size:12px;color:var(--muted);">Documentação oficial submetida para homologação de condução</div>
+                <b style="font-size:16px;color:#fff;">Frota de Motoristas Parceiros GIRO</b>
+                <div style="font-size:12px;color:var(--muted);">Cadastre manualmente ou exclua condutores da plataforma</div>
               </div>
-              <input type="text" class="search-input" placeholder="Pesquisar por nome, tel, matrícula...">
+              <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+                <input type="text" id="filter-driver-input" oninput="renderDriversTable()" class="search-input" placeholder="Pesquisar condutor, matrícula, tel...">
+                <button class="btn-action gold" onclick="openAddDriverModal()">➕ Cadastrar Motorista Manual</button>
+              </div>
             </div>
             <table>
               <thead>
                 <tr>
-                  <th>Candidato</th>
+                  <th>Motorista Parceiro</th>
                   <th>Contacto</th>
                   <th>Categoria & Viatura</th>
                   <th>Matrícula</th>
-                  <th>Documentos</th>
-                  <th>Ação</th>
+                  <th>Estado</th>
+                  <th>Ações de Controlo</th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody id="drivers-tbody">
+                <!-- Preenchido dinamicamente via JS -->
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- ABA 2.1: GESTÃO & CADASTRO DE PASSAGEIROS -->
+        <section id="view-passengers" class="tab-view">
+          <div class="data-table-wrap">
+            <div class="table-head-bar">
+              <div>
+                <b style="font-size:16px;color:#fff;">Passageiros Cadastrados no Ecossistema</b>
+                <div style="font-size:12px;color:var(--muted);">Adicione manualmente, credite saldos ou exclua passageiros</div>
+              </div>
+              <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+                <input type="text" id="filter-passenger-input" oninput="renderPassengersTable()" class="search-input" placeholder="Pesquisar passageiro, telefone...">
+                <button class="btn-action gold" onclick="openAddPassengerModal()">➕ Cadastrar Passageiro Manual</button>
+              </div>
+            </div>
+            <table>
+              <thead>
                 <tr>
-                  <td><b>João Baptista Afonso</b><br><small style="color:var(--muted);">Cadastrado há 2h</small></td>
-                  <td>+244 923 888 111</td>
-                  <td>🚗 Carro Económico (Hyundai i10)</td>
-                  <td><span style="font-family:monospace;background:#1a221b;padding:2px 6px;border-radius:4px;">LD-88-21-BH</span></td>
-                  <td><span class="badge gold">6 Docs Prontos</span></td>
-                  <td><button class="btn-action gold" onclick="openKycModal('João Baptista Afonso', 'LD-88-21-BH', '+244 923 888 111', 'Hyundai i10')">Validar e Aprovar</button></td>
+                  <th>Passageiro</th>
+                  <th>Telemóvel</th>
+                  <th>Província</th>
+                  <th>Viagens Realizadas</th>
+                  <th>Saldo de Carteira</th>
+                  <th>Estado</th>
+                  <th>Ações de Controlo</th>
                 </tr>
+              </thead>
+              <tbody id="passengers-tbody">
+                <!-- Preenchido dinamicamente via JS -->
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- ABA 2.2: GESTÃO DE OPERADORES CENTRAL 24H -->
+        <section id="view-operators" class="tab-view">
+          <div style="background:rgba(212,175,55,0.08);border:1px solid var(--border);border-radius:12px;padding:14px 18px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
+            <div>
+              <div style="font-weight:700;color:var(--gold);font-size:14px;">🔒 Acesso Restrito à Central de Monitoramento</div>
+              <div style="font-size:12px;color:var(--muted);margin-top:2px;">Não há cadastro público na página da Central. Os operadores autenticam-se com os dados gerados aqui.</div>
+            </div>
+            <a href="./central-login.html" target="_blank" class="btn-action outline" style="text-decoration:none;">↗ Abrir Login da Central</a>
+          </div>
+
+          <div class="data-table-wrap">
+            <div class="table-head-bar">
+              <div>
+                <b style="font-size:16px;color:#fff;">Operadores Credenciados da Central 24h</b>
+                <div style="font-size:12px;color:var(--muted);">Emita senhas, copie acessos para WhatsApp e bloqueie turnos</div>
+              </div>
+              <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+                <button class="btn-action gold" onclick="openAddOperatorModal()">➕ Criar Novo Operador</button>
+              </div>
+            </div>
+            <table>
+              <thead>
                 <tr>
-                  <td><b>Manuel Gaspar Ndala</b><br><small style="color:var(--muted);">Cadastrado há 4h</small></td>
-                  <td>+244 912 334 556</td>
-                  <td>🏍️ Moto Kupapata (Lingken 125)</td>
-                  <td><span style="font-family:monospace;background:#1a221b;padding:2px 6px;border-radius:4px;">LD-10-99-MK</span></td>
-                  <td><span class="badge gold">6 Docs Prontos</span></td>
-                  <td><button class="btn-action gold" onclick="openKycModal('Manuel Gaspar Ndala', 'LD-10-99-MK', '+244 912 334 556', 'Lingken 125')">Validar e Aprovar</button></td>
+                  <th>Nome do Operador</th>
+                  <th>Utilizador / Login</th>
+                  <th>Telefone / WhatsApp</th>
+                  <th>Posto / Função</th>
+                  <th>Senha Actual</th>
+                  <th>Estado</th>
+                  <th>Ações</th>
                 </tr>
+              </thead>
+              <tbody id="operators-tbody">
+                <!-- Preenchido dinamicamente via JS -->
               </tbody>
             </table>
           </div>
@@ -963,6 +1042,178 @@
     </main>
   </div>
 
+  
+  <!-- MODAL: CADASTRAR MOTORISTA MANUALMENTE -->
+  <div class="modal-backdrop" id="driver-create-modal">
+    <div class="modal-box" style="max-width:540px;">
+      <div class="modal-head">
+        <div>
+          <b style="font-size:17px;color:#fff;">Cadastrar Motorista Manualmente</b>
+          <div style="font-size:12px;color:var(--gold);">Inclusão directa na base de dados oficial GIRO</div>
+        </div>
+        <button class="btn-action outline" onclick="closeAddDriverModal()">✕</button>
+      </div>
+      <div class="modal-body">
+        <form onsubmit="saveNewDriver(event)">
+          <div class="form-row">
+            <label>Nome Completo do Condutor *</label>
+            <input type="text" id="drv-nome" required placeholder="Ex: Mateus Kuanza">
+          </div>
+          <div class="form-grid-2">
+            <div class="form-row">
+              <label>Telefone / WhatsApp *</label>
+              <input type="text" id="drv-phone" required placeholder="Ex: +244 923 111 222">
+            </div>
+            <div class="form-row">
+              <label>E-mail (Opcional)</label>
+              <input type="email" id="drv-email" placeholder="condutor@email.ao">
+            </div>
+          </div>
+          <div class="form-grid-2">
+            <div class="form-row">
+              <label>Categoria de Serviço *</label>
+              <select id="drv-cat" required>
+                <option value="Económico">🚗 Carro Económico</option>
+                <option value="Conforto">🚙 Carro Conforto</option>
+                <option value="Kupapata">🏍️ Moto Kupapata</option>
+                <option value="GIRO 7">🚐 SUV / 7 Lugares</option>
+                <option value="Carga">🚚 Van / Carga & Mudanças</option>
+              </select>
+            </div>
+            <div class="form-row">
+              <label>Matrícula do Veículo *</label>
+              <input type="text" id="drv-plate" required placeholder="Ex: LD-32-44-AZ" style="text-transform:uppercase;">
+            </div>
+          </div>
+          <div class="form-grid-2">
+            <div class="form-row">
+              <label>Marca & Modelo *</label>
+              <input type="text" id="drv-car" required placeholder="Ex: Toyota Corolla">
+            </div>
+            <div class="form-row">
+              <label>Estado Inicial *</label>
+              <select id="drv-status">
+                <option value="ativo" selected>● Ativo (Apto a rodar)</option>
+                <option value="pendente">⏳ Pendente de Documentação</option>
+                <option value="bloqueado">🔴 Bloqueado</option>
+              </select>
+            </div>
+          </div>
+          <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:16px;">
+            <button type="button" class="btn-action outline" onclick="closeAddDriverModal()">Cancelar</button>
+            <button type="submit" class="btn-action gold">💾 Gravar Motorista</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: CADASTRAR PASSAGEIRO MANUALMENTE -->
+  <div class="modal-backdrop" id="passenger-create-modal">
+    <div class="modal-box" style="max-width:500px;">
+      <div class="modal-head">
+        <div>
+          <b style="font-size:17px;color:#fff;">Cadastrar Passageiro Manualmente</b>
+          <div style="font-size:12px;color:var(--gold);">Criar conta de cliente com saldo opcional</div>
+        </div>
+        <button class="btn-action outline" onclick="closeAddPassengerModal()">✕</button>
+      </div>
+      <div class="modal-body">
+        <form onsubmit="saveNewPassenger(event)">
+          <div class="form-row">
+            <label>Nome Completo do Passageiro *</label>
+            <input type="text" id="pax-nome" required placeholder="Ex: Maria Teresa Bento">
+          </div>
+          <div class="form-grid-2">
+            <div class="form-row">
+              <label>Telefone / WhatsApp *</label>
+              <input type="text" id="pax-phone" required placeholder="Ex: +244 912 345 678">
+            </div>
+            <div class="form-row">
+              <label>Província de Residência *</label>
+              <select id="pax-prov">
+                <option value="Luanda" selected>Luanda</option>
+                <option value="Benguela">Benguela</option>
+                <option value="Huambo">Huambo</option>
+                <option value="Lubango">Lubango</option>
+                <option value="Cabinda">Cabinda</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-grid-2">
+            <div class="form-row">
+              <label>Saldo Inicial na Carteira (Kz)</label>
+              <input type="number" id="pax-saldo" value="0" min="0" step="500">
+            </div>
+            <div class="form-row">
+              <label>Estado Inicial *</label>
+              <select id="pax-status">
+                <option value="ativo" selected>● Ativo</option>
+                <option value="bloqueado">🔴 Bloqueado</option>
+              </select>
+            </div>
+          </div>
+          <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:16px;">
+            <button type="button" class="btn-action outline" onclick="closeAddPassengerModal()">Cancelar</button>
+            <button type="submit" class="btn-action gold">💾 Gravar Passageiro</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: CADASTRAR OPERADOR DA CENTRAL -->
+  <div class="modal-backdrop" id="operator-create-modal">
+    <div class="modal-box" style="max-width:520px;">
+      <div class="modal-head">
+        <div>
+          <b style="font-size:17px;color:#fff;">Criar Credenciais de Operador 24h</b>
+          <div style="font-size:12px;color:var(--gold);">Gera login directo para acesso à Central Táctica</div>
+        </div>
+        <button class="btn-action outline" onclick="closeAddOperatorModal()">✕</button>
+      </div>
+      <div class="modal-body">
+        <form onsubmit="saveNewOperator(event)">
+          <div class="form-row">
+            <label>Nome Completo do Funcionário *</label>
+            <input type="text" id="op-fullname" required placeholder="Ex: João Baptista">
+          </div>
+          <div class="form-grid-2">
+            <div class="form-row">
+              <label>Nome de Utilizador / Login *</label>
+              <input type="text" id="op-userlogin" required placeholder="Ex: operador_joao" autocapitalize="none">
+            </div>
+            <div class="form-row">
+              <label>Telefone / WhatsApp *</label>
+              <input type="text" id="op-phonenumber" required placeholder="Ex: +244 923 000 111">
+            </div>
+          </div>
+          <div class="form-grid-2">
+            <div class="form-row">
+              <label>Posto / Função Operacional *</label>
+              <select id="op-userrole" required>
+                <option value="Operador Radar 24h" selected>Operador Radar 24h</option>
+                <option value="Supervisor SOS & PNA">Supervisor SOS & PNA (111)</option>
+                <option value="Coordenador de Turno">Coordenador de Turno</option>
+              </select>
+            </div>
+            <div class="form-row">
+              <label>Senha de Segurança *</label>
+              <div style="display:flex;gap:6px;">
+                <input type="text" id="op-passwordval" required value="giro2026central">
+                <button type="button" class="btn-action outline" onclick="generateRandomPass()" style="padding:4px 8px;font-size:11px;" title="Gerar senha aleatória">🎲</button>
+              </div>
+            </div>
+          </div>
+          <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:16px;">
+            <button type="button" class="btn-action outline" onclick="closeAddOperatorModal()">Cancelar</button>
+            <button type="submit" class="btn-action gold">💾 Criar Operador & Salvar</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
   <!-- MODAL KYC -->
   <div class="modal-backdrop" id="kyc-modal">
     <div class="modal-box">
@@ -1112,7 +1363,9 @@
     // ═════════════════════════════════════════════════════════════════
     const NAV_TITLES = {
       overview: '📊 Visão Geral & Faturação Real',
-      drivers: '🚗 Aprovação de Motoristas (KYC)',
+      drivers: '🚗 Gestão de Motoristas Parceiros',
+      passengers: '🧑 Gestão de Passageiros Cadastrados',
+      operators: '🛡️ Operadores da Central de Rastreamento 24h',
       payouts: '💰 Repasses Multicaixa & Unitel Money',
       disputes: '⚖️ Disputas & Reembolsos',
       sos: '🚨 Monitor Tático & PNA (111)',
@@ -1196,6 +1449,337 @@
     function saveVpsConfig() {
       alert('💾 Definições de conexão e chaves de segurança guardadas com sucesso.');
     }
+
+    // ═════════════════════════════════════════════════════════════════
+    // CRUD ENGINES: DRIVERS, PASSENGERS & CENTRAL OPERATORS
+    // ═════════════════════════════════════════════════════════════════
+    const STORAGE_DRIVERS = 'giro_admin_drivers';
+    const STORAGE_PASSENGERS = 'giro_admin_passengers';
+    const STORAGE_OPERATORS = 'giro_central_operators';
+
+    function initDataIfEmpty() {
+      // Drivers
+      if (!localStorage.getItem(STORAGE_DRIVERS)) {
+        const initialDrivers = [
+          { id: 'drv-1', nome: 'João Baptista Afonso', phone: '+244 923 888 111', email: 'joao.baptista@gmail.com', cat: 'Económico', car: 'Hyundai i10', plate: 'LD-88-21-BH', status: 'ativo', date: 'Hoje às 14:20' },
+          { id: 'drv-2', nome: 'Manuel Gaspar Ndala', phone: '+244 912 334 556', email: 'manuel.ndala@yahoo.com', cat: 'Kupapata', car: 'Lingken 125', plate: 'LD-10-99-MK', status: 'pendente', date: 'Hoje às 11:15' },
+          { id: 'drv-3', nome: 'Domingos Manuel Silva', phone: '+244 924 556 778', email: 'domingos.m@hotmail.com', cat: 'Conforto', car: 'Toyota Corolla', plate: 'LD-23-45-AA', status: 'ativo', date: 'Ontem' }
+        ];
+        localStorage.setItem(STORAGE_DRIVERS, JSON.stringify(initialDrivers));
+      }
+
+      // Passengers
+      if (!localStorage.getItem(STORAGE_PASSENGERS)) {
+        const initialPassengers = [
+          { id: 'pax-1', nome: 'António Silva', phone: '+244 923 445 566', email: 'antonio.silva@net.ao', prov: 'Luanda', rides: 14, saldo: 5200, status: 'ativo' },
+          { id: 'pax-2', nome: 'Marta Bento', phone: '+244 912 889 900', email: 'marta.bento@gmail.com', prov: 'Luanda', rides: 8, saldo: 1500, status: 'ativo' },
+          { id: 'pax-3', nome: 'Carlos Neves', phone: '+244 931 002 003', email: 'carlos.neves@empresa.ao', prov: 'Benguela', rides: 22, saldo: 0, status: 'ativo' }
+        ];
+        localStorage.setItem(STORAGE_PASSENGERS, JSON.stringify(initialPassengers));
+      }
+
+      // Operators
+      if (!localStorage.getItem(STORAGE_OPERATORS)) {
+        const initialOps = [
+          { id: 'op-default-1', nome: 'Operador Padrão (Central 24h)', username: 'operador1', phone: '+244 923 000 001', password: 'giro2026central', role: 'Operador Radar 24h', status: 'ativo' },
+          { id: 'op-default-2', nome: 'Supervisor Táctico SOS', username: 'supervisor', phone: '+244 923 000 002', password: 'giro2026supervisor', role: 'Supervisor SOS & PNA', status: 'ativo' }
+        ];
+        localStorage.setItem(STORAGE_OPERATORS, JSON.stringify(initialOps));
+      }
+    }
+
+    // ── DRIVER MANAGEMENT ──
+    function getDrivers() {
+      try { return JSON.parse(localStorage.getItem(STORAGE_DRIVERS) || '[]'); } catch(e) { return []; }
+    }
+    function saveDrivers(list) {
+      localStorage.setItem(STORAGE_DRIVERS, JSON.stringify(list));
+      renderDriversTable();
+    }
+
+    function renderDriversTable() {
+      const list = getDrivers();
+      const tbody = document.getElementById('drivers-tbody');
+      const badge = document.getElementById('badge-drivers-count');
+      if (badge) badge.textContent = list.length;
+      if (!tbody) return;
+
+      const q = (document.getElementById('filter-driver-input')?.value || '').toLowerCase().trim();
+      const filtered = list.filter(d => 
+        d.nome.toLowerCase().includes(q) || 
+        d.plate.toLowerCase().includes(q) || 
+        d.phone.includes(q) ||
+        (d.car && d.car.toLowerCase().includes(q))
+      );
+
+      if (filtered.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--muted);padding:24px;">Nenhum motorista encontrado.</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = filtered.map(d => {
+        const statusBadge = d.status === 'ativo' ? '<span class="badge green">● Ativo</span>' :
+                            (d.status === 'pendente' ? '<span class="badge gold">⏳ Pendente KYC</span>' : '<span class="badge red">🔴 Bloqueado</span>');
+        return `
+          <tr>
+            <td><b>${d.nome}</b><br><small style="color:var(--muted);">${d.date || 'Cadastrado'}</small></td>
+            <td>${d.phone}</td>
+            <td>${d.cat} · ${d.car}</td>
+            <td><span style="font-family:monospace;background:#1a221b;padding:3px 7px;border-radius:4px;color:var(--gold);font-weight:700;">${d.plate}</span></td>
+            <td>${statusBadge}</td>
+            <td>
+              <button class="btn-toggle-status" onclick="toggleDriverStatus('${d.id}')" title="Alterar Estado">${d.status === 'ativo' ? 'Bloquear' : 'Ativar'}</button>
+              <button class="btn-action gold" style="padding:6px 10px;font-size:11px;margin-right:4px;" onclick="openKycModal('${d.nome}', '${d.plate}', '${d.phone}', '${d.car}')">Validar KYC</button>
+              <button class="btn-delete" onclick="deleteDriver('${d.id}', '${d.nome}')" title="Excluir Motorista">🗑️ Excluir</button>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function openAddDriverModal() { document.getElementById('driver-create-modal').classList.add('open'); }
+    function closeAddDriverModal() { document.getElementById('driver-create-modal').classList.remove('open'); }
+
+    function saveNewDriver(e) {
+      e.preventDefault();
+      const nome = document.getElementById('drv-nome').value.trim();
+      const phone = document.getElementById('drv-phone').value.trim();
+      const email = document.getElementById('drv-email').value.trim();
+      const cat = document.getElementById('drv-cat').value;
+      const plate = document.getElementById('drv-plate').value.trim().toUpperCase();
+      const car = document.getElementById('drv-car').value.trim();
+      const status = document.getElementById('drv-status').value;
+
+      const list = getDrivers();
+      const newD = {
+        id: 'drv-' + Date.now(),
+        nome, phone, email, cat, plate, car, status,
+        date: 'Registado via Painel Admin'
+      };
+      list.unshift(newD);
+      saveDrivers(list);
+      closeAddDriverModal();
+      alert('✓ Motorista ' + nome + ' cadastrado com sucesso!');
+    }
+
+    function toggleDriverStatus(id) {
+      const list = getDrivers();
+      const item = list.find(d => d.id === id);
+      if (item) {
+        item.status = item.status === 'ativo' ? 'bloqueado' : 'ativo';
+        saveDrivers(list);
+      }
+    }
+
+    function deleteDriver(id, name) {
+      if (confirm('Tem a certeza que deseja EXCLUIR permanentemente o motorista ' + name + '?\nEsta acção removerá o acesso dele à plataforma.')) {
+        let list = getDrivers();
+        list = list.filter(d => d.id !== id);
+        saveDrivers(list);
+      }
+    }
+
+    // ── PASSENGER MANAGEMENT ──
+    function getPassengers() {
+      try { return JSON.parse(localStorage.getItem(STORAGE_PASSENGERS) || '[]'); } catch(e) { return []; }
+    }
+    function savePassengers(list) {
+      localStorage.setItem(STORAGE_PASSENGERS, JSON.stringify(list));
+      renderPassengersTable();
+    }
+
+    function renderPassengersTable() {
+      const list = getPassengers();
+      const tbody = document.getElementById('passengers-tbody');
+      const badge = document.getElementById('badge-passengers-count');
+      if (badge) badge.textContent = list.length;
+      if (!tbody) return;
+
+      const q = (document.getElementById('filter-passenger-input')?.value || '').toLowerCase().trim();
+      const filtered = list.filter(p => p.nome.toLowerCase().includes(q) || p.phone.includes(q));
+
+      if (filtered.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--muted);padding:24px;">Nenhum passageiro encontrado.</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = filtered.map(p => {
+        const statusBadge = p.status === 'ativo' ? '<span class="badge green">● Ativo</span>' : '<span class="badge red">🔴 Bloqueado</span>';
+        return `
+          <tr>
+            <td><b>${p.nome}</b><br><small style="color:var(--muted);">${p.email || 'Sem e-mail'}</small></td>
+            <td>${p.phone}</td>
+            <td>${p.prov || 'Luanda'}</td>
+            <td><b>${p.rides || 0}</b> viagens</td>
+            <td><b style="color:var(--green);">${Number(p.saldo || 0).toLocaleString('pt-AO')} Kz</b></td>
+            <td>${statusBadge}</td>
+            <td>
+              <button class="btn-toggle-status" onclick="togglePassengerStatus('${p.id}')">${p.status === 'ativo' ? 'Bloquear' : 'Ativar'}</button>
+              <button class="btn-delete" onclick="deletePassenger('${p.id}', '${p.nome}')" title="Excluir Passageiro">🗑️ Excluir</button>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function openAddPassengerModal() { document.getElementById('passenger-create-modal').classList.add('open'); }
+    function closeAddPassengerModal() { document.getElementById('passenger-create-modal').classList.remove('open'); }
+
+    function saveNewPassenger(e) {
+      e.preventDefault();
+      const nome = document.getElementById('pax-nome').value.trim();
+      const phone = document.getElementById('pax-phone').value.trim();
+      const prov = document.getElementById('pax-prov').value;
+      const saldo = Number(document.getElementById('pax-saldo').value || 0);
+      const status = document.getElementById('pax-status').value;
+
+      const list = getPassengers();
+      const newP = {
+        id: 'pax-' + Date.now(),
+        nome, phone, prov, saldo, status,
+        rides: 0, email: ''
+      };
+      list.unshift(newP);
+      savePassengers(list);
+      closeAddPassengerModal();
+      alert('✓ Passageiro ' + nome + ' cadastrado com sucesso!');
+    }
+
+    function togglePassengerStatus(id) {
+      const list = getPassengers();
+      const item = list.find(p => p.id === id);
+      if (item) {
+        item.status = item.status === 'ativo' ? 'bloqueado' : 'ativo';
+        savePassengers(list);
+      }
+    }
+
+    function deletePassenger(id, name) {
+      if (confirm('Tem a certeza que deseja EXCLUIR permanentemente o passageiro ' + name + '?')) {
+        let list = getPassengers();
+        list = list.filter(p => p.id !== id);
+        savePassengers(list);
+      }
+    }
+
+    // ── OPERATOR MANAGEMENT ──
+    function getOperators() {
+      try { return JSON.parse(localStorage.getItem(STORAGE_OPERATORS) || '[]'); } catch(e) { return []; }
+    }
+    function saveOperators(list) {
+      localStorage.setItem(STORAGE_OPERATORS, JSON.stringify(list));
+      renderOperatorsTable();
+    }
+
+    function renderOperatorsTable() {
+      const list = getOperators();
+      const tbody = document.getElementById('operators-tbody');
+      const badge = document.getElementById('badge-operators-count');
+      if (badge) badge.textContent = list.length;
+      if (!tbody) return;
+
+      if (list.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--muted);padding:24px;">Nenhum operador cadastrado.</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = list.map(o => {
+        const statusBadge = o.status === 'ativo' ? '<span class="badge green">● Ativo</span>' : '<span class="badge red">🔴 Bloqueado</span>';
+        return `
+          <tr>
+            <td><b>${o.nome}</b></td>
+            <td><code style="color:var(--gold);font-weight:700;">${o.username}</code></td>
+            <td>${o.phone}</td>
+            <td><span class="badge blue">${o.role}</span></td>
+            <td><code style="background:#151c16;padding:2px 6px;border-radius:4px;">${o.password}</code></td>
+            <td>${statusBadge}</td>
+            <td>
+              <button class="btn-copy-wa" onclick="copyOperatorWhatsApp('${o.nome}', '${o.username}', '${o.password}', '${o.phone}')">📲 Enviar WhatsApp</button>
+              <button class="btn-toggle-status" onclick="toggleOperatorStatus('${o.id}')">${o.status === 'ativo' ? 'Bloquear' : 'Desbloquear'}</button>
+              <button class="btn-delete" onclick="deleteOperator('${o.id}', '${o.nome}')">🗑️ Excluir</button>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function openAddOperatorModal() { document.getElementById('operator-create-modal').classList.add('open'); }
+    function closeAddOperatorModal() { document.getElementById('operator-create-modal').classList.remove('open'); }
+
+    function generateRandomPass() {
+      const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789';
+      let pass = 'Giro@';
+      for(let i=0; i<6; i++) pass += chars.charAt(Math.floor(Math.random() * chars.length));
+      document.getElementById('op-passwordval').value = pass;
+    }
+
+    function saveNewOperator(e) {
+      e.preventDefault();
+      const nome = document.getElementById('op-fullname').value.trim();
+      const username = document.getElementById('op-userlogin').value.trim().toLowerCase();
+      const phone = document.getElementById('op-phonenumber').value.trim();
+      const role = document.getElementById('op-userrole').value;
+      const password = document.getElementById('op-passwordval').value.trim();
+
+      const list = getOperators();
+      if (list.some(o => o.username.toLowerCase() === username)) {
+        alert('Erro: Já existe um operador com o nome de utilizador "' + username + '".');
+        return;
+      }
+
+      const newOp = {
+        id: 'op-' + Date.now(),
+        nome, username, phone, role, password,
+        status: 'ativo',
+        createdAt: new Date().toISOString()
+      };
+      list.push(newOp);
+      saveOperators(list);
+      closeAddOperatorModal();
+      alert('✓ Operador ' + nome + ' criado com sucesso! Use o botão "Enviar WhatsApp" para lhe enviar as credenciais.');
+    }
+
+    function toggleOperatorStatus(id) {
+      const list = getOperators();
+      const item = list.find(o => o.id === id);
+      if (item) {
+        item.status = item.status === 'ativo' ? 'bloqueado' : 'ativo';
+        saveOperators(list);
+      }
+    }
+
+    function deleteOperator(id, name) {
+      if (confirm('Tem a certeza que deseja EXCLUIR o operador ' + name + '?\nO acesso deste colaborador à Central será revogado imediatamente.')) {
+        let list = getOperators();
+        list = list.filter(o => o.id !== id);
+        saveOperators(list);
+      }
+    }
+
+    function copyOperatorWhatsApp(nome, username, password, phone) {
+      const msg = `Olá ${nome}, aqui estão os teus acessos à Central de Rastreamento GIRO Angola 24h:
+
+🔗 Link de Acesso: https://isaac-carvalho.github.io/giro/central-login.html
+👤 Utilizador: ${username}
+🔑 Senha: ${password}
+
+⚠️ Este acesso é pessoal e intransmissível, sujeito ao Contrato de Sigilo da Central. Bom serviço!`;
+
+      navigator.clipboard.writeText(msg).then(() => {
+        alert('✓ Mensagem de acesso copiada para a área de transferência! Cole no WhatsApp do operador ' + nome + '.');
+      }).catch(() => {
+        prompt('Copie a mensagem de acesso abaixo:', msg);
+      });
+    }
+
+    // Initialize data tables
+    window.addEventListener('DOMContentLoaded', () => {
+      initDataIfEmpty();
+      renderDriversTable();
+      renderPassengersTable();
+      renderOperatorsTable();
+    });
+
   </script>
 </body>
 </html>

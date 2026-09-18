@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="pt-AO">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GIRO Angola — Contrato de Operador de Central de Rastreamento & Monitoramento 24h</title>
+<style>
+  @page { size: A4; margin: 22mm 18mm 22mm 18mm; }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Georgia', 'Times New Roman', serif;
+    font-size: 10.5pt;
+    line-height: 1.65;
+    color: #1a1a1a;
+    background: #fff;
+    padding: 22mm 18mm;
+    max-width: 210mm;
+    margin: 0 auto;
+  }
+  @media print {
+    body { padding: 0; max-width: none; }
+    .no-print { display: none !important; }
+  }
+  .no-print {
+    position: fixed; top: 16px; right: 16px; z-index: 999;
+    display: flex; gap: 8px;
+  }
+  .no-print button {
+    background: #0a2540; color: #fff; border: none; padding: 10px 20px;
+    border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer;
+    font-family: system-ui, sans-serif;
+  }
+  .no-print button:hover { background: #163a5f; }
+  .contract-header {
+    text-align: center;
+    border-bottom: 3px double #0a2540;
+    padding-bottom: 14px;
+    margin-bottom: 22px;
+  }
+  .contract-header h1 {
+    font-size: 14pt;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #0a2540;
+    margin-bottom: 3px;
+  }
+  .contract-header h2 {
+    font-size: 11pt;
+    font-weight: normal;
+    color: #444;
+  }
+  .contract-header .doc-id { font-size: 9pt; color: #666; margin-top: 5px; }
+  .clause { margin-bottom: 16px; page-break-inside: avoid; }
+  .clause-title {
+    font-size: 11pt;
+    font-weight: bold;
+    color: #0a2540;
+    text-transform: uppercase;
+    margin-bottom: 5px;
+    border-left: 4px solid #0a2540;
+    padding-left: 8px;
+  }
+  ol { margin-left: 20px; margin-bottom: 6px; }
+  ol li { margin-bottom: 4px; }
+  ul { margin-left: 20px; margin-bottom: 6px; list-style: disc; }
+  ul li { margin-bottom: 3px; }
+  table {
+    width: 100%; border-collapse: collapse; margin: 8px 0 12px 0; font-size: 9.5pt;
+  }
+  table th, table td {
+    border: 1px solid #999; padding: 6px 8px; text-align: left; vertical-align: middle;
+  }
+  table th { background: #0a2540; color: #fff; font-weight: 600; }
+  table td { background: #fafafa; }
+  .alert-box {
+    background: #fff8e1; border-left: 4px solid #f59e0b; padding: 8px 12px;
+    margin: 8px 0; font-size: 9.5pt;
+  }
+  .danger-box {
+    background: #fef2f2; border-left: 4px solid #dc2626; padding: 8px 12px;
+    margin: 8px 0; font-size: 9.5pt;
+  }
+  .blank { display: inline-block; min-width: 150px; border-bottom: 1px solid #333; margin: 0 3px; }
+  .sig-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-top: 24px; page-break-inside: avoid; }
+  .sig-box { border: 1px solid #ccc; padding: 12px; border-radius: 4px; font-size: 9.5pt; }
+  .sig-box h4 { font-size: 9pt; text-transform: uppercase; color: #0a2540; border-bottom: 1px solid #ddd; padding-bottom: 4px; margin-bottom: 6px; }
+  .contract-footer { margin-top: 28px; text-align: center; font-size: 8pt; color: #888; border-top: 1px solid #ddd; padding-top: 8px; }
+  .page-break { page-break-before: always; }
+</style>
+</head>
+<body>
+
+<div class="no-print">
+  <button onclick="window.print()">📄 Imprimir / Salvar PDF</button>
+</div>
+
+<div class="contract-header">
+  <h1>Contrato de Prestação de Serviços & Sigilo Reforçado</h1>
+  <h2>Operador de Central de Rastreamento, Telemetria & Incidentes SOS 24 Horas</h2>
+  <div class="doc-id">GIRO ANGOLA · POSTO DE COMANDO & OPERAÇÕES TÁCTICAS · LUANDA, ANGOLA</div>
+</div>
+
+<div class="clause">
+  <div class="clause-title">Entre as Partes Contratantes</div>
+  <p>
+    <strong>PRIMEIRA OUTORGANTE (EMPRESA):</strong> <strong>GIRO Angola</strong>, divisão tecnológica operada por <strong>Oaken Technologies</strong>, representada neste acto pelo seu Fundador & Director-Geral, <strong>Isaac Carvalho</strong>, com sede em Luanda, Angola, doravante designada abreviadamente por <strong>"GIRO"</strong>.
+  </p>
+  <p style="margin-top:6px;">
+    <strong>SEGUNDO OUTORGANTE (OPERADOR):</strong> Sr.(a) <span class="blank" style="min-width:220px;"></span>, de nacionalidade angolana, titular do Bilhete de Identidade n.º <span class="blank" style="min-width:140px;"></span>, residente em Luanda, no Bairro/Município de <span class="blank" style="min-width:160px;"></span>, telefone <span class="blank" style="min-width:130px;"></span>, doravante designado por <strong>"OPERADOR DE CENTRAL"</strong>.
+  </p>
+</div>
+
+<div class="clause">
+  <div class="clause-title">Cláusula 1.ª — Objecto das Funções & Posto Táctico</div>
+  <ol>
+    <li>O presente contrato tem por objecto o exercício das funções especializadas de <strong>Operador de Central de Monitoramento e Rastreamento Táctico 24h</strong> da plataforma GIRO.</li>
+    <li>Constituem atribuições nucleares do OPERADOR:
+      <ul>
+        <li>Monitorizar em tempo real o radar de frotas e tráfego de viaturas parceiras na província de Luanda e demais províncias angolanas;</li>
+        <li>Receber, triar e responder a <strong>Alertas de Pânico / SOS Silencioso</strong> emitidos por passageiros e motoristas no tempo máximo de resposta de <strong>30 (trinta) segundos</strong>;</li>
+        <li>Accionar de imediato o canal prioritário da <strong>Polícia Nacional de Angola (PNA — 111)</strong>, bombeiros e serviços de emergência médica (INEMA);</li>
+        <li>Efectuar o disparo do sinal de socorro solidário por geolocalização aos condutores no raio de 5 km da ocorrência;</li>
+        <li>Prestar assistência e mediação técnica a incidentes em rota.</li>
+      </ul>
+    </li>
+  </ol>
+</div>
+
+<div class="clause">
+  <div class="clause-title">Cláusula 2.ª — Credenciais & Regime de Acesso Exclusivo (Sem Auto-Registo)</div>
+  <div class="alert-box">
+    <strong>ACESSO RESTRITO POR ATRIBUIÇÃO ADMINISTRATIVA:</strong> O OPERADOR reconhece formalmente que a Central de Monitoramento não possui cadastro público. O acesso à interface táctica dá-se unicamente através de credenciais criptografadas individuais criadas directamente pelo Administrador Geral no Cofre Master da GIRO.
+  </div>
+  <ol>
+    <li>O nome de utilizador e senha atribuídos ao OPERADOR são <strong>estritamente confidenciais, pessoais e intransmissíveis</strong>.</li>
+    <li>É expressamente proibido ceder, emprestar, divulgar ou permitir o uso de credenciais por colegas de turno ou terceiros. Toda e qualquer acção realizada sob a credencial é de responsabilidade exclusiva do OPERADOR titular.</li>
+  </ol>
+</div>
+
+<div class="clause">
+  <div class="clause-title">Cláusula 3.ª — Termo de Confidencialidade & Segredo de Estado/Empresa (NDA Reforçado)</div>
+  <div class="danger-box">
+    <strong>ADVERTÊNCIA LEGAL MÁXIMA:</strong> No exercício da função, o OPERADOR terá visibilidade de rotas, nomes, moradas, números de telefone, trajetórias diárias e dados de cidadãos angolanos e estrangeiros. O uso indevido destas informações acarreta demissão imediata com justa causa e responsabilidade criminal perante o SIC (Serviço de Investigação Criminal).
+  </div>
+  <ol>
+    <li>É terminantemente proibido ao OPERADOR:
+      <ul>
+        <li>Tirar fotografias, capturas de ecrã (print screen) ou gravações de vídeo da tela da Central de Rastreamento;</li>
+        <li>Entrar na sala de operações com dispositivos de gravação não autorizados;</li>
+        <li>Divulgar a amigos, parentes ou terceiros o paradeiro ou a rota de qualquer utilizador da plataforma;</li>
+        <li>Consultar a localização de pessoas ou viaturas por curiosidade pessoal ou interesse alheio ao serviço de socorro;</li>
+        <li>Vender, copiar, exportar ou transferir bases de dados da GIRO para qualquer suporte externo.</li>
+      </ul>
+    </li>
+    <li>A obrigação de sigilo profissional e protecção de dados vigorará durante a vigência do contrato e por um período de <strong>5 (cinco) anos</strong> após a cessação do vínculo, sob as penas da Lei n.º 22/11 (Lei de Protecção de Dados Pessoais).</li>
+  </ol>
+</div>
+
+<div class="page-break"></div>
+
+<div class="clause">
+  <div class="clause-title">Cláusula 4.ª — Escalas, Turnos & Dever de Prontidão</div>
+  <ol>
+    <li>A Central de Operações funciona em regime ininterrupto de 24 horas por dia, 7 dias por semana, 365 dias por ano.</li>
+    <li>O trabalho será prestado em regime de <strong>turnos rotativos</strong> (manhã, tarde e nocturno), conforme escala elaborada pela coordenação.</li>
+    <li>O OPERADOR obriga-se a estar no seu posto com antecedência mínima de 15 minutos em relação ao início do turno para a passagem de serviço e actualização de ocorrências em curso.</li>
+    <li>É proibido abandonar o posto de comando sem que o operador do turno seguinte tenha assumido fisicamente a estação de trabalho.</li>
+  </ol>
+</div>
+
+<div class="clause">
+  <div class="clause-title">Cláusula 5.ª — Remuneração & Benefícios</div>
+  <table>
+    <tr><td style="width:35%;font-weight:bold;">Remuneração Base Mensal</td><td><span class="blank" style="min-width:180px;"></span> Kz (Kwanzas)</td></tr>
+    <tr><td style="font-weight:bold;">Subsídio de Turno / Noite</td><td>Conforme tabela de escalas em vigor</td></tr>
+    <tr><td style="font-weight:bold;">Forma de Liquidação</td><td>Transferência Bancária / Multicaixa Express até ao dia 28 de cada mês</td></tr>
+  </table>
+</div>
+
+<div class="clause">
+  <div class="clause-title">Cláusula 6.ª — Rescisão Imediata com Justa Causa</div>
+  <p>Constituem justa causa para a cessação imediata deste contrato pela GIRO, sem direito a pré-aviso ou compensação indemnizatória:</p>
+  <ul>
+    <li>Omissão ou negligência injustificada no atendimento a chamadas de socorro / SOS;</li>
+    <li>Quebra de sigilo profissional, divulgação de dados ou espionagem industrial;</li>
+    <li>Apresentação ao serviço sob efeito de álcool ou substâncias psicotrópicas;</li>
+    <li>Adormecer durante a guarda nocturna do monitor táctico de viaturas;</li>
+    <li>Compartilhamento de credenciais de login ou conluio com criminosos para desvio de frotas.</li>
+  </ul>
+</div>
+
+<div class="clause">
+  <div class="clause-title">Cláusula 7.ª — Foro & Legislação Aplicável</div>
+  <p>
+    Para dirimir qualquer controvérsia decorrente da interpretação ou execução do presente contrato, é competente o <strong>Tribunal da Comarca de Luanda</strong>, com renúncia expressa a qualquer outro foro, aplicando-se integralmente o ordenamento jurídico da República de Angola.
+  </p>
+</div>
+
+<div class="sig-grid">
+  <div class="sig-box">
+    <h4>Pela Direcção Geral: GIRO Angola</h4>
+    <p>Nome: <strong>Isaac Carvalho (Isaac Oaken)</strong></p>
+    <p>Função: Fundador & CEO · Oaken Technologies</p>
+    <div style="margin-top:20px;border-bottom:1px solid #333;height:24px;"></div>
+    <p style="font-size:8.5pt;color:#666;margin-top:4px;">Assinatura & Carimbo Oficial</p>
+  </div>
+
+  <div class="sig-box">
+    <h4>Pelo Operador de Central</h4>
+    <p>Nome: <span class="blank" style="min-width:140px;"></span></p>
+    <p>BI n.º: <span class="blank" style="min-width:130px;"></span></p>
+    <div style="margin-top:20px;border-bottom:1px solid #333;height:24px;"></div>
+    <p style="font-size:8.5pt;color:#666;margin-top:4px;">Assinatura & Aceitação das Cláusulas Penais</p>
+  </div>
+</div>
+
+<div class="contract-footer">
+  GIRO ANGOLA — CENTRAL DE OPERAÇÕES 24H · SEGURANÇA E TELEMETRIA URBANA · LUANDA 🇦🇴
+</div>
+
+</body>
+</html>

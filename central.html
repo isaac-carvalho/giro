@@ -493,6 +493,17 @@
         <span class="metric-sub">Alerta SOS Ativo</span>
       </div>
     </div>
+
+    <!-- Operador Autenticado & Logout -->
+    <div style="display:flex;align-items:center;gap:12px;margin-left:auto;">
+      <div style="text-align:right;">
+        <div id="operator-name-disp" style="font-size:12.5px;font-weight:700;color:#fff;">Operador Conectado</div>
+        <div id="operator-role-disp" style="font-size:10px;color:#22c55e;">● Posto Activo</div>
+      </div>
+      <button onclick="operatorLogout()" style="background:rgba(239,68,68,0.15);border:1px solid rgba(239,68,68,0.4);color:#fca5a5;padding:7px 14px;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;transition:all 0.2s;" title="Encerrar Turno e Bloquear Painel">
+        Terminar Turno 🔒
+      </button>
+    </div>
 </header>
 
   <!-- Main Grid -->
@@ -612,6 +623,36 @@
   </div>
 
   <script>
+    // ═════════════════════════════════════════════════════════════════
+    // AUTHENTICATION GUARD — REQUER SESSÃO DE OPERADOR
+    // ═════════════════════════════════════════════════════════════════
+    const CENTRAL_SESSION_KEY = 'giro_central_session';
+    let currentOperator = null;
+
+    (function requireCentralAuth() {
+      try {
+        const raw = sessionStorage.getItem(CENTRAL_SESSION_KEY);
+        if (!raw) {
+          window.location.replace('./central-login.html');
+          return;
+        }
+        currentOperator = JSON.parse(raw);
+        if (!currentOperator || !currentOperator.token) {
+          window.location.replace('./central-login.html');
+          return;
+        }
+      } catch (e) {
+        window.location.replace('./central-login.html');
+      }
+    })();
+
+    function operatorLogout() {
+      if (confirm('Deseja encerrar o seu turno e bloquear o Posto de Comando?')) {
+        sessionStorage.removeItem(CENTRAL_SESSION_KEY);
+        window.location.replace('./central-login.html');
+      }
+    }
+
     // Fleet simulation
     const fleet = [
       { name: "Carlos Silveira", car: "Toyota Vitz", plate: "LD-44-89-GG", status: "SOS ALERTA", lat: -8.8540, lng: 13.2180, sos: true },
@@ -712,7 +753,14 @@ Todos os condutores parceiros da GIRO num raio de 5 km receberam a localização
       });
     }
 
-    window.addEventListener('DOMContentLoaded', initCentralMap);
-  </script>
+    window.addEventListener('DOMContentLoaded', () => {
+      initCentralMap();
+      if (currentOperator) {
+        const nameEl = document.getElementById('operator-name-disp');
+        const roleEl = document.getElementById('operator-role-disp');
+        if (nameEl) nameEl.textContent = currentOperator.nome || currentOperator.username;
+        if (roleEl) roleEl.textContent = '● ' + (currentOperator.role || 'Posto Activo');
+      }
+    });
 </body>
 </html>
