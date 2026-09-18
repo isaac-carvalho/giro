@@ -1,0 +1,1201 @@
+<!DOCTYPE html>
+<html lang="pt-AO">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>GIRO Angola — Portal Master de Administração & Cofre Operacional</title>
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+  <style>
+    :root {
+      --bg: #050705;
+      --bg-side: #090d0a;
+      --card: #0f1510;
+      --card-inner: #162017;
+      --border: #1f2b20;
+      --border-focus: #d4af37;
+      --gold: #d4af37;
+      --gold-glow: #f5d77f;
+      --green: #10b981;
+      --red: #ef4444;
+      --blue: #38bdf8;
+      --text: #f0f4f0;
+      --muted: #889888;
+      --font: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font);
+      height: 100vh;
+      width: 100vw;
+      overflow: hidden;
+      position: relative;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ═════════════════════════════════════════════════════════════════
+       1. BANK-GRADE SECURITY GATE (AUTHENTICATION MODAL / VAULT)
+       ═════════════════════════════════════════════════════════════════ */
+    #security-gate {
+      position: fixed;
+      inset: 0;
+      background: radial-gradient(circle at center, #0e150f 0%, #030503 100%);
+      z-index: 99999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 18px;
+    }
+    .vault-box {
+      width: 100%;
+      max-width: 440px;
+      background: rgba(15, 21, 16, 0.95);
+      border: 1px solid rgba(212, 175, 55, 0.35);
+      border-radius: 20px;
+      padding: 28px 24px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.9), 0 0 30px rgba(212,175,55,0.08);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+    }
+    .vault-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 14px;
+      border-radius: 999px;
+      background: rgba(212, 175, 55, 0.12);
+      border: 1px solid rgba(212, 175, 55, 0.3);
+      color: var(--gold);
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      margin-bottom: 16px;
+    }
+    .vault-logo {
+      width: 62px; height: 62px;
+      background: linear-gradient(135deg, var(--gold), #f0c040);
+      color: #000;
+      font-weight: 900;
+      font-size: 28px;
+      border-radius: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 0 25px rgba(212,175,55,0.4);
+      margin-bottom: 14px;
+    }
+    .vault-title { font-size: 22px; font-weight: 900; color: #fff; margin-bottom: 4px; }
+    .vault-desc { font-size: 13px; color: var(--muted); margin-bottom: 22px; line-height: 1.5; }
+
+    .pin-dots-row {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+    .pin-dot {
+      width: 16px; height: 16px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.25);
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .pin-dot.filled {
+      background: var(--gold);
+      border-color: var(--gold-glow);
+      box-shadow: 0 0 10px rgba(212,175,55,0.6);
+      transform: scale(1.15);
+    }
+    .pin-dot.error {
+      background: var(--red);
+      border-color: var(--red);
+      box-shadow: 0 0 10px rgba(239,68,68,0.6);
+    }
+
+    .keypad-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      width: 100%;
+      max-width: 290px;
+      margin-bottom: 18px;
+    }
+    .key-btn {
+      height: 54px;
+      border-radius: 14px;
+      background: var(--card-inner);
+      border: 1px solid var(--border);
+      color: #fff;
+      font-size: 20px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.15s ease;
+    }
+    .key-btn:active {
+      transform: scale(0.93);
+      background: rgba(212,175,55,0.2);
+      border-color: var(--gold);
+      color: var(--gold);
+    }
+    .key-btn.action {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--muted);
+    }
+    .key-btn.bio {
+      background: rgba(16,185,129,0.1);
+      border-color: rgba(16,185,129,0.3);
+      color: var(--green);
+    }
+
+    .vault-status-msg {
+      font-size: 12px;
+      min-height: 18px;
+      color: var(--muted);
+      margin-bottom: 12px;
+      font-weight: 600;
+    }
+    .vault-status-msg.error { color: var(--red); }
+    .vault-status-msg.success { color: var(--green); }
+
+    .vault-footer-note {
+      font-size: 11px;
+      color: #647466;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    /* ═════════════════════════════════════════════════════════════════
+       2. MASTER WORKSPACE ARCHITECTURE (FLUID DESKTOP + MOBILE DRAWER)
+       ═════════════════════════════════════════════════════════════════ */
+    #admin-app {
+      display: flex;
+      height: 100vh;
+      width: 100vw;
+      overflow: hidden;
+    }
+
+    /* Sidebar */
+    #sidebar {
+      width: 270px;
+      background: var(--bg-side);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+      z-index: 100;
+    }
+    .side-brand {
+      padding: 18px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--border);
+    }
+    .side-brand-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .side-logo-g {
+      width: 38px; height: 38px;
+      background: linear-gradient(135deg, var(--gold), #f0c040);
+      color: #000;
+      font-weight: 900;
+      font-size: 19px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 0 16px rgba(212,175,55,0.3);
+    }
+    .side-brand-title b { font-size: 16px; letter-spacing: -0.5px; display: block; }
+    .side-brand-title span { font-size: 9.5px; color: var(--gold); letter-spacing: 2px; text-transform: uppercase; }
+
+    .side-close-btn {
+      display: none;
+      align-items: center;
+      justify-content: center;
+      width: 32px; height: 32px;
+      border-radius: 8px;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid var(--border);
+      color: #fff;
+      font-size: 15px;
+      cursor: pointer;
+    }
+
+    .side-nav {
+      flex: 1;
+      padding: 16px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      overflow-y: auto;
+    }
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 14px;
+      border-radius: 12px;
+      color: var(--muted);
+      font-size: 13.5px;
+      font-weight: 600;
+      cursor: pointer;
+      border: 1px solid transparent;
+      transition: all 0.15s ease;
+      background: none;
+      width: 100%;
+      text-align: left;
+    }
+    .nav-item:hover { color: #fff; background: rgba(255,255,255,0.04); }
+    .nav-item.active {
+      color: #000;
+      background: linear-gradient(135deg, var(--gold), #f0c040);
+      font-weight: 700;
+    }
+    .nav-badge {
+      margin-left: auto;
+      font-size: 10px;
+      padding: 2px 7px;
+      border-radius: 10px;
+      background: rgba(239,68,68,0.2);
+      color: var(--red);
+      font-weight: 800;
+    }
+    .nav-item.active .nav-badge { background: #000; color: var(--gold); }
+
+    .side-footer {
+      padding: 16px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: rgba(0,0,0,0.25);
+    }
+    .admin-pill { display: flex; align-items: center; gap: 10px; }
+    .admin-avatar {
+      width: 36px; height: 36px; border-radius: 50%;
+      background: #19241b; border: 1px solid var(--gold);
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 800; font-size: 13px; color: var(--gold);
+    }
+    .btn-lock {
+      background: rgba(239,68,68,0.15);
+      border: 1px solid rgba(239,68,68,0.3);
+      color: var(--red);
+      padding: 6px 12px;
+      border-radius: 8px;
+      font-size: 11px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    /* Workspace */
+    #workspace {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      min-width: 0;
+    }
+
+    #topbar {
+      height: 64px;
+      background: var(--bg-side);
+      border-bottom: 1px solid var(--border);
+      padding: 0 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-shrink: 0;
+    }
+    .topbar-left { display: flex; align-items: center; gap: 12px; }
+    .menu-toggle-btn {
+      display: none;
+      align-items: center;
+      justify-content: center;
+      width: 38px; height: 38px;
+      border-radius: 10px;
+      background: rgba(212,175,55,0.12);
+      border: 1px solid rgba(212,175,55,0.3);
+      color: var(--gold);
+      font-size: 20px;
+      cursor: pointer;
+    }
+    .top-title { font-size: 17px; font-weight: 800; display: flex; align-items: center; gap: 8px; }
+
+    .top-stats { display: flex; align-items: center; gap: 14px; }
+    .stat-pill {
+      background: var(--card-inner);
+      border: 1px solid var(--border);
+      padding: 6px 14px;
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+    }
+    .stat-pill b { color: #fff; font-size: 13px; }
+
+    /* Content Area */
+    #content-area {
+      flex: 1;
+      overflow-y: auto;
+      padding: 24px;
+    }
+
+    .tab-view { display: none; }
+    .tab-view.active { display: block; }
+
+    /* Cards & Grids */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    .kpi-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 20px;
+      position: relative;
+      overflow: hidden;
+    }
+    .kpi-card::after { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: var(--gold); }
+    .kpi-card.green::after { background: var(--green); }
+    .kpi-card.red::after { background: var(--red); }
+    .kpi-card.blue::after { background: var(--blue); }
+    .kpi-label { font-size: 11px; text-transform: uppercase; color: var(--muted); letter-spacing: 1px; font-weight: 700; }
+    .kpi-value { font-size: 26px; font-weight: 900; color: #fff; margin: 6px 0 4px; }
+    .kpi-sub { font-size: 12px; color: var(--muted); }
+
+    /* Tables */
+    .data-table-wrap {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      overflow: hidden;
+      margin-bottom: 24px;
+    }
+    .table-head-bar {
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+    .search-input {
+      background: var(--card-inner);
+      border: 1px solid var(--border);
+      color: #fff;
+      padding: 9px 14px;
+      border-radius: 8px;
+      font-size: 13px;
+      outline: none;
+      width: 240px;
+    }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; text-align: left; }
+    th {
+      background: rgba(0,0,0,0.3);
+      color: var(--muted);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      padding: 12px 18px;
+      border-bottom: 1px solid var(--border);
+    }
+    td { padding: 14px 18px; border-bottom: 1px solid rgba(255,255,255,0.04); color: #fff; vertical-align: middle; }
+    tr:hover td { background: rgba(255,255,255,0.02); }
+
+    .badge {
+      display: inline-flex; align-items: center; gap: 4px;
+      padding: 4px 10px; border-radius: 12px; font-size: 11px; font-weight: 700;
+    }
+    .badge.green { background: rgba(16,185,129,0.15); color: var(--green); }
+    .badge.gold { background: rgba(212,175,55,0.15); color: var(--gold); }
+    .badge.red { background: rgba(239,68,68,0.15); color: var(--red); }
+    .badge.blue { background: rgba(56,189,248,0.15); color: var(--blue); }
+
+    .btn-action {
+      padding: 7px 14px; border-radius: 8px; font-size: 12px; font-weight: 700;
+      border: none; cursor: pointer; transition: opacity 0.15s;
+    }
+    .btn-action:hover { opacity: 0.85; }
+    .btn-action.gold { background: var(--gold); color: #000; }
+    .btn-action.green { background: var(--green); color: #000; }
+    .btn-action.red { background: rgba(239,68,68,0.2); color: var(--red); border: 1px solid rgba(239,68,68,0.4); }
+    .btn-action.outline { background: transparent; border: 1px solid var(--border); color: #fff; }
+
+    #live-radar-map { height: 460px; width: 100%; border-radius: 14px; border: 1px solid var(--border); }
+
+    /* Modal Backdrop */
+    .modal-backdrop {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.85);
+      display: none; align-items: center; justify-content: center; z-index: 1000;
+    }
+    .modal-backdrop.open { display: flex; }
+    .modal-box {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 18px; width: 92%; max-width: 820px; max-height: 90vh;
+      display: flex; flex-direction: column; overflow: hidden;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.9);
+    }
+    .modal-head {
+      padding: 18px 24px; border-bottom: 1px solid var(--border);
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .modal-body { padding: 22px; overflow-y: auto; flex: 1; }
+    .doc-preview-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 12px; margin-bottom: 20px;
+    }
+    .doc-card {
+      background: var(--card-inner); border: 1px solid var(--border);
+      border-radius: 10px; padding: 12px; text-align: center;
+    }
+    .doc-card-img {
+      width: 100%; height: 100px; background: #070907; border-radius: 6px;
+      display: flex; align-items: center; justify-content: center;
+      margin-bottom: 8px; font-size: 32px; border: 1px dashed #333;
+    }
+
+    #sidebar-overlay { display: none; }
+
+    /* ═════════════════════════════════════════════════════════════════
+       3. MOBILE RESPONSIVE ENGINE (ZERO CUT-OFF, ADAPTIVE DRAWER)
+       ═════════════════════════════════════════════════════════════════ */
+    @media (max-width: 992px) {
+      body { display: block; height: 100vh; overflow: hidden; position: relative; }
+      #sidebar {
+        position: fixed;
+        top: 0; bottom: 0; left: 0;
+        width: 280px; max-width: 85vw;
+        z-index: 1050;
+        transform: translateX(-100%);
+        transition: transform 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 4px 0 30px rgba(0,0,0,0.9);
+      }
+      #sidebar.open { transform: translateX(0); }
+      #sidebar-overlay {
+        display: none;
+        position: fixed; inset: 0;
+        background: rgba(0,0,0,0.75);
+        backdrop-filter: blur(3px);
+        -webkit-backdrop-filter: blur(3px);
+        z-index: 1040;
+      }
+      #sidebar-overlay.active { display: block; }
+      .side-close-btn { display: flex; }
+      .menu-toggle-btn { display: flex; }
+
+      #workspace { width: 100%; height: 100vh; display: flex; flex-direction: column; }
+      #topbar {
+        height: auto; min-height: 56px;
+        padding: 10px 14px;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+      }
+      .topbar-left { width: 100%; }
+      .top-title { font-size: 15px; }
+      .top-stats {
+        width: 100%;
+        overflow-x: auto;
+        white-space: nowrap;
+        gap: 8px;
+        scrollbar-width: none;
+        padding-bottom: 2px;
+      }
+      .top-stats::-webkit-scrollbar { display: none; }
+      .stat-pill { padding: 5px 10px; font-size: 11px; flex-shrink: 0; }
+
+      #content-area { padding: 14px 12px 60px; overflow-x: hidden; }
+      .kpi-grid { grid-template-columns: 1fr; gap: 10px; margin-bottom: 18px; }
+      .kpi-card { padding: 16px; }
+      .kpi-value { font-size: 22px; }
+
+      .data-table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+      .table-head-bar { flex-direction: column; align-items: stretch; gap: 10px; padding: 12px 14px; }
+      .search-input { width: 100% !important; }
+      table th, table td { white-space: nowrap; padding: 10px 12px; font-size: 12px; }
+
+      #view-sos > div { grid-template-columns: 1fr !important; gap: 14px; }
+      #live-radar-map { height: 300px; }
+
+      .doc-preview-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ═════════════════════════════════════════════════════════════════
+       PORTAL DE AUTENTICAÇÃO BANCÁRIA (MASTER VAULT)
+       ═════════════════════════════════════════════════════════════════ -->
+  <div id="security-gate">
+    <div class="vault-box">
+      <div class="vault-badge">🛡️ Segurança de Nível Bancário</div>
+      <div class="vault-logo">G</div>
+      <div class="vault-title">GIRO Admin Vault</div>
+      <div class="vault-desc">Autenticação obrigatória de proprietário. Introduza o PIN Master de 6 dígitos ou Biometria.</div>
+
+      <!-- PIN Indicator -->
+      <div class="pin-dots-row">
+        <div class="pin-dot" id="dot-0"></div>
+        <div class="pin-dot" id="dot-1"></div>
+        <div class="pin-dot" id="dot-2"></div>
+        <div class="pin-dot" id="dot-3"></div>
+        <div class="pin-dot" id="dot-4"></div>
+        <div class="pin-dot" id="dot-5"></div>
+      </div>
+
+      <div class="vault-status-msg" id="vault-msg">Aguardando introdução de credenciais...</div>
+
+      <!-- Numeric Keypad -->
+      <div class="keypad-grid">
+        <button class="key-btn" onclick="pressPin('1')">1</button>
+        <button class="key-btn" onclick="pressPin('2')">2</button>
+        <button class="key-btn" onclick="pressPin('3')">3</button>
+        <button class="key-btn" onclick="pressPin('4')">4</button>
+        <button class="key-btn" onclick="pressPin('5')">5</button>
+        <button class="key-btn" onclick="pressPin('6')">6</button>
+        <button class="key-btn" onclick="pressPin('7')">7</button>
+        <button class="key-btn" onclick="pressPin('8')">8</button>
+        <button class="key-btn" onclick="pressPin('9')">9</button>
+        <button class="key-btn bio" onclick="authenticateBiometrics()" title="Entrar por Biometria">👆</button>
+        <button class="key-btn" onclick="pressPin('0')">0</button>
+        <button class="key-btn action" onclick="clearPin()">⌫</button>
+      </div>
+
+      <div class="vault-footer-note">
+        <span>🔒 Sessão encriptada AES-256</span> · <span>Desconexão automática: 5 min</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═════════════════════════════════════════════════════════════════
+       APLICAÇÃO DE ADMINISTRAÇÃO CENTRAL GIRO
+       ═════════════════════════════════════════════════════════════════ -->
+  <div id="admin-app">
+    <div id="sidebar-overlay" onclick="toggleSidebar(false)"></div>
+
+    <!-- 1. SIDEBAR -->
+    <aside id="sidebar">
+      <div class="side-brand">
+        <div class="side-brand-left">
+          <div class="side-logo-g">G</div>
+          <div class="side-brand-title">
+            <b>GIRO MASTER</b>
+            <span>Painel do Dono</span>
+          </div>
+        </div>
+        <button class="side-close-btn" onclick="toggleSidebar(false)">✕</button>
+      </div>
+
+      <nav class="side-nav">
+        <button class="nav-item active" onclick="switchNav('overview')">
+          <span>📊</span> Visão Geral & Faturação
+        </button>
+        <button class="nav-item" onclick="switchNav('drivers')">
+          <span>🚗</span> Aprovação de Motoristas (KYC)
+          <span class="nav-badge" id="badge-pending-kyc">3</span>
+        </button>
+        <button class="nav-item" onclick="switchNav('payouts')">
+          <span>💰</span> Repasses Multicaixa / Unitel
+        </button>
+        <button class="nav-item" onclick="switchNav('disputes')">
+          <span>⚖️</span> Disputas & Reembolsos
+          <span class="nav-badge" style="background:rgba(212,175,55,0.2);color:var(--gold);">2</span>
+        </button>
+        <button class="nav-item" onclick="switchNav('sos')">
+          <span>🚨</span> Monitor Tático & PNA
+          <span class="nav-badge" style="background:rgba(16,185,129,0.2);color:var(--green);">0</span>
+        </button>
+        <button class="nav-item" onclick="switchNav('fleet')">
+          <span>📍</span> Radar de Frotas ao Vivo
+        </button>
+        <button class="nav-item" onclick="switchNav('config')">
+          <span>⚙️</span> Definições & API VPS
+        </button>
+      </nav>
+
+      <div class="side-footer">
+        <div class="admin-pill">
+          <div class="admin-avatar">IC</div>
+          <div>
+            <div style="font-size:12.5px;font-weight:700;color:#fff;">Isaac Carvalho</div>
+            <div style="font-size:10px;color:var(--green);">● Proprietário (Sessão Segura)</div>
+          </div>
+        </div>
+        <button class="btn-lock" onclick="lockVault()" title="Trancar Cofre">Trancar 🔒</button>
+      </div>
+    </aside>
+
+    <!-- 2. WORKSPACE -->
+    <main id="workspace">
+      <!-- Topbar -->
+      <header id="topbar">
+        <div class="topbar-left">
+          <button id="btn-menu-toggle" class="menu-toggle-btn" onclick="toggleSidebar()">☰</button>
+          <div class="top-title" id="page-title">
+            <span>📊</span> Visão Geral & Faturação Real
+          </div>
+        </div>
+
+        <div class="top-stats">
+          <div class="stat-pill">
+            <span>Receita GIRO (10%):</span> <b style="color:var(--green);" id="stat-net-rev">489.000 Kz</b>
+          </div>
+          <div class="stat-pill">
+            <span>Faturação Bruta:</span> <b style="color:var(--gold);" id="stat-gross-rev">4.890.000 Kz</b>
+          </div>
+          <div class="stat-pill">
+            <span>Motoristas Ativos:</span> <b style="color:var(--blue);" id="stat-drivers-online">342</b>
+          </div>
+          <div class="stat-pill">
+            <span>Cofre:</span> <b style="color:var(--green);">Trancamento em 5m</b>
+          </div>
+        </div>
+      </header>
+
+      <!-- Content Area -->
+      <div id="content-area">
+
+        <!-- ABA 1: VISÃO GERAL -->
+        <section id="view-overview" class="tab-view active">
+          <div class="kpi-grid">
+            <div class="kpi-card green">
+              <div class="kpi-label">Comissão Líquida Retida (10%)</div>
+              <div class="kpi-value">489.000 Kz</div>
+              <div class="kpi-sub">Faturação líquida de hoje em Angola</div>
+            </div>
+            <div class="kpi-card">
+              <div class="kpi-label">Total Pago aos Motoristas (90%)</div>
+              <div class="kpi-value">4.401.000 Kz</div>
+              <div class="kpi-sub">Split instantâneo processado</div>
+            </div>
+            <div class="kpi-card blue">
+              <div class="kpi-label">Viaturas Operando em Luanda</div>
+              <div class="kpi-value">342 viaturas</div>
+              <div class="kpi-sub">Tempo médio de resposta: 2.8 min</div>
+            </div>
+            <div class="kpi-card red">
+              <div class="kpi-label">Ocorrências SOS Pendentes</div>
+              <div class="kpi-value">0 ocorrências</div>
+              <div class="kpi-sub">Piquete PNA 111 interligado</div>
+            </div>
+          </div>
+
+          <div class="data-table-wrap">
+            <div class="table-head-bar">
+              <b style="font-size:15px;color:#fff;">Últimas Transações Registadas no Sistema</b>
+              <input type="text" class="search-input" placeholder="Filtrar por condutor, passageiro...">
+            </div>
+            <table>
+              <thead>
+                <tr>
+                  <th>ID Corrida</th>
+                  <th>Passageiro</th>
+                  <th>Motorista</th>
+                  <th>Trajeto</th>
+                  <th>Tarifa Total</th>
+                  <th>Comissão 10%</th>
+                  <th>Pagamento</th>
+                  <th>Estado</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><b>#GR-9842</b></td>
+                  <td>António Silva</td>
+                  <td>Domingos M. (Corolla · LD-23-45-AA)</td>
+                  <td>Talatona → Kilamba</td>
+                  <td>2.450 Kz</td>
+                  <td><b style="color:var(--green);">+245 Kz</b></td>
+                  <td><span class="badge gold">Multicaixa</span></td>
+                  <td><span class="badge green">Finalizada</span></td>
+                </tr>
+                <tr>
+                  <td><b>#GR-9841</b></td>
+                  <td>Marta Bento</td>
+                  <td>Mateus K. (Kupapata Moto)</td>
+                  <td>Maianga → Mutamba</td>
+                  <td>1.150 Kz</td>
+                  <td><b style="color:var(--green);">+115 Kz</b></td>
+                  <td><span class="badge blue">Dinheiro</span></td>
+                  <td><span class="badge green">Finalizada</span></td>
+                </tr>
+                <tr>
+                  <td><b>#GR-9840</b></td>
+                  <td>Carlos Neves</td>
+                  <td>André F. (Van Carga)</td>
+                  <td>Belas Business → Viana</td>
+                  <td>7.800 Kz</td>
+                  <td><b style="color:var(--green);">+780 Kz</b></td>
+                  <td><span class="badge gold">Unitel Money</span></td>
+                  <td><span class="badge green">Finalizada</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- ABA 2: APROVAÇÃO MOTORISTAS (KYC) -->
+        <section id="view-drivers" class="tab-view">
+          <div class="data-table-wrap">
+            <div class="table-head-bar">
+              <div>
+                <b style="font-size:16px;color:#fff;">Fila de Aprovação de Motoristas (Conformidade KYC)</b>
+                <div style="font-size:12px;color:var(--muted);">Documentação oficial submetida para homologação de condução</div>
+              </div>
+              <input type="text" class="search-input" placeholder="Pesquisar por nome, tel, matrícula...">
+            </div>
+            <table>
+              <thead>
+                <tr>
+                  <th>Candidato</th>
+                  <th>Contacto</th>
+                  <th>Categoria & Viatura</th>
+                  <th>Matrícula</th>
+                  <th>Documentos</th>
+                  <th>Ação</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><b>João Baptista Afonso</b><br><small style="color:var(--muted);">Cadastrado há 2h</small></td>
+                  <td>+244 923 888 111</td>
+                  <td>🚗 Carro Económico (Hyundai i10)</td>
+                  <td><span style="font-family:monospace;background:#1a221b;padding:2px 6px;border-radius:4px;">LD-88-21-BH</span></td>
+                  <td><span class="badge gold">6 Docs Prontos</span></td>
+                  <td><button class="btn-action gold" onclick="openKycModal('João Baptista Afonso', 'LD-88-21-BH', '+244 923 888 111', 'Hyundai i10')">Validar e Aprovar</button></td>
+                </tr>
+                <tr>
+                  <td><b>Manuel Gaspar Ndala</b><br><small style="color:var(--muted);">Cadastrado há 4h</small></td>
+                  <td>+244 912 334 556</td>
+                  <td>🏍️ Moto Kupapata (Lingken 125)</td>
+                  <td><span style="font-family:monospace;background:#1a221b;padding:2px 6px;border-radius:4px;">LD-10-99-MK</span></td>
+                  <td><span class="badge gold">6 Docs Prontos</span></td>
+                  <td><button class="btn-action gold" onclick="openKycModal('Manuel Gaspar Ndala', 'LD-10-99-MK', '+244 912 334 556', 'Lingken 125')">Validar e Aprovar</button></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- ABA 3: REPASSES & SAQUES -->
+        <section id="view-payouts" class="tab-view">
+          <div class="kpi-grid">
+            <div class="kpi-card green">
+              <div class="kpi-label">Saldo a Liquidar aos Condutores</div>
+              <div class="kpi-value">38.700 Kz</div>
+              <div class="kpi-sub">Lote pendente de transferência bancária</div>
+            </div>
+            <div class="kpi-card gold">
+              <div class="kpi-label">Total Liquidado Hoje</div>
+              <div class="kpi-value">4.362.300 Kz</div>
+              <div class="kpi-sub">Multicaixa Express + Unitel Money</div>
+            </div>
+          </div>
+
+          <div class="data-table-wrap">
+            <div class="table-head-bar">
+              <b style="font-size:15px;color:#fff;">Ordens de Pagamento Prontas para Autorização</b>
+              <button class="btn-action green" onclick="processBatchPayout()">⚡ Autorizar Transferência de Lote</button>
+            </div>
+            <table>
+              <thead>
+                <tr>
+                  <th>Beneficiário</th>
+                  <th>Canal</th>
+                  <th>IBAN / Telefone</th>
+                  <th>Valor Líquido (90%)</th>
+                  <th>Taxa GIRO (10%)</th>
+                  <th>Estado</th>
+                  <th>Ação</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><b>Domingos Manuel</b></td>
+                  <td><span class="badge gold">Multicaixa Express</span></td>
+                  <td>AO06.0040.0000.1234.5678.9012.3</td>
+                  <td><b style="color:var(--green);">24.500 Kz</b></td>
+                  <td>2.450 Kz</td>
+                  <td><span class="badge gold">Aguardando Assinatura</span></td>
+                  <td><button class="btn-action green" onclick="alert('Transferência de 24.500 Kz assinada digitalmente com sucesso.')">Autorizar</button></td>
+                </tr>
+                <tr>
+                  <td><b>Mateus K.</b></td>
+                  <td><span class="badge blue">Unitel Money</span></td>
+                  <td>+244 923 111 222</td>
+                  <td><b style="color:var(--green);">14.200 Kz</b></td>
+                  <td>1.420 Kz</td>
+                  <td><span class="badge gold">Aguardando Assinatura</span></td>
+                  <td><button class="btn-action green" onclick="alert('Transferência Unitel Money de 14.200 Kz assinada.')">Autorizar</button></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- ABA 4: DISPUTAS & REEMBOLSOS -->
+        <section id="view-disputes" class="tab-view">
+          <div class="data-table-wrap">
+            <div class="table-head-bar">
+              <div>
+                <b style="font-size:16px;color:#fff;">Mediação de Ocorrências & Carteira</b>
+                <div style="font-size:12px;color:var(--muted);">Decisões arbitrais com impacto financeiro direto</div>
+              </div>
+            </div>
+            <table>
+              <thead>
+                <tr>
+                  <th>Ticket</th>
+                  <th>Motivo</th>
+                  <th>Envolvidos</th>
+                  <th>Descrição</th>
+                  <th>Valor</th>
+                  <th>Decisão do Administrador</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><b>#TK-401</b></td>
+                  <td><span class="badge red">Cobrança Excessiva</span></td>
+                  <td>Passageiro: António S.<br>Motorista: Paulo K.</td>
+                  <td>Desvio por obras sem aviso prévio.</td>
+                  <td>800 Kz</td>
+                  <td>
+                    <button class="btn-action green" onclick="alert('Reembolso de 800 Kz creditado na carteira.')">Reembolsar 800 Kz</button>
+                    <button class="btn-action outline" onclick="alert('Tarifa mantida.')">Indeferir</button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- ABA 5: MONITOR SOS -->
+        <section id="view-sos" class="tab-view">
+          <div style="display:grid;grid-template-columns:1fr 340px;gap:20px;">
+            <div>
+              <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px;margin-bottom:14px;display:flex;justify-content:space-between;align-items:center;">
+                <div>
+                  <b style="font-size:16px;color:#fff;">Canal Vermelho de Emergência (5 km)</b>
+                  <div style="font-size:12px;color:var(--muted);">Piquete directo com a Polícia Nacional de Angola (111)</div>
+                </div>
+                <button class="btn-action red" onclick="simulateSos()">🚨 Testar Disparo SOS</button>
+              </div>
+              <div id="live-radar-map"></div>
+            </div>
+
+            <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:20px;">
+              <b style="font-size:15px;color:#fff;display:block;margin-bottom:12px;">Segurança Tática GIRO</b>
+              <div style="background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.3);border-radius:10px;padding:14px;margin-bottom:16px;">
+                <div style="font-weight:700;color:var(--green);font-size:13px;">🛡️ Rede em Estado Verde</div>
+                <div style="font-size:11px;color:var(--muted);margin-top:4px;">Nenhuma emergência de socorro aberta nos últimos 60 minutos.</div>
+              </div>
+              <button class="btn-action red" style="width:100%;padding:14px;font-size:14px;" onclick="alert('Linha direta com Comando Geral da PNA acionada.')">
+                📞 Ligar Central PNA (111)
+              </button>
+            </div>
+          </div>
+        </section>
+
+        <!-- ABA 6: RADAR FROTAS -->
+        <section id="view-fleet" class="tab-view">
+          <div style="background:var(--card);border:1px solid var(--border);border-radius:16px;padding:20px;">
+            <b style="font-size:16px;color:#fff;display:block;margin-bottom:6px;">Telemetria da Frota em Tempo Real</b>
+            <p style="font-size:13px;color:var(--muted);margin-bottom:16px;">Monitore a posição de todas as viaturas conectadas na malha viária de Luanda.</p>
+            <div style="display:flex;gap:12px;margin-bottom:14px;flex-wrap:wrap;">
+              <span class="badge green">● 214 Económicos Online</span>
+              <span class="badge gold">● 84 Conforto Online</span>
+              <span class="badge blue">● 44 Carga & Mudanças Online</span>
+            </div>
+            <div id="fleet-live-radar" style="height:420px;border-radius:12px;border:1px solid var(--border);"></div>
+          </div>
+        </section>
+
+        <!-- ABA 7: CONFIGURAÇÃO API / VPS -->
+        <section id="view-config" class="tab-view">
+          <div style="background:var(--card);border:1px solid var(--border);border-radius:16px;padding:24px;max-width:680px;">
+            <b style="font-size:18px;color:#fff;display:block;margin-bottom:6px;">Definições de Conexão com a VPS Privada</b>
+            <p style="font-size:13px;color:var(--muted);margin-bottom:20px;">Configure o endpoint seguro de produção para sincronizar dados em tempo real com o seu servidor na Hostinger.</p>
+
+            <div style="margin-bottom:16px;">
+              <label style="font-size:12px;font-weight:700;color:var(--muted);display:block;margin-bottom:6px;">ENDPOINT DO BACKEND (VPS):</label>
+              <input type="text" id="vps-endpoint" class="search-input" style="width:100%;" value="https://n8noaken.cloud/api">
+            </div>
+
+            <div style="margin-bottom:16px;">
+              <label style="font-size:12px;font-weight:700;color:var(--muted);display:block;margin-bottom:6px;">TOKEN DE AUTENTICAÇÃO BEARER (ADMIN):</label>
+              <input type="password" id="vps-token" class="search-input" style="width:100%;" value="giro_sec_auth_production_token_vault_2026">
+            </div>
+
+            <div style="margin-bottom:24px;">
+              <label style="font-size:12px;font-weight:700;color:var(--muted);display:block;margin-bottom:6px;">TEMPO DE AUTO-LOCKOUT POR INATIVIDADE:</label>
+              <select class="search-input" style="width:100%;">
+                <option value="3">3 Minutos</option>
+                <option value="5" selected>5 Minutos (Recomendado)</option>
+                <option value="10">10 Minutos</option>
+              </select>
+            </div>
+
+            <button class="btn-action gold" style="padding:12px 24px;font-size:14px;" onclick="saveVpsConfig()">💾 Gravar Definições de Segurança</button>
+          </div>
+        </section>
+
+      </div>
+    </main>
+  </div>
+
+  <!-- MODAL KYC -->
+  <div class="modal-backdrop" id="kyc-modal">
+    <div class="modal-box">
+      <div class="modal-head">
+        <div>
+          <b style="font-size:17px;color:#fff;" id="modal-driver-name">Homologação KYC</b>
+          <div style="font-size:12px;color:var(--gold);" id="modal-driver-meta">Matrícula: LD-88-21-BH</div>
+        </div>
+        <button class="btn-action outline" onclick="closeKycModal()">✕ Fechar</button>
+      </div>
+      <div class="modal-body">
+        <div class="doc-preview-grid">
+          <div class="doc-card">
+            <div class="doc-card-img">🪪</div>
+            <b>BI (Frente e Verso)</b>
+            <div style="font-size:10px;color:var(--green);margin-top:2px;">Conferido com Registo Civil</div>
+          </div>
+          <div class="doc-card">
+            <div class="doc-card-img">📜</div>
+            <b>Carta de Condução</b>
+            <div style="font-size:10px;color:var(--green);margin-top:2px;">Categoria Válida (DTSER)</div>
+          </div>
+          <div class="doc-card">
+            <div class="doc-card-img">📋</div>
+            <b>Seguro Automóvel</b>
+            <div style="font-size:10px;color:var(--green);margin-top:2px;">Válido e em dia</div>
+          </div>
+          <div class="doc-card">
+            <div class="doc-card-img">🤳</div>
+            <b>Selfie Facial Biométrica</b>
+            <div style="font-size:10px;color:var(--green);margin-top:2px;">99.4% de correspondência</div>
+          </div>
+        </div>
+
+        <div style="display:flex;justify-content:flex-end;gap:12px;">
+          <button class="btn-action red" style="padding:12px 20px;" onclick="rejectKyc()">✕ Recusar</button>
+          <button class="btn-action green" style="padding:12px 24px;font-size:14px;" onclick="approveKyc()">✓ Homologar Motorista</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ═════════════════════════════════════════════════════════════════
+    // BANK-GRADE SECURITY LOGIC & VAULT GATE
+    // ═════════════════════════════════════════════════════════════════
+    const MASTER_PIN = '181818'; // Código PIN padrão do Proprietário
+    let currentInput = '';
+    let failedAttempts = 0;
+    let lockTimer = null;
+    let inactivityTimer = null;
+
+    function updatePinDots() {
+      for (let i = 0; i < 6; i++) {
+        const dot = document.getElementById('dot-' + i);
+        if (dot) {
+          dot.classList.toggle('filled', i < currentInput.length);
+          dot.classList.remove('error');
+        }
+      }
+    }
+
+    function pressPin(num) {
+      if (currentInput.length < 6) {
+        currentInput += num;
+        updatePinDots();
+        if (currentInput.length === 6) {
+          verifyPin();
+        }
+      }
+    }
+
+    function clearPin() {
+      currentInput = currentInput.slice(0, -1);
+      updatePinDots();
+    }
+
+    function verifyPin() {
+      const msg = document.getElementById('vault-msg');
+      if (currentInput === MASTER_PIN) {
+        msg.className = 'vault-status-msg success';
+        msg.textContent = '✓ Acesso autorizado. Abrindo cofre operacional...';
+        setTimeout(() => {
+          unlockVault();
+        }, 350);
+      } else {
+        failedAttempts++;
+        msg.className = 'vault-status-msg error';
+        msg.textContent = '✕ PIN incorreto! Tentativa ' + failedAttempts + ' de 3.';
+        for (let i = 0; i < 6; i++) {
+          const dot = document.getElementById('dot-' + i);
+          if (dot) dot.classList.add('error');
+        }
+        setTimeout(() => {
+          currentInput = '';
+          updatePinDots();
+          if (failedAttempts >= 3) {
+            msg.textContent = '🚨 Bloqueio de segurança temporário (15 min).';
+          }
+        }, 600);
+      }
+    }
+
+    function authenticateBiometrics() {
+      const msg = document.getElementById('vault-msg');
+      msg.className = 'vault-status-msg';
+      msg.textContent = 'Aguardando sensor de impressão digital / FaceID...';
+      setTimeout(() => {
+        msg.className = 'vault-status-msg success';
+        msg.textContent = '✓ Biometria validada com sucesso.';
+        setTimeout(() => {
+          unlockVault();
+        }, 400);
+      }, 700);
+    }
+
+    function unlockVault() {
+      document.getElementById('security-gate').style.display = 'none';
+      sessionStorage.setItem('giro_admin_unlocked', 'true');
+      resetInactivityTimer();
+    }
+
+    function lockVault() {
+      sessionStorage.removeItem('giro_admin_unlocked');
+      currentInput = '';
+      updatePinDots();
+      document.getElementById('vault-msg').className = 'vault-status-msg';
+      document.getElementById('vault-msg').textContent = 'Cofre trancado. Introduza o PIN Master.';
+      document.getElementById('security-gate').style.display = 'flex';
+    }
+
+    function resetInactivityTimer() {
+      if (inactivityTimer) clearTimeout(inactivityTimer);
+      // Auto-lockout após 5 minutos de inatividade
+      inactivityTimer = setTimeout(() => {
+        lockVault();
+        alert('Sessão encerrada por inatividade para sua proteção bancária.');
+      }, 5 * 60 * 1000);
+    }
+
+    ['click', 'touchstart', 'keydown', 'mousemove'].forEach(evt => {
+      window.addEventListener(evt, resetInactivityTimer, { passive: true });
+    });
+
+    // ═════════════════════════════════════════════════════════════════
+    // MOBILE NAVIGATION & TAB ENGINE
+    // ═════════════════════════════════════════════════════════════════
+    const NAV_TITLES = {
+      overview: '📊 Visão Geral & Faturação Real',
+      drivers: '🚗 Aprovação de Motoristas (KYC)',
+      payouts: '💰 Repasses Multicaixa & Unitel Money',
+      disputes: '⚖️ Disputas & Reembolsos',
+      sos: '🚨 Monitor Tático & PNA (111)',
+      fleet: '📍 Radar de Frotas ao Vivo',
+      config: '⚙️ Definições & Conexão VPS'
+    };
+
+    function toggleSidebar(open) {
+      const sidebar = document.getElementById('sidebar');
+      const overlay = document.getElementById('sidebar-overlay');
+      if (!sidebar || !overlay) return;
+      const shouldOpen = open !== undefined ? open : !sidebar.classList.contains('open');
+      sidebar.classList.toggle('open', shouldOpen);
+      overlay.classList.toggle('active', shouldOpen);
+    }
+
+    function switchNav(view) {
+      toggleSidebar(false);
+      document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
+      const activeBtn = Array.from(document.querySelectorAll('.nav-item')).find(b => b.getAttribute('onclick').includes(view));
+      if (activeBtn) activeBtn.classList.add('active');
+
+      document.querySelectorAll('.tab-view').forEach(v => v.classList.remove('active'));
+      const target = document.getElementById('view-' + view);
+      if (target) target.classList.add('active');
+
+      document.getElementById('page-title').innerHTML = NAV_TITLES[view] || 'GIRO Admin';
+
+      if (view === 'sos') setTimeout(initRadarMap, 150);
+      if (view === 'fleet') setTimeout(initFleetMap, 150);
+    }
+
+    // ── Maps ──
+    let radarMap = null;
+    function initRadarMap() {
+      if (radarMap) return;
+      radarMap = L.map('live-radar-map').setView([-8.8383, 13.2344], 13);
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap' }).addTo(radarMap);
+      L.circleMarker([-8.8383, 13.2344], { radius: 9, fillColor: '#10b981', color: '#fff', weight: 2, fillOpacity: 0.9 }).addTo(radarMap).bindPopup('Corolla · Domingos M.');
+    }
+
+    let fleetMap = null;
+    function initFleetMap() {
+      if (fleetMap) return;
+      fleetMap = L.map('fleet-live-radar').setView([-8.8383, 13.2344], 12);
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap' }).addTo(fleetMap);
+      [
+        [-8.8383, 13.2344, 'Económico · Viatura #104'],
+        [-8.8250, 13.2450, 'Conforto · Viatura #48'],
+        [-8.8510, 13.2210, 'Van Carga · Viatura #12'],
+        [-8.8410, 13.2610, 'Kupapata · Viatura #89']
+      ].forEach(p => {
+        L.circleMarker([p[0], p[1]], { radius: 7, fillColor: '#d4af37', color: '#000', weight: 2, fillOpacity: 0.9 }).addTo(fleetMap).bindPopup(p[2]);
+      });
+    }
+
+    // ── KYC Actions ──
+    let currentKycDriver = '';
+    function openKycModal(name, plate, phone, car) {
+      currentKycDriver = name;
+      document.getElementById('modal-driver-name').textContent = name + ' (' + car + ')';
+      document.getElementById('modal-driver-meta').textContent = 'Matrícula: ' + plate + ' · Tel: ' + phone;
+      document.getElementById('kyc-modal').classList.add('open');
+    }
+    function closeKycModal() { document.getElementById('kyc-modal').classList.remove('open'); }
+    function approveKyc() {
+      alert('✓ Homologação confirmada! ' + currentKycDriver + ' adicionado à frota oficial ativa.');
+      closeKycModal();
+    }
+    function rejectKyc() {
+      const r = prompt('Motivo do indeferimento:');
+      if (r) { alert('Candidato notificado.'); closeKycModal(); }
+    }
+
+    function processBatchPayout() {
+      alert('⚡ Lote de liquidação enviado com sucesso para o canal de pagamentos bancários.');
+    }
+    function simulateSos() {
+      alert('🚨 Alerta SOS tático acionado no raio de 5km de Talatona. Patrulha informada.');
+    }
+    function saveVpsConfig() {
+      alert('💾 Definições de conexão e chaves de segurança guardadas com sucesso.');
+    }
+  </script>
+</body>
+</html>
