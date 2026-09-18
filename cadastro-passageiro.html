@@ -24,7 +24,7 @@
     .step-label{font-size:11px;color:var(--muted);margin-bottom:20px;}
     .form-group{margin-bottom:16px;}
     .form-label{display:block;font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:7px;}
-    .form-control{width:100%;background:var(--bg3);border:1px solid rgba(255,255,255,.1);border-radius:10px;color:var(--text);font-size:15px;padding:12px 14px;outline:none;transition:border-color .2s;-webkit-appearance:none;}
+    .form-control{width:100%;background:var(--bg3);border:1px solid rgba(255,255,255,.1);border-radius:10px;color:var(--text);font-size:16px;padding:12px 14px;outline:none;transition:border-color .2s;-webkit-appearance:none;}
     .form-control:focus{border-color:var(--gold);}
     .form-control.error{border-color:var(--red);}
     .form-control.ok{border-color:var(--green);}
@@ -36,8 +36,8 @@
     .pw-wrap{position:relative;}
     .pw-wrap .form-control{padding-right:44px;}
     .pw-eye{position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--muted);font-size:18px;padding:0;line-height:1;}
-    .otp-row{display:flex;gap:10px;justify-content:center;}
-    .otp-input{width:44px;height:54px;background:var(--bg3);border:1px solid rgba(255,255,255,.1);border-radius:10px;color:var(--text);font-size:22px;font-weight:700;text-align:center;outline:none;transition:border-color .2s;-webkit-appearance:none;}
+    .otp-row{display:flex;gap:8px;justify-content:center;}
+    .otp-input{width:38px;height:50px;background:var(--bg3);border:1px solid rgba(255,255,255,.1);border-radius:10px;color:var(--text);font-size:20px;font-weight:700;text-align:center;outline:none;transition:border-color .2s;-webkit-appearance:none;}
     .otp-input:focus{border-color:var(--gold);}
     .strength-bar{display:flex;gap:4px;margin-top:8px;}
     .strength-bar span{flex:1;height:4px;border-radius:2px;background:var(--bg3);transition:background .3s;}
@@ -353,8 +353,6 @@ function buildDots(){
   }
   const lbl = document.getElementById('step-label');
   if(lbl) lbl.textContent = 'Passo ' + paxStep + ' de ' + TOTAL_STEPS;
-}
-  document.getElementById('step-label').textContent='Passo '+paxStep+' de '+TOTAL_STEPS;
 }
 buildDots();
 

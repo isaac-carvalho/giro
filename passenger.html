@@ -399,6 +399,16 @@ html, body{
 }
 .sos-fill-bar{position:absolute;left:0;top:0;bottom:0;width:0;background:var(--red);opacity:.4;transition:width .1s linear;}
 .sos-hold-content{position:relative;z-index:2;display:flex;align-items:center;justify-content:center;gap:8px;}
+
+@keyframes progressBarAnim {
+  0% { width: 0%; }
+  100% { width: 100%; }
+}
+button:active, .btn-uber-main:active, .u-tab:active, .nav-pill-btn:active, .btn-mini-gps:active, .q-chip:active, .trip-action-btn:active {
+  transform: scale(0.97);
+  opacity: 0.85;
+  transition: transform 0.15s ease, opacity 0.15s ease;
+}
 </style>
 </head>
 <body>

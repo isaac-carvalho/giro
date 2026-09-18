@@ -404,15 +404,10 @@ body { overscroll-behavior: none; }
   transform: scale(0.97);
   transition: .15s ease;
 }
-.tab-btn:active {
-  opacity: 0.7;
-  transform: scale(0.97);
-  transition: .15s ease;
+@keyframes progressBarAnim {
+  0% { width: 0%; }
+  100% { width: 100%; }
 }
-.uber-sheet {
-  padding-bottom: calc(62px + env(safe-area-inset-bottom, 0px)) !important;
-}
-
 </style>
 </head>
 <body>

@@ -24,7 +24,7 @@
     .step-label{font-size:11px;color:var(--muted);margin-bottom:20px;}
     .form-group{margin-bottom:16px;}
     .form-label{display:block;font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:7px;}
-    .form-control{width:100%;background:var(--bg3);border:1px solid rgba(255,255,255,.1);border-radius:10px;color:var(--text);font-size:15px;padding:12px 14px;outline:none;transition:border-color .2s;-webkit-appearance:none;}
+    .form-control{width:100%;background:var(--bg3);border:1px solid rgba(255,255,255,.1);border-radius:10px;color:var(--text);font-size:16px;padding:12px 14px;outline:none;transition:border-color .2s;-webkit-appearance:none;}
     .form-control:focus{border-color:var(--gold);}
     .form-control.error{border-color:var(--red);}
     .form-control.ok{border-color:var(--green);}
@@ -88,7 +88,6 @@
     .auth-links{margin-top:20px;text-align:center;font-size:13px;color:var(--muted);}
     .auth-links a{font-weight:600;}
     .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
-    @media(max-width:380px){.grid-2{grid-template-columns:1fr;}}
     .pill-skip{display:inline-block;margin-top:4px;padding:4px 12px;border-radius:20px;background:var(--bg3);border:1px solid rgba(255,255,255,.08);font-size:12px;color:var(--muted);cursor:pointer;}
     .pill-skip:hover{border-color:var(--gold);color:var(--gold);}
     .veh-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
@@ -96,7 +95,7 @@
     .veh-btn.selected{border-color:var(--gold);background:rgba(212,175,55,.08);color:var(--gold);}
     .kyc-info{background:rgba(212,175,55,.07);border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-bottom:16px;font-size:12px;color:var(--gold2);line-height:1.6;}
     .doc-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
-    @media(max-width:380px){.doc-grid{grid-template-columns:1fr;}}
+    @media(max-width:380px){.grid-2,.veh-grid,.doc-grid{grid-template-columns:1fr;}}
     .earnings-box{background:var(--bg3);border-radius:12px;padding:16px;margin-bottom:18px;text-align:center;}
     .earnings-box .earn-val{font-size:28px;font-weight:900;color:var(--green);}
     .earnings-box .earn-sub{font-size:12px;color:var(--muted);margin-top:4px;}
@@ -522,8 +521,6 @@ function buildMotDots(){
   }
   const lbl = document.getElementById('mot-step-label');
   if(lbl) lbl.textContent = 'Passo ' + motStep + ' de ' + MOT_TOTAL;
-}
-  document.getElementById('mot-step-label').textContent='Passo '+motStep+' de '+MOT_TOTAL;
 }
 buildMotDots();
 
