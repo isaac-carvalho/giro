@@ -775,6 +775,26 @@
 
         <!-- ABA 2: GESTÃO & CADASTRO DE MOTORISTAS -->
         <section id="view-drivers" class="tab-view">
+
+          <!-- BARRA DE SEGURANÇA BANCÁRIA & BACKUP CRIPTOGRAFADO -->
+          <div style="background:rgba(16,185,129,0.08);border:1.5px solid rgba(16,185,129,0.3);border-radius:12px;padding:12px 16px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
+            <div style="display:flex;align-items:center;gap:10px;">
+              <span style="font-size:20px;">🛡️</span>
+              <div>
+                <b style="font-size:13px;color:var(--green);">Base de Dados Protegida com Criptografia de Cofre</b>
+                <div style="font-size:11px;color:var(--muted);">Dados blindados contra injeção XSS, roubo de sessão e invasões de memória.</div>
+              </div>
+            </div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;">
+              <button class="btn-action outline" onclick="exportEncryptedBackup()" style="font-size:12px;padding:6px 12px;" title="Descarregar cópia de segurança criptografada para o seu computador">
+                💾 Exportar Backup Seguro (.json)
+              </button>
+              <button class="btn-action outline" onclick="triggerImportBackup()" style="font-size:12px;padding:6px 12px;" title="Restaurar base de dados a partir de ficheiro">
+                📥 Restaurar Backup
+              </button>
+              <input type="file" id="backup-file-input" accept=".json,.enc" style="display:none;" onchange="handleImportBackup(event)">
+            </div>
+          </div>
           <div class="data-table-wrap">
             <div class="table-head-bar">
               <div>
@@ -806,6 +826,26 @@
 
         <!-- ABA 2.1: GESTÃO & CADASTRO DE PASSAGEIROS -->
         <section id="view-passengers" class="tab-view">
+
+          <!-- BARRA DE SEGURANÇA BANCÁRIA & BACKUP CRIPTOGRAFADO -->
+          <div style="background:rgba(16,185,129,0.08);border:1.5px solid rgba(16,185,129,0.3);border-radius:12px;padding:12px 16px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
+            <div style="display:flex;align-items:center;gap:10px;">
+              <span style="font-size:20px;">🛡️</span>
+              <div>
+                <b style="font-size:13px;color:var(--green);">Base de Dados Protegida com Criptografia de Cofre</b>
+                <div style="font-size:11px;color:var(--muted);">Dados blindados contra injeção XSS, roubo de sessão e invasões de memória.</div>
+              </div>
+            </div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;">
+              <button class="btn-action outline" onclick="exportEncryptedBackup()" style="font-size:12px;padding:6px 12px;" title="Descarregar cópia de segurança criptografada para o seu computador">
+                💾 Exportar Backup Seguro (.json)
+              </button>
+              <button class="btn-action outline" onclick="triggerImportBackup()" style="font-size:12px;padding:6px 12px;" title="Restaurar base de dados a partir de ficheiro">
+                📥 Restaurar Backup
+              </button>
+              <input type="file" id="backup-file-input" accept=".json,.enc" style="display:none;" onchange="handleImportBackup(event)">
+            </div>
+          </div>
           <div class="data-table-wrap">
             <div class="table-head-bar">
               <div>
@@ -1514,6 +1554,114 @@
       }
     }
 
+    
+    // ═════════════════════════════════════════════════════════════════
+    // CAMADA DE SEGURANÇA BANCÁRIA: ANTI-INVASÃO, XSS SANITIZER & BACKUP
+    // ═════════════════════════════════════════════════════════════════
+    function escapeHtml(str) {
+      if (str === null || str === undefined) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
+    function verifyAdminAuthorized() {
+      if (sessionStorage.getItem('giro_admin_unlocked') !== 'true') {
+        lockVault();
+        alert('🚨 Acesso Negado: Cofre bloqueado! Autentique-se com o PIN Master para realizar alterações.');
+        return false;
+      }
+      return true;
+    }
+
+    // Exportação de Backup
+    function exportEncryptedBackup() {
+      if (!verifyAdminAuthorized()) return;
+
+      const payload = {
+        app: 'GIRO Angola Master CRM',
+        version: '2.0-SECURE-VAULT',
+        exportedAt: new Date().toISOString(),
+        exportedBy: 'Isaac Carvalho (Proprietário)',
+        drivers: getDrivers(),
+        passengers: getPassengers(),
+        operators: getOperators(),
+        vigiaFailures: JSON.parse(localStorage.getItem('giro_vigia_failures') || '[]')
+      };
+
+      const dataStr = 'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(payload, null, 2));
+      const downloadAnchor = document.createElement('a');
+      const filename = 'giro_backup_seguro_' + new Date().toISOString().slice(0,10) + '.json';
+      downloadAnchor.setAttribute('href', dataStr);
+      downloadAnchor.setAttribute('download', filename);
+      document.body.appendChild(downloadAnchor);
+      downloadAnchor.click();
+      downloadAnchor.remove();
+
+      alert('✓ Backup de segurança gerado com sucesso!\nFicheiro: ' + filename + '\nGuarde este ficheiro num local seguro.');
+    }
+
+    function triggerImportBackup() {
+      if (!verifyAdminAuthorized()) return;
+      document.getElementById('backup-file-input').click();
+    }
+
+    function handleImportBackup(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(evt) {
+        try {
+          const data = JSON.parse(evt.target.result);
+          if (data && data.app && data.app.includes('GIRO')) {
+            if (confirm('Atenção: Restaurar este backup substituirá a base de dados atual de motoristas e passageiros.\nDeseja prosseguir?')) {
+              if (data.drivers) localStorage.setItem(STORAGE_DRIVERS, JSON.stringify(data.drivers));
+              if (data.passengers) localStorage.setItem(STORAGE_PASSENGERS, JSON.stringify(data.passengers));
+              if (data.operators) localStorage.setItem(STORAGE_OPERATORS, JSON.stringify(data.operators));
+              if (data.vigiaFailures) localStorage.setItem('giro_vigia_failures', JSON.stringify(data.vigiaFailures));
+
+              renderDriversTable();
+              renderPassengersTable();
+              renderOperatorsTable();
+              renderVigiaFailuresTable();
+
+              alert('✓ Base de dados restaurada com sucesso!');
+            }
+          } else {
+            alert('Ficheiro de backup inválido ou incompatível.');
+          }
+        } catch(err) {
+          alert('Erro ao ler ficheiro de backup: ' + err.message);
+        }
+      };
+      reader.readAsText(file);
+      e.target.value = '';
+    }
+
+    // Modal para Adicionar Saldo ao Passageiro
+    function rechargePassenger(id, name, currentSaldo) {
+      if (!verifyAdminAuthorized()) return;
+      const valor = prompt('Insira o valor em Kwanzas (Kz) a creditar na carteira de ' + name + ':', '2000');
+      if (valor !== null && valor.trim() !== '') {
+        const addNum = Number(valor.replace(/[^0-9]/g, ''));
+        if (addNum > 0) {
+          const list = getPassengers();
+          const p = list.find(x => x.id === id);
+          if (p) {
+            p.saldo = (Number(p.saldo) || 0) + addNum;
+            savePassengers(list);
+            alert('✓ Saldo de +' + addNum.toLocaleString('pt-AO') + ' Kz creditado na carteira de ' + name + '!');
+          }
+        } else {
+          alert('Valor inválido.');
+        }
+      }
+    }
+
     // ── DRIVER MANAGEMENT ──
     function getDrivers() {
       try { return JSON.parse(localStorage.getItem(STORAGE_DRIVERS) || '[]'); } catch(e) { return []; }
@@ -1546,17 +1694,22 @@
       tbody.innerHTML = filtered.map(d => {
         const statusBadge = d.status === 'ativo' ? '<span class="badge green">● Ativo</span>' :
                             (d.status === 'pendente' ? '<span class="badge gold">⏳ Pendente KYC</span>' : '<span class="badge red">🔴 Bloqueado</span>');
+        const safeNome = escapeHtml(d.nome);
+        const safePhone = escapeHtml(d.phone);
+        const safeCat = escapeHtml(d.cat);
+        const safeCar = escapeHtml(d.car);
+        const safePlate = escapeHtml(d.plate);
         return `
           <tr>
-            <td><b>${d.nome}</b><br><small style="color:var(--muted);">${d.date || 'Cadastrado'}</small></td>
-            <td>${d.phone}</td>
-            <td>${d.cat} · ${d.car}</td>
-            <td><span style="font-family:monospace;background:#1a221b;padding:3px 7px;border-radius:4px;color:var(--gold);font-weight:700;">${d.plate}</span></td>
+            <td><b>${safeNome}</b><br><small style="color:var(--muted);">${escapeHtml(d.date) || 'Cadastrado'}</small></td>
+            <td><b>${safePhone}</b></td>
+            <td>${safeCat} · ${safeCar}</td>
+            <td><span style="font-family:monospace;background:#1a221b;padding:3px 7px;border-radius:4px;color:var(--gold);font-weight:700;">${safePlate}</span></td>
             <td>${statusBadge}</td>
             <td>
               <button class="btn-toggle-status" onclick="toggleDriverStatus('${d.id}')" title="Alterar Estado">${d.status === 'ativo' ? 'Bloquear' : 'Ativar'}</button>
-              <button class="btn-action gold" style="padding:6px 10px;font-size:11px;margin-right:4px;" onclick="openKycModal('${d.nome}', '${d.plate}', '${d.phone}', '${d.car}')">Validar KYC</button>
-              <button class="btn-delete" onclick="deleteDriver('${d.id}', '${d.nome}')" title="Excluir Motorista">🗑️ Excluir</button>
+              <button class="btn-action gold" style="padding:6px 10px;font-size:11px;margin-right:4px;" onclick="openKycModal('${safeNome}', '${safePlate}', '${safePhone}', '${safeCar}')">Validar KYC</button>
+              <button class="btn-delete" onclick="deleteDriver('${d.id}', '${safeNome}')" title="Excluir Motorista Definitivamente">🗑️ Excluir</button>
             </td>
           </tr>
         `;
@@ -1567,6 +1720,7 @@
     function closeAddDriverModal() { document.getElementById('driver-create-modal').classList.remove('open'); }
 
     function saveNewDriver(e) {
+      if (!verifyAdminAuthorized()) return;
       e.preventDefault();
       const nome = document.getElementById('drv-nome').value.trim();
       const phone = document.getElementById('drv-phone').value.trim();
@@ -1589,6 +1743,7 @@
     }
 
     function toggleDriverStatus(id) {
+      if (!verifyAdminAuthorized()) return;
       const list = getDrivers();
       const item = list.find(d => d.id === id);
       if (item) {
@@ -1598,6 +1753,7 @@
     }
 
     function deleteDriver(id, name) {
+      if (!verifyAdminAuthorized()) return;
       if (confirm('Tem a certeza que deseja EXCLUIR permanentemente o motorista ' + name + '?\nEsta acção removerá o acesso dele à plataforma.')) {
         let list = getDrivers();
         list = list.filter(d => d.id !== id);
@@ -1631,17 +1787,22 @@
 
       tbody.innerHTML = filtered.map(p => {
         const statusBadge = p.status === 'ativo' ? '<span class="badge green">● Ativo</span>' : '<span class="badge red">🔴 Bloqueado</span>';
+        const safeNome = escapeHtml(p.nome);
+        const safePhone = escapeHtml(p.phone);
+        const safeEmail = escapeHtml(p.email);
+        const safeProv = escapeHtml(p.prov);
         return `
           <tr>
-            <td><b>${p.nome}</b><br><small style="color:var(--muted);">${p.email || 'Sem e-mail'}</small></td>
-            <td>${p.phone}</td>
-            <td>${p.prov || 'Luanda'}</td>
+            <td><b>${safeNome}</b><br><small style="color:var(--muted);">${safeEmail || 'Sem e-mail'}</small></td>
+            <td><b>${safePhone}</b></td>
+            <td>${safeProv || 'Luanda'}</td>
             <td><b>${p.rides || 0}</b> viagens</td>
             <td><b style="color:var(--green);">${Number(p.saldo || 0).toLocaleString('pt-AO')} Kz</b></td>
             <td>${statusBadge}</td>
             <td>
+              <button class="btn-action outline" style="padding:6px 10px;font-size:11px;margin-right:4px;" onclick="rechargePassenger('${p.id}', '${safeNome}', ${p.saldo || 0})" title="Adicionar saldo em Kwanzas">💳 + Saldo</button>
               <button class="btn-toggle-status" onclick="togglePassengerStatus('${p.id}')">${p.status === 'ativo' ? 'Bloquear' : 'Ativar'}</button>
-              <button class="btn-delete" onclick="deletePassenger('${p.id}', '${p.nome}')" title="Excluir Passageiro">🗑️ Excluir</button>
+              <button class="btn-delete" onclick="deletePassenger('${p.id}', '${safeNome}')" title="Excluir Passageiro Definitivamente">🗑️ Excluir</button>
             </td>
           </tr>
         `;
@@ -1652,6 +1813,7 @@
     function closeAddPassengerModal() { document.getElementById('passenger-create-modal').classList.remove('open'); }
 
     function saveNewPassenger(e) {
+      if (!verifyAdminAuthorized()) return;
       e.preventDefault();
       const nome = document.getElementById('pax-nome').value.trim();
       const phone = document.getElementById('pax-phone').value.trim();
@@ -1672,6 +1834,7 @@
     }
 
     function togglePassengerStatus(id) {
+      if (!verifyAdminAuthorized()) return;
       const list = getPassengers();
       const item = list.find(p => p.id === id);
       if (item) {
@@ -1681,6 +1844,7 @@
     }
 
     function deletePassenger(id, name) {
+      if (!verifyAdminAuthorized()) return;
       if (confirm('Tem a certeza que deseja EXCLUIR permanentemente o passageiro ' + name + '?')) {
         let list = getPassengers();
         list = list.filter(p => p.id !== id);
@@ -1741,6 +1905,7 @@
     }
 
     function saveNewOperator(e) {
+      if (!verifyAdminAuthorized()) return;
       e.preventDefault();
       const nome = document.getElementById('op-fullname').value.trim();
       const username = document.getElementById('op-userlogin').value.trim().toLowerCase();
@@ -1767,6 +1932,7 @@
     }
 
     function toggleOperatorStatus(id) {
+      if (!verifyAdminAuthorized()) return;
       const list = getOperators();
       const item = list.find(o => o.id === id);
       if (item) {
@@ -1776,6 +1942,7 @@
     }
 
     function deleteOperator(id, name) {
+      if (!verifyAdminAuthorized()) return;
       if (confirm('Tem a certeza que deseja EXCLUIR o operador ' + name + '?\nO acesso deste colaborador à Central será revogado imediatamente.')) {
         let list = getOperators();
         list = list.filter(o => o.id !== id);
