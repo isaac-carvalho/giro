@@ -1,0 +1,792 @@
+<!DOCTYPE html>
+<html lang="pt-AO">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GIRO Angola — Contrato de Colaboração Comercial</title>
+<style>
+  @page {
+    size: A4;
+    margin: 25mm 20mm 25mm 20mm;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Georgia', 'Times New Roman', serif;
+    font-size: 11.5pt;
+    line-height: 1.7;
+    color: #1a1a1a;
+    background: #fff;
+    padding: 25mm 20mm;
+    max-width: 210mm;
+    margin: 0 auto;
+  }
+  @media print {
+    body { padding: 0; max-width: none; }
+    .no-print { display: none !important; }
+  }
+  /* Print button */
+  .no-print {
+    position: fixed; top: 16px; right: 16px; z-index: 999;
+    display: flex; gap: 8px;
+  }
+  .no-print button {
+    background: #0a2540; color: #fff; border: none; padding: 10px 22px;
+    border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer;
+    font-family: system-ui, sans-serif;
+  }
+  .no-print button:hover { background: #163a5f; }
+
+  /* Header */
+  .contract-header {
+    text-align: center;
+    border-bottom: 3px double #0a2540;
+    padding-bottom: 18px;
+    margin-bottom: 28px;
+  }
+  .contract-header h1 {
+    font-size: 16pt;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: #0a2540;
+    margin-bottom: 4px;
+  }
+  .contract-header h2 {
+    font-size: 12pt;
+    font-weight: normal;
+    color: #444;
+    margin-bottom: 2px;
+  }
+  .contract-header .contract-no {
+    font-size: 10pt;
+    color: #777;
+    margin-top: 8px;
+  }
+
+  /* Sections */
+  .clause {
+    margin-bottom: 20px;
+    page-break-inside: avoid;
+  }
+  .clause-title {
+    font-size: 12pt;
+    font-weight: bold;
+    color: #0a2540;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+    border-left: 4px solid #0a2540;
+    padding-left: 10px;
+  }
+  .sub-clause {
+    margin-left: 18px;
+    margin-bottom: 6px;
+  }
+  .sub-clause-title {
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 4px;
+  }
+
+  /* Numbered items */
+  ol { margin-left: 24px; margin-bottom: 10px; }
+  ol li { margin-bottom: 6px; }
+  ul { margin-left: 24px; margin-bottom: 10px; list-style: disc; }
+  ul li { margin-bottom: 4px; }
+
+  /* Tables */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 10px 0 16px 0;
+    font-size: 10.5pt;
+  }
+  table th, table td {
+    border: 1px solid #999;
+    padding: 6px 10px;
+    text-align: left;
+    vertical-align: top;
+  }
+  table th {
+    background: #0a2540;
+    color: #fff;
+    font-weight: 600;
+    font-size: 10pt;
+  }
+  table td { background: #fafafa; }
+
+  /* Blanks */
+  .blank {
+    display: inline-block;
+    min-width: 180px;
+    border-bottom: 1px solid #333;
+    margin: 0 4px;
+  }
+  .blank-lg { min-width: 280px; }
+
+  /* Signature block */
+  .sig-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
+    margin-top: 30px;
+    page-break-inside: avoid;
+  }
+  .sig-box {
+    border: 1px solid #ccc;
+    padding: 18px;
+    border-radius: 4px;
+  }
+  .sig-box h4 {
+    font-size: 10pt;
+    text-transform: uppercase;
+    color: #0a2540;
+    border-bottom: 1px solid #ddd;
+    padding-bottom: 6px;
+    margin-bottom: 12px;
+  }
+  .sig-line {
+    margin-top: 14px;
+    padding-top: 4px;
+    font-size: 10pt;
+    color: #555;
+  }
+  .sig-line .blank { min-width: 100%; display: block; margin-top: 4px; height: 24px; }
+
+  /* Emphasis */
+  strong { color: #0a2540; }
+  .warning {
+    background: #fff8e1;
+    border-left: 4px solid #f59e0b;
+    padding: 10px 14px;
+    margin: 10px 0;
+    font-size: 10.5pt;
+  }
+  .danger {
+    background: #fef2f2;
+    border-left: 4px solid #dc2626;
+    padding: 10px 14px;
+    margin: 10px 0;
+    font-size: 10.5pt;
+  }
+
+  /* Footer */
+  .contract-footer {
+    margin-top: 40px;
+    text-align: center;
+    font-size: 9pt;
+    color: #999;
+    border-top: 1px solid #ddd;
+    padding-top: 12px;
+    page-break-inside: avoid;
+  }
+
+  /* Page break helper */
+  .page-break { page-break-before: always; }
+</style>
+</head>
+<body>
+
+<!-- Print / PDF buttons -->
+<div class="no-print">
+  <button onclick="window.print()">📄 Imprimir / Salvar PDF</button>
+</div>
+
+<!-- ═══════════════════════════════════════════════ -->
+<!-- CABEÇALHO -->
+<!-- ═══════════════════════════════════════════════ -->
+<div class="contract-header">
+  <h1>Contrato de Colaboração Comercial</h1>
+  <h2>Recrutamento e Cadastro de Motoristas e Passageiros</h2>
+  <h2><strong>GIRO ANGOLA</strong> — Plataforma de Mobilidade Urbana & Logística</h2>
+  <div class="contract-no">Nº GIRO/COL/<span class="blank" style="min-width:80px"></span>/2026</div>
+</div>
+
+<!-- ═══════════════════════════════════════════════ -->
+<!-- PREÂMBULO -->
+<!-- ═══════════════════════════════════════════════ -->
+<div class="clause">
+  <div class="clause-title">Preâmbulo</div>
+  <p>
+    O presente instrumento particular de colaboração comercial é celebrado entre as partes abaixo identificadas, 
+    de livre e espontânea vontade, sem qualquer vício de consentimento, com base na legislação vigente da 
+    <strong>República de Angola</strong>, nomeadamente a Lei n.º 7/15, de 15 de Junho (Lei Geral do Trabalho — 
+    aplicável subsidiariamente), o Código Civil Angolano e demais legislação aplicável aos contratos de prestação 
+    de serviços e colaboração comercial independente.
+  </p>
+</div>
+
+<!-- ═══════════════════════════════════════════════ -->
+<!-- IDENTIFICAÇÃO DAS PARTES -->
+<!-- ═══════════════════════════════════════════════ -->
+<div class="clause">
+  <div class="clause-title">Cláusula 1.ª — Identificação das Partes</div>
+  
+  <div class="sub-clause">
+    <div class="sub-clause-title">1.1 — PRIMEIRA OUTORGANTE (doravante "EMPRESA" ou "GIRO")</div>
+    <table>
+      <tr><td style="width:35%;font-weight:bold">Denominação</td><td>GIRO Angola — operado por Oaken Technologies</td></tr>
+      <tr><td style="font-weight:bold">Representante Legal</td><td>Isaac Carvalho, Fundador & CEO</td></tr>
+      <tr><td style="font-weight:bold">Sede Social</td><td>Luanda, República de Angola</td></tr>
+      <tr><td style="font-weight:bold">NIF</td><td><span class="blank"></span></td></tr>
+      <tr><td style="font-weight:bold">Contacto Oficial</td><td><span class="blank blank-lg"></span></td></tr>
+    </table>
+  </div>
+
+  <div class="sub-clause">
+    <div class="sub-clause-title">1.2 — SEGUNDA OUTORGANTE (doravante "COLABORADOR")</div>
+    <table>
+      <tr><td style="width:35%;font-weight:bold">Nome Completo</td><td><span class="blank blank-lg"></span></td></tr>
+      <tr><td style="font-weight:bold">Nº do Bilhete de Identidade</td><td><span class="blank"></span></td></tr>
+      <tr><td style="font-weight:bold">Data de Nascimento</td><td><span class="blank"></span></td></tr>
+      <tr><td style="font-weight:bold">Morada Completa</td><td><span class="blank blank-lg"></span></td></tr>
+      <tr><td style="font-weight:bold">Província de Actuação</td><td><span class="blank"></span></td></tr>
+      <tr><td style="font-weight:bold">Município(s)</td><td><span class="blank"></span></td></tr>
+      <tr><td style="font-weight:bold">Telefone / WhatsApp</td><td><span class="blank"></span></td></tr>
+      <tr><td style="font-weight:bold">Conta de Pagamento (MCX Express / Unitel Money)</td><td><span class="blank blank-lg"></span></td></tr>
+    </table>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════ -->
+<!-- NATUREZA DA RELAÇÃO -->
+<!-- ═══════════════════════════════════════════════ -->
+<div class="clause">
+  <div class="clause-title">Cláusula 2.ª — Natureza Jurídica da Relação</div>
+  <ol>
+    <li>O presente contrato estabelece uma relação de <strong>colaboração comercial independente</strong>, 
+    <strong>sem vínculo laboral</strong>, subordinação hierárquica, exclusividade de horário ou qualquer 
+    relação de emprego entre a EMPRESA e o COLABORADOR.</li>
+    <li>O COLABORADOR actua por <strong>conta própria</strong>, assumindo os seus próprios custos operacionais 
+    (transporte, comunicação, materiais pessoais), não sendo a EMPRESA responsável por quaisquer encargos 
+    laborais, fiscais, previdenciários ou de seguro social do COLABORADOR.</li>
+    <li>O COLABORADOR <strong>não tem poderes de representação legal</strong> da EMPRESA, não podendo 
+    firmar contratos, assumir obrigações financeiras ou criar compromissos em nome da GIRO sem autorização 
+    expressa e por escrito do representante legal.</li>
+    <li>O COLABORADOR reconhece que <strong>não possui qualquer expectativa de vínculo empregatício</strong>, 
+    indemnização laboral, férias, 13.º salário ou quaisquer benefícios trabalhistas decorrentes deste contrato.</li>
+  </ol>
+</div>
+
+<!-- ═══════════════════════════════════════════════ -->
+<!-- OBJECTO -->
+<!-- ═══════════════════════════════════════════════ -->
+<div class="clause">
+  <div class="clause-title">Cláusula 3.ª — Objecto do Contrato</div>
+  <ol>
+    <li><strong>Recrutamento de Motoristas</strong>: Identificar, abordar e auxiliar potenciais motoristas 
+    a registarem-se na plataforma GIRO, assegurando a recolha completa e fidedigna de toda a documentação 
+    KYC exigida.</li>
+    <li><strong>Recrutamento de Passageiros</strong>: Promover a aplicação GIRO junto de potenciais utilizadores, 
+    auxiliando no download, registo e realização da primeira viagem.</li>
+    <li>O COLABORADOR actua <strong>exclusivamente como facilitador de cadastro</strong>, não tendo qualquer 
+    interferência na operação da plataforma, fixação de tarifas, gestão de motoristas ou políticas comerciais 
+    da EMPRESA.</li>
+  </ol>
+</div>
+
+<!-- ═══════════════════════════════════════════════ -->
+<!-- DOCUMENTAÇÃO KYC OBRIGATÓRIA -->
+<!-- ═══════════════════════════════════════════════ -->
+<div class="clause">
+  <div class="clause-title">Cláusula 4.ª — Documentação KYC Obrigatória (Motoristas)</div>
+  <p>O COLABORADOR deve recolher e submeter, através dos canais oficiais da EMPRESA, os seguintes documentos 
+  de cada motorista candidato:</p>
+  <table>
+    <thead>
+      <tr><th>#</th><th>Documento</th><th>Formato Exigido</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>1</td><td>Bilhete de Identidade (BI) — frente e verso</td><td>Foto digital HD, legível, sem recortes</td></tr>
+      <tr><td>2</td><td>Carta de Condução válida</td><td>Foto digital HD, legível</td></tr>
+      <tr><td>3</td><td>Seguro Automóvel em vigor</td><td>Foto / PDF legível</td></tr>
+      <tr><td>4</td><td>Selfie facial do motorista</td><td>Foto frontal, boa iluminação, sem óculos escuros</td></tr>
+      <tr><td>5</td><td>Fotografias da viatura (4 ângulos exteriores + interior)</td><td>Fotos digitais, viatura limpa e visível</td></tr>
+      <tr><td>6</td><td>Dados do veículo (marca, modelo, ano, matrícula, cor, nº de lugares)</td><td>Formulário preenchido</td></tr>
+    </tbody>
+  </table>
+  <div class="danger">
+    <strong>ADVERTÊNCIA:</strong> A submissão de documentos falsificados, adulterados, de terceiros ou cadastros fictícios 
+    constitui <strong>fraude contratual</strong> e dará lugar à rescisão imediata do contrato, perda de todas 
+    as comissões pendentes e possível responsabilização civil e criminal nos termos da lei angolana.
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════ -->
+<!-- TERRITÓRIO -->
+<!-- ═══════════════════════════════════════════════ -->
+<div class="clause">
+  <div class="clause-title">Cláusula 5.ª — Território de Actuação</div>
+  <ol>
+    <li>O COLABORADOR está autorizado a actuar na(s) seguinte(s) zona(s): 
+    <span class="blank blank-lg"></span></li>
+    <li>A actuação fora do território atribuído requer <strong>autorização prévia por escrito</strong> da EMPRESA.</li>
+    <li>A atribuição de território <strong>não confere exclusividade</strong>. A EMPRESA reserva-se o direito de 
+    designar outros colaboradores para a mesma zona, a qualquer momento e sem necessidade de justificação.</li>
+    <li>A EMPRESA pode, a seu exclusivo critério, <strong>redefinir, reduzir ou alargar</strong> o território 
+    do COLABORADOR, mediante aviso com 7 (sete) dias de antecedência.</li>
+  </ol>
+</div>
+
+<div class="page-break"></div>
+
+<!-- ═══════════════════════════════════════════════ -->
+<!-- COMISSÕES -->
+<!-- ═══════════════════════════════════════════════ -->
+<div class="clause">
+  <div class="clause-title">Cláusula 6.ª — Remuneração e Comissões</div>
+  
+  <div class="sub-clause">
+    <div class="sub-clause-title">6.1 — Tabela de Comissões</div>
+    <table>
+      <thead>
+        <tr><th>Acção</th><th>Valor (Kz)</th><th>Condição de Pagamento</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Motorista aprovado no KYC e com <strong>1.ª viagem concluída</strong></td>
+          <td><span class="blank" style="min-width:100px"></span> Kz</td>
+          <td>Após confirmação do sistema</td>
+        </tr>
+        <tr>
+          <td>Bónus por motorista activo (≥ 20 viagens/mês)</td>
+          <td><span class="blank" style="min-width:100px"></span> Kz/mês</td>
+          <td>Recorrente enquanto motorista activo (máx. 6 meses)</td>
+        </tr>
+        <tr>
+          <td>Passageiro registado com 1.ª viagem concluída</td>
+          <td><span class="blank" style="min-width:100px"></span> Kz</td>
+          <td>Após confirmação do sistema</td>
+        </tr>
+        <tr>
+          <td>Bónus meta mensal (≥ 30 motoristas aprovados)</td>
+          <td><span class="blank" style="min-width:100px"></span> Kz</td>
+          <td>Pagamento único no mês atingido</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="sub-clause">
+    <div class="sub-clause-title">6.2 — Condições Gerais de Pagamento</div>
+    <ol>
+      <li>Os pagamentos são efectuados <strong>mensalmente</strong>, até ao dia <strong>15 (quinze)</strong> do mês 
+      seguinte ao período de referência.</li>
+      <li>Métodos de pagamento: <strong>Multicaixa Express</strong>, <strong>Unitel Money</strong> ou 
+      transferência bancária para conta indicada pelo COLABORADOR.</li>
+      <li>Todas as comissões são expressas em <strong>Kwanzas (Kz)</strong> e estão sujeitas às retenções 
+      fiscais aplicáveis nos termos da legislação angolana.</li>
+      <li>A EMPRESA emitirá um <strong>relatório mensal de comissões</strong> detalhando cada cadastro e o valor correspondente.</li>
+    </ol>
+  </div>
+
+  <div class="sub-clause">
+    <div class="sub-clause-title">6.3 — Limitações e Salvaguardas da EMPRESA</div>
+    <ol>
+      <li>As comissões são pagas <strong>exclusivamente a partir da receita da EMPRESA</strong> (10% de comissão sobre 
+      cada corrida) e <strong>nunca deduzidas dos ganhos do motorista</strong> (90%).</li>
+      <li>A EMPRESA reserva-se o direito de <strong>alterar a tabela de comissões</strong> mediante aviso prévio 
+      de 30 (trinta) dias. As novas condições aplicam-se apenas a cadastros realizados após a data de entrada em vigor.</li>
+      <li>Comissões por cadastros considerados <strong>inactivos</strong> (motorista sem nenhuma viagem em 60 dias 
+      após aprovação) poderão ser <strong>estornadas</strong> pela EMPRESA.</li>
+      <li>O COLABORADOR <strong>não tem direito a participação nos lucros</strong>, dividendos, acções ou 
+      qualquer forma de participação societária na EMPRESA.</li>
+      <li>O valor máximo mensal de comissões não poderá exceder <span class="blank" style="min-width:100px"></span> Kz, 
+      salvo autorização expressa da EMPRESA (tecto mensal de segurança).</li>
+    </ol>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════ -->
+<!-- OBRIGAÇÕES DO COLABORADOR -->
+<!-- ═══════════════════════════════════════════════ -->
+<div class="clause">
+  <div class="clause-title">Cláusula 7.ª — Obrigações do Colaborador</div>
+  <ol>
+    <li>Cumprir rigorosamente os procedimentos de cadastro definidos pela EMPRESA.</li>
+    <li>Verificar visualmente a autenticidade dos documentos antes da submissão.</li>
+    <li><strong>Nunca cobrar qualquer taxa, valor ou benefício</strong> a motoristas ou passageiros pelo processo 
+    de cadastro. O cadastro na GIRO é <strong>gratuito</strong>. A violação desta disposição constitui 
+    <strong>justa causa de rescisão imediata</strong>.</li>
+    <li>Não fazer promessas de rendimentos mínimos, garantias de corridas ou compromissos que a EMPRESA 
+    não tenha autorizado por escrito.</li>
+    <li>Apresentar <strong>relatório semanal</strong> de actividades (nº de abordagens, cadastros submetidos, 
+    cadastros pendentes) através do canal oficial definido pela EMPRESA.</li>
+    <li>Manter conduta ética, profissional e respeitosa em todas as interacções.</li>
+    <li>Cumprir a <strong>meta mínima mensal</strong> de <span class="blank" style="min-width:60px"></span> cadastros 
+    de motoristas aprovados. O não cumprimento por <strong>2 (dois) meses consecutivos</strong> ou 
+    <strong>3 (três) meses alternados</strong> em 6 meses constitui justa causa de rescisão.</li>
+    <li>Participar em sessões de formação e actualização promovidas pela EMPRESA.</li>
+    <li>Comunicar imediatamente à EMPRESA qualquer irregularidade, tentativa de fraude ou situação 
+    que possa comprometer a reputação da GIRO.</li>
+  </ol>
+</div>
+
+<!-- ═══════════════════════════════════════════════ -->
+<!-- OBRIGAÇÕES DA EMPRESA -->
+<!-- ═══════════════════════════════════════════════ -->
+<div class="clause">
+  <div class="clause-title">Cláusula 8.ª — Obrigações da Empresa</div>
+  <ol>
+    <li>Fornecer acesso ao painel de colaborador (link de referência único e intransmissível).</li>
+    <li>Disponibilizar materiais de divulgação aprovados (digitais e/ou impressos, conforme disponibilidade).</li>
+    <li>Ministrar formação inicial sobre a plataforma e procedimentos KYC.</li>
+    <li>Processar e validar os cadastros submetidos no prazo de até 72 horas úteis.</li>
+    <li>Efectuar os pagamentos de comissões conforme a Cláusula 6.ª.</li>
+    <li>Prestar suporte técnico nos canais oficiais em horário comercial (segunda a sexta, 8h-18h).</li>
+  </ol>
+</div>
+
+<div class="page-break"></div>
+
+<!-- ═══════════════════════════════════════════════ -->
+<!-- EXCLUSIVIDADE E NÃO-CONCORRÊNCIA -->
+<!-- ═══════════════════════════════════════════════ -->
+<div class="clause">
+  <div class="clause-title">Cláusula 9.ª — Exclusividade e Não-Concorrência</div>
+  <ol>
+    <li>Durante a vigência deste contrato, o COLABORADOR <strong>compromete-se a não prestar serviços 
+    de recrutamento, angariação ou promoção</strong> para qualquer plataforma concorrente de mobilidade 
+    urbana, transporte de passageiros ou logística que opere ou pretenda operar em Angola, incluindo 
+    mas não se limitando a: Yango, InDrive, Heetch, Bolt ou quaisquer outras.</li>
+    <li>Esta obrigação de não-concorrência <strong>estende-se por 12 (doze) meses</strong> após o 
+    término deste contrato, independentemente do motivo da rescisão.</li>
+    <li>A violação desta cláusula obriga o COLABORADOR ao pagamento de uma <strong>indemnização 
+    compensatória</strong> no valor equivalente ao <strong>triplo</strong> do total de comissões 
+    recebidas nos últimos 6 (seis) meses, sem prejuízo de outras acções legais.</li>
+  </ol>
+  <div class="danger">
+    <strong>PENALIDADE:</strong> A prestação simultânea de serviços a concorrentes durante a vigência 
+    deste contrato constitui justa causa de rescisão imediata, com perda total de comissões pendentes 
+    e obrigação de indemnização nos termos do ponto 3 acima.
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════ -->
+<!-- NÃO-ALICIAMENTO -->
+<!-- ═══════════════════════════════════════════════ -->
+<div class="clause">
+  <div class="clause-title">Cláusula 10.ª — Não-Aliciamento (Non-Solicitation)</div>
+  <ol>
+    <li>O COLABORADOR <strong>compromete-se a não aliciar, desviar ou incentivar</strong> motoristas 
+    ou passageiros cadastrados na plataforma GIRO a migrar para qualquer plataforma concorrente, 
+    durante a vigência e por <strong>18 (dezoito) meses</strong> após o término deste contrato.</li>
+    <li>O COLABORADOR não poderá utilizar a base de dados, contactos ou informações de motoristas 
+    e passageiros da GIRO para qualquer finalidade que não seja estritamente o cumprimento deste contrato.</li>
+    <li>A violação desta cláusula sujeita o COLABORADOR a uma <strong>indemnização mínima</strong> de 
+    <span class="blank" style="min-width:100px"></span> Kz por cada motorista ou passageiro comprovadamente desviado.</li>
+  </ol>
+</div>
+
+<!-- ═══════════════════════════════════════════════ -->
+<!-- CONFIDENCIALIDADE -->
+<!-- ═══════════════════════════════════════════════ -->
+<div class="clause">
+  <div class="clause-title">Cláusula 11.ª — Confidencialidade e Sigilo</div>
+  <ol>
+    <li>O COLABORADOR obriga-se a manter <strong>sigilo absoluto</strong> sobre todas as informações 
+    a que tenha acesso no âmbito deste contrato, incluindo mas não se limitando a:
+      <ul>
+        <li>Dados pessoais de motoristas e passageiros;</li>
+        <li>Estratégias comerciais, tarifárias e de expansão da EMPRESA;</li>
+        <li>Algoritmos, processos tecnológicos e funcionalidades da plataforma;</li>
+        <li>Estrutura de comissões, receitas e informações financeiras;</li>
+        <li>Credenciais de acesso, links internos e materiais não públicos;</li>
+        <li>Número de motoristas, passageiros ou viagens na plataforma;</li>
+        <li>Planos de expansão territorial e parcerias estratégicas.</li>
+      </ul>
+    </li>
+    <li>Esta obrigação de sigilo <strong>mantém-se por 3 (três) anos</strong> após o término do contrato.</li>
+    <li>A violação desta cláusula constitui fundamento para:
+      <ul>
+        <li>Rescisão imediata sem direito a comissões pendentes;</li>
+        <li>Acção de indemnização por perdas e danos;</li>
+        <li>Participação criminal nos termos da legislação angolana aplicável.</li>
+      </ul>
+    </li>
+  </ol>
+</div>
+
+<!-- ═══════════════════════════════════════════════ -->
+<!-- PROTECÇÃO DE DADOS -->
+<!-- ═══════════════════════════════════════════════ -->
+<div class="clause">
+  <div class="clause-title">Cláusula 12.ª — Protecção de Dados Pessoais</div>
+  <ol>
+    <li>O COLABORADOR actua como <strong>subprocessador</strong> de dados pessoais, exclusivamente 
+    no âmbito e finalidade deste contrato, em conformidade com a Lei n.º 22/11, de 17 de Junho 
+    (Lei de Protecção de Dados Pessoais de Angola).</li>
+    <li>Os dados recolhidos devem ser transmitidos <strong>exclusivamente</strong> através dos canais 
+    oficiais da EMPRESA (painel de colaborador, WhatsApp oficial).</li>
+    <li><strong>É EXPRESSAMENTE PROIBIDO:</strong>
+      <ul>
+        <li>Armazenar cópias de documentos pessoais de motoristas ou passageiros em dispositivos pessoais 
+        após a submissão à plataforma;</li>
+        <li>Partilhar dados de motoristas ou passageiros com terceiros, familiares ou outros colaboradores;</li>
+        <li>Utilizar dados para fins comerciais próprios ou de terceiros;</li>
+        <li>Publicar dados em redes sociais, grupos de WhatsApp ou qualquer meio público.</li>
+      </ul>
+    </li>
+    <li>Em caso de perda, roubo ou acesso não autorizado a dados, o COLABORADOR deve notificar 
+    a EMPRESA <strong>imediatamente</strong> (prazo máximo de 12 horas).</li>
+    <li>Após o término do contrato, o COLABORADOR deve <strong>eliminar permanentemente</strong> 
+    todos os dados, documentos e informações da GIRO dos seus dispositivos num prazo de 48 horas.</li>
+  </ol>
+</div>
+
+<!-- ═══════════════════════════════════════════════ -->
+<!-- PROPRIEDADE INTELECTUAL -->
+<!-- ═══════════════════════════════════════════════ -->
+<div class="clause">
+  <div class="clause-title">Cláusula 13.ª — Propriedade Intelectual e Uso da Marca</div>
+  <ol>
+    <li>A marca <strong>GIRO</strong>, o logótipo, a identidade visual, o software, a aplicação e todos 
+    os materiais são propriedade <strong>exclusiva e inalienável</strong> da Oaken Technologies.</li>
+    <li>O COLABORADOR recebe uma licença <strong>limitada, temporária, não exclusiva, intransmissível 
+    e revogável</strong> para uso da marca GIRO exclusivamente no âmbito deste contrato.</li>
+    <li><strong>É PROIBIDO:</strong>
+      <ul>
+        <li>Alterar, deformar ou adaptar o logótipo ou identidade visual;</li>
+        <li>Criar materiais de marketing, vídeos ou publicações em nome da GIRO sem aprovação prévia;</li>
+        <li>Registar marcas, domínios ou nomes comerciais semelhantes ou confundíveis com GIRO;</li>
+        <li>Usar a marca para fins pessoais ou promoção de outros serviços.</li>
+      </ul>
+    </li>
+    <li>Todos os materiais fornecidos pela EMPRESA devem ser <strong>devolvidos ou eliminados</strong> 
+    no prazo de 48 horas após o término do contrato.</li>
+  </ol>
+</div>
+
+<div class="page-break"></div>
+
+<!-- ═══════════════════════════════════════════════ -->
+<!-- PROIBIÇÕES EXPRESSAS -->
+<!-- ═══════════════════════════════════════════════ -->
+<div class="clause">
+  <div class="clause-title">Cláusula 14.ª — Proibições Expressas</div>
+  <p>O COLABORADOR está <strong>expressamente proibido</strong> de:</p>
+  <ol>
+    <li>Cobrar qualquer taxa, pagamento ou favor a motoristas ou passageiros pelo cadastro;</li>
+    <li>Apresentar-se como funcionário, sócio, director ou representante legal da EMPRESA;</li>
+    <li>Assinar contratos, assumir dívidas ou criar compromissos financeiros em nome da GIRO;</li>
+    <li>Cadastrar-se a si próprio como motorista para receber comissão (auto-cadastro);</li>
+    <li>Cadastrar familiares de 1.º grau sem divulgação e aprovação prévia da EMPRESA;</li>
+    <li>Criar cadastros duplicados, fictícios ou com dados de pessoas inexistentes;</li>
+    <li>Utilizar práticas enganosas, coercivas ou abusivas no processo de recrutamento;</li>
+    <li>Denegrir a imagem da EMPRESA ou de plataformas concorrentes;</li>
+    <li>Subcontratar terceiros para exercer as funções deste contrato sem autorização escrita;</li>
+    <li>Aceder ou tentar aceder a áreas restritas da plataforma, sistemas internos ou bases de dados.</li>
+  </ol>
+  <div class="danger">
+    <strong>CONSEQUÊNCIA:</strong> A violação de qualquer item acima constitui <strong>justa causa 
+    de rescisão imediata</strong>, com perda integral das comissões pendentes e possível acção judicial.
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════ -->
+<!-- RESPONSABILIDADE E INDEMNIZAÇÃO -->
+<!-- ═══════════════════════════════════════════════ -->
+<div class="clause">
+  <div class="clause-title">Cláusula 15.ª — Responsabilidade e Indemnização</div>
+  <ol>
+    <li>O COLABORADOR é o <strong>único responsável</strong> pelos seus actos, declarações e condutas 
+    no exercício da colaboração, isentando a EMPRESA de qualquer responsabilidade perante terceiros.</li>
+    <li>O COLABORADOR <strong>indemnizará integralmente</strong> a EMPRESA por quaisquer perdas, 
+    danos, custos judiciais, multas ou reclamações que resultem directa ou indirectamente de:
+      <ul>
+        <li>Submissão de documentos falsificados ou cadastros fraudulentos;</li>
+        <li>Cobrança de taxas a motoristas ou passageiros;</li>
+        <li>Violação de confidencialidade ou protecção de dados;</li>
+        <li>Violação de não-concorrência ou não-aliciamento;</li>
+        <li>Quaisquer actos ilícitos praticados no âmbito deste contrato.</li>
+      </ul>
+    </li>
+    <li>A EMPRESA <strong>não é responsável</strong> por:
+      <ul>
+        <li>Rendimentos ou resultados financeiros do COLABORADOR;</li>
+        <li>Acidentes, danos patrimoniais ou pessoais sofridos pelo COLABORADOR;</li>
+        <li>Despesas de transporte, comunicação ou materiais do COLABORADOR;</li>
+        <li>Quaisquer obrigações fiscais ou previdenciárias do COLABORADOR;</li>
+        <li>Indisponibilidade temporária da plataforma por manutenção ou caso fortuito.</li>
+      </ul>
+    </li>
+  </ol>
+</div>
+
+<!-- ═══════════════════════════════════════════════ -->
+<!-- DURAÇÃO, PERÍODO EXPERIMENTAL E RENOVAÇÃO -->
+<!-- ═══════════════════════════════════════════════ -->
+<div class="clause">
+  <div class="clause-title">Cláusula 16.ª — Duração, Período Experimental e Renovação</div>
+  <table>
+    <tr><td style="width:35%;font-weight:bold">Data de Início</td><td><span class="blank"></span></td></tr>
+    <tr><td style="font-weight:bold">Período Experimental</td><td><strong>45 (quarenta e cinco) dias</strong> — rescisão livre por qualquer das partes, sem penalização</td></tr>
+    <tr><td style="font-weight:bold">Duração Inicial</td><td><strong>6 (seis) meses</strong> após o período experimental</td></tr>
+    <tr><td style="font-weight:bold">Renovação</td><td>Automática por períodos iguais, salvo denúncia por qualquer das partes com <strong>30 dias de aviso prévio</strong></td></tr>
+    <tr><td style="font-weight:bold">Avaliação de Desempenho</td><td>Trimestral — a EMPRESA reserva-se o direito de não renovar com base no desempenho</td></tr>
+  </table>
+</div>
+
+<!-- ═══════════════════════════════════════════════ -->
+<!-- RESCISÃO -->
+<!-- ═══════════════════════════════════════════════ -->
+<div class="clause">
+  <div class="clause-title">Cláusula 17.ª — Rescisão</div>
+  
+  <div class="sub-clause">
+    <div class="sub-clause-title">17.1 — Rescisão pela EMPRESA (com justa causa e efeito imediato)</div>
+    <ol>
+      <li>Fraude, falsificação de documentos ou cadastros fictícios;</li>
+      <li>Cobrança de taxas a motoristas ou passageiros;</li>
+      <li>Violação de confidencialidade, protecção de dados ou propriedade intelectual;</li>
+      <li>Violação de exclusividade, não-concorrência ou não-aliciamento;</li>
+      <li>Inactividade superior a 15 (quinze) dias consecutivos sem justificação;</li>
+      <li>Não cumprimento da meta mínima mensal por 2 meses consecutivos;</li>
+      <li>Conduta que cause danos à reputação da GIRO;</li>
+      <li>Condenação criminal transitada em julgado;</li>
+      <li>Qualquer violação das proibições da Cláusula 14.ª.</li>
+    </ol>
+    <div class="warning">
+      <strong>NOTA:</strong> Na rescisão por justa causa, o COLABORADOR <strong>perde integralmente</strong> 
+      o direito a comissões pendentes e não processadas, sem direito a qualquer indemnização.
+    </div>
+  </div>
+
+  <div class="sub-clause">
+    <div class="sub-clause-title">17.2 — Rescisão pela EMPRESA (sem justa causa)</div>
+    <p>A EMPRESA pode rescindir o contrato a qualquer momento, mediante aviso escrito com 
+    <strong>15 (quinze) dias</strong> de antecedência. As comissões devidas até à data de rescisão 
+    serão liquidadas no ciclo de pagamento seguinte.</p>
+  </div>
+
+  <div class="sub-clause">
+    <div class="sub-clause-title">17.3 — Rescisão pelo COLABORADOR</div>
+    <p>O COLABORADOR pode rescindir mediante aviso escrito com <strong>30 (trinta) dias</strong> de 
+    antecedência. Comissões devidas até à data serão pagas no ciclo seguinte. A rescisão não isenta 
+    o COLABORADOR das obrigações de confidencialidade, não-concorrência e não-aliciamento.</p>
+  </div>
+
+  <div class="sub-clause">
+    <div class="sub-clause-title">17.4 — Efeitos da Rescisão</div>
+    <ol>
+      <li>Perda imediata de acesso ao painel de colaborador;</li>
+      <li>Cessação imediata do uso da marca GIRO;</li>
+      <li>Devolução ou eliminação de todos os materiais e dados em 48 horas;</li>
+      <li>Permanência das obrigações de confidencialidade (3 anos), não-concorrência (12 meses) e não-aliciamento (18 meses).</li>
+    </ol>
+  </div>
+</div>
+
+<div class="page-break"></div>
+
+<!-- ═══════════════════════════════════════════════ -->
+<!-- RESOLUÇÃO DE CONFLITOS -->
+<!-- ═══════════════════════════════════════════════ -->
+<div class="clause">
+  <div class="clause-title">Cláusula 18.ª — Resolução de Conflitos</div>
+  <ol>
+    <li>Qualquer litígio será resolvido preferencialmente por <strong>negociação directa</strong> entre 
+    as partes num prazo de 15 (quinze) dias.</li>
+    <li>Não havendo resolução amigável, as partes poderão recorrer a <strong>mediação ou arbitragem</strong> 
+    nos termos da Lei n.º 16/03, de 25 de Julho (Lei da Arbitragem Voluntária de Angola).</li>
+    <li>Em última instância, fica eleito o foro do <strong>Tribunal Provincial de Luanda</strong>, 
+    República de Angola, com renúncia expressa a qualquer outro, por mais privilegiado que seja.</li>
+  </ol>
+</div>
+
+<!-- ═══════════════════════════════════════════════ -->
+<!-- DISPOSIÇÕES FINAIS -->
+<!-- ═══════════════════════════════════════════════ -->
+<div class="clause">
+  <div class="clause-title">Cláusula 19.ª — Disposições Finais</div>
+  <ol>
+    <li>O presente contrato constitui o <strong>acordo integral</strong> entre as partes relativamente ao 
+    seu objecto, substituindo e revogando quaisquer acordos verbais ou escritos anteriores.</li>
+    <li>Alterações a este contrato só são válidas mediante <strong>aditamento escrito</strong> assinado 
+    por ambas as partes.</li>
+    <li>A tolerância ou não-exercício de qualquer direito por parte da EMPRESA <strong>não constitui 
+    renúncia</strong> nem precedente para situações futuras.</li>
+    <li>Se qualquer cláusula for declarada nula ou inválida, as restantes mantêm plena validade e eficácia.</li>
+    <li>O COLABORADOR <strong>não pode ceder</strong> os seus direitos ou obrigações a terceiros sem 
+    autorização expressa e por escrito da EMPRESA.</li>
+    <li>As comunicações oficiais entre as partes serão feitas por escrito, preferencialmente via 
+    WhatsApp oficial ou e-mail, considerando-se recebidas na data de envio.</li>
+    <li>O COLABORADOR declara que leu integralmente este contrato, compreendeu todas as cláusulas e 
+    aceita-as <strong>sem reservas</strong>, tendo tido oportunidade de consultar advogado antes 
+    da assinatura.</li>
+  </ol>
+</div>
+
+<!-- ═══════════════════════════════════════════════ -->
+<!-- DECLARAÇÃO DO COLABORADOR -->
+<!-- ═══════════════════════════════════════════════ -->
+<div class="clause">
+  <div class="clause-title">Declaração de Ciência e Aceitação</div>
+  <div style="border:2px solid #0a2540; padding:16px; border-radius:4px; background:#f8f9fa">
+    <p>Eu, <span class="blank blank-lg"></span>, portador(a) do Bilhete de Identidade n.º 
+    <span class="blank"></span>, <strong>DECLARO</strong> para todos os efeitos legais que:</p>
+    <ol>
+      <li>Li e compreendi integralmente todas as cláusulas deste contrato;</li>
+      <li>Tive oportunidade de esclarecer dúvidas e consultar advogado;</li>
+      <li>Aceito todas as condições, incluindo as cláusulas de não-concorrência, não-aliciamento, 
+      confidencialidade, penalidades e indemnização;</li>
+      <li>Reconheço que esta relação é de <strong>colaboração comercial independente</strong> e 
+      <strong>não constitui vínculo laboral</strong>;</li>
+      <li>Comprometo-me a agir com honestidade, integridade e profissionalismo no desempenho 
+      das minhas funções.</li>
+    </ol>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════ -->
+<!-- ASSINATURAS -->
+<!-- ═══════════════════════════════════════════════ -->
+<div class="clause" style="margin-top:40px">
+  <div class="clause-title">Assinaturas</div>
+  <p>O presente contrato é assinado em <strong>2 (duas) vias</strong> de igual teor e forma, 
+  ficando uma via na posse de cada parte.</p>
+
+  <p style="margin-top:12px"><strong>Luanda,</strong> <span class="blank" style="min-width:40px"></span> de 
+  <span class="blank" style="min-width:100px"></span> de 2026</p>
+
+  <div class="sig-grid">
+    <div class="sig-box">
+      <h4>Pela Empresa — GIRO Angola / Oaken Technologies</h4>
+      <div class="sig-line">Nome: <strong>Isaac Carvalho</strong></div>
+      <div class="sig-line">Cargo: Fundador & CEO</div>
+      <div class="sig-line">Assinatura:<span class="blank"></span></div>
+    </div>
+    <div class="sig-box">
+      <h4>Pelo Colaborador</h4>
+      <div class="sig-line">Nome:<span class="blank"></span></div>
+      <div class="sig-line">Nº do BI:<span class="blank"></span></div>
+      <div class="sig-line">Assinatura:<span class="blank"></span></div>
+    </div>
+  </div>
+
+  <div class="sig-grid" style="margin-top:24px">
+    <div class="sig-box">
+      <h4>Testemunha 1</h4>
+      <div class="sig-line">Nome:<span class="blank"></span></div>
+      <div class="sig-line">BI:<span class="blank"></span></div>
+      <div class="sig-line">Assinatura:<span class="blank"></span></div>
+    </div>
+    <div class="sig-box">
+      <h4>Testemunha 2</h4>
+      <div class="sig-line">Nome:<span class="blank"></span></div>
+      <div class="sig-line">BI:<span class="blank"></span></div>
+      <div class="sig-line">Assinatura:<span class="blank"></span></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════ -->
+<!-- RODAPÉ -->
+<!-- ═══════════════════════════════════════════════ -->
+<div class="contract-footer">
+  <strong>GIRO ANGOLA</strong> — A mobilidade que Angola merece 🇦🇴<br>
+  Plataforma de Mobilidade Urbana & Logística<br>
+  © 2026 Oaken Technologies. Todos os direitos reservados.<br>
+  <em>Documento confidencial — Reprodução proibida sem autorização.</em>
+</div>
+
+</body>
+</html>

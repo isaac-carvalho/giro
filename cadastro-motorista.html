@@ -330,37 +330,125 @@
       </div>
     </div>
 
-    <!-- STEP 6: Termos -->
+    <!-- STEP 6: Contrato de Parceria (auto-preenchido) -->
     <div class="step-pane" id="mstep6">
       <h2 class="auth-title">Contrato de Parceria 📝</h2>
+      <p class="auth-subtitle">Leia o contrato completo — preenchido com os seus dados</p>
       <div class="earnings-box">
         <div class="earn-val">90%</div>
         <div class="earn-sub">da corrida é seu — GIRO retém apenas 10%</div>
       </div>
-      <div style="background:var(--bg3);border-radius:10px;padding:14px;max-height:180px;overflow-y:auto;margin-bottom:16px;font-size:12px;color:var(--muted);line-height:1.7">
-        <strong style="color:var(--text)">Contrato de Parceria — GIRO Angola</strong><br><br>
-        1. O Motorista Parceiro opera de forma independente, não sendo empregado da GIRO Angola.<br>
-        2. <strong style="color:var(--gold)">Comissão GIRO: 10% fixo</strong> sobre o valor de cada viagem concluída.<br>
-        3. Pagamentos via Multicaixa Express ou Unitel Money: GIRO retém 10% e credita 90% imediatamente.<br>
-        4. Pagamento em dinheiro: o motorista fica com 100% em mãos; 10% de comissão é lançada a débito na conta.<br>
-        5. <strong style="color:var(--gold)">Bónus Desafio 30K</strong>: Ao facturar 30.000 Kz/dia, receberá +1.500 Kz de bónus automático.<br>
-        6. O SOS de Pânico alertará motoristas no raio de 5km em caso de emergência.<br>
+      <!-- Scrollable contract -->
+      <div id="contrato-scroll" style="background:var(--bg3);border-radius:12px;padding:16px;max-height:340px;overflow-y:auto;margin-bottom:14px;font-size:11.5px;color:var(--muted);line-height:1.75;border:1px solid var(--border);scroll-behavior:smooth">
+        <div style="text-align:center;margin-bottom:14px">
+          <strong style="color:var(--gold);font-size:14px;letter-spacing:1px">CONTRATO DE PARCERIA</strong><br>
+          <span style="font-size:10px;color:var(--muted)">GIRO Angola — Plataforma de Mobilidade Urbana & Logística</span>
+        </div>
+
+        <strong style="color:var(--text)">PARTES:</strong><br>
+        <strong>EMPRESA:</strong> GIRO Angola, operado por Oaken Technologies, representada por Isaac Carvalho, Fundador & CEO, com sede em Luanda, Angola.<br>
+        <strong>MOTORISTA PARCEIRO:</strong> <span style="color:var(--gold)" id="c-nome">—</span>, telefone <span style="color:var(--gold)" id="c-phone">—</span>, veículo <span style="color:var(--gold)" id="c-veiculo">—</span> <span style="color:var(--gold)" id="c-marca-modelo">—</span>, matrícula <span style="color:var(--gold)" id="c-matricula">—</span>.<br><br>
+
+        <strong style="color:var(--text)">CLÁUSULA 1.ª — NATUREZA DA RELAÇÃO</strong><br>
+        1.1. O presente contrato estabelece uma relação de colaboração comercial independente, <strong style="color:var(--gold)">sem vínculo laboral</strong>, subordinação hierárquica ou relação de emprego.<br>
+        1.2. O Motorista Parceiro opera por conta própria, assumindo os seus custos operacionais (combustível, manutenção, comunicação).<br>
+        1.3. O Motorista Parceiro não tem poderes de representação legal da EMPRESA.<br>
+        1.4. Este contrato não gera qualquer expectativa de vínculo empregatício, indemnização laboral, férias, 13.º salário ou benefícios trabalhistas.<br><br>
+
+        <strong style="color:var(--text)">CLÁUSULA 2.ª — OBJECTO</strong><br>
+        2.1. O Motorista Parceiro disponibiliza-se para realizar viagens de transporte de passageiros e/ou entregas através da plataforma GIRO Angola.<br>
+        2.2. O Motorista Parceiro tem liberdade para aceitar ou recusar corridas, definir os seus horários e a sua zona de actuação.<br><br>
+
+        <strong style="color:var(--text)">CLÁUSULA 3.ª — COMISSÃO E PAGAMENTOS</strong><br>
+        3.1. <strong style="color:var(--gold)">Comissão GIRO: 10% (dez por cento)</strong> sobre o valor total de cada viagem concluída com sucesso.<br>
+        3.2. O Motorista Parceiro recebe <strong style="color:var(--green)">90% do valor da viagem</strong>.<br>
+        3.3. Pagamentos digitais (Multicaixa Express / Unitel Money): a GIRO retém automaticamente 10% e credita 90% na conta do motorista.<br>
+        3.4. Pagamentos em dinheiro: o motorista fica com 100% em mãos; a comissão de 10% é lançada a débito no saldo da conta GIRO e deduzida nas próximas corridas digitais.<br>
+        3.5. <strong style="color:var(--gold)">Bónus "Desafio 30K"</strong>: Ao facturar 30.000 Kz num único dia, o motorista recebe +1.500 Kz de bónus automático.<br>
+        3.6. A EMPRESA reserva-se o direito de alterar a tabela de comissões com aviso prévio de 30 dias.<br><br>
+
+        <strong style="color:var(--text)">CLÁUSULA 4.ª — OBRIGAÇÕES DO MOTORISTA PARCEIRO</strong><br>
+        4.1. Manter válidos todos os documentos: Bilhete de Identidade, Carta de Condução, Seguro Automóvel.<br>
+        4.2. Manter o veículo em boas condições mecânicas, de higiene e segurança.<br>
+        4.3. Tratar passageiros com respeito, cortesia e profissionalismo.<br>
+        4.4. Seguir o trajecto indicado pela aplicação, salvo instrução contrária do passageiro.<br>
+        4.5. Não cobrar valores adicionais fora da tarifa calculada pela plataforma.<br>
+        4.6. Utilizar o botão SOS em caso de emergência real.<br>
+        4.7. Manter o telemóvel carregado e com dados móveis activos durante as corridas.<br>
+        4.8. Comunicar imediatamente à GIRO qualquer acidente, incidente ou alteração na documentação.<br><br>
+
+        <strong style="color:var(--text)">CLÁUSULA 5.ª — OBRIGAÇÕES DA EMPRESA</strong><br>
+        5.1. Disponibilizar a plataforma tecnológica funcional para recepção de corridas.<br>
+        5.2. Processar os pagamentos conforme a Cláusula 3.ª.<br>
+        5.3. Oferecer suporte técnico via WhatsApp e dentro da aplicação.<br>
+        5.4. Manter o sistema de segurança SOS/Pânico conectado às autoridades (PNA — 111).<br>
+        5.5. Tratar os dados pessoais do motorista com sigilo e em conformidade com a legislação angolana.<br><br>
+
+        <strong style="color:var(--text)">CLÁUSULA 6.ª — DOCUMENTAÇÃO KYC</strong><br>
+        6.1. O motorista deve submeter: BI (frente/verso), Carta de Condução, Seguro Automóvel, Selfie Facial e Fotos do Veículo.<br>
+        6.2. Documentos falsos, adulterados ou de terceiros resultam em suspensão imediata e permanente, sem direito a indemnização.<br>
+        6.3. A EMPRESA pode solicitar actualização de documentos a qualquer momento.<br><br>
+
+        <strong style="color:var(--text)">CLÁUSULA 7.ª — SEGURANÇA</strong><br>
+        7.1. O botão SOS/Pânico activa alerta à Polícia Nacional de Angola (PNA — 111) e notifica motoristas num raio de 5 km.<br>
+        7.2. Todas as viagens são rastreadas via GPS em tempo real.<br>
+        7.3. O uso fraudulento do botão SOS constitui justa causa de rescisão.<br><br>
+
+        <strong style="color:var(--text)">CLÁUSULA 8.ª — SUSPENSÃO E DESACTIVAÇÃO</strong><br>
+        8.1. A EMPRESA pode suspender ou desactivar a conta do motorista, a qualquer momento e sem aviso prévio, nos seguintes casos:<br>
+        — Avaliação média inferior a 4.0 estrelas por 30 dias consecutivos;<br>
+        — Reclamações graves de passageiros (assédio, condução perigosa, cobrança extra);<br>
+        — Documentação expirada sem renovação em 15 dias;<br>
+        — Uso de conta por terceiros;<br>
+        — Qualquer conduta ilícita ou que viole este contrato.<br>
+        8.2. Na suspensão, os saldos pendentes ficam retidos até resolução.<br><br>
+
+        <strong style="color:var(--text)">CLÁUSULA 9.ª — CONFIDENCIALIDADE</strong><br>
+        9.1. O motorista compromete-se a não divulgar dados de passageiros (nome, contacto, endereço, trajecto) a terceiros.<br>
+        9.2. Esta obrigação mantém-se por 2 (dois) anos após o término deste contrato.<br>
+        9.3. A violação dá lugar à rescisão imediata e possível acção judicial.<br><br>
+
+        <strong style="color:var(--text)">CLÁUSULA 10.ª — PROPRIEDADE INTELECTUAL</strong><br>
+        10.1. A marca GIRO, o logótipo e a aplicação são propriedade exclusiva da Oaken Technologies.<br>
+        10.2. O motorista não pode usar a marca GIRO para fins pessoais, criar materiais publicitários não autorizados ou registar marcas semelhantes.<br><br>
+
+        <strong style="color:var(--text)">CLÁUSULA 11.ª — RESCISÃO</strong><br>
+        11.1. O motorista pode desactivar a sua conta a qualquer momento nas configurações da aplicação ou contactando o suporte.<br>
+        11.2. A EMPRESA pode rescindir sem aviso prévio por justa causa (Cláusula 8.ª).<br>
+        11.3. Saldos positivos devidos ao motorista serão creditados no prazo de 15 dias úteis após a rescisão.<br>
+        11.4. Saldos devedores (comissões pendentes de corridas em dinheiro) devem ser liquidados em 30 dias.<br><br>
+
+        <strong style="color:var(--text)">CLÁUSULA 12.ª — DISPOSIÇÕES FINAIS</strong><br>
+        12.1. Este contrato rege-se pela legislação da República de Angola.<br>
+        12.2. As partes elegem o foro do Tribunal Provincial de Luanda para resolução de litígios.<br>
+        12.3. A aceitação digital deste contrato tem o mesmo valor legal que a assinatura manuscrita, nos termos da Lei angolana.<br>
+        12.4. A EMPRESA pode actualizar os termos deste contrato com aviso de 15 dias via notificação na aplicação.<br>
+        12.5. O uso continuado da plataforma após a notificação constitui aceitação dos novos termos.<br><br>
+
+        <div style="text-align:center;padding:12px 0;border-top:1px solid rgba(255,255,255,.08);margin-top:8px">
+          <span style="font-size:10px;color:var(--muted)">GIRO Angola — A mobilidade que Angola merece 🇦🇴<br>© 2026 Oaken Technologies. Todos os direitos reservados.</span>
+        </div>
       </div>
+      <!-- Scroll indicator -->
+      <div id="scroll-hint" style="text-align:center;font-size:11px;color:var(--gold);margin-bottom:14px;opacity:1;transition:opacity .3s">
+        ↓ Deslize para ler o contrato completo
+      </div>
+      <!-- Checkboxes -->
       <div class="check-group">
         <input type="checkbox" id="chk-m-termos">
-        <label for="chk-m-termos">Li e aceito os <a href="#">Termos de Uso</a>, a <a href="#">Política de Privacidade</a> e o <a href="#">Contrato de Parceria GIRO</a>.</label>
+        <label for="chk-m-termos">Li integralmente e aceito os <a href="termos.html">Termos de Uso</a>, a <a href="privacidade.html">Política de Privacidade</a> e o presente <strong style="color:var(--gold)">Contrato de Parceria GIRO</strong>.</label>
       </div>
       <div class="check-group">
         <input type="checkbox" id="chk-m-comissao">
-        <label for="chk-m-comissao">Estou ciente da comissão de <strong style="color:var(--gold)">10%</strong> sobre cada corrida.</label>
+        <label for="chk-m-comissao">Declaro que estou ciente e aceito a comissão de <strong style="color:var(--gold)">10%</strong> sobre cada corrida concluída.</label>
       </div>
       <div class="check-group">
         <input type="checkbox" id="chk-m-idade">
-        <label for="chk-m-idade">Confirmo que tenho 18 anos ou mais e que as informações são verdadeiras.</label>
+        <label for="chk-m-idade">Confirmo que tenho 18 anos ou mais, que todas as informações e documentos submetidos são verdadeiros, e que aceito a validade jurídica desta aceitação digital.</label>
       </div>
       <div class="nav-btns">
         <button class="btn btn-outline" onclick="motBack(6)">← Voltar</button>
-        <button class="btn btn-green" onclick="motNext(6)">✅ Enviar Cadastro</button>
+        <button class="btn btn-green" onclick="motNext(6)">✅ Aceitar e Enviar Cadastro</button>
       </div>
     </div>
 
@@ -507,6 +595,29 @@ function goMotStep(n){
   document.querySelectorAll('.step-pane').forEach(p=>p.classList.remove('active'));
   document.getElementById('mstep'+n).classList.add('active');
   motStep=n;buildMotDots();showAlert('');window.scrollTo(0,0);
+  // Auto-populate contract on step 6
+  if(n===6) populateContract();
+}
+
+const VEH_LABELS={moto:'Moto / Kupapata',eco:'Carro Económico',conforto:'Carro Conforto',giro7:'SUV / 7 Lugares',van:'Van / Furgão',pickup:'Pick-Up / Carga'};
+function populateContract(){
+  const el=id=>document.getElementById(id);
+  el('c-nome').textContent=MOT.nome||'—';
+  el('c-phone').textContent=MOT.phone?('+244 '+MOT.phone):'—';
+  el('c-veiculo').textContent=VEH_LABELS[MOT.veiculo]||MOT.veiculo||'—';
+  el('c-marca-modelo').textContent=(MOT.marca&&MOT.modelo)?(MOT.marca+' '+MOT.modelo+' ('+MOT.ano+'), cor '+MOT.cor):'—';
+  el('c-matricula').textContent=MOT.matricula||'—';
+  // Reset scroll
+  const box=el('contrato-scroll');
+  const hint=el('scroll-hint');
+  if(box&&hint){
+    box.scrollTop=0;
+    hint.style.opacity='1';
+    box.onscroll=function(){
+      const atBottom=box.scrollTop+box.clientHeight>=box.scrollHeight-20;
+      hint.style.opacity=atBottom?'0':'1';
+    };
+  }
 }
 function motBack(from){if(from>1)goMotStep(from-1);}
 
