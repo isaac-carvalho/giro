@@ -28,7 +28,7 @@
 <script>
 // Auto-purga imediata de caches de versões antigas do navegador
 (function purgeStaleGiroCaches() {
-  const GIRO_BUILD_SIG = 'giro_build_2026_09_20_1630_live';
+  const GIRO_BUILD_SIG = 'giro_build_2026_09_20_1800_fix';
   try {
     if (localStorage.getItem('giro_last_build') !== GIRO_BUILD_SIG) {
       localStorage.setItem('giro_last_build', GIRO_BUILD_SIG);
@@ -131,13 +131,6 @@ html, body{
 .brand-text b{font-size:17px;font-weight:900;letter-spacing:-.03em;display:block;line-height:1;}
 .brand-text span{font-size:9px;color:var(--gold);font-weight:700;letter-spacing:.04em;white-space:nowrap;}
 
-.header-nav-pills{
-  display:flex;align-items:center;gap:6px;
-  overflow-x:auto;white-space:nowrap;scrollbar-width:none;
-  -webkit-overflow-scrolling:touch;
-  flex-shrink:1;min-width:0;
-}
-.header-nav-pills::-webkit-scrollbar{display:none;}
 .nav-pill-btn{
   background:var(--card-inner);border:1px solid var(--line);
   color:var(--txt-mut);font-family:var(--f);font-size:11.5px;font-weight:700;
@@ -187,8 +180,8 @@ html, body{
 }
 .map-pin.b .pin-circle{background:#000000;border-radius:3px;border-color:#ffffff;}
 .map-pin.b .pin-label{background:#000000;color:#ffffff;}
-.map-pin.stop .pin-circle{background:#2563eb;border-radius:3px;}
-.map-pin.stop .pin-label{background:#2563eb;color:#ffffff;}
+.map-pin.stop .pin-circle{background:#1a1a1a;border-radius:3px;}
+.map-pin.stop .pin-label{background:#1a1a1a;color:#ffffff;}
 
 /* BOTÕES FLUTUANTES NO MAPA */
 .map-floating-bar{
@@ -1835,7 +1828,7 @@ function startRealDriverTrackingSequence() {
 
   if (approachRoutePolyline) realMap.removeLayer(approachRoutePolyline);
   approachRoutePolyline = L.polyline(approachPts, {
-    color: '#2563eb',
+    color: '#1a1a1a',
     weight: 4.5,
     dashArray: '6, 6',
     opacity: 0.95
