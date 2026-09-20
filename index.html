@@ -834,6 +834,58 @@ body { overscroll-behavior: none; }
   </div>
 
 
+  <!-- MODAL DE AUTENTICAÇÃO E CADASTRO PASSAGEIRO (EMBEDDED) -->
+  <div class="modal-backdrop" id="pax-auth-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:9999;align-items:center;justify-content:center;padding:16px;">
+    <div class="modal-window" style="background:#121612;border:1.5px solid var(--gold);border-radius:20px;padding:24px;width:100%;max-width:400px;box-shadow:0 24px 60px rgba(0,0,0,.95);">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+        <div style="display:flex;align-items:center;gap:10px;">
+          <div style="width:36px;height:36px;background:var(--gold-grad);border-radius:10px;display:flex;align-items:center;justify-content:center;color:#000;font-weight:900;font-size:18px;">G</div>
+          <div>
+            <b style="font-size:16px;color:#fff;display:block;">Passageiro GIRO</b>
+            <span style="font-size:11px;color:var(--gold);">Segurança 24h Luanda</span>
+          </div>
+        </div>
+        <button onclick="closePaxAuthModal()" style="background:none;border:none;color:#8d9e8d;font-size:22px;cursor:pointer;">✕</button>
+      </div>
+
+      <!-- Abas Entrar / Cadastro -->
+      <div style="display:flex;background:#1b221b;border-radius:10px;padding:4px;margin-bottom:18px;">
+        <button id="tab-btn-login" onclick="switchPaxAuthTab('login')" style="flex:1;background:var(--gold);color:#000;border:none;border-radius:8px;padding:8px;font-size:13px;font-weight:700;cursor:pointer;">Entrar</button>
+        <button id="tab-btn-register" onclick="switchPaxAuthTab('register')" style="flex:1;background:none;color:#8d9e8d;border:none;border-radius:8px;padding:8px;font-size:13px;font-weight:600;cursor:pointer;">Criar Conta</button>
+      </div>
+
+      <!-- Formulário de Login -->
+      <form id="form-pax-login" onsubmit="handlePaxLogin(event)">
+        <div style="margin-bottom:12px;">
+          <label style="display:block;font-size:12px;color:#a6a6a6;margin-bottom:6px;">Telefone / WhatsApp</label>
+          <input type="tel" id="pax-login-phone" placeholder="923 000 000" value="923 456 789" required style="width:100%;background:#090d0a;border:1px solid #262626;border-radius:10px;padding:12px;color:#fff;font-size:14px;outline:none;">
+        </div>
+        <div style="margin-bottom:18px;">
+          <label style="display:block;font-size:12px;color:#a6a6a6;margin-bottom:6px;">Palavra-passe</label>
+          <input type="password" id="pax-login-pass" placeholder="••••••••" value="123456" required style="width:100%;background:#090d0a;border:1px solid #262626;border-radius:10px;padding:12px;color:#fff;font-size:14px;outline:none;">
+        </div>
+        <button type="submit" class="btn-uber-main" style="width:100%;padding:14px;border-radius:12px;background:var(--gold-grad);color:#000;font-weight:800;font-size:14px;cursor:pointer;border:none;">Entrar no GIRO</button>
+      </form>
+
+      <!-- Formulário de Registo / Cadastro -->
+      <form id="form-pax-register" onsubmit="handlePaxRegister(event)" style="display:none;">
+        <div style="margin-bottom:12px;">
+          <label style="display:block;font-size:12px;color:#a6a6a6;margin-bottom:6px;">Nome Completo</label>
+          <input type="text" id="pax-reg-name" placeholder="Ex: Isaac Carvalho" required style="width:100%;background:#090d0a;border:1px solid #262626;border-radius:10px;padding:12px;color:#fff;font-size:14px;outline:none;">
+        </div>
+        <div style="margin-bottom:12px;">
+          <label style="display:block;font-size:12px;color:#a6a6a6;margin-bottom:6px;">Telefone / WhatsApp</label>
+          <input type="tel" id="pax-reg-phone" placeholder="923 000 000" required style="width:100%;background:#090d0a;border:1px solid #262626;border-radius:10px;padding:12px;color:#fff;font-size:14px;outline:none;">
+        </div>
+        <div style="margin-bottom:16px;">
+          <label style="display:block;font-size:12px;color:#a6a6a6;margin-bottom:6px;">Palavra-passe</label>
+          <input type="password" id="pax-reg-pass" placeholder="Mínimo 6 dígitos" required style="width:100%;background:#090d0a;border:1px solid #262626;border-radius:10px;padding:12px;color:#fff;font-size:14px;outline:none;">
+        </div>
+        <button type="submit" class="btn-uber-main" style="width:100%;padding:14px;border-radius:12px;background:var(--gold-grad);color:#000;font-weight:800;font-size:14px;cursor:pointer;border:none;">Criar Conta de Passageiro</button>
+      </form>
+    </div>
+  </div>
+
 <!-- BOTTOM TAB BAR - PWA ANGOLA-FIRST -->
 <nav id="bottom-tab-bar" style="position:fixed;bottom:0;left:0;right:0;height:54px;background:#111;border-top:1px solid #262626;display:flex;align-items:stretch;z-index:200;padding-bottom:env(safe-area-inset-bottom,0px);">
   <button class="tab-btn active" data-tab="home" onclick="switchTab('home')" style="flex:1;background:none;border:none;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;cursor:pointer;color:#d4af37;font-size:20px;padding:0;">&#127968;<span style="font-size:10px;font-weight:600;">In&#237;cio</span></button>
@@ -1309,6 +1361,61 @@ window.addEventListener('DOMContentLoaded', () => {
 
 
 <script>
+function openPaxAuthModal(tab = 'login') {
+  const m = document.getElementById('pax-auth-modal');
+  if (m) {
+    m.style.display = 'flex';
+    switchPaxAuthTab(tab);
+  }
+}
+function closePaxAuthModal() {
+  const m = document.getElementById('pax-auth-modal');
+  if (m) m.style.display = 'none';
+}
+function switchPaxAuthTab(tab) {
+  const btnL = document.getElementById('tab-btn-login');
+  const btnR = document.getElementById('tab-btn-register');
+  const formL = document.getElementById('form-pax-login');
+  const formR = document.getElementById('form-pax-register');
+  if (tab === 'login') {
+    if (btnL) { btnL.style.background = 'var(--gold)'; btnL.style.color = '#000'; btnL.style.fontWeight = '700'; }
+    if (btnR) { btnR.style.background = 'none'; btnR.style.color = '#8d9e8d'; btnR.style.fontWeight = '600'; }
+    if (formL) formL.style.display = 'block';
+    if (formR) formR.style.display = 'none';
+  } else {
+    if (btnR) { btnR.style.background = 'var(--gold)'; btnR.style.color = '#000'; btnR.style.fontWeight = '700'; }
+    if (btnL) { btnL.style.background = 'none'; btnL.style.color = '#8d9e8d'; btnL.style.fontWeight = '600'; }
+    if (formR) formR.style.display = 'block';
+    if (formL) formL.style.display = 'none';
+  }
+}
+function handlePaxLogin(e) {
+  e.preventDefault();
+  const phone = document.getElementById('pax-login-phone').value.trim();
+  GiroAuth.save({ phone, nome: 'Passageiro GIRO', role: 'passageiro' });
+  closePaxAuthModal();
+  GiroAuth.renderUserPill('auth-pill');
+  updateProfileView();
+}
+function handlePaxRegister(e) {
+  e.preventDefault();
+  const name = document.getElementById('pax-reg-name').value.trim();
+  const phone = document.getElementById('pax-reg-phone').value.trim();
+  GiroAuth.save({ phone, nome: name || 'Passageiro GIRO', role: 'passageiro' });
+  closePaxAuthModal();
+  GiroAuth.renderUserPill('auth-pill');
+  updateProfileView();
+}
+function updateProfileView() {
+  const s = (typeof GiroAuth !== 'undefined') ? GiroAuth.get() : null;
+  if (s) {
+    const pn = document.getElementById('profile-user-name');
+    const pp = document.getElementById('profile-user-phone');
+    if (pn) pn.textContent = s.nome || 'Passageiro GIRO';
+    if (pp) pp.textContent = s.phone || '+244 9XX XXX XXX';
+  }
+}
+
 const GIRO_SESSION_KEY='giro_session';
 const GiroAuth={
   save(user){localStorage.setItem(GIRO_SESSION_KEY,JSON.stringify({...user,ts:Date.now()}));},
@@ -1324,8 +1431,8 @@ const GiroAuth={
   clear(){localStorage.removeItem(GIRO_SESSION_KEY);},
   requireAuth(role){
     const s=this.get();
-    if(!s){window.location.href='login.html';return null;}
-    if(role&&s.role!==role){window.location.href='login.html';return null;}
+    if(!s){openPaxAuthModal();return null;}
+    if(role&&s.role!==role){openPaxAuthModal();return null;}
     return s;
   },
   renderUserPill(containerId){
@@ -1340,14 +1447,21 @@ const GiroAuth={
         <button onclick="GiroAuth.logout()" style="margin-left:4px;background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.3);border-radius:8px;padding:5px 10px;color:#fca5a5;font-size:12px;cursor:pointer;">Sair</button>
       </div>`;
     }else{
-      el.innerHTML='<a href="login.html" style="text-decoration:none;padding:7px 14px;border-radius:20px;background:rgba(212,175,55,.12);border:1px solid rgba(212,175,55,.3);color:#d4af37;font-size:13px;font-weight:700;">&#128100; Entrar</a>';
+      el.innerHTML='<button onclick="openPaxAuthModal()" style="border:none;outline:none;cursor:pointer;padding:7px 14px;border-radius:20px;background:rgba(212,175,55,.15);border:1px solid rgba(212,175,55,.35);color:#d4af37;font-size:13px;font-weight:700;display:flex;align-items:center;gap:5px;">&#128100; Entrar</button>';
     }
   },
-  logout(){this.clear();window.location.href='login.html';}
+  logout(){
+    this.clear();
+    const pn = document.getElementById('profile-user-name');
+    const pp = document.getElementById('profile-user-phone');
+    if (pn) pn.textContent = 'Utilizador GIRO';
+    if (pp) pp.textContent = '+244 9XX XXX XXX';
+    this.renderUserPill('auth-pill');
+  }
 };
 document.addEventListener('DOMContentLoaded',function(){
-  // no role required
   GiroAuth.renderUserPill('auth-pill');
+  updateProfileView();
 });
 </script>
 </body>

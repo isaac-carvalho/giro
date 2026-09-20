@@ -14,9 +14,6 @@
 <meta name="apple-mobile-web-app-title" content="GIRO">
 <link rel="icon" type="image/x-icon" href="favicon.ico">
 
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-
 <style>
 /* ==========================================================================
    DESIGN SYSTEM GIRO PASSAGEIRO — UBER BLACK & LUXURY GOLD EDITION
@@ -49,7 +46,7 @@ input, textarea, select{user-select:auto;-webkit-user-select:auto;}
   
   --wht:#ffffff;
   --txt-mut:#a6a6a6;
-  --f:'Inter',-apple-system,BlinkMacSystemFont,system-ui,sans-serif;
+  --f:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,system-ui,sans-serif;
   --safe-top: env(safe-area-inset-top, 0px);
   --safe-bottom: env(safe-area-inset-bottom, 0px);
 }
@@ -74,8 +71,7 @@ html, body{
    ========================================================================== */
 .uber-header{
   padding:calc(10px + var(--safe-top)) 14px 10px;
-  background:rgba(0,0,0,0.92);
-  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  background:rgba(7,9,7,0.95);
   border-bottom:1px solid var(--line);
   display:flex;align-items:center;justify-content:space-between;
   z-index:100;flex-shrink:0;gap:8px;
@@ -158,8 +154,7 @@ html, body{
   display:flex;align-items:center;justify-content:space-between;pointer-events:none;
 }
 .map-btn{
-  pointer-events:auto;background:rgba(18,18,18,0.94);
-  backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+  pointer-events:auto;background:rgba(7,9,7,0.95);
   border:1px solid var(--line);color:#fff;border-radius:50%;
   width:42px;height:42px;display:flex;align-items:center;justify-content:center;
   cursor:pointer;font-size:16px;box-shadow:0 8px 24px rgba(0,0,0,0.7);
@@ -172,7 +167,7 @@ html, body{
 }
 .map-status-pill{
   pointer-events:auto;background:rgba(18,18,18,0.95);
-  backdrop-filter:blur(14px);border:1px solid var(--line);
+  background:rgba(7,9,7,0.95);border:1px solid var(--line);
   padding:8px 14px;border-radius:20px;font-size:11.5px;font-weight:700;
   display:none;align-items:center;gap:7px;box-shadow:0 8px 20px rgba(0,0,0,.6);
 }
@@ -185,7 +180,7 @@ html, body{
 .uber-sheet{
   position:absolute;left:0;right:0;bottom:0;z-index:50;
   background:rgba(14,14,14,0.98);
-  backdrop-filter:blur(25px);-webkit-backdrop-filter:blur(25px);
+  background:rgba(7,9,7,0.95);
   border-radius:24px 24px 0 0;
   border-top:1px solid var(--line);
   box-shadow:0 -12px 50px rgba(0,0,0,0.95);
@@ -379,7 +374,7 @@ html, body{
 /* MODAIS */
 .modal-backdrop{
   position:fixed;inset:0;background:rgba(0,0,0,.88);
-  backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+  background:rgba(7,9,7,0.95);
   z-index:9999;display:none;align-items:flex-start;justify-content:center;
   padding:calc(16px + var(--safe-top)) 16px calc(24px + var(--safe-bottom));
   overflow-y:auto;
@@ -400,18 +395,28 @@ html, body{
 .sos-fill-bar{position:absolute;left:0;top:0;bottom:0;width:0;background:var(--red);opacity:.4;transition:width .1s linear;}
 .sos-hold-content{position:relative;z-index:2;display:flex;align-items:center;justify-content:center;gap:8px;}
 
+/* ===== PWA ULTRA-LEVE ANGOLA-FIRST ===== */
+body { overscroll-behavior: none; }
+* { scrollbar-width: none; }
+*::-webkit-scrollbar { display: none; }
+.btn:active, button:active, [onclick]:active {
+  opacity: 0.7;
+  transform: scale(0.97);
+  transition: .15s ease;
+}
 @keyframes progressBarAnim {
   0% { width: 0%; }
   100% { width: 100%; }
 }
-button:active, .btn-uber-main:active, .u-tab:active, .nav-pill-btn:active, .btn-mini-gps:active, .q-chip:active, .trip-action-btn:active {
-  transform: scale(0.97);
-  opacity: 0.85;
-  transition: transform 0.15s ease, opacity 0.15s ease;
-}
 </style>
 </head>
 <body>
+
+
+<div id="giro-splash" style="position:fixed;inset:0;background:#070907;z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;transition:opacity 0.2s ease;">
+  <div style="font-size:48px;font-weight:900;color:#d4af37;letter-spacing:-2px;line-height:1;">GIRO</div>
+  <div style="font-size:11px;letter-spacing:4px;color:#8d9e8d;text-transform:uppercase;margin-top:6px;">Angola · Mobilidade</div>
+</div>
 
 <div id="app-root">
 
@@ -426,36 +431,8 @@ button:active, .btn-uber-main:active, .u-tab:active, .nav-pill-btn:active, .btn-
     </div>
 
     <!-- SELETOR DE APPS & PROVÍNCIA -->
-    <div class="header-nav-pills">
-      <div class="prov-select-pill">
-        <span class="net-blip" title="Rede 4G GPS"></span>
-        <select id="provSel" onchange="setProv()">
-          <option value="luanda" data-mult="1">Luanda</option>
-          <option value="benguela" data-mult="0.88">Benguela</option>
-          <option value="lobito" data-mult="0.88">Lobito</option>
-          <option value="huambo" data-mult="0.82">Huambo</option>
-          <option value="lubango" data-mult="0.85">Lubango</option>
-          <option value="cabinda" data-mult="1.06">Cabinda</option>
-          <option value="malanje" data-mult="0.8">Malanje</option>
-          <option value="namibe" data-mult="0.84">Namibe</option>
-          <option value="soyo" data-mult="1.02">Soyo</option>
-          <option value="uige" data-mult="0.8">Uíge</option>
-        </select>
-      </div>
-
-      <a href="driver.html" class="nav-pill-btn" title="Ir para aplicação de Motorista">
-        <span>🚖</span> Motorista
-      </a>
-
-      <a href="central.html" class="nav-pill-btn" title="Central de Operações 24h">
-        <span>🏢</span> Central
-      </a>
-
-      <a href="landing.html" class="nav-pill-btn" title="Ver Vantagens e Tarifas">
-        <span>✦</span> Vantagens
-      </a>
-    </div>
-  </header>
+    <div id="auth-pill" style="display:flex;align-items:center;flex-shrink:0;"></div>
+</header>
 
   <!-- 2. VIEWPORT COM MAPA GPS AO VIVO -->
   <main class="viewport-body">
@@ -688,6 +665,154 @@ button:active, .btn-uber-main:active, .u-tab:active, .nav-pill-btn:active, .btn-
     </div>
   </main>
 
+  <!-- TAB SECTIONS (NATIVE SHOW / HIDE) -->
+
+  <!-- TAB: CORRIDAS (HISTÓRICO) -->
+  <section id="tab-rides" style="display:none;flex:1;overflow-y:auto;padding:16px 16px 80px;background:#070907;">
+    <h2 style="font-size:20px;font-weight:800;color:#fff;margin-bottom:14px;">As Minhas Corridas</h2>
+    
+    <div style="background:#121612;border:1px solid #262626;border-radius:14px;padding:14px;margin-bottom:12px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+        <span style="font-size:11px;font-weight:700;color:#4fe36a;background:rgba(79,227,106,0.12);padding:3px 8px;border-radius:6px;">Concluída</span>
+        <span style="font-size:11px;color:#8d9e8d;">Hoje, 14:20</span>
+      </div>
+      <div style="font-size:14px;font-weight:700;color:#fff;margin-bottom:4px;">🚗 GIRO Económico · Domingos M.</div>
+      <div style="font-size:12px;color:#a6a6a6;margin-bottom:10px;">Talatona (Rua Principal) → Kilamba (Bloco 12)</div>
+      <div style="display:flex;justify-content:space-between;align-items:center;border-top:1px solid #1f241f;padding-top:10px;">
+        <span style="font-size:11px;color:#d4af37;">Multicaixa Express</span>
+        <b style="font-size:15px;color:#fff;">2.450 Kz</b>
+      </div>
+    </div>
+
+    <div style="background:#121612;border:1px solid #262626;border-radius:14px;padding:14px;margin-bottom:12px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+        <span style="font-size:11px;font-weight:700;color:#4fe36a;background:rgba(79,227,106,0.12);padding:3px 8px;border-radius:6px;">Concluída</span>
+        <span style="font-size:11px;color:#8d9e8d;">Ontem, 08:45</span>
+      </div>
+      <div style="font-size:14px;font-weight:700;color:#fff;margin-bottom:4px;">🏍️ GIRO Moto (Kupapata) · Mateus K.</div>
+      <div style="font-size:12px;color:#a6a6a6;margin-bottom:10px;">Maianga → Mutamba (Largo)</div>
+      <div style="display:flex;justify-content:space-between;align-items:center;border-top:1px solid #1f241f;padding-top:10px;">
+        <span style="font-size:11px;color:#d4af37;">Dinheiro</span>
+        <b style="font-size:15px;color:#fff;">1.150 Kz</b>
+      </div>
+    </div>
+
+    <div style="background:#121612;border:1px solid #262626;border-radius:14px;padding:14px;margin-bottom:12px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+        <span style="font-size:11px;font-weight:700;color:#4fe36a;background:rgba(79,227,106,0.12);padding:3px 8px;border-radius:6px;">Concluída</span>
+        <span style="font-size:11px;color:#8d9e8d;">14 Set, 19:10</span>
+      </div>
+      <div style="font-size:14px;font-weight:700;color:#fff;margin-bottom:4px;">📦 GIRO Flash Moto · André F.</div>
+      <div style="font-size:12px;color:#a6a6a6;margin-bottom:10px;">Belas Business Park → Viana</div>
+      <div style="display:flex;justify-content:space-between;align-items:center;border-top:1px solid #1f241f;padding-top:10px;">
+        <span style="font-size:11px;color:#d4af37;">Unitel Money</span>
+        <b style="font-size:15px;color:#fff;">1.800 Kz</b>
+      </div>
+    </div>
+  </section>
+
+  <!-- TAB: CARTEIRA -->
+  <section id="tab-wallet" style="display:none;flex:1;overflow-y:auto;padding:16px 16px 80px;background:#070907;">
+    <h2 style="font-size:20px;font-weight:800;color:#fff;margin-bottom:14px;">Carteira GIRO</h2>
+
+    <div style="background:linear-gradient(135deg, #1b241c 0%, #0d140e 100%);border:1px solid #d4af37;border-radius:16px;padding:20px;margin-bottom:18px;box-shadow:0 8px 24px rgba(0,0,0,0.5);">
+      <div style="font-size:11px;text-transform:uppercase;letter-spacing:1px;color:#d4af37;font-weight:700;">Saldo Disponível</div>
+      <div style="font-size:32px;font-weight:900;color:#fff;margin:6px 0 14px;">12.500 <span style="font-size:18px;color:#d4af37;">Kz</span></div>
+      <div style="display:flex;gap:10px;">
+        <button onclick="alert('Carregamento via Multicaixa Express iniciado.')" style="flex:1;background:#d4af37;color:#000;border:none;border-radius:10px;padding:10px;font-weight:700;font-size:13px;cursor:pointer;">+ Adicionar Saldo</button>
+        <button onclick="alert('Histórico financeiro detalhado.')" style="flex:1;background:rgba(255,255,255,0.08);color:#fff;border:1px solid #333;border-radius:10px;padding:10px;font-weight:600;font-size:13px;cursor:pointer;">Extrato</button>
+      </div>
+    </div>
+
+    <div style="background:#121612;border:1px solid #262626;border-radius:14px;padding:16px;margin-bottom:14px;">
+      <div style="font-size:13px;font-weight:700;color:#fff;margin-bottom:10px;">Métodos de Pagamento Guardados</div>
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid #1f241f;">
+        <div style="display:flex;align-items:center;gap:10px;">
+          <span style="font-size:20px;">💳</span>
+          <div><div style="font-size:13px;font-weight:600;color:#fff;">Multicaixa Express</div><div style="font-size:11px;color:#8d9e8d;">Principal · 923 ••• •••</div></div>
+        </div>
+        <span style="color:#4fe36a;font-weight:700;font-size:12px;">Activo</span>
+      </div>
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;">
+        <div style="display:flex;align-items:center;gap:10px;">
+          <span style="font-size:20px;">📱</span>
+          <div><div style="font-size:13px;font-weight:600;color:#fff;">Unitel Money</div><div style="font-size:11px;color:#8d9e8d;">923 ••• •••</div></div>
+        </div>
+        <span style="color:#8d9e8d;font-size:12px;">Conectado</span>
+      </div>
+    </div>
+
+    <!-- GIRO Clube Card -->
+    <div style="background:rgba(212,175,55,0.08);border:1px solid rgba(212,175,55,0.25);border-radius:14px;padding:16px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+        <b style="font-size:13px;color:#d4af37;">🎁 GIRO Clube — Programa Fidelidade</b>
+        <span style="font-size:11px;background:#d4af37;color:#000;padding:2px 6px;border-radius:4px;font-weight:800;">−10% BÓNUS</span>
+      </div>
+      <p style="font-size:12px;color:#a6a6a6;margin-bottom:8px;">Faça 5 viagens e ganhe 10% de desconto automático na próxima!</p>
+      <div style="height:6px;background:#222;border-radius:3px;overflow:hidden;margin-bottom:6px;">
+        <div style="width:60%;height:100%;background:#d4af37;"></div>
+      </div>
+      <small style="color:#8d9e8d;font-size:10px;">3 de 5 corridas completadas</small>
+    </div>
+  </section>
+
+  <!-- TAB: PERFIL & DEFINIÇÕES (PLAY STORE & APPLE STORE COMPLIANT) -->
+  <section id="tab-profile" style="display:none;flex:1;overflow-y:auto;padding:16px 16px 80px;background:#070907;">
+    <h2 style="font-size:20px;font-weight:800;color:#fff;margin-bottom:14px;">Meu Perfil</h2>
+
+    <div style="background:#121612;border:1px solid #262626;border-radius:14px;padding:16px;margin-bottom:14px;display:flex;align-items:center;gap:14px;">
+      <div style="width:50px;height:50px;border-radius:50%;background:linear-gradient(135deg,#d4af37,#f0c040);display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:900;color:#000;">U</div>
+      <div>
+        <div style="font-size:16px;font-weight:700;color:#fff;" id="profile-user-name">Utilizador GIRO</div>
+        <div style="font-size:12px;color:#8d9e8d;" id="profile-user-phone">+244 9XX XXX XXX</div>
+        <div style="font-size:11px;color:#4fe36a;margin-top:2px;">★ 5.0 · Passageiro Verificado</div>
+      </div>
+    </div>
+
+    <!-- Definições e Província -->
+    <div style="background:#121612;border:1px solid #262626;border-radius:14px;padding:16px;margin-bottom:14px;">
+      <div style="font-size:13px;font-weight:700;color:#fff;margin-bottom:12px;">Preferências</div>
+      
+      <div style="display:flex;justify-content:space-between;align-items:center;padding-bottom:12px;border-bottom:1px solid #1f241f;">
+        <span style="font-size:13px;color:#a6a6a6;">Província / Cidade</span>
+        <select id="profile-prov-select" onchange="changeProvince(this.value)" style="background:#1a211b;border:1px solid #333;color:#fff;padding:6px 10px;border-radius:8px;font-size:12px;outline:none;">
+          <option value="luanda">Luanda</option>
+          <option value="benguela">Benguela</option>
+          <option value="lobito">Lobito</option>
+          <option value="huambo">Huambo</option>
+          <option value="lubango">Lubango</option>
+        </select>
+      </div>
+
+      <div style="display:flex;justify-content:space-between;align-items:center;padding-top:12px;">
+        <span style="font-size:13px;color:#a6a6a6;">Idioma</span>
+        <span style="font-size:12px;color:#fff;font-weight:600;">Português (Angola)</span>
+      </div>
+    </div>
+
+    <!-- Documentação Legal & Conformidade App Store / Play Store -->
+    <div style="background:#121612;border:1px solid #262626;border-radius:14px;padding:16px;margin-bottom:14px;">
+      <div style="font-size:13px;font-weight:700;color:#fff;margin-bottom:10px;">Segurança & Legal</div>
+      <a href="termos.html" style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid #1f241f;color:#fff;text-decoration:none;">
+        <span style="font-size:13px;">Termos de Uso</span>
+        <span style="color:#8d9e8d;">›</span>
+      </a>
+      <a href="privacidade.html" style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid #1f241f;color:#fff;text-decoration:none;">
+        <span style="font-size:13px;">Política de Privacidade</span>
+        <span style="color:#8d9e8d;">›</span>
+      </a>
+      <a href="eliminar-conta.html" style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;color:#ef4444;text-decoration:none;">
+        <span style="font-size:13px;font-weight:600;">Eliminar Minha Conta</span>
+        <span style="color:#ef4444;">›</span>
+      </a>
+    </div>
+
+    <button onclick="GiroAuth.logout()" style="width:100%;padding:14px;border-radius:10px;background:rgba(239,68,68,0.12);border:1px solid rgba(239,68,68,0.3);color:#fca5a5;font-size:14px;font-weight:700;cursor:pointer;">
+      Sair da Conta
+    </button>
+  </section>
+
+
   <!-- MODAL DE ESCOLHA DE MÉTODO DE PAGAMENTO -->
   <div class="modal-backdrop" id="pay-options-modal">
     <div class="modal-window">
@@ -707,6 +832,67 @@ button:active, .btn-uber-main:active, .u-tab:active, .nav-pill-btn:active, .btn-
       <button class="btn-uber-main" style="background:#222;color:#fff;box-shadow:none;" onclick="closePayDrawer()">Fechar</button>
     </div>
   </div>
+
+
+  <!-- MODAL DE AUTENTICAÇÃO E CADASTRO PASSAGEIRO (EMBEDDED) -->
+  <div class="modal-backdrop" id="pax-auth-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:9999;align-items:center;justify-content:center;padding:16px;">
+    <div class="modal-window" style="background:#121612;border:1.5px solid var(--gold);border-radius:20px;padding:24px;width:100%;max-width:400px;box-shadow:0 24px 60px rgba(0,0,0,.95);">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+        <div style="display:flex;align-items:center;gap:10px;">
+          <div style="width:36px;height:36px;background:var(--gold-grad);border-radius:10px;display:flex;align-items:center;justify-content:center;color:#000;font-weight:900;font-size:18px;">G</div>
+          <div>
+            <b style="font-size:16px;color:#fff;display:block;">Passageiro GIRO</b>
+            <span style="font-size:11px;color:var(--gold);">Segurança 24h Luanda</span>
+          </div>
+        </div>
+        <button onclick="closePaxAuthModal()" style="background:none;border:none;color:#8d9e8d;font-size:22px;cursor:pointer;">✕</button>
+      </div>
+
+      <!-- Abas Entrar / Cadastro -->
+      <div style="display:flex;background:#1b221b;border-radius:10px;padding:4px;margin-bottom:18px;">
+        <button id="tab-btn-login" onclick="switchPaxAuthTab('login')" style="flex:1;background:var(--gold);color:#000;border:none;border-radius:8px;padding:8px;font-size:13px;font-weight:700;cursor:pointer;">Entrar</button>
+        <button id="tab-btn-register" onclick="switchPaxAuthTab('register')" style="flex:1;background:none;color:#8d9e8d;border:none;border-radius:8px;padding:8px;font-size:13px;font-weight:600;cursor:pointer;">Criar Conta</button>
+      </div>
+
+      <!-- Formulário de Login -->
+      <form id="form-pax-login" onsubmit="handlePaxLogin(event)">
+        <div style="margin-bottom:12px;">
+          <label style="display:block;font-size:12px;color:#a6a6a6;margin-bottom:6px;">Telefone / WhatsApp</label>
+          <input type="tel" id="pax-login-phone" placeholder="923 000 000" value="923 456 789" required style="width:100%;background:#090d0a;border:1px solid #262626;border-radius:10px;padding:12px;color:#fff;font-size:14px;outline:none;">
+        </div>
+        <div style="margin-bottom:18px;">
+          <label style="display:block;font-size:12px;color:#a6a6a6;margin-bottom:6px;">Palavra-passe</label>
+          <input type="password" id="pax-login-pass" placeholder="••••••••" value="123456" required style="width:100%;background:#090d0a;border:1px solid #262626;border-radius:10px;padding:12px;color:#fff;font-size:14px;outline:none;">
+        </div>
+        <button type="submit" class="btn-uber-main" style="width:100%;padding:14px;border-radius:12px;background:var(--gold-grad);color:#000;font-weight:800;font-size:14px;cursor:pointer;border:none;">Entrar no GIRO</button>
+      </form>
+
+      <!-- Formulário de Registo / Cadastro -->
+      <form id="form-pax-register" onsubmit="handlePaxRegister(event)" style="display:none;">
+        <div style="margin-bottom:12px;">
+          <label style="display:block;font-size:12px;color:#a6a6a6;margin-bottom:6px;">Nome Completo</label>
+          <input type="text" id="pax-reg-name" placeholder="Ex: Isaac Carvalho" required style="width:100%;background:#090d0a;border:1px solid #262626;border-radius:10px;padding:12px;color:#fff;font-size:14px;outline:none;">
+        </div>
+        <div style="margin-bottom:12px;">
+          <label style="display:block;font-size:12px;color:#a6a6a6;margin-bottom:6px;">Telefone / WhatsApp</label>
+          <input type="tel" id="pax-reg-phone" placeholder="923 000 000" required style="width:100%;background:#090d0a;border:1px solid #262626;border-radius:10px;padding:12px;color:#fff;font-size:14px;outline:none;">
+        </div>
+        <div style="margin-bottom:16px;">
+          <label style="display:block;font-size:12px;color:#a6a6a6;margin-bottom:6px;">Palavra-passe</label>
+          <input type="password" id="pax-reg-pass" placeholder="Mínimo 6 dígitos" required style="width:100%;background:#090d0a;border:1px solid #262626;border-radius:10px;padding:12px;color:#fff;font-size:14px;outline:none;">
+        </div>
+        <button type="submit" class="btn-uber-main" style="width:100%;padding:14px;border-radius:12px;background:var(--gold-grad);color:#000;font-weight:800;font-size:14px;cursor:pointer;border:none;">Criar Conta de Passageiro</button>
+      </form>
+    </div>
+  </div>
+
+<!-- BOTTOM TAB BAR - PWA ANGOLA-FIRST -->
+<nav id="bottom-tab-bar" style="position:fixed;bottom:0;left:0;right:0;height:54px;background:#111;border-top:1px solid #262626;display:flex;align-items:stretch;z-index:200;padding-bottom:env(safe-area-inset-bottom,0px);">
+  <button class="tab-btn active" data-tab="home" onclick="switchTab('home')" style="flex:1;background:none;border:none;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;cursor:pointer;color:#d4af37;font-size:20px;padding:0;">&#127968;<span style="font-size:10px;font-weight:600;">In&#237;cio</span></button>
+  <button class="tab-btn" data-tab="rides" onclick="switchTab('rides')" style="flex:1;background:none;border:none;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;cursor:pointer;color:#666;font-size:20px;padding:0;">&#128664;<span style="font-size:10px;font-weight:600;">Corridas</span></button>
+  <button class="tab-btn" data-tab="wallet" onclick="switchTab('wallet')" style="flex:1;background:none;border:none;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;cursor:pointer;color:#666;font-size:20px;padding:0;">&#128179;<span style="font-size:10px;font-weight:600;">Carteira</span></button>
+  <button class="tab-btn" data-tab="profile" onclick="switchTab('profile')" style="flex:1;background:none;border:none;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;cursor:pointer;color:#666;font-size:20px;padding:0;">&#128100;<span style="font-size:10px;font-weight:600;">Perfil</span></button>
+</nav>
 
 </div>
 
@@ -1131,7 +1317,152 @@ if ('serviceWorker' in navigator) {
 
 // Inicialização
 renderTiers();
+
+
+function switchTab(tab) {
+  document.querySelectorAll('#bottom-tab-bar .tab-btn').forEach(b => {
+    b.style.color = (b.dataset.tab === tab) ? '#d4af37' : '#666';
+  });
+
+  const mainViewport = document.querySelector('.viewport-body');
+  if (tab === 'home') {
+    if (mainViewport) mainViewport.style.display = 'flex';
+    const r = document.getElementById('tab-rides'); if (r) r.style.display = 'none';
+    const w = document.getElementById('tab-wallet'); if (w) w.style.display = 'none';
+    const p = document.getElementById('tab-profile'); if (p) p.style.display = 'none';
+  } else {
+    if (mainViewport) mainViewport.style.display = 'none';
+    const r = document.getElementById('tab-rides'); if (r) r.style.display = (tab === 'rides') ? 'block' : 'none';
+    const w = document.getElementById('tab-wallet'); if (w) w.style.display = (tab === 'wallet') ? 'block' : 'none';
+    const p = document.getElementById('tab-profile'); if (p) p.style.display = (tab === 'profile') ? 'block' : 'none';
+  }
+}
+
+// Dismiss splash screen on load
+window.addEventListener('DOMContentLoaded', () => {
+  const splash = document.getElementById('giro-splash');
+  if (splash) {
+    setTimeout(() => {
+      splash.style.opacity = '0';
+      setTimeout(() => splash.style.display = 'none', 200);
+    }, 150);
+  }
+  const s = (typeof GiroAuth !== 'undefined') ? GiroAuth.get() : null;
+  if (s) {
+    const pn = document.getElementById('profile-user-name');
+    const pp = document.getElementById('profile-user-phone');
+    if (pn && s.nome) pn.textContent = s.nome;
+    if (pp && s.phone) pp.textContent = s.phone;
+  }
+});
+
+
 </script>
 
+
+<script>
+function openPaxAuthModal(tab = 'login') {
+  const m = document.getElementById('pax-auth-modal');
+  if (m) {
+    m.style.display = 'flex';
+    switchPaxAuthTab(tab);
+  }
+}
+function closePaxAuthModal() {
+  const m = document.getElementById('pax-auth-modal');
+  if (m) m.style.display = 'none';
+}
+function switchPaxAuthTab(tab) {
+  const btnL = document.getElementById('tab-btn-login');
+  const btnR = document.getElementById('tab-btn-register');
+  const formL = document.getElementById('form-pax-login');
+  const formR = document.getElementById('form-pax-register');
+  if (tab === 'login') {
+    if (btnL) { btnL.style.background = 'var(--gold)'; btnL.style.color = '#000'; btnL.style.fontWeight = '700'; }
+    if (btnR) { btnR.style.background = 'none'; btnR.style.color = '#8d9e8d'; btnR.style.fontWeight = '600'; }
+    if (formL) formL.style.display = 'block';
+    if (formR) formR.style.display = 'none';
+  } else {
+    if (btnR) { btnR.style.background = 'var(--gold)'; btnR.style.color = '#000'; btnR.style.fontWeight = '700'; }
+    if (btnL) { btnL.style.background = 'none'; btnL.style.color = '#8d9e8d'; btnL.style.fontWeight = '600'; }
+    if (formR) formR.style.display = 'block';
+    if (formL) formL.style.display = 'none';
+  }
+}
+function handlePaxLogin(e) {
+  e.preventDefault();
+  const phone = document.getElementById('pax-login-phone').value.trim();
+  GiroAuth.save({ phone, nome: 'Passageiro GIRO', role: 'passageiro' });
+  closePaxAuthModal();
+  GiroAuth.renderUserPill('auth-pill');
+  updateProfileView();
+}
+function handlePaxRegister(e) {
+  e.preventDefault();
+  const name = document.getElementById('pax-reg-name').value.trim();
+  const phone = document.getElementById('pax-reg-phone').value.trim();
+  GiroAuth.save({ phone, nome: name || 'Passageiro GIRO', role: 'passageiro' });
+  closePaxAuthModal();
+  GiroAuth.renderUserPill('auth-pill');
+  updateProfileView();
+}
+function updateProfileView() {
+  const s = (typeof GiroAuth !== 'undefined') ? GiroAuth.get() : null;
+  if (s) {
+    const pn = document.getElementById('profile-user-name');
+    const pp = document.getElementById('profile-user-phone');
+    if (pn) pn.textContent = s.nome || 'Passageiro GIRO';
+    if (pp) pp.textContent = s.phone || '+244 9XX XXX XXX';
+  }
+}
+
+const GIRO_SESSION_KEY='giro_session';
+const GiroAuth={
+  save(user){localStorage.setItem(GIRO_SESSION_KEY,JSON.stringify({...user,ts:Date.now()}));},
+  get(){
+    try{
+      const raw=localStorage.getItem(GIRO_SESSION_KEY);
+      if(!raw)return null;
+      const s=JSON.parse(raw);
+      if(Date.now()-s.ts>30*24*3600*1000){this.clear();return null;}
+      return s;
+    }catch{return null;}
+  },
+  clear(){localStorage.removeItem(GIRO_SESSION_KEY);},
+  requireAuth(role){
+    const s=this.get();
+    if(!s){openPaxAuthModal();return null;}
+    if(role&&s.role!==role){openPaxAuthModal();return null;}
+    return s;
+  },
+  renderUserPill(containerId){
+    const s=this.get();
+    const el=document.getElementById(containerId);
+    if(!el)return;
+    if(s){
+      const initials=(s.nome||s.phone||'?')[0].toUpperCase();
+      el.innerHTML=`<div style="display:flex;align-items:center;gap:8px;">
+        <div style="width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#d4af37,#f0c040);display:flex;align-items:center;justify-content:center;font-weight:900;font-size:14px;color:#000;">${initials}</div>
+        <div style="line-height:1.2;"><div style="font-size:13px;font-weight:700;color:#f1f5f1;">${s.nome||s.phone}</div><div style="font-size:10px;color:#8d9e8d;text-transform:uppercase;">${s.role==='motorista'?'🚗 Motorista':'🧑 Passageiro'}</div></div>
+        <button onclick="GiroAuth.logout()" style="margin-left:4px;background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.3);border-radius:8px;padding:5px 10px;color:#fca5a5;font-size:12px;cursor:pointer;">Sair</button>
+      </div>`;
+    }else{
+      el.innerHTML='<button onclick="openPaxAuthModal()" style="border:none;outline:none;cursor:pointer;padding:7px 14px;border-radius:20px;background:rgba(212,175,55,.15);border:1px solid rgba(212,175,55,.35);color:#d4af37;font-size:13px;font-weight:700;display:flex;align-items:center;gap:5px;">&#128100; Entrar</button>';
+    }
+  },
+  logout(){
+    this.clear();
+    const pn = document.getElementById('profile-user-name');
+    const pp = document.getElementById('profile-user-phone');
+    if (pn) pn.textContent = 'Utilizador GIRO';
+    if (pp) pp.textContent = '+244 9XX XXX XXX';
+    this.renderUserPill('auth-pill');
+  }
+};
+document.addEventListener('DOMContentLoaded',function(){
+  GiroAuth.renderUserPill('auth-pill');
+  updateProfileView();
+});
+</script>
 </body>
 </html>

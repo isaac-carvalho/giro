@@ -1322,7 +1322,116 @@ Valor disponível na sua conta em até 2 minutos.`);
     });
   </script>
 
+  <!-- MODAL DE AUTENTICAÇÃO E CADASTRO MOTORISTA (EMBEDDED) -->
+  <div class="modal-backdrop" id="driver-auth-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:99999;align-items:center;justify-content:center;padding:16px;overflow-y:auto;">
+    <div class="modal-window" style="background:#121612;border:1.5px solid #d4af37;border-radius:20px;padding:24px;width:100%;max-width:440px;box-shadow:0 24px 60px rgba(0,0,0,.95);margin:auto;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+        <div style="display:flex;align-items:center;gap:10px;">
+          <div style="width:36px;height:36px;background:linear-gradient(135deg,#d4af37,#f0c040);border-radius:10px;display:flex;align-items:center;justify-content:center;color:#000;font-weight:900;font-size:18px;">G</div>
+          <div>
+            <b style="font-size:16px;color:#fff;display:block;">Motorista Parceiro GIRO</b>
+            <span style="font-size:11px;color:#d4af37;">Comissão Fixa 10% · Luanda</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Abas Entrar / Cadastro -->
+      <div style="display:flex;background:#1b221b;border-radius:10px;padding:4px;margin-bottom:18px;">
+        <button id="driver-tab-btn-login" onclick="switchDriverAuthTab('login')" style="flex:1;background:#d4af37;color:#000;border:none;border-radius:8px;padding:8px;font-size:13px;font-weight:700;cursor:pointer;">Entrar</button>
+        <button id="driver-tab-btn-register" onclick="switchDriverAuthTab('register')" style="flex:1;background:none;color:#8d9e8d;border:none;border-radius:8px;padding:8px;font-size:13px;font-weight:600;cursor:pointer;">Quero ser Motorista</button>
+      </div>
+
+      <!-- Formulário de Login Motorista -->
+      <form id="form-driver-login" onsubmit="handleDriverLogin(event)">
+        <div style="margin-bottom:12px;">
+          <label style="display:block;font-size:12px;color:#a6a6a6;margin-bottom:6px;">Telefone do Motorista</label>
+          <input type="tel" id="driver-login-phone" placeholder="923 000 000" value="923 888 777" required style="width:100%;background:#090d0a;border:1px solid #262626;border-radius:10px;padding:12px;color:#fff;font-size:14px;outline:none;box-sizing:border-box;">
+        </div>
+        <div style="margin-bottom:18px;">
+          <label style="display:block;font-size:12px;color:#a6a6a6;margin-bottom:6px;">Palavra-passe</label>
+          <input type="password" id="driver-login-pass" placeholder="••••••••" value="123456" required style="width:100%;background:#090d0a;border:1px solid #262626;border-radius:10px;padding:12px;color:#fff;font-size:14px;outline:none;box-sizing:border-box;">
+        </div>
+        <button type="submit" style="width:100%;padding:14px;border-radius:12px;background:linear-gradient(135deg,#d4af37,#f0c040);color:#000;font-weight:800;font-size:14px;cursor:pointer;border:none;">Acessar Radar do Motorista</button>
+      </form>
+
+      <!-- Formulário de Cadastro Motorista -->
+      <form id="form-driver-register" onsubmit="handleDriverRegister(event)" style="display:none;">
+        <div style="margin-bottom:10px;">
+          <label style="display:block;font-size:12px;color:#a6a6a6;margin-bottom:4px;">Nome Completo</label>
+          <input type="text" id="driver-reg-name" placeholder="Ex: Domingos Manuel" required style="width:100%;background:#090d0a;border:1px solid #262626;border-radius:10px;padding:10px 12px;color:#fff;font-size:13px;outline:none;box-sizing:border-box;">
+        </div>
+        <div style="margin-bottom:10px;">
+          <label style="display:block;font-size:12px;color:#a6a6a6;margin-bottom:4px;">Telefone / WhatsApp</label>
+          <input type="tel" id="driver-reg-phone" placeholder="923 000 000" required style="width:100%;background:#090d0a;border:1px solid #262626;border-radius:10px;padding:10px 12px;color:#fff;font-size:13px;outline:none;box-sizing:border-box;">
+        </div>
+        <div style="margin-bottom:10px;">
+          <label style="display:block;font-size:12px;color:#a6a6a6;margin-bottom:4px;">Tipo de Viatura</label>
+          <select id="driver-reg-veh" style="width:100%;background:#090d0a;border:1px solid #262626;border-radius:10px;padding:10px 12px;color:#fff;font-size:13px;outline:none;box-sizing:border-box;">
+            <option value="eco">Carro Particular / Sedan (Económico / Conforto)</option>
+            <option value="moto">Moto Urbana / Kupapata</option>
+            <option value="sete">Viatura 7 Lugares / Familiar</option>
+            <option value="deliv_van">Van / Furgão de Carga & Encomendas</option>
+          </select>
+        </div>
+        <div style="margin-bottom:10px;">
+          <label style="display:block;font-size:12px;color:#a6a6a6;margin-bottom:4px;">Matrícula da Viatura</label>
+          <input type="text" id="driver-reg-plate" placeholder="Ex: LD-45-88-GG" required style="width:100%;background:#090d0a;border:1px solid #262626;border-radius:10px;padding:10px 12px;color:#fff;font-size:13px;outline:none;box-sizing:border-box;">
+        </div>
+        <div style="margin-bottom:14px;">
+          <label style="display:block;font-size:12px;color:#a6a6a6;margin-bottom:4px;">Palavra-passe</label>
+          <input type="password" id="driver-reg-pass" placeholder="Mínimo 6 dígitos" required style="width:100%;background:#090d0a;border:1px solid #262626;border-radius:10px;padding:10px 12px;color:#fff;font-size:13px;outline:none;box-sizing:border-box;">
+        </div>
+        <button type="submit" style="width:100%;padding:14px;border-radius:12px;background:linear-gradient(135deg,#d4af37,#f0c040);color:#000;font-weight:800;font-size:14px;cursor:pointer;border:none;">Concluir Cadastro de Motorista</button>
+      </form>
+    </div>
+  </div>
+
 <script>
+function openDriverAuthModal(tab = 'login') {
+  const m = document.getElementById('driver-auth-modal');
+  if (m) {
+    m.style.display = 'flex';
+    switchDriverAuthTab(tab);
+  }
+}
+function closeDriverAuthModal() {
+  const m = document.getElementById('driver-auth-modal');
+  if (m) m.style.display = 'none';
+}
+function switchDriverAuthTab(tab) {
+  const btnL = document.getElementById('driver-tab-btn-login');
+  const btnR = document.getElementById('driver-tab-btn-register');
+  const formL = document.getElementById('form-driver-login');
+  const formR = document.getElementById('form-driver-register');
+  if (tab === 'login') {
+    if (btnL) { btnL.style.background = '#d4af37'; btnL.style.color = '#000'; btnL.style.fontWeight = '700'; }
+    if (btnR) { btnR.style.background = 'none'; btnR.style.color = '#8d9e8d'; btnR.style.fontWeight = '600'; }
+    if (formL) formL.style.display = 'block';
+    if (formR) formR.style.display = 'none';
+  } else {
+    if (btnR) { btnR.style.background = '#d4af37'; btnR.style.color = '#000'; btnR.style.fontWeight = '700'; }
+    if (btnL) { btnL.style.background = 'none'; btnL.style.color = '#8d9e8d'; btnL.style.fontWeight = '600'; }
+    if (formR) formR.style.display = 'block';
+    if (formL) formL.style.display = 'none';
+  }
+}
+function handleDriverLogin(e) {
+  e.preventDefault();
+  const phone = document.getElementById('driver-login-phone').value.trim();
+  GiroAuth.save({ phone, nome: 'Motorista Parceiro', role: 'motorista' });
+  closeDriverAuthModal();
+  GiroAuth.renderUserPill('auth-pill');
+}
+function handleDriverRegister(e) {
+  e.preventDefault();
+  const name = document.getElementById('driver-reg-name').value.trim();
+  const phone = document.getElementById('driver-reg-phone').value.trim();
+  const plate = document.getElementById('driver-reg-plate').value.trim();
+  GiroAuth.save({ phone, nome: name || 'Motorista Parceiro', plate, role: 'motorista' });
+  closeDriverAuthModal();
+  GiroAuth.renderUserPill('auth-pill');
+}
+
 const GIRO_SESSION_KEY='giro_session';
 const GiroAuth={
   save(user){localStorage.setItem(GIRO_SESSION_KEY,JSON.stringify({...user,ts:Date.now()}));},
@@ -1338,29 +1447,35 @@ const GiroAuth={
   clear(){localStorage.removeItem(GIRO_SESSION_KEY);},
   requireAuth(role){
     const s=this.get();
-    if(!s){window.location.href='login.html';return null;}
-    if(role&&s.role!==role){window.location.href='login.html';return null;}
+    if(!s || (role && s.role !== role)){openDriverAuthModal();return null;}
     return s;
   },
   renderUserPill(containerId){
     const s=this.get();
     const el=document.getElementById(containerId);
     if(!el)return;
-    if(s){
+    if(s && s.role==='motorista'){
       const initials=(s.nome||s.phone||'?')[0].toUpperCase();
       el.innerHTML=`<div style="display:flex;align-items:center;gap:8px;">
         <div style="width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#d4af37,#f0c040);display:flex;align-items:center;justify-content:center;font-weight:900;font-size:14px;color:#000;">${initials}</div>
-        <div style="line-height:1.2;"><div style="font-size:13px;font-weight:700;color:#f1f5f1;">${s.nome||s.phone}</div><div style="font-size:10px;color:#8d9e8d;text-transform:uppercase;">${s.role==='motorista'?'🚗 Motorista':'🧑 Passageiro'}</div></div>
+        <div style="line-height:1.2;"><div style="font-size:13px;font-weight:700;color:#f1f5f1;">${s.nome||s.phone}</div><div style="font-size:10px;color:#8d9e8d;text-transform:uppercase;">🚗 Motorista</div></div>
         <button onclick="GiroAuth.logout()" style="margin-left:4px;background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.3);border-radius:8px;padding:5px 10px;color:#fca5a5;font-size:12px;cursor:pointer;">Sair</button>
       </div>`;
     }else{
-      el.innerHTML='<a href="login.html" style="text-decoration:none;padding:7px 14px;border-radius:20px;background:rgba(212,175,55,.12);border:1px solid rgba(212,175,55,.3);color:#d4af37;font-size:13px;font-weight:700;">&#128100; Entrar</a>';
+      el.innerHTML='<button onclick="openDriverAuthModal()" style="border:none;outline:none;cursor:pointer;padding:7px 14px;border-radius:20px;background:rgba(212,175,55,.15);border:1px solid rgba(212,175,55,.35);color:#d4af37;font-size:13px;font-weight:700;display:flex;align-items:center;gap:5px;">&#128100; Entrar</button>';
     }
   },
-  logout(){this.clear();window.location.href='login.html';}
+  logout(){
+    this.clear();
+    this.renderUserPill('auth-pill');
+    openDriverAuthModal();
+  }
 };
 document.addEventListener('DOMContentLoaded',function(){
-  const _s=GiroAuth.requireAuth('motorista');if(!_s)throw new Error('not auth');
+  const s = GiroAuth.get();
+  if(!s || s.role !== 'motorista') {
+    openDriverAuthModal();
+  }
   GiroAuth.renderUserPill('auth-pill');
 });
 </script>

@@ -1,1078 +1,1337 @@
 <!DOCTYPE html>
-<html lang="pt">
+<html lang="pt-AO">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>GIRO Central 24h | Monitoramento Tático Luanda</title>
-  
-  <!-- PWA & Android Meta -->
-  <link rel="manifest" href="./manifest.json">
-  <meta name="theme-color" content="#000000">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <link rel="apple-touch-icon" href="./icons/icon-192.png">
-  <link rel="icon" type="image/x-icon" href="./favicon.ico">
-
-  <!-- Google Fonts & Leaflet -->
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+  <title>GIRO Angola — CRM & Painel de Administração Central</title>
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
   <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      -webkit-tap-highlight-color: transparent;
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, system-ui, sans-serif;
+    :root {
+      --bg: #070907;
+      --bg-side: #0b0f0b;
+      --card: #121712;
+      --card-inner: #1a221b;
+      --border: #222c23;
+      --gold: #d4af37;
+      --gold-glow: #f5d77f;
+      --green: #22c55e;
+      --red: #ef4444;
+      --blue: #38bdf8;
+      --text: #f1f5f1;
+      --muted: #8d9e8d;
+      --font: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, system-ui, sans-serif;
     }
 
+    * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
-      background: #000000;
-      color: #ffffff;
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font);
+      display: flex;
       height: 100vh;
       overflow: hidden;
-      display: flex;
-      flex-direction: column;
+      -webkit-font-smoothing: antialiased;
     }
 
-    /* Top Navigation Header */
-    header {
-      background: #0d0d0d;
-      border-bottom: 1px solid #1f1f1f;
-      padding: 12px 20px;
+    /* ── Sidebar ── */
+    #sidebar {
+      width: 250px;
+      background: var(--bg-side);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+      z-index: 100;
+    }
+    .side-brand {
+      padding: 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      border-bottom: 1px solid var(--border);
+    }
+    .side-logo-g {
+      width: 36px; height: 36px;
+      background: linear-gradient(135deg, var(--gold), #f0c040);
+      color: #000;
+      font-weight: 900;
+      font-size: 18px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 0 16px rgba(212,175,55,0.3);
+    }
+    .side-brand-title b { font-size: 17px; letter-spacing: -0.5px; display: block; }
+    .side-brand-title span { font-size: 10px; color: var(--gold); letter-spacing: 2px; text-transform: uppercase; }
+
+    .side-nav {
+      flex: 1;
+      padding: 16px 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      overflow-y: auto;
+    }
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 11px 14px;
+      border-radius: 10px;
+      color: var(--muted);
+      font-size: 13.5px;
+      font-weight: 600;
+      cursor: pointer;
+      border: 1px solid transparent;
+      transition: all 0.15s ease;
+      background: none;
+      width: 100%;
+      text-align: left;
+    }
+    .nav-item:hover { color: #fff; background: rgba(255,255,255,0.04); }
+    .nav-item.active {
+      color: #000;
+      background: linear-gradient(135deg, var(--gold), #f0c040);
+      font-weight: 700;
+    }
+    .nav-badge {
+      margin-left: auto;
+      font-size: 10px;
+      padding: 2px 7px;
+      border-radius: 10px;
+      background: rgba(239,68,68,0.2);
+      color: var(--red);
+      font-weight: 800;
+    }
+    .nav-item.active .nav-badge {
+      background: #000;
+      color: var(--gold);
+    }
+
+    .side-footer {
+      padding: 16px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: rgba(0,0,0,0.2);
+    }
+    .admin-avatar {
+      width: 34px; height: 34px; border-radius: 50%;
+      background: #2a362c; border: 1px solid var(--gold);
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 800; font-size: 13px; color: var(--gold);
+    }
+
+    /* ── Main Workspace ── */
+    #workspace {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* Top Bar */
+    #topbar {
+      height: 64px;
+      background: var(--bg-side);
+      border-bottom: 1px solid var(--border);
+      padding: 0 24px;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      z-index: 100;
-      flex-wrap: wrap;
-      gap: 12px;
-      width: 100%;
-      box-sizing: border-box;
+      flex-shrink: 0;
     }
-
-    .brand-section {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      flex-wrap: wrap;
-    }
-
-    .brand-logo {
-      font-size: 20px;
-      font-weight: 900;
-      letter-spacing: -0.5px;
-      color: #ffffff;
+    .top-title { font-size: 18px; font-weight: 800; display: flex; align-items: center; gap: 8px; }
+    .top-stats { display: flex; align-items: center; gap: 18px; }
+    .stat-pill {
+      background: var(--card-inner);
+      border: 1px solid var(--border);
+      padding: 6px 14px;
+      border-radius: 20px;
       display: flex;
       align-items: center;
       gap: 8px;
+      font-size: 12px;
     }
+    .stat-pill b { color: #fff; font-size: 13px; }
 
-    .badge-live {
-      background: rgba(239, 68, 68, 0.15);
-      border: 1px solid #ef4444;
-      color: #ef4444;
-      font-size: 11px;
-      font-weight: 800;
-      padding: 3px 8px;
-      border-radius: 6px;
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-      white-space: nowrap;
-    }
-
-    .badge-live::before {
-      content: "";
-      width: 6px;
-      height: 6px;
-      border-radius: 50%;
-      background: #ef4444;
-      box-shadow: 0 0 8px #ef4444;
-      /* animation removed */
-      flex-shrink: 0;
-    }
-50% { opacity: 0.3; }
-    }
-
-    .header-metrics {
-      display: flex;
-      gap: 18px;
-      align-items: center;
-      overflow-x: auto;
-      white-space: nowrap;
-      scrollbar-width: none;
-      -webkit-overflow-scrolling: touch;
-      padding: 2px 0;
-    }
-    .header-metrics::-webkit-scrollbar { display: none; }
-
-    .metric-pill {
-      display: flex;
-      flex-direction: column;
-      text-align: right;
-      flex-shrink: 0;
-    }
-
-    .metric-val {
-      font-weight: 800;
-      font-size: 15px;
-      font-family: 'Courier New', Courier, monospace;
-    }
-
-    .metric-sub {
-      font-size: 10px;
-      color: #6b7280;
-      text-transform: uppercase;
-      font-weight: 700;
-      white-space: nowrap;
-    }
-
-/* Main Operations Dashboard Grid */
-    .dashboard-grid {
-      display: grid;
-      grid-template-columns: 320px 1fr 340px;
+    /* Content Area */
+    #content-area {
       flex: 1;
-      height: calc(100vh - 61px);
-      overflow: hidden;
-      width: 100%;
-      box-sizing: border-box;
-    }
-
-    /* Left Sidebar: Live Emergency & SOS Desk */
-    .panel-left {
-      background: #0a0a0a;
-      border-right: 1px solid #1a1a1a;
-      display: flex;
-      flex-direction: column;
       overflow-y: auto;
-      box-sizing: border-box;
+      padding: 24px;
     }
 
-    .panel-title {
-      padding: 14px 16px;
-      border-bottom: 1px solid #1a1a1a;
+    .tab-view { display: none; }
+    .tab-view.active { display: block; }
+
+    /* ── Dashboard Grid ── */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    .kpi-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 18px 20px;
+      position: relative;
+      overflow: hidden;
+    }
+    .kpi-card::after {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+      background: var(--gold);
+    }
+    .kpi-card.green::after { background: var(--green); }
+    .kpi-card.red::after { background: var(--red); }
+    .kpi-card.blue::after { background: var(--blue); }
+    .kpi-label { font-size: 11px; text-transform: uppercase; color: var(--muted); letter-spacing: 1px; font-weight: 700; }
+    .kpi-value { font-size: 26px; font-weight: 900; color: #fff; margin: 6px 0 4px; }
+    .kpi-sub { font-size: 12px; color: var(--muted); }
+
+    /* ── Tables & Lists ── */
+    .data-table-wrap {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      overflow: hidden;
+      margin-bottom: 24px;
+    }
+    .table-head-bar {
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+    .search-input {
+      background: var(--card-inner);
+      border: 1px solid var(--border);
+      color: #fff;
+      padding: 8px 14px;
+      border-radius: 8px;
       font-size: 13px;
-      font-weight: 800;
+      outline: none;
+      width: 240px;
+    }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; text-align: left; }
+    th {
+      background: rgba(0,0,0,0.3);
+      color: var(--muted);
+      font-size: 11px;
       text-transform: uppercase;
       letter-spacing: 0.5px;
-      color: #9ca3af;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 8px;
+      padding: 12px 18px;
+      border-bottom: 1px solid var(--border);
     }
+    td { padding: 14px 18px; border-bottom: 1px solid rgba(255,255,255,0.04); color: #fff; vertical-align: middle; }
+    tr:hover td { background: rgba(255,255,255,0.02); }
 
-    .sos-card {
-      margin: 12px 14px;
-      background: linear-gradient(145deg, #1c0a0a, #2a0e0e);
-      border: 1px solid #ef4444;
-      border-radius: 12px;
-      padding: 14px;
-      box-shadow: 0 4px 20px rgba(239, 68, 68, 0.2);
-      box-sizing: border-box;
+    /* Status Badges */
+    .badge {
+      display: inline-flex; align-items: center; gap: 4px;
+      padding: 4px 10px; border-radius: 12px; font-size: 11px; font-weight: 700;
     }
+    .badge.green { background: rgba(34,197,94,0.15); color: var(--green); }
+    .badge.gold { background: rgba(212,175,55,0.15); color: var(--gold); }
+    .badge.red { background: rgba(239,68,68,0.15); color: var(--red); }
+    .badge.blue { background: rgba(56,189,248,0.15); color: var(--blue); }
 
-    .sos-card-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 8px;
-      gap: 8px;
-      flex-wrap: wrap;
+    /* Buttons */
+    .btn-action {
+      padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: 700;
+      border: none; cursor: pointer; transition: opacity 0.15s;
     }
+    .btn-action:hover { opacity: 0.85; }
+    .btn-action.gold { background: var(--gold); color: #000; }
+    .btn-action.green { background: var(--green); color: #000; }
+    .btn-action.red { background: rgba(239,68,68,0.2); color: var(--red); border: 1px solid rgba(239,68,68,0.4); }
+    .btn-action.outline { background: transparent; border: 1px solid var(--border); color: #fff; }
 
-    .sos-driver-name {
-      font-weight: 800;
-      font-size: 14px;
-      color: #ffffff;
-      word-break: break-word;
+    /* ── AI Multi-Agent Console ── */
+    .ai-console-grid {
+      display: grid;
+      grid-template-columns: 320px 1fr 340px;
+      gap: 16px;
+      height: calc(100vh - 140px);
     }
-
-    .sos-radius-tag {
-      font-size: 11px;
-      font-weight: 800;
-      background: #dc2626;
-      padding: 2px 8px;
-      border-radius: 10px;
-      color: #fff;
-      white-space: nowrap;
-      flex-shrink: 0;
-    }
-
-    .sos-loc {
-      font-size: 12px;
-      color: #fca5a5;
-      margin-bottom: 10px;
-      line-height: 1.4;
-      word-break: break-word;
-    }
-
-    .sos-actions-row {
-      display: flex;
-      gap: 6px;
-    }
-
-    .btn-pna {
-      flex: 1;
-      padding: 9px 8px;
-      background: #ef4444;
-      border: none;
-      border-radius: 8px;
-      color: #ffffff;
-      font-weight: 800;
-      font-size: 11px;
-      cursor: pointer;
-      text-align: center;
-      transition: background 0.2s;
-    }
-    .btn-pna:active { background: #dc2626; }
-
-    .btn-p2p {
-      flex: 1;
-      padding: 9px 8px;
-      background: #1f1f1f;
-      border: 1px solid #333;
-      border-radius: 8px;
-      color: #ffffff;
-      font-weight: 700;
-      font-size: 11px;
-      cursor: pointer;
-      text-align: center;
-      transition: background 0.2s;
-    }
-    .btn-p2p:active { background: #2a2a2a; }
-
-    /* Middle Section: Full Map */
-    .panel-center {
-      position: relative;
-      background: #121212;
-      width: 100%;
-      height: 100%;
-      box-sizing: border-box;
-    }
-
-    #map {
-      width: 100%;
-      height: 100%;
-      background: #121212;
-    }
-
-    .map-floating-bar {
-      position: absolute;
-      top: 14px;
-      left: 14px;
-      right: 14px;
-      z-index: 10;
-      display: flex;
-      justify-content: space-between;
-      pointer-events: none;
-      gap: 8px;
-      flex-wrap: wrap;
-    }
-
-    .map-pill {
-      pointer-events: auto;
-      background: rgba(7,9,7,0.95);
-      -webkit-border: 1px solid #2a2a2a;
-      border-radius: 20px;
-      padding: 8px 14px;
-      font-size: 12px;
-      font-weight: 700;
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      white-space: nowrap;
-    }
-
-    /* Right Sidebar: Commission & Budget Audit */
-    .panel-right {
-      background: #0a0a0a;
-      border-left: 1px solid #1a1a1a;
+    .ai-box {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
       display: flex;
       flex-direction: column;
-      overflow-y: auto;
-      box-sizing: border-box;
+      overflow: hidden;
     }
-
-    .audit-box {
-      margin: 14px;
-      background: #121212;
-      border: 1px solid #222222;
-      border-radius: 12px;
-      padding: 16px;
-      box-sizing: border-box;
-    }
-
-    .audit-title {
-      font-size: 13px;
-      font-weight: 800;
-      color: #ffffff;
-      margin-bottom: 4px;
-    }
-
-    .audit-desc {
-      font-size: 11px;
-      color: #9ca3af;
-      margin-bottom: 12px;
-      line-height: 1.4;
-    }
-
-    .stat-row {
-      display: flex;
-      justify-content: space-between;
-      padding: 8px 0;
-      border-bottom: 1px solid #1c1c1c;
-      font-size: 12px;
-      gap: 8px;
-    }
-
-    .stat-row:last-child {
-      border-bottom: none;
-    }
-
-    .fleet-item {
-      padding: 10px 14px;
-      border-bottom: 1px solid #161616;
+    .ai-box-head {
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--border);
       display: flex;
       align-items: center;
       justify-content: space-between;
-      font-size: 12px;
+      background: rgba(0,0,0,0.2);
+    }
+    .ai-box-head b { font-size: 13px; display: flex; align-items: center; gap: 6px; }
+    .ai-msg-list {
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .msg-bubble {
+      max-width: 85%;
+      padding: 10px 14px;
+      border-radius: 12px;
+      font-size: 12.5px;
+      line-height: 1.4;
+    }
+    .msg-bubble.in {
+      background: var(--card-inner);
+      border: 1px solid var(--border);
+      align-self: flex-start;
+      border-bottom-left-radius: 2px;
+    }
+    .msg-bubble.out {
+      background: linear-gradient(135deg, rgba(212,175,55,0.2), rgba(212,175,55,0.1));
+      border: 1px solid rgba(212,175,55,0.3);
+      color: #fff;
+      align-self: flex-end;
+      border-bottom-right-radius: 2px;
+    }
+    .msg-bubble.system {
+      background: rgba(56,189,248,0.1);
+      border: 1px dashed var(--blue);
+      color: var(--blue);
+      align-self: center;
+      font-size: 11px;
+      text-align: center;
+    }
+    .ai-input-bar {
+      padding: 12px;
+      border-top: 1px solid var(--border);
+      display: flex;
       gap: 8px;
+      background: rgba(0,0,0,0.2);
+    }
+    .ai-input {
+      flex: 1;
+      background: var(--card-inner);
+      border: 1px solid var(--border);
+      color: #fff;
+      padding: 10px 14px;
+      border-radius: 8px;
+      font-size: 13px;
+      outline: none;
     }
 
-    .fleet-item:hover {
-      background: #141414;
+    /* ── Modal Document Viewer ── */
+    .modal-backdrop {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.85);
+      display: none; align-items: center; justify-content: center; z-index: 1000;
+    }
+    .modal-backdrop.open { display: flex; }
+    .modal-box {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 16px; width: 90%; max-width: 860px; max-height: 90vh;
+      display: flex; flex-direction: column; overflow: hidden;
+      box-shadow: 0 16px 48px rgba(0,0,0,0.8);
+    }
+    .modal-head {
+      padding: 18px 24px; border-bottom: 1px solid var(--border);
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .modal-body { padding: 24px; overflow-y: auto; flex: 1; }
+    .doc-preview-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 14px; margin-bottom: 20px;
+    }
+    .doc-card {
+      background: var(--card-inner); border: 1px solid var(--border);
+      border-radius: 10px; padding: 12px; text-align: center;
+    }
+    .doc-card-img {
+      width: 100%; height: 110px; background: #070907; border-radius: 6px;
+      display: flex; align-items: center; justify-content: center;
+      margin-bottom: 8px; font-size: 32px; border: 1px dashed #333;
     }
 
-    /* Mobile & Responsive Rules (Mobile-First Architecture) */
-    @media (max-width: 900px) {
+    /* Map container */
+    #live-radar-map {
+      height: 480px; width: 100%; border-radius: 14px; border: 1px solid var(--border);
+    }
+
+    /* ── Mobile Responsive Overhaul (Drawer, Touch Tables, Adaptive Grids) ── */
+    .menu-toggle-btn { display: none; }
+    .side-close-btn { display: none; }
+    #sidebar-overlay { display: none; }
+    .topbar-main-row { display: flex; align-items: center; gap: 12px; }
+
+    @media (max-width: 992px) {
       body {
-        height: auto;
-        min-height: 100vh;
-        overflow-x: hidden;
-        overflow-y: auto;
+        display: block;
+        height: 100vh;
+        overflow: hidden;
+        position: relative;
       }
-
-      header {
+      #sidebar {
+        position: fixed;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        width: 280px;
+        max-width: 84vw;
+        z-index: 1050;
+        transform: translateX(-100%);
+        transition: transform 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 4px 0 28px rgba(0,0,0,0.85);
+      }
+      #sidebar.open {
+        transform: translateX(0);
+      }
+      #sidebar-overlay {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,0.72);
+        backdrop-filter: blur(3px);
+        -webkit-backdrop-filter: blur(3px);
+        z-index: 1040;
+      }
+      #sidebar-overlay.active {
+        display: block;
+      }
+      .side-brand {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      .side-close-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 32px;
+        height: 32px;
+        border-radius: 8px;
+        background: rgba(255,255,255,0.08);
+        border: 1px solid var(--border);
+        color: #fff;
+        font-size: 14px;
+        cursor: pointer;
+      }
+      .menu-toggle-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 38px;
+        height: 38px;
+        border-radius: 8px;
+        background: rgba(212,175,55,0.15);
+        border: 1px solid rgba(212,175,55,0.35);
+        color: var(--gold);
+        font-size: 20px;
+        cursor: pointer;
+        flex-shrink: 0;
+      }
+      #workspace {
+        width: 100%;
+        height: 100vh;
+        min-width: 0;
+        display: flex;
+        flex-direction: column;
+      }
+      #topbar {
+        height: auto;
+        min-height: 56px;
         padding: 10px 14px;
         flex-direction: column;
         align-items: stretch;
         gap: 10px;
       }
-
-      .brand-section {
-        justify-content: space-between;
+      .top-title {
+        font-size: 15px;
+        font-weight: 800;
+      }
+      .top-stats {
         width: 100%;
+        overflow-x: auto;
+        white-space: nowrap;
+        gap: 8px;
+        scrollbar-width: none;
+        padding-bottom: 2px;
       }
-
-      .header-metrics {
-        width: 100%;
-        justify-content: space-between;
-        background: #141414;
-        padding: 8px 12px;
-        border-radius: 10px;
-        border: 1px solid #222;
+      .top-stats::-webkit-scrollbar {
+        display: none;
       }
-
-      .metric-pill {
-        text-align: left;
-      }
-.dashboard-grid {
-        display: flex;
-        flex-direction: column;
-        height: auto;
-        overflow: visible;
-      }
-
-      .panel-center {
-        order: 1;
-        height: 380px;
-        min-height: 380px;
-      }
-
-      #map {
-        height: 380px;
-      }
-
-      .panel-left {
-        order: 2;
-        border-right: none;
-        border-bottom: 1px solid #1a1a1a;
-        overflow: visible;
-        height: auto;
-      }
-
-      .panel-right {
-        order: 3;
-        border-left: none;
-        overflow: visible;
-        height: auto;
-      }
-
-      .sos-card {
-        margin: 10px;
-      }
-
-      .audit-box {
-        margin: 10px;
-      }
-    }
-
-    @media (max-width: 480px) {
-      .brand-logo {
-        font-size: 17px;
-      }
-
-      .badge-live {
-        font-size: 9.5px;
-        padding: 2px 6px;
-      }
-
-      .metric-val {
-        font-size: 13.5px;
-      }
-
-      .metric-sub {
-        font-size: 8.5px;
-      }
-
-      .sos-actions-row {
-        flex-direction: column;
-      }
-
-      .map-floating-bar {
-        top: 10px;
-        left: 10px;
-        right: 10px;
-        flex-direction: column;
-        gap: 6px;
-      }
-
-      .map-pill {
+      .stat-pill {
+        padding: 5px 10px;
         font-size: 11px;
-        padding: 6px 10px;
-        width: fit-content;
+        flex-shrink: 0;
       }
-    }
-
-    /* === PWA Angola-first globals === */
-    * { -webkit-tap-highlight-color: transparent; user-select: none; -webkit-user-select: none; }
-    input, textarea, select { user-select: text; -webkit-user-select: text; }
-    body { overscroll-behavior: none; }
-    * { scrollbar-width: none; }
-    *::-webkit-scrollbar { display: none; }
-    button:active, .btn-pna:active, .btn-p2p:active {
-      opacity: 0.7 !important;
-      transform: scale(0.97) !important;
-      transition: .15s ease !important;
+      #content-area {
+        padding: 14px 12px 60px;
+        overflow-x: hidden;
+      }
+      .kpi-grid {
+        grid-template-columns: 1fr;
+        gap: 10px;
+        margin-bottom: 18px;
+      }
+      .kpi-card {
+        padding: 14px 16px;
+      }
+      .kpi-value {
+        font-size: 22px;
+      }
+      .data-table-wrap {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        border-radius: 10px;
+      }
+      .table-head-bar {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+        padding: 12px 14px;
+      }
+      .search-input {
+        width: 100% !important;
+      }
+      table th, table td {
+        white-space: nowrap;
+        padding: 10px 12px;
+        font-size: 12px;
+      }
+      #view-sos > div {
+        grid-template-columns: 1fr !important;
+        gap: 14px;
+      }
+      #live-radar-map {
+        height: 300px;
+      }
+      .ai-console-grid {
+        display: flex !important;
+        flex-direction: column !important;
+        height: auto !important;
+        gap: 14px;
+      }
+      .ai-box {
+        height: 420px;
+      }
+      .modal-box {
+        width: 95%;
+        max-height: 92vh;
+      }
+      .doc-preview-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 8px;
+      }
     }
   </style>
 </head>
 <body>
 
-  <!-- Top Navigation Header -->
-  <header>
-    <div class="brand-section">
-      <div class="brand-logo">
-        <span>GIRO</span>
-        <span style="font-size: 12px; background: #ffffff; color: #000; padding: 2px 6px; border-radius: 4px; font-weight: 900;">CENTRAL 24H</span>
+  <!-- OVERLAY MOBILE -->
+  <div id="sidebar-overlay" onclick="toggleSidebar(false)"></div>
+
+  <!-- 1. SIDEBAR -->
+  <aside id="sidebar">
+    <div class="side-brand">
+      <div style="display:flex;align-items:center;gap:10px;">
+        <div class="side-logo-g">G</div>
+        <div class="side-brand-title">
+          <b>GIRO CRM</b>
+          <span>Angola Central</span>
+        </div>
       </div>
-      <div class="badge-live">RADAR LUANDA EM TEMPO REAL</div>
+      <button class="side-close-btn" onclick="toggleSidebar(false)" aria-label="Fechar Menu">✕</button>
     </div>
 
-    <div class="header-metrics">
-      <div class="metric-pill">
-        <span class="metric-val" style="color: #22c55e;">142</span>
-        <span class="metric-sub">Motoristas Online</span>
-      </div>
-      <div class="metric-pill">
-        <span class="metric-val" style="color: #3b82f6;">89</span>
-        <span class="metric-sub">Corridas em Curso</span>
-      </div>
-      <div class="metric-pill">
-        <span class="metric-val" style="color: #ef4444;">1</span>
-        <span class="metric-sub">Alerta SOS Ativo</span>
-      </div>
-    </div>
+    <nav class="side-nav">
+      <button class="nav-item active" onclick="switchNav('overview')">
+        <span>📊</span> Visão Geral
+      </button>
+      <button class="nav-item" onclick="switchNav('drivers')">
+        <span>🚗</span> Motoristas & KYC
+        <span class="nav-badge" id="badge-pending-kyc">3</span>
+      </button>
+      <button class="nav-item" onclick="switchNav('passengers')">
+        <span>🧑‍💼</span> Passageiros
+      </button>
+      <button class="nav-item" onclick="switchNav('disputes')">
+        <span>⚖️</span> Corridas & Disputas
+        <span class="nav-badge" style="background:rgba(212,175,55,0.2);color:var(--gold);">2</span>
+      </button>
+      <button class="nav-item" onclick="switchNav('sos')">
+        <span>🚨</span> Monitor SOS (5km)
+        <span class="nav-badge" style="background:rgba(34,197,94,0.2);color:var(--green);">0</span>
+      </button>
+      <button class="nav-item" onclick="switchNav('financial')">
+        <span>💰</span> Comissões (10%)
+      </button>
+      <button class="nav-item" onclick="switchNav('ai-support')">
+        <span>🤖</span> Atendimento IA Multi-Agente
+      </button>
+    </nav>
 
-    <!-- WIDGET VIGIA ALERTA 24H (ANTI-SONO / RONDA) -->
-    <div id="vigia-hud" style="display:flex;align-items:center;gap:10px;background:#141a15;border:1.5px solid rgba(212,175,55,0.3);border-radius:12px;padding:6px 12px;flex-shrink:0;">
-      <div style="font-size:18px;">⏰</div>
+    <div class="side-footer">
+      <div class="admin-avatar">ADM</div>
       <div>
-        <div style="font-size:9.5px;color:#8d9e8d;text-transform:uppercase;font-weight:700;letter-spacing:0.5px;">Vigia Anti-Sono 24h</div>
-        <div id="vigia-timer-display" style="font-size:13px;font-weight:800;color:#f0c040;font-family:monospace;">Próximo: 15:00</div>
-      </div>
-      <button onclick="triggerVigiaAlert(true)" style="background:rgba(212,175,55,0.15);border:1px solid rgba(212,175,55,0.4);color:#d4af37;padding:5px 9px;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;transition:all 0.15s;" title="Testar disparo do alarme vigia imediatamente">
-        ⚡ Testar Alarme
-      </button>
-    </div>
-
-
-    <!-- Operador Autenticado & Logout -->
-    <div style="display:flex;align-items:center;gap:12px;margin-left:auto;">
-      <div style="text-align:right;">
-        <div id="operator-name-disp" style="font-size:12.5px;font-weight:700;color:#fff;">Operador Conectado</div>
-        <div id="operator-role-disp" style="font-size:10px;color:#22c55e;">● Posto Activo</div>
-      </div>
-      <button onclick="operatorLogout()" style="background:rgba(239,68,68,0.15);border:1px solid rgba(239,68,68,0.4);color:#fca5a5;padding:7px 14px;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;transition:all 0.2s;" title="Encerrar Turno e Bloquear Painel">
-        Terminar Turno 🔒
-      </button>
-    </div>
-</header>
-
-  <!-- Main Grid -->
-  <div class="dashboard-grid">
-    
-    <!-- Left: SOS & Dispatch -->
-    <div class="panel-left">
-      <div class="panel-title">
-        <span>🚨 Ocorrências Críticas (SOS)</span>
-        <span style="color: #ef4444;">1 Pendente</span>
-      </div>
-
-      <div class="sos-card">
-        <div class="sos-card-header">
-          <span class="sos-driver-name">Carlos Silveira (Toyota Vitz)</span>
-          <span class="sos-radius-tag">5 KM RADAR</span>
-        </div>
-        <div class="sos-loc">
-          📍 <strong>Av. 21 de Janeiro (junto ao Rocha Pinto)</strong><br>
-          Coordenadas: -8.8540, 13.2180 • Disparo: há 2 min
-        </div>
-        <div class="sos-actions-row">
-          <button class="btn-pna" onclick="dispatchPNA('7ª Esquadra Talatona')">Acionar 7ª Esquadra PNA</button>
-          <button class="btn-p2p" onclick="broadcastPeerHelp()">Alerta Solidário 5km</button>
-        </div>
-      </div>
-
-      <div class="panel-title" style="margin-top: 10px;">
-        <span>🚔 Postos da Polícia Nacional (PNA)</span>
-      </div>
-      <div style="padding: 10px 14px; font-size: 12px; color: #9ca3af; display: flex; flex-direction: column; gap: 8px;">
-        <div style="display:flex; justify-content:space-between; align-items:center; background:#121212; padding:8px 10px; border-radius:8px;">
-          <span>7ª Esquadra (Talatona)</span>
-          <span style="color:#22c55e; font-weight:700;">Pronta (1.4 km)</span>
-        </div>
-        <div style="display:flex; justify-content:space-between; align-items:center; background:#121212; padding:8px 10px; border-radius:8px;">
-          <span>14ª Esquadra (Kilamba)</span>
-          <span style="color:#22c55e; font-weight:700;">Pronta (6.8 km)</span>
-        </div>
-        <div style="display:flex; justify-content:space-between; align-items:center; background:#121212; padding:8px 10px; border-radius:8px;">
-          <span>1ª Esquadra (Mutamba)</span>
-          <span style="color:#22c55e; font-weight:700;">Pronta (3.2 km)</span>
-        </div>
-        <div style="display:flex; justify-content:space-between; align-items:center; background:#121212; padding:8px 10px; border-radius:8px;">
-          <span>12ª Esquadra (Cazenga)</span>
-          <span style="color:#22c55e; font-weight:700;">Pronta (5.1 km)</span>
-        </div>
+        <div style="font-size:13px;font-weight:700;color:#fff;">Administrador Central</div>
+        <div style="font-size:10px;color:var(--green);">● Online (Luanda HQ)</div>
       </div>
     </div>
+  </aside>
 
-    <!-- Center: Live Tactical Map -->
-    <div class="panel-center">
-      <div class="map-floating-bar">
-        <div class="map-pill">
-          <span>📡 Radar Ativo: Toda a Província de Luanda</span>
-        </div>
-        <div class="map-pill">
-          <span style="color:#10b981;">● 10% Taxa de Plataforma</span>
+  <!-- 2. MAIN WORKSPACE -->
+  <main id="workspace">
+    <!-- Topbar -->
+    <header id="topbar">
+      <div class="topbar-main-row">
+        <button id="btn-menu-toggle" class="menu-toggle-btn" onclick="toggleSidebar()" aria-label="Menu Principal">☰</button>
+        <div class="top-title" id="page-title">
+          <span>📊</span> Visão Geral Operacional
         </div>
       </div>
-      <div id="map"></div>
+
+      <div class="top-stats">
+        <div class="stat-pill">
+          <span>Corridas Hoje:</span> <b id="stat-trips-today">1.428</b>
+        </div>
+        <div class="stat-pill">
+          <span>Faturação Bruta:</span> <b style="color:var(--gold);" id="stat-gross-rev">4.890.000 Kz</b>
+        </div>
+        <div class="stat-pill">
+          <span>Comissão GIRO (10%):</span> <b style="color:var(--green);" id="stat-net-rev">489.000 Kz</b>
+        </div>
+        <div class="stat-pill">
+          <span>Motoristas Online:</span> <b style="color:var(--blue);" id="stat-drivers-online">342</b>
+        </div>
+      </div>
+    </header>
+
+    <!-- Content Area -->
+    <div id="content-area">
+
+      <!-- ═════════════════════════════════════════════════════════════
+           ABA 1: VISÃO GERAL (OVERVIEW)
+           ═════════════════════════════════════════════════════════════ -->
+      <section id="view-overview" class="tab-view active">
+        <div class="kpi-grid">
+          <div class="kpi-card green">
+            <div class="kpi-label">Receita Retida (10% GIRO)</div>
+            <div class="kpi-value">489.000 Kz</div>
+            <div class="kpi-sub">↑ 18% em relação a ontem</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-label">Volume Total de Corridas</div>
+            <div class="kpi-value">1.428</div>
+            <div class="kpi-sub">94% concluídas com sucesso</div>
+          </div>
+          <div class="kpi-card blue">
+            <div class="kpi-label">Frotas em Circulação</div>
+            <div class="kpi-value">342 viaturas</div>
+            <div class="kpi-sub">Luanda, Benguela, Huambo, Lubango</div>
+          </div>
+          <div class="kpi-card red">
+            <div class="kpi-label">Alertas SOS / Segurança</div>
+            <div class="kpi-value">0 ativos</div>
+            <div class="kpi-sub">Tempo médio de socorro: 3.2 min</div>
+          </div>
+        </div>
+
+        <!-- Live Operations Table -->
+        <div class="data-table-wrap">
+          <div class="table-head-bar">
+            <b style="font-size:15px;color:#fff;">Corridas em Tempo Real (Últimas Transações)</b>
+            <input type="text" class="search-input" placeholder="Filtrar por condutor, passageiro...">
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th>Código</th>
+                <th>Passageiro</th>
+                <th>Motorista & Viatura</th>
+                <th>Trajeto</th>
+                <th>Valor (Kz)</th>
+                <th>Comissão 10%</th>
+                <th>Método</th>
+                <th>Estado</th>
+              </tr>
+            </thead>
+            <tbody id="overview-trips-tbody">
+              <tr>
+                <td><b>#GR-9842</b></td>
+                <td>António Silva</td>
+                <td>Domingos M. (Toyota Corolla · LD-23-45-AA)</td>
+                <td>Talatona → Kilamba</td>
+                <td>2.450 Kz</td>
+                <td><b style="color:var(--green);">+245 Kz</b></td>
+                <td><span class="badge gold">Multicaixa</span></td>
+                <td><span class="badge green">Em Curso</span></td>
+              </tr>
+              <tr>
+                <td><b>#GR-9841</b></td>
+                <td>Marta Bento</td>
+                <td>Mateus K. (Kupapata Moto)</td>
+                <td>Maianga → Mutamba</td>
+                <td>1.150 Kz</td>
+                <td><b style="color:var(--green);">+115 Kz</b></td>
+                <td><span class="badge blue">Dinheiro</span></td>
+                <td><span class="badge green">Concluída</span></td>
+              </tr>
+              <tr>
+                <td><b>#GR-9840</b></td>
+                <td>Carlos Neves</td>
+                <td>André F. (Van Carga)</td>
+                <td>Belas Business → Viana</td>
+                <td>7.800 Kz</td>
+                <td><b style="color:var(--green);">+780 Kz</b></td>
+                <td><span class="badge gold">Unitel Money</span></td>
+                <td><span class="badge green">Concluída</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ═════════════════════════════════════════════════════════════
+           ABA 2: MOTORISTAS & VALIDAÇÃO KYC
+           ═════════════════════════════════════════════════════════════ -->
+      <section id="view-drivers" class="tab-view">
+        <div class="data-table-wrap">
+          <div class="table-head-bar">
+            <div>
+              <b style="font-size:16px;color:#fff;">Aprovações Pendentes & Gestão de Motoristas</b>
+              <div style="font-size:12px;color:var(--muted);margin-top:2px;">Analise os documentos KYC (BI, Carta, Seguro, Selfie e Viatura)</div>
+            </div>
+            <div style="display:flex;gap:10px;">
+              <select class="search-input" style="width:160px;" onchange="filterDrivers(this.value)">
+                <option value="all">Todos os Estados</option>
+                <option value="pending" selected>Pendentes (3)</option>
+                <option value="active">Aprovados</option>
+                <option value="blocked">Suspensos</option>
+              </select>
+              <input type="text" class="search-input" placeholder="Pesquisar por nome, tel, matrícula...">
+            </div>
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th>Motorista</th>
+                <th>Telefone</th>
+                <th>Viatura & Categoria</th>
+                <th>Matrícula</th>
+                <th>Documentos KYC</th>
+                <th>Saldo Acumulado</th>
+                <th>Estado</th>
+                <th>Ações</th>
+              </tr>
+            </thead>
+            <tbody id="drivers-tbody">
+              <!-- Pending 1 -->
+              <tr>
+                <td><b>João Baptista Afonso</b><br><small style="color:var(--muted);">Cadastrado há 2h</small></td>
+                <td>+244 923 888 111</td>
+                <td>🚗 Carro Económico (Hyundai i10)</td>
+                <td><span style="font-family:monospace;background:#222;padding:2px 6px;border-radius:4px;">LD-88-21-BH</span></td>
+                <td><span class="badge gold">6 Docs Enviados</span></td>
+                <td>0 Kz</td>
+                <td><span class="badge gold">Pendente KYC</span></td>
+                <td>
+                  <button class="btn-action gold" onclick="openKycModal('João Baptista Afonso', 'LD-88-21-BH', '+244 923 888 111', 'Hyundai i10 Prata (2020)')">Validar Docs</button>
+                </td>
+              </tr>
+              <!-- Pending 2 -->
+              <tr>
+                <td><b>Manuel Gaspar Ndala</b><br><small style="color:var(--muted);">Cadastrado há 4h</small></td>
+                <td>+244 912 334 556</td>
+                <td>🏍️ Moto Kupapata (Lingken 125)</td>
+                <td><span style="font-family:monospace;background:#222;padding:2px 6px;border-radius:4px;">LD-10-99-MK</span></td>
+                <td><span class="badge gold">6 Docs Enviados</span></td>
+                <td>0 Kz</td>
+                <td><span class="badge gold">Pendente KYC</span></td>
+                <td>
+                  <button class="btn-action gold" onclick="openKycModal('Manuel Gaspar Ndala', 'LD-10-99-MK', '+244 912 334 556', 'Lingken 125 Vermelha (2022)')">Validar Docs</button>
+                </td>
+              </tr>
+              <!-- Active 1 -->
+              <tr>
+                <td><b>Domingos Manuel</b><br><small style="color:var(--green);">★ 4.9 (412 viagens)</small></td>
+                <td>+244 923 456 789</td>
+                <td>🚙 Conforto (Toyota Corolla)</td>
+                <td><span style="font-family:monospace;background:#222;padding:2px 6px;border-radius:4px;">LD-23-45-AA</span></td>
+                <td><span class="badge green">Verificado ✓</span></td>
+                <td><b style="color:var(--green);">+24.500 Kz</b></td>
+                <td><span class="badge green">Ativo</span></td>
+                <td>
+                  <button class="btn-action red" onclick="toggleBlockDriver('Domingos Manuel')">Suspender</button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ═════════════════════════════════════════════════════════════
+           ABA 3: PASSAGEIROS & FIDELIDADE
+           ═════════════════════════════════════════════════════════════ -->
+      <section id="view-passengers" class="tab-view">
+        <div class="data-table-wrap">
+          <div class="table-head-bar">
+            <div>
+              <b style="font-size:16px;color:#fff;">Gestão de Passageiros</b>
+              <div style="font-size:12px;color:var(--muted);margin-top:2px;">Histórico, GIRO Clube e gestão de confiança</div>
+            </div>
+            <input type="text" class="search-input" placeholder="Pesquisar passageiro...">
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th>Nome</th>
+                <th>Telefone</th>
+                <th>Total de Viagens</th>
+                <th>GIRO Clube (Cupão)</th>
+                <th>Classificação</th>
+                <th>Gasto Total</th>
+                <th>Estado</th>
+                <th>Ações</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><b>António Silva</b></td>
+                <td>+244 924 112 233</td>
+                <td>18 corridas</td>
+                <td><span class="badge gold">Cupom 10% Ativo</span></td>
+                <td>★ 5.0</td>
+                <td>48.200 Kz</td>
+                <td><span class="badge green">Ativo</span></td>
+                <td><button class="btn-action outline" onclick="alert('Histórico de viagens do passageiro aberto.')">Ver Histórico</button></td>
+              </tr>
+              <tr>
+                <td><b>Marta Bento</b></td>
+                <td>+244 931 556 778</td>
+                <td>9 corridas</td>
+                <td><span class="badge blue">4/5 Corridas</span></td>
+                <td>★ 4.8</td>
+                <td>22.100 Kz</td>
+                <td><span class="badge green">Ativo</span></td>
+                <td><button class="btn-action outline" onclick="alert('Histórico de viagens do passageiro aberto.')">Ver Histórico</button></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ═════════════════════════════════════════════════════════════
+           ABA 4: CORRIDAS & DISPUTAS
+           ═════════════════════════════════════════════════════════════ -->
+      <section id="view-disputes" class="tab-view">
+        <div class="data-table-wrap">
+          <div class="table-head-bar">
+            <div>
+              <b style="font-size:16px;color:#fff;">Resolução de Disputas & Ocorrências</b>
+              <div style="font-size:12px;color:var(--muted);margin-top:2px;">Reembolsos, objetos esquecidos e diferenças de tarifa</div>
+            </div>
+            <span class="badge gold">2 Casos Pendentes</span>
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th>Ticket</th>
+                <th>Tipo</th>
+                <th>Envolvidos</th>
+                <th>Descrição do Problema</th>
+                <th>Valor Disputado</th>
+                <th>Ação Recomendada (IA)</th>
+                <th>Decisão do Operador</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><b>#TK-401</b></td>
+                <td><span class="badge red">Cobrança Extra</span></td>
+                <td>Passageiro: António S.<br>Motorista: Paulo K.</td>
+                <td>Motorista fez desvio sem concordância por conta de obras na Samba.</td>
+                <td>800 Kz</td>
+                <td><span style="color:var(--green);font-size:12px;">Reembolsar 800 Kz na Carteira</span></td>
+                <td>
+                  <button class="btn-action green" onclick="resolveDispute(401, 'refund')">Reembolsar 800 Kz</button>
+                  <button class="btn-action outline" onclick="resolveDispute(401, 'dismiss')">Manter Tarifa</button>
+                </td>
+              </tr>
+              <tr>
+                <td><b>#TK-402</b></td>
+                <td><span class="badge blue">Item Perdido</span></td>
+                <td>Passageira: Clara M.<br>Motorista: Domingos M.</td>
+                <td>Mochila preta com documentos esquecida no banco de trás da viatura.</td>
+                <td>—</td>
+                <td><span style="color:var(--blue);font-size:12px;">Conectar partes via chamada</span></td>
+                <td>
+                  <button class="btn-action gold" onclick="alert('Chamada de ligação segura iniciada entre Clara M. e Domingos M.')">Conectar Partes</button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ═════════════════════════════════════════════════════════════
+           ABA 5: MONITOR SOS & PÂNICO (5KM)
+           ═════════════════════════════════════════════════════════════ -->
+      <section id="view-sos" class="tab-view">
+        <div style="display:grid;grid-template-columns:1fr 360px;gap:20px;">
+          <div>
+            <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px;margin-bottom:14px;display:flex;justify-content:space-between;align-items:center;">
+              <div>
+                <b style="font-size:16px;color:#fff;">Radar Tático de Emergência (5 km)</b>
+                <div style="font-size:12px;color:var(--muted);margin-top:2px;">Monitoramento geoespacial de condutores e alertas de socorro mútuo</div>
+              </div>
+              <button class="btn-action red" onclick="simulateSosAlert()">Simular Alerta SOS</button>
+            </div>
+            <div id="live-radar-map"></div>
+          </div>
+
+          <!-- SOS Incident Card -->
+          <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:20px;">
+            <b style="font-size:15px;color:#fff;display:block;margin-bottom:12px;">Protocolo de Segurança Central</b>
+            <div style="background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.3);border-radius:10px;padding:14px;margin-bottom:16px;" id="sos-hud-status">
+              <div style="font-weight:700;color:var(--red);font-size:13px;">🛡️ Nenhuma Emergência Ativa</div>
+              <div style="font-size:11px;color:var(--muted);margin-top:4px;">Frotas em patrulha e monitoramento normal em Luanda.</div>
+            </div>
+
+            <div style="font-size:12px;color:var(--muted);line-height:1.6;margin-bottom:18px;">
+              <b>Ações Automáticas em caso de Pânico:</b><br>
+              1. Notificação push imediata para todos os motoristas no raio de 5km.<br>
+              2. Gravação de áudio ambiente criptografada de 60s.<br>
+              3. Telemetria GPS com envio direto ao piquete da PNA.
+            </div>
+
+            <button class="btn-action red" style="width:100%;padding:12px;font-size:14px;" onclick="callPnaEmergency()">
+              🚨 Contactar PNA (Polícia 111)
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ═════════════════════════════════════════════════════════════
+           ABA 6: FINANCEIRO & COMISSÕES (10%)
+           ═════════════════════════════════════════════════════════════ -->
+      <section id="view-financial" class="tab-view">
+        <div class="kpi-grid">
+          <div class="kpi-card green">
+            <div class="kpi-label">Comissão Retida GIRO (10%)</div>
+            <div class="kpi-value">489.000 Kz</div>
+            <div class="kpi-sub">Faturação acumulada hoje</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-label">Créditos dos Motoristas (90%)</div>
+            <div class="kpi-value">4.401.000 Kz</div>
+            <div class="kpi-sub">Split automático processado</div>
+          </div>
+          <div class="kpi-card gold">
+            <div class="kpi-label">Bónus Desafio 30K Pagos</div>
+            <div class="kpi-value">42.000 Kz</div>
+            <div class="kpi-sub">28 motoristas atingiram a meta (+1.500 Kz)</div>
+          </div>
+        </div>
+
+        <div class="data-table-wrap">
+          <div class="table-head-bar">
+            <b style="font-size:15px;color:#fff;">Liquidações & Repasses Multicaixa / Unitel Money</b>
+            <button class="btn-action green" onclick="alert('Lote de liquidação enviado para o Banco/Multicaixa Express.')">Processar Lote de Saques</button>
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th>Motorista</th>
+                <th>Canal de Pagamento</th>
+                <th>IBAN / Conta</th>
+                <th>Valor a Transferir (90%)</th>
+                <th>Comissão Retida (10%)</th>
+                <th>Estado</th>
+                <th>Ação</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><b>Domingos Manuel</b></td>
+                <td><span class="badge gold">Multicaixa Express</span></td>
+                <td>AO06.0040.0000.1234.5678.9012.3</td>
+                <td><b style="color:var(--green);">24.500 Kz</b></td>
+                <td>2.450 Kz</td>
+                <td><span class="badge gold">Aguardando Envio</span></td>
+                <td><button class="btn-action green" onclick="alert('Repasse de 24.500 Kz enviado com sucesso.')">Liquidar</button></td>
+              </tr>
+              <tr>
+                <td><b>Mateus K.</b></td>
+                <td><span class="badge blue">Unitel Money</span></td>
+                <td>+244 923 111 222</td>
+                <td><b style="color:var(--green);">14.200 Kz</b></td>
+                <td>1.420 Kz</td>
+                <td><span class="badge gold">Aguardando Envio</span></td>
+                <td><button class="btn-action green" onclick="alert('Repasse Unitel Money enviado com sucesso.')">Liquidar</button></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ═════════════════════════════════════════════════════════════
+           ABA 7: ATENDIMENTO IA MULTI-AGENTE (ORQUESTRADOR INTELIGENTE)
+           ═════════════════════════════════════════════════════════════ -->
+      <section id="view-ai-support" class="tab-view">
+        <div class="ai-console-grid">
+
+          <!-- Coluna 1: Fila de Entrada / Router IA -->
+          <div class="ai-box">
+            <div class="ai-box-head">
+              <b><span>🔀</span> Orquestrador de Chamados</b>
+              <span class="badge blue">Ativo</span>
+            </div>
+            <div style="padding:12px;border-bottom:1px solid var(--border);font-size:11px;color:var(--muted);">
+              Analisa mensagens recebidas via WhatsApp/App e encaminha para o agente especializado.
+            </div>
+            <div class="ai-msg-list" id="incoming-tickets-list">
+              <div style="background:var(--card-inner);border:1px solid var(--gold);border-radius:10px;padding:12px;cursor:pointer;" onclick="loadConversation('pax-1')">
+                <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:4px;">
+                  <b style="color:var(--gold);">Passageiro: António</b>
+                  <span style="color:var(--muted);">há 2 min</span>
+                </div>
+                <div style="font-size:12px;color:#fff;">«Como uso o meu cupom do GIRO Clube?»</div>
+                <span class="badge gold" style="margin-top:6px;">→ Agente Passageiro</span>
+              </div>
+
+              <div style="background:var(--card-inner);border:1px solid var(--border);border-radius:10px;padding:12px;cursor:pointer;" onclick="loadConversation('driver-1')">
+                <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:4px;">
+                  <b style="color:var(--green);">Motorista: Paulo K.</b>
+                  <span style="color:var(--muted);">há 5 min</span>
+                </div>
+                <div style="font-size:12px;color:#fff;">«Quando recebo o bónus do Desafio 30K?»</div>
+                <span class="badge green" style="margin-top:6px;">→ Agente Motorista</span>
+              </div>
+
+              <div style="background:var(--card-inner);border:1px solid var(--border);border-radius:10px;padding:12px;cursor:pointer;" onclick="loadConversation('pax-2')">
+                <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:4px;">
+                  <b style="color:var(--blue);">Passageira: Sofia</b>
+                  <span style="color:var(--muted);">há 8 min</span>
+                </div>
+                <div style="font-size:12px;color:#fff;">«Esqueci o meu telemóvel no carro.»</div>
+                <span class="badge red" style="margin-top:6px;">→ Agente Disputas</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Coluna 2: Chat com o Utilizador (Canal IA Autônomo) -->
+          <div class="ai-box">
+            <div class="ai-box-head">
+              <b id="active-chat-header"><span>🤖</span> Agente IA de Atendimento ao Passageiro</b>
+              <span class="badge green">Resposta em < 1s</span>
+            </div>
+            <div class="ai-msg-list" id="chat-conversation-flow">
+              <div class="msg-bubble in">
+                <b>António:</b> Olá, completei 5 viagens na semana passada. Como faço para ter o desconto de 10% do GIRO Clube?
+              </div>
+              <div class="msg-bubble system">
+                🔀 <b>Orquestrador IA:</b> Intenção classificada como "Fidelidade / Cupom". Encaminhado para Agente Passageiro.
+              </div>
+              <div class="msg-bubble out">
+                <b>GIRO IA (Passageiro):</b> Olá António! Parabéns pelas 5 corridas. O seu cupão de 10% já está ativo. Basta inserir o código <b>GIRO10</b> no campo de promoção antes de confirmar a sua próxima viagem. O desconto é aplicado de imediato! 🚗💨
+              </div>
+            </div>
+            <div class="ai-input-bar">
+              <input type="text" class="ai-input" id="inp-operator-msg" placeholder="Digitar resposta ou deixar a IA responder...">
+              <button class="btn-action gold" onclick="sendAiChatResponse()">Enviar</button>
+            </div>
+          </div>
+
+          <!-- Coluna 3: Copiloto do Administrador (Central IA Assistant) -->
+          <div class="ai-box" style="border-color:rgba(212,175,55,0.3);">
+            <div class="ai-box-head" style="background:rgba(212,175,55,0.08);">
+              <b style="color:var(--gold);"><span>🧠</span> Copiloto Central (Admin IA)</b>
+              <span class="badge gold">Operador HQ</span>
+            </div>
+            <div style="padding:12px;border-bottom:1px solid var(--border);font-size:11px;color:var(--muted);">
+              Tire dúvidas da operação, peça relatórios instantâneos e sugestões de tomada de decisão.
+            </div>
+            <div class="ai-msg-list" id="copilot-msg-list">
+              <div class="msg-bubble out" style="background:var(--card-inner);border-color:var(--border);">
+                <b>Você:</b> Qual foi a província com maior faturamento hoje?
+              </div>
+              <div class="msg-bubble in" style="border-color:var(--gold);">
+                <b>Copiloto IA:</b> <b>Luanda</b> lidera com <b>3.420.000 Kz</b> (70% do total), seguida de <b>Benguela</b> (890.000 Kz). A categoria mais pedida foi o <b>GIRO Económico</b>.
+              </div>
+            </div>
+            <div class="ai-input-bar">
+              <input type="text" class="ai-input" id="inp-copilot" placeholder="Pergunte à IA do CRM (ex: Como resolver o ticket 401?)..." onkeydown="if(event.key==='Enter')askAdminCopilot()">
+              <button class="btn-action gold" onclick="askAdminCopilot()">Perguntar</button>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
     </div>
+  </main>
 
-    <!-- Right: Financial & Sustainability Audit -->
-    <div class="panel-right">
-      <div class="panel-title">
-        <span>📊 Auditoria Orçamentária</span>
-        <span style="color:#10b981;">100% Sustentável</span>
+  <!-- 3. MODAL DE VALIDAÇÃO KYC DE MOTORISTAS -->
+  <div class="modal-backdrop" id="kyc-modal">
+    <div class="modal-box">
+      <div class="modal-head">
+        <div>
+          <b style="font-size:17px;color:#fff;" id="modal-driver-name">Validação de Documentos</b>
+          <div style="font-size:12px;color:var(--gold);" id="modal-driver-meta">Matrícula: LD-88-21-BH</div>
+        </div>
+        <button class="btn-action outline" onclick="closeKycModal()">✕ Fechar</button>
       </div>
+      <div class="modal-body">
+        <div class="doc-preview-grid">
+          <div class="doc-card">
+            <div class="doc-card-img">🪪</div>
+            <b>BI (Frente)</b>
+            <div style="font-size:10px;color:var(--green);margin-top:2px;">Ilegibilidade: 0% (Nítido)</div>
+          </div>
+          <div class="doc-card">
+            <div class="doc-card-img">🪪</div>
+            <b>BI (Verso)</b>
+            <div style="font-size:10px;color:var(--green);margin-top:2px;">Nº BI Válido</div>
+          </div>
+          <div class="doc-card">
+            <div class="doc-card-img">📜</div>
+            <b>Carta de Condução</b>
+            <div style="font-size:10px;color:var(--green);margin-top:2px;">Categoria Ligeiro B</div>
+          </div>
+          <div class="doc-card">
+            <div class="doc-card-img">📋</div>
+            <b>Seguro Automóvel</b>
+            <div style="font-size:10px;color:var(--green);margin-top:2px;">Válido até Out/2026</div>
+          </div>
+          <div class="doc-card">
+            <div class="doc-card-img">🤳</div>
+            <b>Selfie Facial</b>
+            <div style="font-size:10px;color:var(--green);margin-top:2px;">Match 98% com BI</div>
+          </div>
+          <div class="doc-card">
+            <div class="doc-card-img">🚗</div>
+            <b>Foto da Viatura</b>
+            <div style="font-size:10px;color:var(--green);margin-top:2px;">Matrícula Confere</div>
+          </div>
+        </div>
 
-      <div class="audit-box">
-        <div class="audit-title">Desafio Diário 30K (Motoristas)</div>
-        <div class="audit-desc">
-          O motorista ganha +1.500 Kz ao atingir 30.000 Kz no dia. A comissão GIRO de 10% sobre 30.000 Kz é 3.000 Kz. A GIRO reinveste metade (1.500 Kz) no motorista e retém 1.500 Kz de lucro líquido sem estouro orçamentário.
+        <div style="background:rgba(34,197,94,0.08);border:1px solid rgba(34,197,94,0.3);border-radius:10px;padding:14px;margin-bottom:18px;">
+          <b style="color:var(--green);font-size:13px;">✓ Parecer da IA de Pré-Validação:</b>
+          <div style="font-size:12px;color:#fff;margin-top:4px;">
+            Todos os 6 documentos atendem aos critérios de conformidade da República de Angola. O motorista está apto para aprovação e início imediato de corridas.
+          </div>
         </div>
-        <div class="stat-row">
-          <span style="color:#9ca3af;">Meta por Motorista</span>
-          <span style="font-weight:700;">30.000 Kz / dia</span>
-        </div>
-        <div class="stat-row">
-          <span style="color:#9ca3af;">Comissão GIRO (10%)</span>
-          <span style="color:#3b82f6; font-weight:700;">+3.000 Kz</span>
-        </div>
-        <div class="stat-row">
-          <span style="color:#9ca3af;">Bônus Concedido</span>
-          <span style="color:#ef4444; font-weight:700;">-1.500 Kz</span>
-        </div>
-        <div class="stat-row" style="background:#161616; padding:8px; border-radius:6px; margin-top:6px;">
-          <span style="font-weight:800; color:#fff;">Lucro Líquido GIRO</span>
-          <span style="color:#10b981; font-weight:900;">+1.500 Kz (50% Margem)</span>
-        </div>
-      </div>
 
-      <div class="audit-box">
-        <div class="audit-title">Clube Passageiro (10% Cupom)</div>
-        <div class="audit-desc">
-          Cupom de 10% desbloqueado a cada 5 corridas concluídas. O impacto médio por corrida é de apenas 2% do faturamento, respeitando rigorosamente o teto de 10%.
+        <div style="display:flex;justify-content:flex-end;gap:12px;">
+          <button class="btn-action red" style="padding:12px 20px;" onclick="rejectKyc()">✕ Rejeitar & Notificar</button>
+          <button class="btn-action green" style="padding:12px 24px;font-size:14px;" onclick="approveKyc()">✓ Aprovar Motorista</button>
         </div>
-        <div class="stat-row">
-          <span style="color:#9ca3af;">Frequência Cupom</span>
-          <span style="font-weight:700;">1 a cada 5 viagens</span>
-        </div>
-        <div class="stat-row">
-          <span style="color:#9ca3af;">Impacto Médio Receita</span>
-          <span style="color:#10b981; font-weight:700;">~2.0% (Teto máx: 10%)</span>
-        </div>
-      </div>
-
-      <div class="panel-title">
-        <span>🚖 Amostra da Frota em Tempo Real</span>
-      </div>
-      <div id="fleet-list">
-        <!-- Injected via JS -->
       </div>
     </div>
-
   </div>
 
   <script>
-    // ═════════════════════════════════════════════════════════════════
-    // AUTHENTICATION GUARD — REQUER SESSÃO DE OPERADOR
-    // ═════════════════════════════════════════════════════════════════
-    const CENTRAL_SESSION_KEY = 'giro_central_session';
-    let currentOperator = null;
+    // ── Mobile Drawer Toggle ──
+    function toggleSidebar(open) {
+      const sidebar = document.getElementById('sidebar');
+      const overlay = document.getElementById('sidebar-overlay');
+      if (!sidebar || !overlay) return;
+      const shouldOpen = open !== undefined ? open : !sidebar.classList.contains('open');
+      sidebar.classList.toggle('open', shouldOpen);
+      overlay.classList.toggle('active', shouldOpen);
+    }
 
-    (function requireCentralAuth() {
-      try {
-        const raw = sessionStorage.getItem(CENTRAL_SESSION_KEY);
-        if (!raw) {
-          window.location.replace('./central-login.html');
-          return;
-        }
-        currentOperator = JSON.parse(raw);
-        if (!currentOperator || !currentOperator.token) {
-          window.location.replace('./central-login.html');
-          return;
-        }
-      } catch (e) {
-        window.location.replace('./central-login.html');
-      }
-    })();
+    // ── Navigation ──
+    const NAV_TITLES = {
+      overview: '📊 Visão Geral Operacional',
+      drivers: '🚗 Motoristas & Validação KYC',
+      passengers: '🧑‍💼 Gestão de Passageiros',
+      disputes: '⚖️ Corridas & Disputas',
+      sos: '🚨 Monitor de Segurança & Pânico (5 km)',
+      financial: '💰 Módulo Financeiro & Repasses (10%)',
+      'ai-support': '🤖 Central de Atendimento IA Multi-Agente'
+    };
 
-    function operatorLogout() {
-      if (confirm('Deseja encerrar o seu turno e bloquear o Posto de Comando?')) {
-        sessionStorage.removeItem(CENTRAL_SESSION_KEY);
-        window.location.replace('./central-login.html');
+    function switchNav(view) {
+      toggleSidebar(false);
+      document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
+      const activeBtn = Array.from(document.querySelectorAll('.nav-item')).find(b => b.getAttribute('onclick').includes(view));
+      if (activeBtn) activeBtn.classList.add('active');
+
+      document.querySelectorAll('.tab-view').forEach(v => v.classList.remove('active'));
+      const target = document.getElementById('view-' + view);
+      if (target) target.classList.add('active');
+
+      document.getElementById('page-title').innerHTML = NAV_TITLES[view] || 'GIRO CRM';
+
+      if (view === 'sos') {
+        setTimeout(initRadarMap, 100);
       }
     }
 
-    // Fleet simulation
-    const fleet = [
-      { name: "Carlos Silveira", car: "Toyota Vitz", plate: "LD-44-89-GG", status: "SOS ALERTA", lat: -8.8540, lng: 13.2180, sos: true },
-      { name: "António Mateus", car: "Hyundai i10", plate: "LD-12-34-AB", status: "Em Corrida", lat: -8.8383, lng: 13.2344, sos: false },
-      { name: "Manuel Domingos", car: "Kia Picanto", plate: "LD-88-21-CX", status: "Disponível", lat: -8.8200, lng: 13.2500, sos: false },
-      { name: "Francisco Costa", car: "Toyota Hiace (Carga)", plate: "LD-90-11-FA", status: "Em Corrida", lat: -8.8700, lng: 13.2100, sos: false },
-      { name: "João Pedro", car: "Moto TVS Apache", plate: "LD-05-99-MT", status: "Disponível", lat: -8.8450, lng: 13.2280, sos: false }
-    ];
-
-    let map;
-
-    function initCentralMap() {
-      map = L.map('map', {
-        zoomControl: true,
-        attributionControl: false
-      }).setView([-8.8450, 13.2300], 13);
-
-      L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
-        maxZoom: 19
-      }).addTo(map);
-
-      // Render Fleet Markers
-      fleet.forEach(driver => {
-        const isSos = driver.sos;
-        const iconHtml = isSos ? 
-          '<div style="background:#dc2626; color:#fff; width:34px; height:34px; border-radius:50%; display:flex; align-items:center; justify-content:center; border:2px solid #fff; box-shadow:0 0 15px #dc2626; font-size:16px;">🚨</div>' :
-          '<div style="background:#000000; color:#fff; width:30px; height:30px; border-radius:50%; display:flex; align-items:center; justify-content:center; border:2px solid #fff; box-shadow:0 2px 8px rgba(0,0,0,0.5); font-size:14px;">🚖</div>';
-
-        const customIcon = L.divIcon({
-          className: 'central-marker',
-          html: iconHtml,
-          iconSize: [34, 34],
-          iconAnchor: [17, 17]
-        });
-
-        const marker = L.marker([driver.lat, driver.lng], { icon: customIcon }).addTo(map);
-        marker.bindPopup(`
-          <div style="color:#000; font-family:sans-serif; padding:4px;">
-            <strong>${driver.name}</strong><br>
-            Veículo: ${driver.car} (${driver.plate})<br>
-            Status: <span style="color:${isSos ? 'red' : 'green'}; font-weight:bold;">${driver.status}</span>
-          </div>
-        `);
-
-        if (isSos) {
-          // Draw 5km radius circle
-          L.circle([driver.lat, driver.lng], {
-            color: '#ef4444',
-            fillColor: '#ef4444',
-            fillOpacity: 0.12,
-            radius: 5000
-          }).addTo(map);
-        }
-      });
-
-      renderFleetList();
+    // ── KYC Modal ──
+    let currentKycDriver = '';
+    function openKycModal(name, plate, phone, car) {
+      currentKycDriver = name;
+      document.getElementById('modal-driver-name').textContent = name + ' (' + car + ')';
+      document.getElementById('modal-driver-meta').textContent = 'Matrícula: ' + plate + ' · Tel: ' + phone;
+      document.getElementById('kyc-modal').classList.add('open');
+    }
+    function closeKycModal() {
+      document.getElementById('kyc-modal').classList.remove('open');
+    }
+    function approveKyc() {
+      alert('✓ Motorista ' + currentKycDriver + ' APROVADO com sucesso! Conta ativa e SMS de notificação enviado.');
+      closeKycModal();
+      const badge = document.getElementById('badge-pending-kyc');
+      if (badge) badge.textContent = Math.max(0, parseInt(badge.textContent || '1') - 1);
+    }
+    function rejectKyc() {
+      const motivo = prompt('Insira o motivo da rejeição para enviar por SMS ao motorista:', 'Documento ilegível. Por favor reenvie a foto da Carta de Condução.');
+      if (motivo) {
+        alert('✕ Motorista notificado sobre a pendência: "' + motivo + '"');
+        closeKycModal();
+      }
     }
 
-    function renderFleetList() {
-      const container = document.getElementById('fleet-list');
-      container.innerHTML = '';
+    // ── Dispute Resolution ──
+    function resolveDispute(ticketId, action) {
+      if (action === 'refund') {
+        alert('✓ Ticket #' + ticketId + ' resolvido: Reembolso de 800 Kz creditado na carteira do passageiro.');
+      } else {
+        alert('✓ Ticket #' + ticketId + ' concluído: Tarifa mantida.');
+      }
+    }
 
+    // ── Live Radar Map ──
+    let radarMap = null;
+    function initRadarMap() {
+      if (radarMap) return;
+      radarMap = L.map('live-radar-map').setView([-8.8383, 13.2344], 13);
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap'
+      }).addTo(radarMap);
+
+      // Add fleet markers
+      const fleet = [
+        [-8.8383, 13.2344, 'Toyota Corolla · Domingos M.'],
+        [-8.8450, 13.2410, 'Hyundai i10 · Paulo K.'],
+        [-8.8310, 13.2370, 'Kupapata · Mateus K.'],
+        [-8.8575, 13.2310, 'Pick-Up Carga · André F.']
+      ];
       fleet.forEach(f => {
-        const item = document.createElement('div');
-        item.className = 'fleet-item';
-        item.innerHTML = `
-          <div>
-            <div style="font-weight:700; color:#fff;">${f.name}</div>
-            <div style="color:#9ca3af; font-size:11px;">${f.car} • ${f.plate}</div>
-          </div>
-          <span style="font-weight:700; color:${f.sos ? '#ef4444' : (f.status === 'Disponível' ? '#22c55e' : '#3b82f6')};">
-            ${f.status}
-          </span>
-        `;
-        container.appendChild(item);
+        L.circleMarker([f[0], f[1]], {
+          radius: 8, fillColor: '#22c55e', color: '#fff', weight: 2, fillOpacity: 0.9
+        }).bindPopup('<b>' + f[2] + '</b><br>Estado: Livre / Em patrulha').addTo(radarMap);
       });
     }
 
-    function dispatchPNA(stationName) {
-      alert(`🚔 DESPACHO PNA ACIONADO!
-
-Alerta prioritário enviado com telemetria e coordenadas para ${stationName}.
-Unidade de patrulha mais próxima acionada via canal policial.`);
-    }
-
-    function broadcastPeerHelp() {
-      alert(`📡 TRANSMISSÃO P2P DISPARADA!
-
-Todos os condutores parceiros da GIRO num raio de 5 km receberam a localização do colega Carlos Silveira para socorro imediato.`);
-    }
-
-    // PWA SW
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./service-worker.js').catch(err => {
-          console.log('SW note:', err);
-        });
-      });
-    }
-
-    
-    // ═════════════════════════════════════════════════════════════════
-    // SISTEMA VIGIA ALERTA 24H (ANTI-SONO / RONDA INTERMITENTE)
-    // Alterna entre 15 e 45 minutos (ou tempos pré-definidos)
-    // ═════════════════════════════════════════════════════════════════
-    const VIGIA_STORAGE_FAILURES = 'giro_vigia_failures';
-    const VIGIA_STORAGE_LOGS = 'giro_vigia_logs';
-
-    // Ciclo de intervalos em segundos: 15min, 45min, 20min, 35min, 15min, 45min...
-    const VIGIA_INTERVALS = [15 * 60, 45 * 60, 20 * 60, 35 * 60, 15 * 60, 45 * 60];
-    let vigiaIntervalIdx = 0;
-    let vigiaSecondsRemaining = VIGIA_INTERVALS[0];
-    let vigiaTimerInterval = null;
-    let vigiaCountdownInterval = null;
-    let vigiaAlertActive = false;
-    let vigiaDeadlineSeconds = 60;
-
-    // Web Audio Synthesizer (Zero ficheiros externos, 100% nativo)
-    let audioCtx = null;
-    let alarmOsc = null;
-    let alarmGain = null;
-    let isBeeping = false;
-    let beepInterval = null;
-
-    function getAudioContext() {
-      if (!audioCtx) {
-        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-      }
-      return audioCtx;
-    }
-
-    function startBuzzerSound(emergency = false) {
-      try {
-        const ctx = getAudioContext();
-        if (ctx.state === 'suspended') ctx.resume();
-
-        stopBuzzerSound();
-        isBeeping = true;
-
-        const freqHigh = emergency ? 950 : 800;
-        const freqLow = emergency ? 400 : 500;
-        const speed = emergency ? 200 : 350;
-
-        let high = false;
-        beepInterval = setInterval(() => {
-          if (!isBeeping) return;
-          try {
-            const osc = ctx.createOscillator();
-            const gain = ctx.createGain();
-            osc.type = emergency ? 'sawtooth' : 'square';
-            osc.frequency.setValueAtTime(high ? freqHigh : freqLow, ctx.currentTime);
-            high = !high;
-
-            gain.gain.setValueAtTime(0.35, ctx.currentTime);
-            gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.18);
-
-            osc.connect(gain);
-            gain.connect(ctx.destination);
-            osc.start();
-            osc.stop(ctx.currentTime + 0.19);
-          } catch(e) {}
-        }, speed);
-      } catch(err) {
-        console.log('Audio init notice:', err);
+    function simulateSosAlert() {
+      alert('🚨 ALERTA SOS SIMULADO: Pânico acionado em Talatona. Raio de 5km traçado e 14 viaturas notificadas.');
+      document.getElementById('sos-hud-status').innerHTML = `
+        <div style="font-weight:800;color:var(--red);font-size:14px;">🚨 PÂNICO ACIONADO EM TALATONA</div>
+        <div style="font-size:12px;color:#fff;margin-top:4px;">Condutor: Paulo K. (LD-44-12-BB) · 14 viaturas a caminho no raio de 5km.</div>
+      `;
+      if (radarMap) {
+        L.circle([-8.8383, 13.2344], { radius: 5000, color: '#ef4444', fillColor: '#ef4444', fillOpacity: 0.15 }).addTo(radarMap);
       }
     }
 
-    function stopBuzzerSound() {
-      isBeeping = false;
-      if (beepInterval) {
-        clearInterval(beepInterval);
-        beepInterval = null;
+    function callPnaEmergency() {
+      alert('Ligação para o Piquete Central da Polícia Nacional de Angola (111) estabelecida com transmissão de telemetria.');
+    }
+
+    // ── AI Multi-Agent Conversations ──
+    const CONVERSATIONS = {
+      'pax-1': {
+        header: '🤖 Agente IA de Atendimento ao Passageiro',
+        msgs: [
+          { type: 'in', sender: 'António', text: 'Olá, completei 5 viagens na semana passada. Como faço para ter o desconto de 10% do GIRO Clube?' },
+          { type: 'system', text: '🔀 Orquestrador IA: Intenção classificada como "Fidelidade / Cupom". Encaminhado para Agente Passageiro.' },
+          { type: 'out', sender: 'GIRO IA (Passageiro)', text: 'Olá António! Parabéns pelas 5 corridas. O seu cupão de 10% já está ativo. Basta inserir o código GIRO10 no campo de promoção antes de confirmar a sua próxima viagem. O desconto é aplicado de imediato! 🚗💨' }
+        ]
+      },
+      'driver-1': {
+        header: '🤖 Agente IA de Atendimento ao Motorista',
+        msgs: [
+          { type: 'in', sender: 'Paulo K.', text: 'Boa tarde, hoje faturei 31.500 Kz. Quando é que entra o bónus do Desafio 30K na minha carteira?' },
+          { type: 'system', text: '🔀 Orquestrador IA: Intenção classificada como "Financeiro / Bónus Motorista". Encaminhado para Agente Motorista.' },
+          { type: 'out', sender: 'GIRO IA (Motorista)', text: 'Olá parceiro Paulo! Parabéns por atingir a meta! O bónus de +1.500 Kz é creditado automaticamente no fecho diário da meia-noite e fica disponível para saque imediato via Multicaixa Express. Excelente trabalho hoje! 👏' }
+        ]
+      },
+      'pax-2': {
+        header: '⚖️ Agente IA de Disputas & Objetos Perdidos',
+        msgs: [
+          { type: 'in', sender: 'Sofia', text: 'Esqueci a minha mochila preta no carro do Domingos que me deixou no Kilamba.' },
+          { type: 'system', text: '🔀 Orquestrador IA: Intenção classificada como "Objeto Perdido (Alta Prioridade)". Encaminhado para Agente Disputas.' },
+          { type: 'out', sender: 'GIRO IA (Disputas)', text: 'Olá Sofia! Já localizamos a sua corrida #GR-9842 com o condutor Domingos M. (Toyota Corolla). Já enviamos um alerta seguro ao motorista para verificar o banco de trás e conectaremos vocês por chamada protegida em instantes.' }
+        ]
       }
+    };
+
+    function loadConversation(id) {
+      const data = CONVERSATIONS[id];
+      if (!data) return;
+      document.getElementById('active-chat-header').innerHTML = '<span>🤖</span> ' + data.header;
+      const list = document.getElementById('chat-conversation-flow');
+      list.innerHTML = data.msgs.map(m => {
+        if (m.type === 'system') return `<div class="msg-bubble system">${m.text}</div>`;
+        return `<div class="msg-bubble ${m.type}"><b>${m.sender}:</b> ${m.text}</div>`;
+      }).join('');
     }
 
-    function formatTimeMinSec(sec) {
-      const m = Math.floor(sec / 60);
-      const s = sec % 60;
-      return (m < 10 ? '0' : '') + m + ':' + (s < 10 ? '0' : '') + s;
+    function sendAiChatResponse() {
+      const inp = document.getElementById('inp-operator-msg');
+      const val = inp.value.trim();
+      if (!val) return;
+      const list = document.getElementById('chat-conversation-flow');
+      list.innerHTML += `<div class="msg-bubble out"><b>Operador Central:</b> ${val}</div>`;
+      inp.value = '';
+      list.scrollTop = list.scrollHeight;
     }
 
-    function updateVigiaHudDisplay() {
-      const el = document.getElementById('vigia-timer-display');
-      if (el) {
-        const intervalMins = Math.round(VIGIA_INTERVALS[vigiaIntervalIdx] / 60);
-        el.textContent = formatTimeMinSec(vigiaSecondsRemaining) + ' (' + intervalMins + 'm)';
+    // ── Admin Copilot ──
+    const COPILOT_KNOWLEDGE = {
+      'faturamento': 'O faturamento bruto de hoje é de 4.890.000 Kz, gerando 489.000 Kz líquidos de comissão (10%) para a GIRO.',
+      'motorista': 'O motorista com maior volume hoje é Domingos Manuel (LD-23-45-AA) com 14 corridas e 24.500 Kz faturados.',
+      'ticket 401': 'Para o Ticket #401 (António S.), a recomendação da IA é aprovar o reembolso de 800 Kz devido ao desvio não acordado na Samba.',
+      'desafio': 'Hoje 28 motoristas já bateram a meta do Desafio 30K (+1.500 Kz), totalizando 42.000 Kz em incentivos distribuídos.',
+      'comissao': 'A comissão GIRO é fixa em 10%. Motoristas retêm 90% dos ganhos.',
+      'sos': 'Não há nenhum chamado SOS de pânico aberto no momento. O sistema realizou 1 simulação de teste com sucesso.'
+    };
+
+    function askAdminCopilot() {
+      const inp = document.getElementById('inp-copilot');
+      const q = inp.value.trim();
+      if (!q) return;
+      const list = document.getElementById('copilot-msg-list');
+      list.innerHTML += `<div class="msg-bubble out" style="background:var(--card-inner);border-color:var(--border);"><b>Você:</b> ${q}</div>`;
+      inp.value = '';
+
+      // Find answer
+      let answer = 'Entendido. Para essa solicitação operacional, a recomendação é verificar os dados de telemetria da corrida e validar o saldo da carteira.';
+      for (const [k, a] of Object.entries(COPILOT_KNOWLEDGE)) {
+        if (q.toLowerCase().includes(k)) { answer = a; break; }
       }
+
+      setTimeout(() => {
+        list.innerHTML += `<div class="msg-bubble in" style="border-color:var(--gold);"><b>Copiloto IA:</b> ${answer}</div>`;
+        list.scrollTop = list.scrollHeight;
+      }, 300);
     }
-
-    
-    function broadcastVigiaTelemetry(state = 'NORMAL') {
-      try {
-        const payload = {
-          operatorName: currentOperator ? (currentOperator.nome || currentOperator.username) : 'Operador de Turno',
-          operatorRole: currentOperator ? currentOperator.role : 'Radar 24h',
-          state: state, // 'NORMAL', 'CHECANDO' (tocando alarme), 'DORMENCIA'
-          secondsRemaining: vigiaSecondsRemaining,
-          intervalTotal: VIGIA_INTERVALS[vigiaIntervalIdx],
-          deadlineRemaining: vigiaDeadlineSeconds,
-          lastHeartbeat: Date.now()
-        };
-        localStorage.setItem('giro_vigia_live_telemetry', JSON.stringify(payload));
-      } catch(e) {}
-    }
-
-    // Listener para o Dono disparar teste surpresa remotamente a partir do Admin
-    window.addEventListener('storage', (e) => {
-      if (e.key === 'giro_vigia_force_trigger') {
-        triggerVigiaAlert(false);
-      }
-    });
-
-    setInterval(() => {
-      const forceCmd = localStorage.getItem('giro_vigia_force_trigger');
-      if (forceCmd) {
-        const cmdTime = parseInt(forceCmd, 10);
-        if (Date.now() - cmdTime < 5000 && !vigiaAlertActive) {
-          localStorage.removeItem('giro_vigia_force_trigger');
-          triggerVigiaAlert(false);
-        }
-      }
-    }, 1000);
-
-    function startVigiaTicker() {
-      if (vigiaTimerInterval) clearInterval(vigiaTimerInterval);
-      vigiaTimerInterval = setInterval(() => {
-        if (!vigiaAlertActive) {
-          vigiaSecondsRemaining--;
-          updateVigiaHudDisplay();
-          broadcastVigiaTelemetry('NORMAL');
-          if (vigiaSecondsRemaining <= 0) {
-            triggerVigiaAlert(false);
-          }
-        }
-      }, 1000);
-    }
-
-    function triggerVigiaAlert(isManualTest = false) {
-      vigiaAlertActive = true;
-      vigiaDeadlineSeconds = 60;
-
-      const modal = document.getElementById('vigia-modal');
-      const box = document.getElementById('vigia-modal-box');
-      const head = document.getElementById('vigia-head-text');
-      const desc = document.getElementById('vigia-desc-text');
-      const btn = document.getElementById('btn-vigia-confirm');
-      const failBanner = document.getElementById('vigia-fail-banner');
-      const countEl = document.getElementById('vigia-countdown-circle');
-
-      box.style.borderColor = '#ef4444';
-      box.style.boxShadow = '0 0 90px rgba(239,68,68,0.75)';
-      failBanner.style.display = 'none';
-      btn.style.display = 'block';
-      countEl.style.display = 'flex';
-      countEl.style.color = '#ef4444';
-      countEl.style.borderColor = '#ef4444';
-      countEl.textContent = '60';
-
-      const opName = currentOperator ? (currentOperator.nome || currentOperator.username) : 'Operador';
-      head.textContent = isManualTest ? 'TESTE DE VIGÍLIA ANTI-SONO!' : 'CHECAGEM OBRIGATÓRIA DE PRESENÇA!';
-      desc.innerHTML = `Atenção <strong>${opName}</strong>! Desative o sinal para comprovar que se encontra <strong>acordado, vigilante e em operação no posto</strong>.`;
-
-      modal.style.display = 'flex';
-      startBuzzerSound(false);
-      broadcastVigiaTelemetry('CHECANDO');
-
-      if (vigiaCountdownInterval) clearInterval(vigiaCountdownInterval);
-      vigiaCountdownInterval = setInterval(() => {
-        vigiaDeadlineSeconds--;
-        countEl.textContent = vigiaDeadlineSeconds;
-
-        if (vigiaDeadlineSeconds <= 15) {
-          countEl.style.color = '#ff2222';
-          startBuzzerSound(true); // som mais agressivo
-        }
-
-        if (vigiaDeadlineSeconds <= 0) {
-          clearInterval(vigiaCountdownInterval);
-          onVigiaFailed(opName);
-      broadcastVigiaTelemetry('DORMENCIA');
-        }
-      }, 1000);
-    }
-
-    function confirmVigiaPresence() {
-      stopBuzzerSound();
-      if (vigiaCountdownInterval) clearInterval(vigiaCountdownInterval);
-      vigiaAlertActive = false;
-
-      document.getElementById('vigia-modal').style.display = 'none';
-
-      // Log success
-      const opName = currentOperator ? (currentOperator.nome || currentOperator.username) : 'Operador';
-      const log = {
-        id: 'vigia-ok-' + Date.now(),
-        operador: opName,
-        data: new Date().toLocaleString('pt-AO'),
-        tipo: 'Presença Confirmada (Operador Atento)'
-      };
-      try {
-        const logs = JSON.parse(localStorage.getItem(VIGIA_STORAGE_LOGS) || '[]');
-        logs.unshift(log);
-        if (logs.length > 50) logs.pop();
-        localStorage.setItem(VIGIA_STORAGE_LOGS, JSON.stringify(logs));
-      } catch(e) {}
-
-      // Rotate to next interval (alternating 15 min <-> 45 min)
-      vigiaIntervalIdx = (vigiaIntervalIdx + 1) % VIGIA_INTERVALS.length;
-      vigiaSecondsRemaining = VIGIA_INTERVALS[vigiaIntervalIdx];
-      updateVigiaHudDisplay();
-
-      const nextMin = Math.round(vigiaSecondsRemaining / 60);
-      broadcastVigiaTelemetry('NORMAL');
-      alert(`✓ Presença confirmada às ${new Date().toLocaleTimeString('pt-AO')}!\nPróxima checagem programada para daqui a ${nextMin} minutos.`);
-    }
-
-    function onVigiaFailed(opName) {
-      stopBuzzerSound();
-      startBuzzerSound(true); // Alarme crítico de emergência
-
-      const btn = document.getElementById('btn-vigia-confirm');
-      const failBanner = document.getElementById('vigia-fail-banner');
-      const head = document.getElementById('vigia-head-text');
-      const box = document.getElementById('vigia-modal-box');
-
-      btn.style.display = 'none';
-      failBanner.style.display = 'block';
-      head.textContent = '🚨 OPERADOR ADORMECIDO OU POSTO ABANDONADO!';
-      box.style.borderColor = '#ff0000';
-      box.style.boxShadow = '0 0 120px rgba(255,0,0,0.9)';
-
-      // Gravar falha crítica no localStorage para auditoria do Isaac
-      const failure = {
-        id: 'falha-' + Date.now(),
-        operador: opName,
-        data: new Date().toLocaleString('pt-AO'),
-        tempoExcedido: '60 segundos sem resposta',
-        motivo: 'Alarme de Vigília não desligado a tempo (Possível sono / abandono)'
-      };
-
-      try {
-        const failures = JSON.parse(localStorage.getItem(VIGIA_STORAGE_FAILURES) || '[]');
-        failures.unshift(failure);
-        localStorage.setItem(VIGIA_STORAGE_FAILURES, JSON.stringify(failures));
-      } catch(e) {}
-    }
-
-    function resetVigiaAfterFail() {
-      stopBuzzerSound();
-      vigiaAlertActive = false;
-      document.getElementById('vigia-modal').style.display = 'none';
-
-      // Redefine para o próximo intervalo
-      vigiaIntervalIdx = (vigiaIntervalIdx + 1) % VIGIA_INTERVALS.length;
-      vigiaSecondsRemaining = VIGIA_INTERVALS[vigiaIntervalIdx];
-      updateVigiaHudDisplay();
-    }
-
-    window.addEventListener('DOMContentLoaded', () => {
-      startVigiaTicker();
-      updateVigiaHudDisplay();
-      initCentralMap();
-      if (currentOperator) {
-        const nameEl = document.getElementById('operator-name-disp');
-        const roleEl = document.getElementById('operator-role-disp');
-        if (nameEl) nameEl.textContent = currentOperator.nome || currentOperator.username;
-        if (roleEl) roleEl.textContent = '● ' + (currentOperator.role || 'Posto Activo');
-      }
-    });
-
-  <!-- ═════════════════════════════════════════════════════════════════
-       MODAL SISTEMA VIGIA ALERTA 24H (ANTI-SONO / CONTROLO DE RONDA)
-       ═════════════════════════════════════════════════════════════════ -->
-  <div id="vigia-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);z-index:99999;align-items:center;justify-content:center;padding:20px;">
-    <div id="vigia-modal-box" style="background:#0e130f;border:3px solid #ef4444;border-radius:24px;width:100%;max-width:540px;padding:34px 26px;text-align:center;box-shadow:0 0 90px rgba(239,68,68,0.75);position:relative;">
-      <div style="font-size:56px;margin-bottom:12px;animation:pulse 0.8s infinite alternate;">🚨</div>
-      <div style="display:inline-block;background:rgba(239,68,68,0.2);border:1.5px solid #ef4444;color:#fca5a5;padding:4px 14px;border-radius:20px;font-size:11px;font-weight:800;letter-spacing:1px;margin-bottom:14px;text-transform:uppercase;">
-        Sistema de Ronda & Vigília Anti-Sono 24h
-      </div>
-      <h2 style="font-size:23px;font-weight:900;color:#fff;margin-bottom:10px;" id="vigia-head-text">CHECAGEM OBRIGATÓRIA DE PRESENÇA!</h2>
-      <p style="font-size:13.5px;color:#d1d5db;line-height:1.6;margin-bottom:20px;" id="vigia-desc-text">
-        Atenção operador no posto de comando! Desative o sinal de alerta para comprovar que se encontra <strong>acordado, vigilante e em operação na Central</strong>.
-      </p>
-      
-      <!-- Contador regressivo -->
-      <div style="margin-bottom:24px;">
-        <div id="vigia-countdown-circle" style="width:96px;height:96px;border-radius:50%;background:#180f0f;border:4px solid #ef4444;margin:0 auto;display:flex;align-items:center;justify-content:center;font-size:38px;font-weight:900;color:#ef4444;font-family:monospace;box-shadow:0 0 30px rgba(239,68,68,0.4);">
-          60
-        </div>
-        <div style="font-size:11.5px;color:#9ca3af;margin-top:8px;">segundos para registo de dormência ou ausência</div>
-      </div>
-
-      <!-- Botão de Confirmação -->
-      <button id="btn-vigia-confirm" onclick="confirmVigiaPresence()" style="width:100%;padding:18px;background:linear-gradient(135deg,#22c55e,#16a34a);border:none;border-radius:14px;color:#fff;font-size:16.5px;font-weight:900;letter-spacing:0.5px;cursor:pointer;box-shadow:0 8px 30px rgba(34,197,94,0.45);transition:transform 0.1s;">
-        ✋ ESTOU ACORDADO E NO POSTO
-      </button>
-
-      <!-- Banner de Falha Registada -->
-      <div id="vigia-fail-banner" style="display:none;margin-top:20px;background:#2d0a0a;border:1.5px solid #ef4444;border-radius:12px;padding:16px;color:#fca5a5;font-size:13px;line-height:1.5;text-align:left;">
-        <strong style="color:#fff;font-size:14px;">❌ FALHA DE VIGÍLIA REGISTADA NO SISTEMA!</strong><br>
-        O prazo limite de 60 segundos expirou sem confirmação. Ocorrência de <strong style="color:#ef4444;">operador adormecido ou posto abandonado</strong> foi gravada com carimbo de tempo e enviada para o relatório da Administração Geral.
-        <div style="margin-top:12px;text-align:right;">
-          <button onclick="resetVigiaAfterFail()" style="background:#ef4444;color:#fff;border:none;padding:9px 18px;border-radius:8px;font-weight:700;cursor:pointer;font-size:13px;">Retomar Operação do Turno</button>
-        </div>
-      </div>
-    </div>
-  </div>
-
+  </script>
 </body>
 </html>
