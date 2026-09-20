@@ -3,32 +3,49 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>GIRO Angola — Entrar & Pré-Cadastro</title>
-  
-  <meta name="theme-color" content="#070907">
+  <title>GIRO Angola — Entrar & Criar Conta</title>
+
+  <!-- PWA Meta Tags -->
+  <meta name="theme-color" content="#000000">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="GIRO">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
 
   <style>
+    /* ==========================================================================
+       GIRO ANGOLA — UNIFIED LUXURY DARK DESIGN SYSTEM (MATCHING INDEX & PASSENGER)
+       ========================================================================== */
     :root {
-      --bg: #070907;
-      --bg-card: #121613;
-      --bg-input: #1a221c;
+      --bg-dark: #000000;
+      --card-dark: #121212;
+      --card-inner: #1a1a1a;
+      --line: #262626;
+      --line-focus: #d4af37;
+      
       --gold: #d4af37;
       --gold-light: #f3cf65;
-      --green: #22c55e;
+      --gold-grad: linear-gradient(135deg, #d4af37 0%, #f3cf65 100%);
+      --gold-glow: rgba(212, 175, 55, 0.25);
+      
+      --green: #06C167;
       --red: #ef4444;
-      --text: #f8faf8;
-      --muted: #8d9e8d;
-      --border: rgba(212, 175, 55, 0.22);
-      --border-subtle: rgba(255, 255, 255, 0.08);
-      --radius: 16px;
+      --red-bg: rgba(239, 68, 68, 0.12);
+      
+      --wht: #ffffff;
+      --text-muted: #888888;
+      --text-sub: #aaaaaa;
+      
+      --radius-lg: 20px;
+      --radius-md: 14px;
+      --radius-sm: 10px;
+      
       --safe-top: env(safe-area-inset-top, 0px);
       --safe-bottom: env(safe-area-inset-bottom, 0px);
+      --font-system: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, system-ui, sans-serif;
     }
-    
+
     * {
       box-sizing: border-box;
       margin: 0;
@@ -37,44 +54,113 @@
       user-select: none;
       -webkit-user-select: none;
     }
-    
+
     input, select, textarea {
       user-select: auto;
       -webkit-user-select: auto;
+      font-family: inherit;
     }
-    
-    body {
-      background: var(--bg);
-      color: var(--text);
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, system-ui, sans-serif;
-      min-height: 100vh;
+
+    html, body {
+      min-height: 100%;
+      background: var(--bg-dark);
+      color: var(--wht);
+      font-family: var(--font-system);
       display: flex;
       flex-direction: column;
       justify-content: space-between;
       overscroll-behavior: none;
+      -webkit-font-smoothing: antialiased;
     }
 
-    .header {
-      padding: calc(var(--safe-top) + 28px) 20px 16px;
-      text-align: center;
+    /* Background Ambient Glow */
+    body::before {
+      content: '';
+      position: fixed;
+      top: -100px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 320px;
+      height: 280px;
+      background: radial-gradient(circle, rgba(212, 175, 55, 0.12) 0%, transparent 70%);
+      pointer-events: none;
+      z-index: 0;
     }
-    .brand-logo {
-      font-size: 42px;
+
+    /* Header & Branding */
+    .app-header {
+      padding: calc(var(--safe-top) + 20px) 20px 12px;
+      text-align: center;
+      position: relative;
+      z-index: 10;
+    }
+
+    .brand-wrap {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 8px;
+    }
+
+    .brand-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      background: #ffffff;
+      color: #000000;
       font-weight: 900;
-      letter-spacing: -1.5px;
-      color: var(--gold);
+      font-size: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 20px rgba(255, 255, 255, 0.2);
+      letter-spacing: -0.5px;
+    }
+
+    .brand-text {
+      text-align: left;
+    }
+
+    .brand-name {
+      font-size: 26px;
+      font-weight: 900;
+      letter-spacing: -0.04em;
+      color: var(--wht);
       line-height: 1;
     }
-    .brand-sub {
-      font-size: 11px;
-      letter-spacing: 4px;
-      color: var(--muted);
+
+    .brand-tagline {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      color: var(--gold);
       text-transform: uppercase;
-      margin-top: 6px;
-      font-weight: 600;
+      margin-top: 3px;
     }
 
-    .main-container {
+    .status-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--line);
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-top: 6px;
+    }
+
+    .status-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--green);
+      box-shadow: 0 0 8px var(--green);
+    }
+
+    /* Main Container */
+    .main-wrap {
       flex: 1;
       padding: 10px 20px 24px;
       max-width: 440px;
@@ -83,341 +169,658 @@
       display: flex;
       flex-direction: column;
       justify-content: center;
+      position: relative;
+      z-index: 10;
     }
 
+    /* Segmented Navigation Tab (Entrar vs Criar Conta) */
+    .tab-switcher {
+      display: flex;
+      background: #141414;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-md);
+      padding: 4px;
+      margin-bottom: 16px;
+      gap: 4px;
+    }
+
+    .tab-btn {
+      flex: 1;
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      font-size: 14px;
+      font-weight: 700;
+      padding: 11px 0;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+
+    .tab-btn.active {
+      background: #242424;
+      color: var(--wht);
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    /* Auth Card */
     .auth-card {
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
+      background: var(--card-dark);
+      border: 1px solid var(--line);
+      border-radius: var(--radius-lg);
       padding: 24px 20px;
-      box-shadow: 0 12px 36px rgba(0, 0, 0, 0.7);
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.85);
+      position: relative;
     }
 
-    .card-title {
+    .auth-card-title {
       font-size: 20px;
       font-weight: 800;
-      color: var(--text);
+      color: var(--wht);
+      letter-spacing: -0.02em;
       margin-bottom: 6px;
-    }
-    .card-desc {
-      font-size: 13px;
-      color: var(--muted);
-      margin-bottom: 20px;
-      line-height: 1.4;
+      display: flex;
+      align-items: center;
+      gap: 8px;
     }
 
-    .form-group {
+    .auth-card-desc {
+      font-size: 13px;
+      color: var(--text-muted);
+      line-height: 1.45;
+      margin-bottom: 20px;
+    }
+
+    /* Alert / Error Box */
+    .alert-box {
+      background: var(--red-bg);
+      border: 1px solid rgba(239, 68, 68, 0.35);
+      color: #fca5a5;
+      padding: 12px 14px;
+      border-radius: var(--radius-sm);
+      font-size: 13px;
+      line-height: 1.4;
+      margin-bottom: 16px;
+      display: none;
+      animation: fadeIn 0.2s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Form Fields */
+    .field-group {
       margin-bottom: 16px;
     }
-    .form-label {
-      display: block;
+
+    .field-label {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
       font-size: 11px;
       font-weight: 700;
       text-transform: uppercase;
-      letter-spacing: 0.6px;
-      color: var(--muted);
-      margin-bottom: 6px;
+      letter-spacing: 0.8px;
+      color: var(--text-sub);
+      margin-bottom: 8px;
     }
 
-    .input-control {
+    .input-box {
       width: 100%;
-      background: var(--bg-input);
-      border: 1px solid var(--border-subtle);
-      border-radius: 12px;
-      padding: 14px 14px;
-      font-size: 15px;
-      color: var(--text);
+      background: var(--card-inner);
+      border: 1px solid var(--line);
+      border-radius: var(--radius-md);
+      padding: 15px 14px;
+      font-size: 16px;
+      color: var(--wht);
       outline: none;
-      transition: border-color 0.2s;
-    }
-    .input-control:focus {
-      border-color: var(--gold);
+      transition: all 0.2s ease;
+      box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.4);
     }
 
-    .phone-row {
+    .input-box:focus {
+      border-color: var(--gold);
+      box-shadow: 0 0 0 1px var(--gold), inset 0 2px 4px rgba(0, 0, 0, 0.4);
+    }
+
+    .input-box::placeholder {
+      color: #555555;
+    }
+
+    /* Angolan Phone Group */
+    .phone-group {
       display: flex;
       gap: 8px;
     }
-    .phone-prefix {
-      background: var(--bg-input);
-      border: 1px solid var(--border-subtle);
-      border-radius: 12px;
-      padding: 14px 10px;
-      font-size: 15px;
-      font-weight: 700;
-      color: var(--gold);
+
+    .phone-code {
+      background: var(--card-inner);
+      border: 1px solid var(--line);
+      border-radius: var(--radius-md);
+      padding: 0 12px;
       display: flex;
       align-items: center;
-      justify-content: center;
-      min-width: 86px;
+      gap: 6px;
+      font-size: 15px;
+      font-weight: 800;
+      color: var(--gold);
+      flex-shrink: 0;
+      letter-spacing: 0.5px;
     }
 
-    .role-selector {
+    /* Role Selector Cards */
+    .role-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 10px;
-      margin-bottom: 20px;
+      margin-bottom: 22px;
     }
-    .role-btn {
-      background: var(--bg-input);
-      border: 2px solid var(--border-subtle);
-      border-radius: 12px;
-      padding: 14px 10px;
-      text-align: center;
+
+    .role-card {
+      background: var(--card-inner);
+      border: 2px solid var(--line);
+      border-radius: var(--radius-md);
+      padding: 14px 12px;
       cursor: pointer;
-      transition: all 0.2s;
+      transition: all 0.2s ease;
       display: flex;
       flex-direction: column;
       align-items: center;
+      text-align: center;
       gap: 4px;
-    }
-    .role-btn.active {
-      border-color: var(--gold);
-      background: rgba(212, 175, 55, 0.12);
-    }
-    .role-btn .r-icon {
-      font-size: 24px;
-    }
-    .role-btn .r-title {
-      font-size: 13px;
-      font-weight: 700;
-      color: var(--text);
-    }
-    .role-btn.active .r-title {
-      color: var(--gold);
-    }
-    .role-btn .r-sub {
-      font-size: 10px;
-      color: var(--muted);
+      position: relative;
     }
 
-    .btn-main {
-      width: 100%;
-      background: linear-gradient(135deg, var(--gold), var(--gold-light));
+    .role-card:active {
+      transform: scale(0.97);
+    }
+
+    .role-card.active {
+      border-color: var(--gold);
+      background: rgba(212, 175, 55, 0.1);
+      box-shadow: 0 0 16px rgba(212, 175, 55, 0.15);
+    }
+
+    .role-card-badge {
+      position: absolute;
+      top: 6px;
+      right: 6px;
+      background: var(--green);
       color: #000;
-      font-size: 16px;
+      font-size: 9px;
       font-weight: 800;
+      padding: 2px 5px;
+      border-radius: 6px;
+      line-height: 1;
+    }
+
+    .role-icon {
+      font-size: 26px;
+      margin-bottom: 2px;
+    }
+
+    .role-title {
+      font-size: 14px;
+      font-weight: 800;
+      color: var(--wht);
+      letter-spacing: -0.01em;
+    }
+
+    .role-card.active .role-title {
+      color: var(--gold);
+    }
+
+    .role-subtitle {
+      font-size: 11px;
+      color: var(--text-muted);
+      line-height: 1.3;
+    }
+
+    /* Primary CTA Button */
+    .btn-submit {
+      width: 100%;
+      height: 52px;
+      background: var(--gold-grad);
+      color: #000000;
+      font-size: 16px;
+      font-weight: 900;
+      letter-spacing: -0.01em;
       border: none;
-      border-radius: 12px;
-      padding: 16px;
+      border-radius: var(--radius-md);
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 8px;
-      box-shadow: 0 4px 20px rgba(212, 175, 55, 0.3);
+      gap: 10px;
+      box-shadow: 0 6px 24px var(--gold-glow);
+      transition: all 0.2s ease;
+      position: relative;
+      overflow: hidden;
     }
-    .btn-main:active {
+
+    .btn-submit:active {
       transform: scale(0.98);
-      opacity: 0.85;
+      opacity: 0.9;
     }
 
-    .alert-box {
-      background: rgba(239, 68, 68, 0.12);
-      border: 1px solid rgba(239, 68, 68, 0.3);
-      color: #fca5a5;
-      padding: 10px 12px;
-      border-radius: 10px;
-      font-size: 12px;
-      margin-bottom: 14px;
-      display: none;
+    .btn-submit:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
     }
 
-    .footer-links {
+    /* Sub Links */
+    .footer-help {
       margin-top: 18px;
       text-align: center;
       font-size: 12px;
-      color: var(--muted);
+      color: var(--text-muted);
       display: flex;
       flex-direction: column;
-      gap: 8px;
+      gap: 10px;
+      line-height: 1.4;
     }
-    .footer-links a {
+
+    .footer-help a {
       color: var(--gold);
       text-decoration: none;
-      font-weight: 600;
+      font-weight: 700;
     }
-    .footer-links a:hover {
+
+    .footer-help a:hover {
       text-decoration: underline;
     }
 
-    .benefits-strip {
-      display: flex;
-      justify-content: space-around;
+    /* Trust & Value Bar (Bottom) */
+    .trust-strip {
       padding: 14px 20px calc(var(--safe-bottom) + 14px);
-      background: rgba(18, 22, 19, 0.6);
-      border-top: 1px solid rgba(255, 255, 255, 0.05);
-      font-size: 11px;
-      color: var(--muted);
+      background: #0d0d0d;
+      border-top: 1px solid var(--line);
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 10px;
       text-align: center;
+      font-size: 11px;
+      position: relative;
+      z-index: 10;
     }
-    .benefit-item span {
+
+    .trust-item b {
       display: block;
       color: var(--gold);
-      font-weight: 700;
+      font-weight: 800;
       font-size: 12px;
+      margin-bottom: 2px;
+    }
+
+    .trust-item span {
+      color: var(--text-muted);
+      font-size: 10px;
+      line-height: 1.2;
+    }
+
+    /* Mode Switching Form Display */
+    .mode-form {
+      display: none;
+    }
+    .mode-form.active {
+      display: block;
     }
   </style>
 </head>
 <body>
 
-  <!-- Top Branding -->
-  <div class="header">
-    <div class="brand-logo">GIRO</div>
-    <div class="brand-sub">Angola · Mobilidade & Carga</div>
-  </div>
+  <!-- Top App Branding -->
+  <header class="app-header">
+    <div class="brand-wrap">
+      <div class="brand-icon">G</div>
+      <div class="brand-text">
+        <div class="brand-name">GIRO</div>
+        <div class="brand-tagline">Angola · Mobilidade & Carga</div>
+      </div>
+    </div>
+    <div>
+      <div class="status-chip">
+        <span class="status-dot"></span>
+        <span>Rede Nacional · 18 Províncias Online</span>
+      </div>
+    </div>
+  </header>
 
-  <!-- Main Auth Container -->
-  <div class="main-container">
+  <!-- Main Card Container -->
+  <main class="main-wrap">
+    
+    <!-- Tab Switcher: Entrar vs Criar Conta -->
+    <div class="tab-switcher">
+      <button class="tab-btn active" id="tab-login" onclick="switchMode('login')">
+        <span>🔑 Já Tenho Conta</span>
+      </button>
+      <button class="tab-btn" id="tab-register" onclick="switchMode('register')">
+        <span>✨ Novo Usuário</span>
+      </button>
+    </div>
+
+    <!-- Auth Card -->
     <div class="auth-card">
-      <div class="card-title">Pré-Cadastro & Entrada 👋</div>
-      <div class="card-desc">Introduza os seus dados para aceder imediatamente à plataforma.</div>
 
       <div id="auth-alert" class="alert-box"></div>
 
-      <!-- Full Name -->
-      <div class="form-group">
-        <label class="form-label">Nome Completo</label>
-        <input class="input-control" id="inp-name" type="text" placeholder="Ex: Isaac Carvalho" autocomplete="name">
-      </div>
+      <!-- ================= FORMULÁRIO 1: ENTRAR (LOGIN) ================= -->
+      <div id="form-login" class="mode-form active">
+        <div class="auth-card-title">
+          <span>Bem-vindo de volta</span> 👋
+        </div>
+        <div class="auth-card-desc">
+          Introduza o seu telemóvel para aceder diretamente à sua conta.
+        </div>
 
-      <!-- Phone -->
-      <div class="form-group">
-        <label class="form-label">Número de Telemóvel (Angola)</label>
-        <div class="phone-row">
-          <div class="phone-prefix">🇦🇴 +244</div>
-          <input class="input-control" id="inp-phone" type="tel" inputmode="numeric" placeholder="9XX XXX XXX" maxlength="9" autocomplete="tel-national">
+        <div class="field-group">
+          <label class="field-label" for="login-phone">
+            <span>Número de Telemóvel</span>
+            <span style="color:var(--gold); font-size:10px;">Angola (Unitel/Africell/Movicel)</span>
+          </label>
+          <div class="phone-group">
+            <div class="phone-code">🇦🇴 +244</div>
+            <input class="input-box" id="login-phone" type="tel" inputmode="numeric" placeholder="9XX XXX XXX" maxlength="11" autocomplete="tel-national">
+          </div>
+        </div>
+
+        <div class="field-group">
+          <label class="field-label">Aceder Como</label>
+          <div class="role-grid">
+            <div class="role-card active" id="login-role-pax" onclick="selectLoginRole('passageiro')">
+              <div class="role-icon">🧑‍💼</div>
+              <div class="role-title">Passageiro</div>
+              <div class="role-subtitle">Viagens & Carga</div>
+            </div>
+            <div class="role-card" id="login-role-driver" onclick="selectLoginRole('motorista')">
+              <div class="role-card-badge">10%</div>
+              <div class="role-icon">🚗</div>
+              <div class="role-title">Motorista</div>
+              <div class="role-subtitle">Receber Corridas</div>
+            </div>
+          </div>
+        </div>
+
+        <button class="btn-submit" id="btn-login-submit" onclick="handleLogin()">
+          <span>Entrar no GIRO</span>
+          <span style="font-size:18px;">➔</span>
+        </button>
+
+        <div class="footer-help">
+          <div>Ainda não tem conta? <a href="javascript:void(0)" onclick="switchMode('register')">Criar conta em 10 segundos</a></div>
+          <div>Motorista parceiro com viatura? <a href="cadastro-motorista.html">Registo Oficial de Motorista</a></div>
         </div>
       </div>
 
-      <!-- Role Selector -->
-      <label class="form-label">Como deseja utilizar?</label>
-      <div class="role-selector">
-        <div class="role-btn active" id="btn-role-pax" onclick="selectRole('passageiro')">
-          <div class="r-icon">🧑‍💼</div>
-          <div class="r-title">Passageiro</div>
-          <div class="r-sub">Pedir viagens e entregas</div>
+      <!-- ================= FORMULÁRIO 2: CRIAR CONTA (PRÉ-CADASTRO) ================= -->
+      <div id="form-register" class="mode-form">
+        <div class="auth-card-title">
+          <span>Criar Nova Conta</span> 🚀
         </div>
-        <div class="role-btn" id="btn-role-driver" onclick="selectRole('motorista')">
-          <div class="r-icon">🚗</div>
-          <div class="r-title">Motorista</div>
-          <div class="r-sub">Conduzir (10% comissão)</div>
+        <div class="auth-card-desc">
+          Registo simplificado e imediato para começar a viajar ou faturar.
+        </div>
+
+        <!-- Nome Completo -->
+        <div class="field-group">
+          <label class="field-label" for="reg-name">Nome Completo</label>
+          <input class="input-box" id="reg-name" type="text" placeholder="Ex: Isaac Carvalho" autocomplete="name">
+        </div>
+
+        <!-- Telefone -->
+        <div class="field-group">
+          <label class="field-label" for="reg-phone">
+            <span>Número de Telemóvel</span>
+            <span style="color:var(--gold); font-size:10px;">🇦🇴 +244</span>
+          </label>
+          <div class="phone-group">
+            <div class="phone-code">🇦🇴 +244</div>
+            <input class="input-box" id="reg-phone" type="tel" inputmode="numeric" placeholder="9XX XXX XXX" maxlength="11" autocomplete="tel-national">
+          </div>
+        </div>
+
+        <!-- Tipo de Conta -->
+        <div class="field-group">
+          <label class="field-label">Tipo de Perfil</label>
+          <div class="role-grid">
+            <div class="role-card active" id="reg-role-pax" onclick="selectRegRole('passageiro')">
+              <div class="role-icon">🧑‍💼</div>
+              <div class="role-title">Passageiro</div>
+              <div class="role-subtitle">Pedir viagens e entregas</div>
+            </div>
+            <div class="role-card" id="reg-role-driver" onclick="selectRegRole('motorista')">
+              <div class="role-card-badge">10%</div>
+              <div class="role-icon">🚗</div>
+              <div class="role-title">Motorista</div>
+              <div class="role-subtitle">Conduzir e lucrar mais</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Botão Criar -->
+        <button class="btn-submit" id="btn-reg-submit" onclick="handleRegister()">
+          <span>Registar & Aceder</span>
+          <span style="font-size:18px;">➔</span>
+        </button>
+
+        <div class="footer-help">
+          <div>Já tem conta registada? <a href="javascript:void(0)" onclick="switchMode('login')">Aceder com o telemóvel</a></div>
+          <div>Ao registar-se concorda com os <a href="termos.html">Termos</a> e a <a href="privacidade.html">Privacidade</a> da GIRO Angola.</div>
         </div>
       </div>
 
-      <!-- Submit Button -->
-      <button class="btn-main" onclick="handlePreRegister()">
-        <span>🚀 Continuar para o GIRO</span>
-      </button>
+    </div>
+  </main>
 
-      <!-- Sub Links -->
-      <div class="footer-links">
-        <div>Precisa de cadastro completo com viatura? <a href="cadastro-motorista.html">Registo de Parceiro</a></div>
-        <div>Ao continuar, concorda com os <a href="termos.html">Termos de Uso</a> e <a href="privacidade.html">Privacidade</a>.</div>
-      </div>
+  <!-- Bottom Fast Trust Stats -->
+  <footer class="trust-strip">
+    <div class="trust-item">
+      <b>10% Taxa Fixa</b>
+      <span>Mais lucro p/ motorista</span>
     </div>
-  </div>
-
-  <!-- Bottom Fast Info -->
-  <div class="benefits-strip">
-    <div class="benefit-item">
-      <span>10% Fixos</span>
-      Comissão Motorista
+    <div class="trust-item">
+      <b>100% Kwanza</b>
+      <span>Tarifas sem surpresa</span>
     </div>
-    <div class="benefit-item">
-      <span>Kz Sem Surpresas</span>
-      Preço Transparente
+    <div class="trust-item">
+      <b>Central 24h</b>
+      <span>Segurança integrada</span>
     </div>
-    <div class="benefit-item">
-      <span>24h Luanda</span>
-      Segurança Integrada
-    </div>
-  </div>
+  </footer>
 
   <script>
     const GIRO_SESSION_KEY = 'giro_session';
-    let selectedRole = 'passageiro';
+    let currentMode = 'login'; // 'login' | 'register'
+    let loginRole = 'passageiro';
+    let regRole = 'passageiro';
 
-    // Se já estiver logado, entra direto
-    (function autoRedirectIfLoggedIn() {
+    // Auto-redirecionamento se já houver sessão ativa
+    (function checkExistingSession() {
       try {
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.has('logout')) {
+          localStorage.removeItem(GIRO_SESSION_KEY);
+          return;
+        }
+
         const raw = localStorage.getItem(GIRO_SESSION_KEY);
         if (raw) {
-          const s = JSON.parse(raw);
-          if (s && s.phone) {
-            // Se veio especificamente com ?force_login=1, não redireciona
-            const urlParams = new URLSearchParams(window.location.search);
-            if (!urlParams.has('logout') && !urlParams.has('force')) {
-              window.location.replace(s.role === 'motorista' ? 'driver.html' : 'index.html');
+          const session = JSON.parse(raw);
+          if (session && session.phone) {
+            // Se veio com ?force=1, não faz auto-redirect
+            if (!urlParams.has('force')) {
+              window.location.replace(session.role === 'motorista' ? 'driver.html' : 'index.html');
+              return;
+            } else {
+              // Preenche campos se veio com force
+              const p = (session.rawPhone || session.phone.replace('+244', '')).trim();
+              if (document.getElementById('login-phone')) document.getElementById('login-phone').value = p;
+              if (document.getElementById('reg-name') && session.nome) document.getElementById('reg-name').value = session.nome;
+              if (document.getElementById('reg-phone')) document.getElementById('reg-phone').value = p;
             }
           }
         }
       } catch (e) {}
     })();
 
-    function selectRole(role) {
-      selectedRole = role;
-      document.getElementById('btn-role-pax').classList.toggle('active', role === 'passageiro');
-      document.getElementById('btn-role-driver').classList.toggle('active', role === 'motorista');
+    // Alternar entre Abas (Entrar / Novo Usuário)
+    function switchMode(mode) {
+      currentMode = mode;
+      showAlert('');
+      
+      document.getElementById('tab-login').classList.toggle('active', mode === 'login');
+      document.getElementById('tab-register').classList.toggle('active', mode === 'register');
+      
+      document.getElementById('form-login').classList.toggle('active', mode === 'login');
+      document.getElementById('form-register').classList.toggle('active', mode === 'register');
     }
 
+    // Seletores de Perfil
+    function selectLoginRole(role) {
+      loginRole = role;
+      document.getElementById('login-role-pax').classList.toggle('active', role === 'passageiro');
+      document.getElementById('login-role-driver').classList.toggle('active', role === 'motorista');
+    }
+
+    function selectRegRole(role) {
+      regRole = role;
+      document.getElementById('reg-role-pax').classList.toggle('active', role === 'passageiro');
+      document.getElementById('reg-role-driver').classList.toggle('active', role === 'motorista');
+    }
+
+    // Mensagens de Alerta
     function showAlert(msg) {
       const el = document.getElementById('auth-alert');
       if (!msg) {
         el.style.display = 'none';
+        el.textContent = '';
         return;
       }
       el.textContent = msg;
       el.style.display = 'block';
+      el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
+    // Validador de Telemóvel Angolano (9 dígitos iniciando por 9)
+    function cleanPhone(num) {
+      return (num || '').replace(/\D/g, '');
     }
 
     function validatePhone(v) {
-      return /^9[1-9][0-9]{7}$/.test(v.replace(/\s/g, ''));
+      const c = cleanPhone(v);
+      return /^9[0-9]{8}$/.test(c);
     }
 
-    function handlePreRegister() {
-      const name = document.getElementById('inp-name').value.trim();
-      const phone = document.getElementById('inp-phone').value.replace(/\s/g, '');
+    // Máscara Automática de Digitação para Telemóvel
+    function attachPhoneMask(inputEl) {
+      if (!inputEl) return;
+      inputEl.addEventListener('input', function(e) {
+        let v = cleanPhone(e.target.value);
+        if (v.length > 9) v = v.slice(0, 9);
+        
+        // Formato: 9XX XXX XXX
+        let formatted = v;
+        if (v.length > 3 && v.length <= 6) {
+          formatted = v.slice(0, 3) + ' ' + v.slice(3);
+        } else if (v.length > 6) {
+          formatted = v.slice(0, 3) + ' ' + v.slice(3, 6) + ' ' + v.slice(6);
+        }
+        e.target.value = formatted;
+      });
+    }
 
-      if (!name || name.length < 2) {
-        showAlert('Por favor, introduza o seu nome.');
-        document.getElementById('inp-name').focus();
-        return;
-      }
+    attachPhoneMask(document.getElementById('login-phone'));
+    attachPhoneMask(document.getElementById('reg-phone'));
 
-      if (!phone || !validatePhone(phone)) {
+    // Ação: Login
+    function handleLogin() {
+      const phoneInput = document.getElementById('login-phone');
+      const rawDigits = cleanPhone(phoneInput.value);
+
+      if (!validatePhone(rawDigits)) {
         showAlert('Introduza um número de telemóvel angolano válido (ex: 923 456 789).');
-        document.getElementById('inp-phone').focus();
+        phoneInput.focus();
         return;
       }
 
       showAlert('');
 
-      // Salva sessão local pré-cadastro
-      const userSession = {
+      // Recupera ou cria sessão rápida
+      let existingName = 'Utilizador GIRO';
+      try {
+        const prev = JSON.parse(localStorage.getItem(GIRO_SESSION_KEY) || '{}');
+        if (prev && prev.nome) existingName = prev.nome;
+      } catch (e) {}
+
+      const session = {
+        nome: existingName,
+        phone: '+244' + rawDigits,
+        rawPhone: rawDigits,
+        role: loginRole,
+        loginAt: new Date().toISOString(),
+        ts: Date.now()
+      };
+
+      localStorage.setItem(GIRO_SESSION_KEY, JSON.stringify(session));
+
+      const btn = document.getElementById('btn-login-submit');
+      btn.innerHTML = '<span>A autenticar...</span>';
+      btn.disabled = true;
+
+      setTimeout(() => {
+        window.location.href = loginRole === 'motorista' ? 'driver.html' : 'index.html';
+      }, 350);
+    }
+
+    // Ação: Registo / Novo Cadastro
+    function handleRegister() {
+      const nameInput = document.getElementById('reg-name');
+      const phoneInput = document.getElementById('reg-phone');
+      
+      const name = nameInput.value.trim();
+      const rawDigits = cleanPhone(phoneInput.value);
+
+      if (!name || name.length < 2) {
+        showAlert('Por favor, introduza o seu nome completo.');
+        nameInput.focus();
+        return;
+      }
+
+      if (!validatePhone(rawDigits)) {
+        showAlert('Introduza um número de telemóvel angolano válido (ex: 923 456 789).');
+        phoneInput.focus();
+        return;
+      }
+
+      showAlert('');
+
+      const session = {
         nome: name,
-        phone: '+244' + phone,
-        rawPhone: phone,
-        role: selectedRole,
+        phone: '+244' + rawDigits,
+        rawPhone: rawDigits,
+        role: regRole,
         registeredAt: new Date().toISOString(),
         ts: Date.now()
       };
 
-      localStorage.setItem(GIRO_SESSION_KEY, JSON.stringify(userSession));
+      localStorage.setItem(GIRO_SESSION_KEY, JSON.stringify(session));
 
-      // Feedback visual rápido
-      const btn = document.querySelector('.btn-main');
-      btn.innerHTML = '<span>⏳ A entrar...</span>';
-      btn.style.opacity = '0.8';
+      const btn = document.getElementById('btn-reg-submit');
+      btn.innerHTML = '<span>A criar conta...</span>';
       btn.disabled = true;
 
       setTimeout(() => {
-        if (selectedRole === 'motorista') {
-          window.location.href = 'driver.html';
-        } else {
-          window.location.href = 'index.html';
-        }
-      }, 400);
+        window.location.href = regRole === 'motorista' ? 'driver.html' : 'index.html';
+      }, 350);
     }
   </script>
 </body>
