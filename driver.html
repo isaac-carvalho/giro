@@ -1,6 +1,26 @@
 <!DOCTYPE html>
 <html lang="pt">
 <head>
+<script>
+// Auth Guard Motorista: Garante sessão ativa
+(function checkGiroDriverAuth() {
+  const GIRO_SESSION_KEY = 'giro_session';
+  try {
+    const raw = localStorage.getItem(GIRO_SESSION_KEY);
+    if (!raw) {
+      window.location.replace('login.html');
+      return;
+    }
+    const session = JSON.parse(raw);
+    if (!session || !session.phone) {
+      window.location.replace('login.html');
+      return;
+    }
+  } catch (e) {
+    window.location.replace('login.html');
+  }
+})();
+</script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>GIRO Motorista Parceiro | Luanda</title>

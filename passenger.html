@@ -1,6 +1,26 @@
 <!DOCTYPE html>
 <html lang="pt-AO">
 <head>
+<script>
+// Auth Guard: Garante que utilizadores sem sessão passem pelo Pré-Cadastro / Login
+(function checkGiroAuth() {
+  const GIRO_SESSION_KEY = 'giro_session';
+  try {
+    const raw = localStorage.getItem(GIRO_SESSION_KEY);
+    if (!raw) {
+      window.location.replace('login.html');
+      return;
+    }
+    const session = JSON.parse(raw);
+    if (!session || !session.phone) {
+      window.location.replace('login.html');
+      return;
+    }
+  } catch (e) {
+    window.location.replace('login.html');
+  }
+})();
+</script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>GIRO — Viagens, Entregas & Carga em Angola</title>

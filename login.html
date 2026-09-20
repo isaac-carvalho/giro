@@ -1,396 +1,424 @@
 <!DOCTYPE html>
-<html lang="pt">
+<html lang="pt-AO">
 <head>
-  <title>GIRO — Entrar</title>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>GIRO Angola — Entrar & Pré-Cadastro</title>
+  
   <meta name="theme-color" content="#070907">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+
   <style>
-    :root{--bg:#070907;--bg2:#0f1410;--bg3:#1a211b;--gold:#d4af37;--gold2:#f0c040;--green:#22c55e;--green2:#16a34a;--red:#ef4444;--text:#f1f5f1;--muted:#8d9e8d;--border:rgba(212,175,55,0.18);--card:rgba(255,255,255,0.04);--radius:16px;--shadow:0 4px 24px rgba(0,0,0,0.6);}
-    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
-    html,body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;min-height:100vh;-webkit-font-smoothing:antialiased;}
-    a{color:var(--gold);text-decoration:none;}a:hover{text-decoration:underline;}
-    .auth-wrapper{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding:24px 16px 48px;}
-    .auth-logo{margin-bottom:24px;text-align:center;}
-    .auth-logo .logo-g{font-size:48px;font-weight:900;color:var(--gold);letter-spacing:-2px;line-height:1;}
-    .auth-logo .logo-sub{font-size:11px;letter-spacing:4px;color:var(--muted);text-transform:uppercase;}
-    .auth-card{width:100%;max-width:420px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:28px 24px 32px;box-shadow:var(--shadow);}
-    .auth-title{font-size:20px;font-weight:700;color:var(--text);margin-bottom:6px;}
-    .auth-subtitle{font-size:13px;color:var(--muted);margin-bottom:28px;}
-    .progress-bar-wrap{display:flex;gap:6px;margin-bottom:24px;}
-    .progress-bar-wrap .step-dot{flex:1;height:4px;border-radius:2px;background:var(--bg3);transition:background .3s;}
-    .progress-bar-wrap .step-dot.active{background:var(--gold);}
-    .progress-bar-wrap .step-dot.done{background:var(--green);}
-    .step-label{font-size:11px;color:var(--muted);margin-bottom:20px;}
-    .form-group{margin-bottom:16px;}
-    .form-label{display:block;font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:7px;}
-    .form-control{width:100%;background:var(--bg3);border:1px solid rgba(255,255,255,.1);border-radius:10px;color:var(--text);font-size:15px;padding:12px 14px;outline:none;transition:border-color .2s;-webkit-appearance:none;}
-    .form-control:focus{border-color:var(--gold);}
-    .form-control.error{border-color:var(--red);}
-    .form-control.ok{border-color:var(--green);}
-    .form-hint{font-size:11px;color:var(--muted);margin-top:5px;}
-    .form-hint.err{color:var(--red);}
-    .form-hint.suc{color:var(--green);}
-    .phone-row{display:flex;gap:8px;}
-    .phone-prefix{background:var(--bg3);border:1px solid rgba(255,255,255,.1);border-radius:10px;color:var(--gold);font-size:15px;padding:12px 10px;min-width:80px;text-align:center;font-weight:700;}
-    .pw-wrap{position:relative;}
-    .pw-wrap .form-control{padding-right:44px;}
-    .pw-eye{position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--muted);font-size:18px;padding:0;line-height:1;}
-    .otp-row{display:flex;gap:10px;justify-content:center;}
-    .otp-input{width:44px;height:54px;background:var(--bg3);border:1px solid rgba(255,255,255,.1);border-radius:10px;color:var(--text);font-size:22px;font-weight:700;text-align:center;outline:none;transition:border-color .2s;-webkit-appearance:none;}
-    .otp-input:focus{border-color:var(--gold);}
-    .strength-bar{display:flex;gap:4px;margin-top:8px;}
-    .strength-bar span{flex:1;height:4px;border-radius:2px;background:var(--bg3);transition:background .3s;}
-    .strength-label{font-size:11px;margin-top:5px;color:var(--muted);}
-    .btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:14px;border:none;border-radius:10px;font-size:15px;font-weight:700;cursor:pointer;transition:opacity .2s,transform .1s;-webkit-appearance:none;}
-    .btn:active{transform:scale(.98);}
-    .btn-gold{background:linear-gradient(135deg,var(--gold),var(--gold2));color:#000;}
-    .btn-green{background:linear-gradient(135deg,var(--green),var(--green2));color:#fff;}
-    .btn-outline{background:transparent;border:1px solid var(--border);color:var(--text);margin-top:10px;}
-    .btn:disabled{opacity:.45;cursor:not-allowed;}
-    .btn-sm{padding:10px 16px;font-size:13px;width:auto;border-radius:8px;}
-    .nav-btns{display:flex;gap:10px;margin-top:20px;}
-    .nav-btns .btn{margin-top:0;}
-    .upload-box{border:2px dashed rgba(212,175,55,.3);border-radius:12px;padding:18px 12px;text-align:center;cursor:pointer;transition:border-color .2s,background .2s;position:relative;}
-    .upload-box:hover,.upload-box.drag{border-color:var(--gold);background:rgba(212,175,55,.04);}
-    .upload-box input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;}
-    .upload-box .up-icon{font-size:28px;margin-bottom:6px;}
-    .upload-box .up-label{font-size:13px;color:var(--muted);}
-    .upload-box .up-label strong{color:var(--gold);}
-    .upload-preview{margin-top:8px;border-radius:8px;overflow:hidden;max-height:120px;display:none;}
-    .upload-preview img{width:100%;object-fit:cover;max-height:120px;}
-    .check-group{display:flex;align-items:flex-start;gap:12px;margin-bottom:14px;}
-    .check-group input[type=checkbox]{width:20px;height:20px;accent-color:var(--gold);flex-shrink:0;margin-top:2px;cursor:pointer;}
-    .check-group label{font-size:13px;color:var(--muted);cursor:pointer;line-height:1.5;}
-    .divider{display:flex;align-items:center;gap:12px;margin:20px 0;}
-    .divider::before,.divider::after{content:'';flex:1;height:1px;background:rgba(255,255,255,.08);}
-    .divider span{font-size:12px;color:var(--muted);white-space:nowrap;}
-    .alert{padding:12px 14px;border-radius:10px;font-size:13px;margin-bottom:16px;display:none;}
-    .alert.err{background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.3);color:#fca5a5;}
-    .alert.suc{background:rgba(34,197,94,.12);border:1px solid rgba(34,197,94,.3);color:#86efac;}
-    .alert.info{background:rgba(212,175,55,.10);border:1px solid rgba(212,175,55,.3);color:var(--gold2);}
-    .step-pane{display:none;}
-    .step-pane.active{display:block;}
-    .success-screen{text-align:center;padding:32px 0;}
-    .success-screen .big-icon{font-size:64px;margin-bottom:16px;}
-    .success-screen h2{font-size:22px;font-weight:800;margin-bottom:10px;}
-    .success-screen p{font-size:14px;color:var(--muted);line-height:1.6;}
-    .success-screen .badge-pending{display:inline-block;margin-top:16px;padding:8px 18px;border-radius:20px;background:rgba(212,175,55,.12);border:1px solid var(--border);color:var(--gold);font-size:13px;font-weight:600;}
-    .resend-row{text-align:center;margin-top:16px;font-size:13px;color:var(--muted);}
-    .resend-btn{color:var(--gold);font-weight:600;cursor:pointer;background:none;border:none;font-size:13px;}
-    .resend-btn:disabled{color:var(--muted);cursor:default;}
-    .role-cards{display:flex;gap:12px;margin-top:20px;}
-    .role-card{flex:1;padding:18px 12px;border-radius:12px;border:2px solid rgba(255,255,255,.08);background:var(--bg3);text-align:center;cursor:pointer;transition:border-color .2s,background .2s;}
-    .role-card:hover{border-color:var(--gold);}
-    .role-card .rc-icon{font-size:34px;margin-bottom:10px;}
-    .role-card .rc-label{font-size:14px;font-weight:700;}
-    .role-card .rc-desc{font-size:11px;color:var(--muted);margin-top:4px;}
-    .auth-links{margin-top:20px;text-align:center;font-size:13px;color:var(--muted);}
-    .auth-links a{font-weight:600;}
-    .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
-    @media(max-width:380px){.grid-2{grid-template-columns:1fr;}}
-    .pill-skip{display:inline-block;margin-top:4px;padding:4px 12px;border-radius:20px;background:var(--bg3);border:1px solid rgba(255,255,255,.08);font-size:12px;color:var(--muted);cursor:pointer;}
-    .pill-skip:hover{border-color:var(--gold);color:var(--gold);}
-    .veh-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
-    .veh-btn{padding:10px 8px;border-radius:8px;border:1px solid rgba(255,255,255,.08);background:var(--bg3);color:var(--text);font-size:13px;cursor:pointer;transition:border-color .2s;}
-    .veh-btn.selected{border-color:var(--gold);background:rgba(212,175,55,.08);color:var(--gold);}
-    .kyc-info{background:rgba(212,175,55,.07);border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-bottom:16px;font-size:12px;color:var(--gold2);line-height:1.6;}
-    .doc-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
-    @media(max-width:380px){.doc-grid{grid-template-columns:1fr;}}
-    .earnings-box{background:var(--bg3);border-radius:12px;padding:16px;margin-bottom:18px;text-align:center;}
-    .earnings-box .earn-val{font-size:28px;font-weight:900;color:var(--green);}
-    .earnings-box .earn-sub{font-size:12px;color:var(--muted);margin-top:4px;}
-
-    /* === PWA Angola-first globals === */
-    * { -webkit-tap-highlight-color: transparent; user-select: none; -webkit-user-select: none; }
-    input, textarea, select { user-select: text; -webkit-user-select: text; }
-    body { overscroll-behavior: none; }
-    * { scrollbar-width: none; }
-    *::-webkit-scrollbar { display: none; }
-
-    /* Fullscreen layout override */
-    .auth-wrapper {
+    :root {
+      --bg: #070907;
+      --bg-card: #121613;
+      --bg-input: #1a221c;
+      --gold: #d4af37;
+      --gold-light: #f3cf65;
+      --green: #22c55e;
+      --red: #ef4444;
+      --text: #f8faf8;
+      --muted: #8d9e8d;
+      --border: rgba(212, 175, 55, 0.22);
+      --border-subtle: rgba(255, 255, 255, 0.08);
+      --radius: 16px;
+      --safe-top: env(safe-area-inset-top, 0px);
+      --safe-bottom: env(safe-area-inset-bottom, 0px);
+    }
+    
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+    
+    input, select, textarea {
+      user-select: auto;
+      -webkit-user-select: auto;
+    }
+    
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, system-ui, sans-serif;
       min-height: 100vh;
       display: flex;
       flex-direction: column;
-      padding: 0;
-      background: #070907;
-      align-items: stretch !important;
-      justify-content: flex-start !important;
+      justify-content: space-between;
+      overscroll-behavior: none;
     }
-    .auth-card {
-      background: transparent !important;
-      border: none !important;
-      box-shadow: none !important;
-      border-radius: 0 !important;
-      padding: 24px 20px !important;
+
+    .header {
+      padding: calc(var(--safe-top) + 28px) 20px 16px;
+      text-align: center;
+    }
+    .brand-logo {
+      font-size: 42px;
+      font-weight: 900;
+      letter-spacing: -1.5px;
+      color: var(--gold);
+      line-height: 1;
+    }
+    .brand-sub {
+      font-size: 11px;
+      letter-spacing: 4px;
+      color: var(--muted);
+      text-transform: uppercase;
+      margin-top: 6px;
+      font-weight: 600;
+    }
+
+    .main-container {
       flex: 1;
-      width: 100% !important;
-      max-width: 100% !important;
+      padding: 10px 20px 24px;
+      max-width: 440px;
+      width: 100%;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
     }
 
-    /* Sticky primary action button */
-    .btn-primary-sticky {
-      position: sticky;
-      bottom: calc(env(safe-area-inset-bottom, 0px) + 16px);
-      width: calc(100% - 40px);
-      margin: 16px 20px 0;
-      z-index: 10;
+    .auth-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px 20px;
+      box-shadow: 0 12px 36px rgba(0, 0, 0, 0.7);
     }
 
-    /* Step dots (bolinhas) */
-    .step-dot-row { display:flex; gap:8px; justify-content:center; padding:16px 0 8px; }
-    .step-dot-circle { color: #333; font-size: 14px; transition: color .2s; }
-    .step-dot-circle.active { color: #d4af37; }
-    .step-dot-circle.done { color: #22c55e; }
-
-    /* Active state — ÚNICA animação permitida */
-    button:active, .btn:active, .role-card:active, .veh-btn:active {
-      opacity: 0.7 !important;
-      transform: scale(0.97) !important;
-      transition: .15s ease !important;
+    .card-title {
+      font-size: 20px;
+      font-weight: 800;
+      color: var(--text);
+      margin-bottom: 6px;
     }
-    /* Override generic .btn:active */
-    .btn:active { transform: scale(0.97) !important; opacity: 0.7 !important; }
+    .card-desc {
+      font-size: 13px;
+      color: var(--muted);
+      margin-bottom: 20px;
+      line-height: 1.4;
+    }
 
-    /* Auth links bottom */
-    .auth-links { padding: 16px 20px calc(env(safe-area-inset-bottom,0px) + 24px); }
+    .form-group {
+      margin-bottom: 16px;
+    }
+    .form-label {
+      display: block;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
 
-    /* Login: sticky primary buttons */
-    #pane-phone .btn-gold,
-    #pane-otp .btn-gold,
-    #pane-password .btn-gold,
-    #pane-forgot .btn-gold {
-      position: sticky;
-      bottom: calc(env(safe-area-inset-bottom, 0px) + 16px);
+    .input-control {
+      width: 100%;
+      background: var(--bg-input);
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+      padding: 14px 14px;
+      font-size: 15px;
+      color: var(--text);
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .input-control:focus {
+      border-color: var(--gold);
+    }
+
+    .phone-row {
+      display: flex;
+      gap: 8px;
+    }
+    .phone-prefix {
+      background: var(--bg-input);
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+      padding: 14px 10px;
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--gold);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 86px;
+    }
+
+    .role-selector {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    .role-btn {
+      background: var(--bg-input);
+      border: 2px solid var(--border-subtle);
+      border-radius: 12px;
+      padding: 14px 10px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+    }
+    .role-btn.active {
+      border-color: var(--gold);
+      background: rgba(212, 175, 55, 0.12);
+    }
+    .role-btn .r-icon {
+      font-size: 24px;
+    }
+    .role-btn .r-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text);
+    }
+    .role-btn.active .r-title {
+      color: var(--gold);
+    }
+    .role-btn .r-sub {
+      font-size: 10px;
+      color: var(--muted);
+    }
+
+    .btn-main {
+      width: 100%;
+      background: linear-gradient(135deg, var(--gold), var(--gold-light));
+      color: #000;
+      font-size: 16px;
+      font-weight: 800;
+      border: none;
+      border-radius: 12px;
+      padding: 16px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      box-shadow: 0 4px 20px rgba(212, 175, 55, 0.3);
+    }
+    .btn-main:active {
+      transform: scale(0.98);
+      opacity: 0.85;
+    }
+
+    .alert-box {
+      background: rgba(239, 68, 68, 0.12);
+      border: 1px solid rgba(239, 68, 68, 0.3);
+      color: #fca5a5;
+      padding: 10px 12px;
+      border-radius: 10px;
+      font-size: 12px;
+      margin-bottom: 14px;
+      display: none;
+    }
+
+    .footer-links {
+      margin-top: 18px;
+      text-align: center;
+      font-size: 12px;
+      color: var(--muted);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .footer-links a {
+      color: var(--gold);
+      text-decoration: none;
+      font-weight: 600;
+    }
+    .footer-links a:hover {
+      text-decoration: underline;
+    }
+
+    .benefits-strip {
+      display: flex;
+      justify-content: space-around;
+      padding: 14px 20px calc(var(--safe-bottom) + 14px);
+      background: rgba(18, 22, 19, 0.6);
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
+      font-size: 11px;
+      color: var(--muted);
+      text-align: center;
+    }
+    .benefit-item span {
+      display: block;
+      color: var(--gold);
+      font-weight: 700;
+      font-size: 12px;
     }
   </style>
 </head>
 <body>
-<div class="auth-wrapper">
-  <div style="padding: calc(env(safe-area-inset-top,0px) + 24px) 20px 12px; text-align:center;">
-    <div style="font-size:38px;font-weight:900;color:#d4af37;letter-spacing:-2px;line-height:1;">GIRO</div>
-    <div style="font-size:10px;letter-spacing:4px;color:#8d9e8d;text-transform:uppercase;margin-top:5px;">Angola · Mobilidade</div>
+
+  <!-- Top Branding -->
+  <div class="header">
+    <div class="brand-logo">GIRO</div>
+    <div class="brand-sub">Angola · Mobilidade & Carga</div>
   </div>
 
-  <div class="auth-card" id="card-phone">
-    <h1 class="auth-title">Bem-vindo de volta 👋</h1>
-    <p class="auth-subtitle">Insira o seu número para continuar</p>
-    <div id="alert-login" class="alert"></div>
+  <!-- Main Auth Container -->
+  <div class="main-container">
+    <div class="auth-card">
+      <div class="card-title">Pré-Cadastro & Entrada 👋</div>
+      <div class="card-desc">Introduza os seus dados para aceder imediatamente à plataforma.</div>
 
-    <!-- PHONE -->
-    <div id="pane-phone" class="step-pane active">
+      <div id="auth-alert" class="alert-box"></div>
+
+      <!-- Full Name -->
       <div class="form-group">
-        <label class="form-label">Número de Telefone</label>
+        <label class="form-label">Nome Completo</label>
+        <input class="input-control" id="inp-name" type="text" placeholder="Ex: Isaac Carvalho" autocomplete="name">
+      </div>
+
+      <!-- Phone -->
+      <div class="form-group">
+        <label class="form-label">Número de Telemóvel (Angola)</label>
         <div class="phone-row">
           <div class="phone-prefix">🇦🇴 +244</div>
-          <input class="form-control" id="inp-phone" type="tel" inputmode="numeric" placeholder="9XX XXX XXX" maxlength="9" autocomplete="tel-national">
+          <input class="input-control" id="inp-phone" type="tel" inputmode="numeric" placeholder="9XX XXX XXX" maxlength="9" autocomplete="tel-national">
         </div>
-        <div class="form-hint" id="hint-phone"></div>
       </div>
-      <button class="btn btn-gold" onclick="sendOTP()">📲 Enviar Código SMS</button>
-      <div class="divider"><span>ou</span></div>
-      <button class="btn btn-outline" onclick="showPane('pane-password')">🔑 Entrar com Senha</button>
-    </div>
 
-    <!-- OTP -->
-    <div id="pane-otp" class="step-pane">
-      <p style="font-size:13px;color:var(--muted);margin-bottom:20px">
-        Código enviado para <strong id="otp-phone-display" style="color:var(--text)"></strong>
-      </p>
-      <div class="otp-row" id="otp-boxes"></div>
-      <div class="resend-row">
-        Não recebeu? <button class="resend-btn" id="btn-resend" onclick="resendOTP()" disabled>Reenviar (<span id="timer">30</span>s)</button>
+      <!-- Role Selector -->
+      <label class="form-label">Como deseja utilizar?</label>
+      <div class="role-selector">
+        <div class="role-btn active" id="btn-role-pax" onclick="selectRole('passageiro')">
+          <div class="r-icon">🧑‍💼</div>
+          <div class="r-title">Passageiro</div>
+          <div class="r-sub">Pedir viagens e entregas</div>
+        </div>
+        <div class="role-btn" id="btn-role-driver" onclick="selectRole('motorista')">
+          <div class="r-icon">🚗</div>
+          <div class="r-title">Motorista</div>
+          <div class="r-sub">Conduzir (10% comissão)</div>
+        </div>
       </div>
-      <div class="nav-btns" style="margin-top:24px">
-        <button class="btn btn-outline" onclick="showPane('pane-phone')">← Voltar</button>
-        <button class="btn btn-gold" onclick="verifyOTP()">✅ Verificar</button>
-      </div>
-    </div>
 
-    <!-- PASSWORD -->
-    <div id="pane-password" class="step-pane">
-      <div class="form-group">
-        <label class="form-label">Número de Telefone</label>
-        <div class="phone-row">
-          <div class="phone-prefix">🇦🇴 +244</div>
-          <input class="form-control" id="inp-phone-pw" type="tel" inputmode="numeric" placeholder="9XX XXX XXX" maxlength="9">
-        </div>
-      </div>
-      <div class="form-group">
-        <label class="form-label">Senha</label>
-        <div class="pw-wrap">
-          <input class="form-control" id="inp-password" type="password" placeholder="••••••••" autocomplete="current-password">
-          <button class="pw-eye" onclick="togglePw('inp-password')">👁</button>
-        </div>
-      </div>
-      <button class="btn btn-gold" onclick="loginPassword()" style="margin-bottom:12px">🚀 Entrar</button>
-      <div style="text-align:center;font-size:13px;color:var(--muted)">
-        <a href="#" onclick="showPane('pane-phone')">Entrar com SMS</a>
-        &nbsp;·&nbsp;
-        <a href="#" onclick="showPane('pane-forgot')">Esqueci a senha</a>
-      </div>
-    </div>
+      <!-- Submit Button -->
+      <button class="btn-main" onclick="handlePreRegister()">
+        <span>🚀 Continuar para o GIRO</span>
+      </button>
 
-    <!-- FORGOT -->
-    <div id="pane-forgot" class="step-pane">
-      <p style="font-size:13px;color:var(--muted);margin-bottom:18px">Enviaremos um código SMS para redefinir a sua senha.</p>
-      <div class="form-group">
-        <label class="form-label">Número de Telefone</label>
-        <div class="phone-row">
-          <div class="phone-prefix">🇦🇴 +244</div>
-          <input class="form-control" id="inp-forgot-phone" type="tel" inputmode="numeric" placeholder="9XX XXX XXX" maxlength="9">
-        </div>
-      </div>
-      <div class="nav-btns">
-        <button class="btn btn-outline" onclick="showPane('pane-phone')">← Voltar</button>
-        <button class="btn btn-gold" onclick="sendForgotOTP()">📲 Enviar Código</button>
+      <!-- Sub Links -->
+      <div class="footer-links">
+        <div>Precisa de cadastro completo com viatura? <a href="cadastro-motorista.html">Registo de Parceiro</a></div>
+        <div>Ao continuar, concorda com os <a href="termos.html">Termos de Uso</a> e <a href="privacidade.html">Privacidade</a>.</div>
       </div>
     </div>
   </div>
 
-  <!-- CREATE ACCOUNT -->
-  <div class="auth-card" style="margin-top:16px;padding:20px 24px">
-    <div style="text-align:center;font-size:14px;color:var(--muted)">Não tem conta?</div>
-    <div class="role-cards">
-      <div class="role-card" onclick="location.href='cadastro-passageiro.html'">
-        <div class="rc-icon">🧑‍💼</div>
-        <div class="rc-label">Passageiro</div>
-        <div class="rc-desc">Solicite viagens</div>
-      </div>
-      <div class="role-card" onclick="location.href='cadastro-motorista.html'">
-        <div class="rc-icon">🚗</div>
-        <div class="rc-label">Motorista</div>
-        <div class="rc-desc">Ganhe dinheiro</div>
-      </div>
+  <!-- Bottom Fast Info -->
+  <div class="benefits-strip">
+    <div class="benefit-item">
+      <span>10% Fixos</span>
+      Comissão Motorista
+    </div>
+    <div class="benefit-item">
+      <span>Kz Sem Surpresas</span>
+      Preço Transparente
+    </div>
+    <div class="benefit-item">
+      <span>24h Luanda</span>
+      Segurança Integrada
     </div>
   </div>
-</div>
 
-<script>
-const GIRO_SESSION_KEY='giro_session';
-const GiroAuth={
-  save(user){localStorage.setItem(GIRO_SESSION_KEY,JSON.stringify({...user,ts:Date.now()}));},
-  get(){
-    try{
-      const raw=localStorage.getItem(GIRO_SESSION_KEY);
-      if(!raw)return null;
-      const s=JSON.parse(raw);
-      if(Date.now()-s.ts>30*24*3600*1000){this.clear();return null;}
-      return s;
-    }catch{return null;}
-  },
-  clear(){localStorage.removeItem(GIRO_SESSION_KEY);},
-  requireAuth(role){
-    const s=this.get();
-    if(!s){window.location.href='login.html';return null;}
-    if(role&&s.role!==role){window.location.href='login.html';return null;}
-    return s;
-  },
-  renderUserPill(containerId){
-    const s=this.get();
-    const el=document.getElementById(containerId);
-    if(!el)return;
-    if(s){
-      const initials=(s.nome||s.phone||'?')[0].toUpperCase();
-      el.innerHTML=`<div style="display:flex;align-items:center;gap:8px;">
-        <div style="width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#d4af37,#f0c040);display:flex;align-items:center;justify-content:center;font-weight:900;font-size:14px;color:#000;">${initials}</div>
-        <div style="line-height:1.2;"><div style="font-size:13px;font-weight:700;color:#f1f5f1;">${s.nome||s.phone}</div><div style="font-size:10px;color:#8d9e8d;text-transform:uppercase;">${s.role==='motorista'?'🚗 Motorista':'🧑 Passageiro'}</div></div>
-        <button onclick="GiroAuth.logout()" style="margin-left:4px;background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.3);border-radius:8px;padding:5px 10px;color:#fca5a5;font-size:12px;cursor:pointer;">Sair</button>
-      </div>`;
-    }else{
-      el.innerHTML='<a href="login.html" style="text-decoration:none;padding:7px 14px;border-radius:20px;background:rgba(212,175,55,.12);border:1px solid rgba(212,175,55,.3);color:#d4af37;font-size:13px;font-weight:700;">&#128100; Entrar</a>';
+  <script>
+    const GIRO_SESSION_KEY = 'giro_session';
+    let selectedRole = 'passageiro';
+
+    // Se já estiver logado, entra direto
+    (function autoRedirectIfLoggedIn() {
+      try {
+        const raw = localStorage.getItem(GIRO_SESSION_KEY);
+        if (raw) {
+          const s = JSON.parse(raw);
+          if (s && s.phone) {
+            // Se veio especificamente com ?force_login=1, não redireciona
+            const urlParams = new URLSearchParams(window.location.search);
+            if (!urlParams.has('logout') && !urlParams.has('force')) {
+              window.location.replace(s.role === 'motorista' ? 'driver.html' : 'index.html');
+            }
+          }
+        }
+      } catch (e) {}
+    })();
+
+    function selectRole(role) {
+      selectedRole = role;
+      document.getElementById('btn-role-pax').classList.toggle('active', role === 'passageiro');
+      document.getElementById('btn-role-driver').classList.toggle('active', role === 'motorista');
     }
-  },
-  logout(){this.clear();window.location.href='login.html';}
-};
 
-// Se já logado, redirigir
-(function(){
-  const s=GiroAuth.get();
-  if(s){window.location.href=s.role==='motorista'?'driver.html':'index.html';}
-})();
+    function showAlert(msg) {
+      const el = document.getElementById('auth-alert');
+      if (!msg) {
+        el.style.display = 'none';
+        return;
+      }
+      el.textContent = msg;
+      el.style.display = 'block';
+    }
 
-function showPane(id){
-  document.querySelectorAll('.step-pane').forEach(p=>p.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
-  showAlert('');
-}
-function showAlert(msg,type='err'){
-  const el=document.getElementById('alert-login');
-  el.className='alert '+(msg?type:'');
-  el.style.display=msg?'block':'none';
-  el.textContent=msg;
-}
-function togglePw(id){const el=document.getElementById(id);el.type=el.type==='password'?'text':'password';}
-function validatePhone(v){return /^9[1-9][0-9]{7}$/.test(v.replace(/\s/g,''));}
-function getPhone(id='inp-phone'){return document.getElementById(id).value.replace(/\s/g,'');}
+    function validatePhone(v) {
+      return /^9[1-9][0-9]{7}$/.test(v.replace(/\s/g, ''));
+    }
 
-// OTP boxes
-(function buildOTP(){
-  const wrap=document.getElementById('otp-boxes');
-  for(let i=0;i<6;i++){
-    const inp=document.createElement('input');
-    inp.type='text';inp.inputMode='numeric';inp.maxLength=1;inp.className='otp-input';inp.dataset.idx=i;
-    inp.addEventListener('input',()=>{if(inp.value&&wrap.children[i+1])wrap.children[i+1].focus();});
-    inp.addEventListener('keydown',e=>{if(e.key==='Backspace'&&!inp.value&&wrap.children[i-1]){wrap.children[i-1].value='';wrap.children[i-1].focus();}});
-    wrap.appendChild(inp);
-  }
-})();
+    function handlePreRegister() {
+      const name = document.getElementById('inp-name').value.trim();
+      const phone = document.getElementById('inp-phone').value.replace(/\s/g, '');
 
-let _loginPhone='';
-let timerInterval;
-function startTimer(){
-  let t=30;
-  const btn=document.getElementById('btn-resend');
-  const lbl=document.getElementById('timer');
-  btn.disabled=true;
-  clearInterval(timerInterval);
-  timerInterval=setInterval(()=>{t--;lbl.textContent=t;if(t<=0){clearInterval(timerInterval);btn.disabled=false;btn.textContent='Reenviar código';}},1000);
-}
+      if (!name || name.length < 2) {
+        showAlert('Por favor, introduza o seu nome.');
+        document.getElementById('inp-name').focus();
+        return;
+      }
 
-function sendOTP(){
-  const phone=getPhone();
-  if(!validatePhone(phone)){showAlert('Número inválido. Formato: 9XX XXX XXX (9 dígitos)');return;}
-  _loginPhone=phone;
-  document.getElementById('otp-phone-display').textContent='+244 '+phone;
-  showPane('pane-otp');
-  startTimer();
-}
+      if (!phone || !validatePhone(phone)) {
+        showAlert('Introduza um número de telemóvel angolano válido (ex: 923 456 789).');
+        document.getElementById('inp-phone').focus();
+        return;
+      }
 
-function resendOTP(){startTimer();}
+      showAlert('');
 
-function verifyOTP(){
-  const code=[...document.querySelectorAll('#otp-boxes .otp-input')].map(i=>i.value).join('');
-  if(code.length<6){showAlert('Introduza os 6 dígitos do código');return;}
-  showAlert('A verificar...','info');
-  // Demo: qualquer código de 6 dígitos é aceite
-  // Prod: POST /api/auth/otp/verify
-  setTimeout(()=>{
-    GiroAuth.save({phone:'+244'+_loginPhone,nome:'Utilizador GIRO',role:'passageiro'});
-    window.location.href='index.html';
-  },800);
-}
+      // Salva sessão local pré-cadastro
+      const userSession = {
+        nome: name,
+        phone: '+244' + phone,
+        rawPhone: phone,
+        role: selectedRole,
+        registeredAt: new Date().toISOString(),
+        ts: Date.now()
+      };
 
-function loginPassword(){
-  const phone=getPhone('inp-phone-pw');
-  const pw=document.getElementById('inp-password').value;
-  if(!validatePhone(phone)){showAlert('Número inválido');return;}
-  if(pw.length<6){showAlert('Senha demasiado curta (mínimo 6 caracteres)');return;}
-  showAlert('A entrar...','info');
-  // Demo: aceita qualquer senha com >=6 chars
-  // Prod: POST /api/auth/login
-  setTimeout(()=>{
-    GiroAuth.save({phone:'+244'+phone,nome:'Utilizador GIRO',role:'passageiro'});
-    window.location.href='index.html';
-  },800);
-}
+      localStorage.setItem(GIRO_SESSION_KEY, JSON.stringify(userSession));
 
-function sendForgotOTP(){
-  const phone=getPhone('inp-forgot-phone');
-  if(!validatePhone(phone)){showAlert('Número inválido');return;}
-  showAlert('Código enviado para +244 '+phone,'suc');
-}
-</script>
+      // Feedback visual rápido
+      const btn = document.querySelector('.btn-main');
+      btn.innerHTML = '<span>⏳ A entrar...</span>';
+      btn.style.opacity = '0.8';
+      btn.disabled = true;
+
+      setTimeout(() => {
+        if (selectedRole === 'motorista') {
+          window.location.href = 'driver.html';
+        } else {
+          window.location.href = 'index.html';
+        }
+      }, 400);
+    }
+  </script>
 </body>
 </html>
