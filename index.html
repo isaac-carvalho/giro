@@ -463,8 +463,10 @@ body { overscroll-behavior: none; }
 @keyframes splashAutoFadeOut { 0% { opacity: 1; visibility: visible; } 99% { opacity: 0; } 100% { opacity: 0; visibility: hidden; display: none; } }
 </style>
 
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 <link rel="stylesheet" href="leaflet.css">
-<script src="leaflet.js"></script>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>if(typeof L==='undefined'){document.write('<script src="leaflet.js"><\/script>');}</script>
 </head>
 <body>
 
@@ -493,7 +495,7 @@ body { overscroll-behavior: none; }
   <!-- 2. VIEWPORT COM MAPA GPS AO VIVO -->
   <main class="viewport-body">
     <!-- MAPA CARTOGRÁFICO REAL DE ANGOLA (LEAFLET + OPENSTREETMAP / CARTODB) -->
-    <div id="giro-real-map" style="position:absolute;inset:0;width:100%;height:100%;z-index:1;background:#f4f5f8;"></div>
+    <div id="giro-real-map" style="position:absolute;inset:0;width:100%;height:100%;z-index:1;background:#141414;"></div>
 
     <!-- BOTÕES FLUTUANTES NO MAPA -->
     <div class="map-floating-bar" style="z-index:40;">
@@ -1529,63 +1531,81 @@ let activeDestPlace = ANGOLA_GEO_PLACES[1]; // Kilamba default
 
 function initRealAngolaMap() {
   if (typeof L === 'undefined') {
-    console.warn('Leaflet ainda não carregado');
+    setTimeout(initRealAngolaMap, 300);
     return;
   }
   const mapEl = document.getElementById('giro-real-map');
   if (!mapEl || realMap) return;
 
-  // Inicializar mapa centrado em Luanda
-  realMap = L.map('giro-real-map', {
-    center: [-8.9220, 13.1840],
-    zoom: 13,
-    zoomControl: false,
-    attributionControl: false
-  });
-
-  // Camada de Ruas Reais com estilo Uber Light (CartoDB Positron / OSM)
-  L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
-    subdomains: 'abcd',
-    maxZoom: 19
-  }).addTo(realMap);
-
-  // Criar Marcadores
-  const createUberPin = (title, isDest = false) => {
-    return L.divIcon({
-      className: 'giro-map-pin',
-      html: `
-        <div style="display:flex;flex-direction:column;align-items:center;transform:translate(-50%,-100%);">
-          <div style="background:#000000;color:#ffffff;font-size:10.5px;font-weight:900;padding:4px 9px;border-radius:6px;box-shadow:0 3px 12px rgba(0,0,0,0.35);white-space:nowrap;margin-bottom:3px;border:1px solid #333333;">${title}</div>
-          <div style="width:14px;height:14px;border-radius:${isDest ? '3px' : '50%'};background:#000000;border:3px solid #ffffff;box-shadow:0 2px 8px rgba(0,0,0,0.4);"></div>
-        </div>
-      `,
-      iconSize: [0, 0]
+  try {
+    // Inicializar mapa centrado em Luanda
+    realMap = L.map('giro-real-map', {
+      center: [-8.8580, 13.2310],
+      zoom: 13,
+      zoomControl: false,
+      attributionControl: false
     });
-  };
 
-  const createCarPin = (eta = '3 min') => {
-    return L.divIcon({
-      className: 'giro-car-pin',
-      html: `
-        <div style="display:flex;flex-direction:column;align-items:center;transform:translate(-50%,-50%);">
-          <div id="driver-bubble-eta" style="background:#000000;color:#ffffff;font-size:9.5px;font-weight:800;padding:2px 7px;border-radius:6px;border:1px solid #333333;white-space:nowrap;margin-bottom:2px;box-shadow:0 3px 10px rgba(0,0,0,0.35);">🚗 ${eta}</div>
-          <div style="width:36px;height:36px;border-radius:50%;background:#000000;border:2.5px solid #ffffff;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(0,0,0,0.4);">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="#ffffff"><path d="M18.92 6.01C18.72 5.42 18.16 5 17.5 5h-11c-.66 0-1.21.42-1.42 1.01L3 12v8c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1h12v1c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-8l-2.08-5.99zM6.85 7h10.29l1.04 3H5.81l1.04-3zM19 17H5v-4.66l.12-.34h13.77l.11.34V17z"/><circle cx="7.5" cy="14.5" r="1.5"/><circle cx="16.5" cy="14.5" r="1.5"/></svg>
+    // Camada de Ruas com fallback automático para OpenStreetMap
+    const tiles = L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+      subdomains: 'abcd',
+      maxZoom: 19
+    }).addTo(realMap);
+
+    tiles.on('tileerror', function() {
+      L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19
+      }).addTo(realMap);
+    });
+
+    // Criar Marcadores
+    const createUberPin = (title, isDest = false) => {
+      return L.divIcon({
+        className: 'giro-map-pin',
+        html: `
+          <div style="display:flex;flex-direction:column;align-items:center;transform:translate(-50%,-100%);">
+            <div style="background:#000000;color:#ffffff;font-size:10.5px;font-weight:900;padding:4px 9px;border-radius:6px;box-shadow:0 3px 12px rgba(0,0,0,0.35);white-space:nowrap;margin-bottom:3px;border:1px solid #333333;">${title}</div>
+            <div style="width:14px;height:14px;border-radius:${isDest ? '3px' : '50%'};background:#000000;border:3px solid #ffffff;box-shadow:0 2px 8px rgba(0,0,0,0.4);"></div>
           </div>
-        </div>
-      `,
-      iconSize: [0, 0]
+        `,
+        iconSize: [0, 0]
+      });
+    };
+
+    const createCarPin = (eta = '3 min') => {
+      return L.divIcon({
+        className: 'giro-car-pin',
+        html: `
+          <div style="display:flex;flex-direction:column;align-items:center;transform:translate(-50%,-50%);">
+            <div id="driver-bubble-eta" style="background:#000000;color:#ffffff;font-size:9.5px;font-weight:800;padding:2px 7px;border-radius:6px;border:1px solid #333333;white-space:nowrap;margin-bottom:2px;box-shadow:0 3px 10px rgba(0,0,0,0.35);">🚗 ${eta}</div>
+            <div style="width:36px;height:36px;border-radius:50%;background:#000000;border:2.5px solid #ffffff;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(0,0,0,0.4);">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="#ffffff"><path d="M18.92 6.01C18.72 5.42 18.16 5 17.5 5h-11c-.66 0-1.21.42-1.42 1.01L3 12v8c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1h12v1c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-8l-2.08-5.99zM6.85 7h10.29l1.04 3H5.81l1.04-3zM19 17H5v-4.66l.12-.34h13.77l.11.34V17z"/><circle cx="7.5" cy="14.5" r="1.5"/><circle cx="16.5" cy="14.5" r="1.5"/></svg>
+            </div>
+          </div>
+        `,
+        iconSize: [0, 0]
+      });
+    };
+
+    const p1 = (activeOrigPlace && activeOrigPlace.coords) ? activeOrigPlace.coords : [-8.8580, 13.2310];
+    const p2 = (activeDestPlace && activeDestPlace.coords) ? activeDestPlace.coords : [-8.9800, 13.4300];
+
+    origMarker = L.marker(p1, { icon: createUberPin(activeOrigPlace.name.split('(')[0].trim(), false) }).addTo(realMap);
+    destMarker = L.marker(p2, { icon: createUberPin(activeDestPlace.name.split('(')[0].trim(), true) }).addTo(realMap);
+    carMarker = L.marker([-8.9320, 13.1870], { icon: createCarPin('3 min') });
+
+    [100, 350, 900].forEach(delay => {
+      setTimeout(() => {
+        if (realMap) {
+          realMap.invalidateSize();
+          recalculateRealRoute();
+        }
+      }, delay);
     });
-  };
-
-  origMarker = L.marker(activeOrigPlace.coords, { icon: createUberPin(activeOrigPlace.name.split('(')[0].trim(), false) }).addTo(realMap);
-  destMarker = L.marker(activeDestPlace.coords, { icon: createUberPin(activeDestPlace.name.split('(')[0].trim(), true) }).addTo(realMap);
-  carMarker = L.marker([-8.9320, 13.1870], { icon: createCarPin('3 min') });
-
-  setTimeout(() => {
-    realMap.invalidateSize();
-    recalculateRealRoute();
-  }, 250);
+  } catch (err) {
+    console.warn('Erro ao inicializar mapa Leaflet:', err);
+  }
+}
 }
 
 function calculateGeoDistance(lat1, lon1, lat2, lon2) {
