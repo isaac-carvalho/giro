@@ -440,13 +440,14 @@ body { overscroll-behavior: none; }
   0% { width: 0%; }
   100% { width: 100%; }
 }
+@keyframes splashAutoFadeOut { 0% { opacity: 1; visibility: visible; } 99% { opacity: 0; } 100% { opacity: 0; visibility: hidden; display: none; } }
 </style>
 
 </head>
 <body>
 
 
-<div id="giro-splash" style="position:fixed;inset:0;background:#000000;z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;transition:opacity 0.2s ease;">
+<div id="giro-splash" style="position:fixed;inset:0;background:#000000;z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;animation:splashAutoFadeOut 0.35s ease 0.4s forwards;pointer-events:none;">
   <div style="font-size:48px;font-weight:900;color:#ffffff;letter-spacing:-2px;line-height:1;">GIRO</div>
   <div style="font-size:11px;letter-spacing:4px;color:#8c8c8c;text-transform:uppercase;margin-top:6px;">Angola · Mobilidade</div>
 </div>
@@ -1391,13 +1392,7 @@ function setProv() {
   renderTiers();
 }
 
-/* ==========================================================================
-   ESTADOS DE VIAGEM (UBER FLOW)
-   ========================================================================== */
-let paxTimers = [];
-const paxCarEl = document.getElementById('pax-car-el');
-const paxRouteSvg = document.getElementById('pax-route-svg');
-const paxPinB = document.getElementById('pax-pin-b');
+
 
 
 /* ==========================================================================
