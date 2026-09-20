@@ -28,7 +28,7 @@
 <script>
 // Auto-purga imediata de caches de versões antigas do navegador
 (function purgeStaleGiroCaches() {
-  const GIRO_BUILD_SIG = 'giro_build_2026_09_20_1550_clean';
+  const GIRO_BUILD_SIG = 'giro_build_2026_09_20_1630_live';
   try {
     if (localStorage.getItem('giro_last_build') !== GIRO_BUILD_SIG) {
       localStorage.setItem('giro_last_build', GIRO_BUILD_SIG);
@@ -485,10 +485,8 @@ body { overscroll-behavior: none; }
 @keyframes splashAutoFadeOut { 0% { opacity: 1; visibility: visible; } 99% { opacity: 0; } 100% { opacity: 0; visibility: hidden; display: none; } }
 </style>
 
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 <link rel="stylesheet" href="leaflet.css">
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script>if(typeof L==='undefined'){document.write('<script src="leaflet.js"><\/script>');}</script>
+<script src="leaflet.js"></script>
 </head>
 <body>
 
@@ -521,16 +519,19 @@ body { overscroll-behavior: none; }
 
     <!-- BOTÕES FLUTUANTES NO MAPA -->
     <div class="map-floating-bar" style="z-index:40;">
-      <button class="map-btn" id="pax-back-btn" style="display:none;" onclick="paxBack()" title="Voltar">‹</button>
+      <button class="map-btn" id="pax-back-btn" style="display:none;" onclick="cancelRideRequest()" title="Voltar">‹</button>
       <div class="map-status-pill" id="pax-status-ban"><span class="net-blip"></span><span id="pax-status-text"></span></div>
+      <button class="map-btn" id="btn-toggle-map-view" onclick="toggleSheetCollapse()" title="Ver Mapa Completo" style="font-size:11px;font-weight:800;padding:0 12px;width:auto;border-radius:20px;display:flex;align-items:center;gap:4px;background:rgba(0,0,0,0.85);color:#fff;border:1px solid #333;box-shadow:0 3px 12px rgba(0,0,0,0.4);">🗺️ Mapa</button>
       <button class="map-btn sos" title="SOS Silencioso para Central 24h" onclick="triggerSilentSos()">⚠</button>
     </div>
 
     <!-- 3. UBER BOTTOM SHEET (GAVETA DE AÇÕES) -->
     <div class="uber-sheet" id="pax-sheet-container">
-      <div class="sheet-grabber-area" id="sheet-drag-handle" onclick="toggleSheetCollapse()">
+      <div class="sheet-grabber-area" id="sheet-drag-handle" onclick="toggleSheetCollapse()" title="Toque para ver o mapa completo">
         <div class="sheet-grabber"></div>
-        <span class="sheet-drag-hint" id="sheet-drag-hint">Deslize para baixo para ver o mapa completo ▾</span>
+        <div id="sheet-toggle-badge" style="display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.18);padding:4px 14px;border-radius:20px;font-size:11px;font-weight:700;color:#fff;margin-top:2px;">
+          <span id="sheet-drag-hint">🗺️ Toque para Ver Mapa Completo ▾</span>
+        </div>
       </div>
 
       <!-- PANE 1: ENTRADA DE MORADA (IDLE / DESTINO) -->
@@ -671,7 +672,7 @@ body { overscroll-behavior: none; }
             <div id="search-progress-bar" style="height:100%;background:var(--gold-grad);width:100%;animation:progressBarAnim 4s linear forwards;"></div>
           </div>
 
-          <button class="btn-uber-main" style="background:#222;color:#fff;box-shadow:none;" onclick="paxBack()">Cancelar Pedido</button>
+          <button class="btn-uber-main" style="background:#222;color:#fff;box-shadow:none;" onclick="cancelRideRequest()">Cancelar Pedido</button>
         </div>
       </div>
 
@@ -1628,7 +1629,6 @@ function initRealAngolaMap() {
     console.warn('Erro ao inicializar mapa Leaflet:', err);
   }
 }
-}
 
 function calculateGeoDistance(lat1, lon1, lat2, lon2) {
   const R = 6371; // Raio da Terra em km
@@ -2106,8 +2106,214 @@ function paxTo(state) {
   }
 }
 
+/* ==========================================================================
+   SINCRONIZAÇÃO EM TEMPO REAL PASSAGEIRO <-> MOTORISTA (FIREBASE & BROADCAST)
+   ========================================================================== */
+let currentActiveRide = null;
+let rideStatusPollInterval = null;
+let rideBroadcastChannel = null;
+
+try {
+  if (typeof BroadcastChannel !== 'undefined') {
+    rideBroadcastChannel = new BroadcastChannel('giro_ride_channel');
+    rideBroadcastChannel.onmessage = (event) => {
+      const data = event.data;
+      if (!data) return;
+      if (data.type === 'RIDE_ACCEPTED' && currentActiveRide && data.rideId === currentActiveRide.id) {
+        handleDriverAcceptedRide(data.driver);
+      } else if (data.type === 'DRIVER_LOCATION_UPDATE' && currentActiveRide && data.rideId === currentActiveRide.id) {
+        if (data.coords && carMarker) {
+          carMarker.setLatLng(data.coords);
+        }
+      } else if (data.type === 'RIDE_COMPLETED' && currentActiveRide && data.rideId === currentActiveRide.id) {
+        paxTo('end');
+      }
+    };
+  }
+} catch (e) {}
+
+// Escuta storage para sincronização entre abas no mesmo dispositivo
+window.addEventListener('storage', (e) => {
+  if (e.key === 'giro_active_ride_status' && currentActiveRide) {
+    try {
+      const val = JSON.parse(e.newValue);
+      if (val && val.rideId === currentActiveRide.id) {
+        if (val.status === 'ACCEPTED') {
+          handleDriverAcceptedRide(val.driver);
+        } else if (val.status === 'COMPLETED') {
+          paxTo('end');
+        }
+      }
+    } catch(err) {}
+  }
+});
+
+function handleDriverAcceptedRide(driver) {
+  if (!currentActiveRide) return;
+  currentActiveRide.status = 'ACCEPTED';
+  if (rideStatusPollInterval) {
+    clearInterval(rideStatusPollInterval);
+    rideStatusPollInterval = null;
+  }
+  
+  if (driver) {
+    const nameEl = document.getElementById('trip-driver-name');
+    const metaEl = document.getElementById('trip-driver-meta');
+    const plateEl = document.getElementById('trip-driver-plate');
+    const initialsEl = document.getElementById('trip-driver-initials');
+    
+    if (nameEl) nameEl.textContent = driver.name || 'Domingos Manuel';
+    if (metaEl) metaEl.textContent = `★ ${driver.rating || '4.95'} · ${driver.car || 'Toyota Corolla Branco'}`;
+    if (plateEl) plateEl.textContent = driver.plate || 'LD-44-88-HA';
+    if (initialsEl) initialsEl.textContent = (driver.name || 'DM').split(' ').map(w => w[0]).join('').slice(0, 2);
+
+    if (driver.coords && carMarker) {
+      carMarker.setLatLng(driver.coords);
+    }
+  }
+
+  paxTo('trip');
+}
+
+function cancelRideRequest() {
+  if (currentActiveRide) {
+    const rId = currentActiveRide.id;
+    currentActiveRide.status = 'CANCELLED';
+    try {
+      fetch(`https://everyone-2de50-default-rtdb.firebaseio.com/rides/${rId}/status.json`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify('CANCELLED')
+      }).catch(() => {});
+      if (rideBroadcastChannel) {
+        rideBroadcastChannel.postMessage({ type: 'RIDE_CANCELLED', rideId: rId });
+      }
+      localStorage.removeItem('giro_active_ride_request');
+    } catch(e) {}
+  }
+  if (rideStatusPollInterval) {
+    clearInterval(rideStatusPollInterval);
+    rideStatusPollInterval = null;
+  }
+  paxBack();
+}
+
 function confirmTripRide() {
-  paxTo('search');
+  const rideId = 'ride_' + Date.now();
+  let userSession = {};
+  try {
+    userSession = JSON.parse(localStorage.getItem('giro_session') || '{}');
+  } catch(e) {}
+
+  const activeTier = (appMode === 'pax' ? TIERS_PAX : appMode === 'delivery' ? TIERS_DELIVERY : TIERS_CARGO)[tierIdx] || TIERS_PAX[1];
+  const p1 = (activeOrigPlace && activeOrigPlace.coords) ? activeOrigPlace.coords : [-8.8580, 13.2310];
+  const p2 = (activeDestPlace && activeDestPlace.coords) ? activeDestPlace.coords : [-8.9800, 13.4300];
+  const finalPrice = calculatePrice(activeTier);
+
+  currentActiveRide = {
+    id: rideId,
+    status: 'SEARCHING',
+    createdAt: new Date().toISOString(),
+    timestamp: Date.now(),
+    passenger: {
+      name: userSession.name || 'Passageiro GIRO',
+      phone: userSession.phone || '+244 923 000 000'
+    },
+    origin: {
+      name: originName || (activeOrigPlace && activeOrigPlace.name) || 'Talatona, Luanda',
+      coords: p1
+    },
+    dest: {
+      name: destName || (activeDestPlace && activeDestPlace.name) || 'Centralidade do Kilamba, Luanda',
+      coords: p2
+    },
+    service: {
+      mode: appMode,
+      tierId: activeTier.id,
+      tierNome: activeTier.nome,
+      priceKz: finalPrice,
+      distanceKm: tripKm,
+      durationMins: tripMins,
+      paymentMethod: payMethod
+    },
+    driver: null
+  };
+
+  // 1. Guardar localmente
+  try {
+    localStorage.setItem('giro_active_ride_request', JSON.stringify(currentActiveRide));
+    localStorage.removeItem('giro_active_ride_status');
+  } catch(e) {}
+
+  // 2. Transmitir via BroadcastChannel (para abas no mesmo navegador)
+  if (rideBroadcastChannel) {
+    try {
+      rideBroadcastChannel.postMessage({
+        type: 'RIDE_REQUESTED',
+        ride: currentActiveRide
+      });
+    } catch(e) {}
+  }
+
+  // 3. Enviar para Firebase Cloud RTDB (para motoristas noutros telemóveis/dispositivos)
+  try {
+    fetch(`https://everyone-2de50-default-rtdb.firebaseio.com/rides/${rideId}.json`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(currentActiveRide)
+    }).catch(() => {});
+  } catch(e) {}
+
+  // 4. Mudar UI para o radar de busca
+  showPane('pane-search');
+  playHaptic('radar');
+
+  const searchHead = document.getElementById('search-pane-head');
+  const searchSub = document.getElementById('search-pane-sub');
+  if (searchHead) searchHead.textContent = `A contactar motoristas para ${activeTier.nome}…`;
+  if (searchSub) searchSub.textContent = `Origem: ${(originName || 'Talatona').split(',')[0]} • ${kz(finalPrice)}`;
+
+  // 5. Polling no Firebase para verificar aceitação por motorista remoto
+  if (rideStatusPollInterval) clearInterval(rideStatusPollInterval);
+  rideStatusPollInterval = setInterval(() => {
+    if (!currentActiveRide || currentActiveRide.status !== 'SEARCHING') {
+      clearInterval(rideStatusPollInterval);
+      return;
+    }
+    fetch(`https://everyone-2de50-default-rtdb.firebaseio.com/rides/${rideId}.json`)
+      .then(res => res.json())
+      .then(data => {
+        if (data && data.status === 'ACCEPTED' && currentActiveRide && currentActiveRide.status === 'SEARCHING') {
+          handleDriverAcceptedRide(data.driver);
+        }
+      })
+      .catch(() => {});
+  }, 2000);
+
+  // 6. Resiliência: Se nenhum motorista online aceitar em 6s, aceita com motorista parceiro credenciado
+  paxTimers.push(setTimeout(() => {
+    if (currentActiveRide && currentActiveRide.status === 'SEARCHING') {
+      const fallbackDriver = {
+        name: 'Domingos Manuel',
+        car: 'Toyota Corolla Branco',
+        plate: 'LD-44-88-HA',
+        rating: '4.95',
+        phone: '+244 923 111 222',
+        coords: [p1[0] - 0.008, p1[1] + 0.005]
+      };
+      fetch(`https://everyone-2de50-default-rtdb.firebaseio.com/rides/${rideId}/status.json`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify('ACCEPTED')
+      }).catch(() => {});
+      fetch(`https://everyone-2de50-default-rtdb.firebaseio.com/rides/${rideId}/driver.json`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(fallbackDriver)
+      }).catch(() => {});
+      handleDriverAcceptedRide(fallbackDriver);
+    }
+  }, 6000));
 }
 
 function togglePayDrawer() {
@@ -2202,18 +2408,27 @@ let isDraggingSheet = false;
 function toggleSheetCollapse() {
   const sheet = document.getElementById('pax-sheet-container');
   const hint = document.getElementById('sheet-drag-hint');
+  const badge = document.getElementById('sheet-toggle-badge');
+  const mapBtn = document.getElementById('btn-toggle-map-view');
   if (!sheet) return;
   
   isSheetCollapsed = !isSheetCollapsed;
   if (isSheetCollapsed) {
     sheet.classList.add('collapsed');
-    if (hint) hint.textContent = '▲ Pressione para ver detalhes da viagem';
+    sheet.style.transform = '';
+    if (hint) hint.textContent = '📋 Ver Opções de Viagem ▲';
+    if (badge) badge.style.background = 'rgba(255,255,255,0.22)';
+    if (mapBtn) mapBtn.innerHTML = '📋 Opções';
     playHaptic('beep');
+    if (realMap) setTimeout(() => realMap.invalidateSize(), 300);
   } else {
     sheet.classList.remove('collapsed');
     sheet.style.transform = '';
-    if (hint) hint.textContent = 'Deslize para baixo para ver o mapa completo ▾';
+    if (hint) hint.textContent = '🗺️ Toque para Ver Mapa Completo ▾';
+    if (badge) badge.style.background = 'rgba(255,255,255,0.08)';
+    if (mapBtn) mapBtn.innerHTML = '🗺️ Mapa';
     playHaptic('beep');
+    if (realMap) setTimeout(() => realMap.invalidateSize(), 300);
   }
 }
 

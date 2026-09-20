@@ -1058,14 +1058,25 @@
     let map, driverMarker, tripRouteLayer;
 
     function initDriverMap() {
+      if (!driverState.coords || !driverState.coords[0]) {
+        driverState.coords = [-8.8383, 13.2344]; // Luanda Centro padrão
+      }
+
       map = L.map('map', {
         zoomControl: false,
         attributionControl: false
       }).setView(driverState.coords, 14);
 
-      L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+      // Camada de Ruas Oficial 100% Livre e Limpa (Sem Marcas de Água / Sem API Key)
+      const tiles = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
         maxZoom: 19
       }).addTo(map);
+
+      tiles.on('tileerror', function() {
+        L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', {
+          maxZoom: 19
+        }).addTo(map);
+      });
 
       // Driver custom icon
       const carIcon = L.divIcon({
@@ -1077,16 +1088,121 @@
 
       driverMarker = L.marker(driverState.coords, { icon: carIcon }).addTo(map);
 
-      // Try device geolocation
+      // Try device geolocation com trava estrita para Angola (Luanda Centro se fora)
       if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition((pos) => {
-          driverState.coords = [pos.coords.latitude, pos.coords.longitude];
-          map.setView(driverState.coords, 15);
-          driverMarker.setLatLng(driverState.coords);
+          const lat = pos.coords.latitude;
+          const lng = pos.coords.longitude;
+          if (lat >= -18.1 && lat <= -4.4 && lng >= 11.6 && lng <= 24.1) {
+            driverState.coords = [lat, lng];
+            map.setView(driverState.coords, 15);
+            driverMarker.setLatLng(driverState.coords);
+          } else {
+            console.log('GPS fora de Angola. Centrando em Luanda Centro.');
+            driverState.coords = [-8.8383, 13.2344];
+            map.setView(driverState.coords, 14);
+            driverMarker.setLatLng(driverState.coords);
+          }
         }, (err) => {
           console.log('GPS default Luanda');
-        }, { enableHighAccuracy: true });
+          driverState.coords = [-8.8383, 13.2344];
+          map.setView(driverState.coords, 14);
+          driverMarker.setLatLng(driverState.coords);
+        }, { enableHighAccuracy: true, timeout: 5000 });
       }
+    }
+
+    // Sincronização em Tempo Real Driver <-> Passenger
+    let driverBroadcastChannel = null;
+    let driverPollInterval = null;
+    let driverLocationBroadcastInterval = null;
+
+    try {
+      if (typeof BroadcastChannel !== 'undefined') {
+        driverBroadcastChannel = new BroadcastChannel('giro_ride_channel');
+        driverBroadcastChannel.onmessage = (event) => {
+          const data = event.data;
+          if (!data) return;
+          if (data.type === 'RIDE_REQUESTED' && driverState.isOnline && !driverState.activeTrip) {
+            receiveIncomingPassengerRide(data.ride);
+          } else if (data.type === 'RIDE_CANCELLED') {
+            if (driverState.pendingRide && driverState.pendingRide.id === data.rideId) {
+              dismissRequest();
+            }
+          }
+        };
+      }
+    } catch(e) {}
+
+    window.addEventListener('storage', (e) => {
+      if (e.key === 'giro_active_ride_request' && driverState.isOnline && !driverState.activeTrip) {
+        try {
+          const ride = JSON.parse(e.newValue);
+          if (ride && ride.status === 'SEARCHING') {
+            receiveIncomingPassengerRide(ride);
+          }
+        } catch(err) {}
+      }
+    });
+
+    function pollFirebaseForAvailableRides() {
+      if (!driverState.isOnline || driverState.activeTrip) return;
+      fetch('https://everyone-2de50-default-rtdb.firebaseio.com/rides.json')
+        .then(res => res.json())
+        .then(rides => {
+          if (!rides || !driverState.isOnline || driverState.activeTrip) return;
+          const keys = Object.keys(rides);
+          for (let i = keys.length - 1; i >= 0; i--) {
+            const r = rides[keys[i]];
+            if (r && r.status === 'SEARCHING' && (Date.now() - (r.timestamp || 0) < 60000)) {
+              receiveIncomingPassengerRide(r);
+              break;
+            }
+          }
+        })
+        .catch(() => {});
+    }
+
+    function receiveIncomingPassengerRide(ride) {
+      if (!ride || driverState.activeTrip) return;
+      driverState.pendingRide = ride;
+
+      const modal = document.getElementById('request-modal');
+      const timerFill = document.getElementById('req-timer-fill');
+
+      const gross = (ride.service && ride.service.priceKz) || ride.priceKz || 3000;
+      const net = Math.round(gross * 0.9);
+      const comm = gross - net;
+
+      const priceEl = document.getElementById('req-price-display');
+      if (priceEl) priceEl.innerText = net.toLocaleString('pt-AO') + ' Kz';
+
+      const commTag = document.querySelector('.req-commission-tag');
+      if (commTag) commTag.innerText = `GIRO 10%: -${comm.toLocaleString('pt-AO')} Kz`;
+
+      const pickupEl = document.getElementById('req-pickup-name');
+      const destEl = document.getElementById('req-dest-name');
+      if (pickupEl) pickupEl.innerText = (ride.origin && ride.origin.name) || ride.originName || 'Talatona, Luanda';
+      if (destEl) destEl.innerText = (ride.dest && ride.dest.name) || ride.destName || 'Kilamba, Luanda';
+
+      const pOrig = (ride.origin && ride.origin.coords) || [-8.8383, 13.2344];
+      const pDest = (ride.dest && ride.dest.coords) || [-8.9147, 13.1893];
+      driverState._lastRouteOriginCoords = pOrig;
+      driverState._lastRouteDestCoords = pDest;
+
+      modal.classList.add('active');
+      timerFill.style.transition = 'none';
+      timerFill.style.width = '100%';
+
+      setTimeout(() => {
+        timerFill.style.transition = 'width 15s linear';
+        timerFill.style.width = '0%';
+      }, 50);
+
+      clearTimeout(timerInterval);
+      timerInterval = setTimeout(() => {
+        dismissRequest();
+      }, 15000);
     }
 
     // Toggle Online / Offline
@@ -1102,17 +1218,26 @@
         radar.classList.add('active');
         dot.classList.add('online');
         
-        // Auto simulate incoming ride after 3.5 seconds
+        // Iniciar busca de passageiros em tempo real na nuvem Firebase
+        if (driverPollInterval) clearInterval(driverPollInterval);
+        driverPollInterval = setInterval(pollFirebaseForAvailableRides, 3000);
+        pollFirebaseForAvailableRides();
+
+        // Fallback: se nenhum pedido real chegar após 5s, simula pedido
         setTimeout(() => {
-          if (driverState.isOnline && !driverState.activeTrip) {
+          if (driverState.isOnline && !driverState.activeTrip && !driverState.pendingRide) {
             simulateIncomingRequest();
           }
-        }, 3500);
+        }, 5000);
       } else {
         goBtn.innerText = 'GO';
         goBtn.classList.remove('online');
         radar.classList.remove('active');
         dot.classList.remove('online');
+        if (driverPollInterval) {
+          clearInterval(driverPollInterval);
+          driverPollInterval = null;
+        }
         dismissRequest();
       }
     }
@@ -1170,17 +1295,64 @@
     function acceptRequest() {
       dismissRequest();
       
-      // Get pickup and destination names from the request card
+      const pending = driverState.pendingRide;
       const pickupName = document.getElementById('req-pickup-name').innerText;
       const destName = document.getElementById('req-dest-name').innerText;
+      const rideId = pending ? pending.id : ('ride_' + Date.now());
+      const grossPrice = (pending && pending.service && pending.service.priceKz) || 3000;
+
+      const driverProfile = {
+        name: 'Domingos Manuel',
+        car: 'Toyota Corolla Branco',
+        plate: 'LD-44-88-HA',
+        rating: '4.95',
+        phone: '+244 923 111 222',
+        coords: driverState.coords
+      };
 
       driverState.activeTrip = {
+        rideId: rideId,
         origin: driverState.coords,
         originName: pickupName,
         dest: driverState._lastRouteDestCoords || [-8.9147, 13.1893],
         destName: destName,
-        price: 3000
+        price: grossPrice,
+        passengerName: (pending && pending.passenger && pending.passenger.name) || 'Passageiro GIRO'
       };
+
+      // 1. Transmitir aceitação via BroadcastChannel
+      if (driverBroadcastChannel) {
+        try {
+          driverBroadcastChannel.postMessage({
+            type: 'RIDE_ACCEPTED',
+            rideId: rideId,
+            driver: driverProfile
+          });
+        } catch(e) {}
+      }
+
+      // 2. Transmitir via localStorage
+      try {
+        localStorage.setItem('giro_active_ride_status', JSON.stringify({
+          rideId: rideId,
+          status: 'ACCEPTED',
+          driver: driverProfile
+        }));
+      } catch(e) {}
+
+      // 3. Atualizar no Firebase Realtime Database
+      try {
+        fetch(`https://everyone-2de50-default-rtdb.firebaseio.com/rides/${rideId}/status.json`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify('ACCEPTED')
+        }).catch(() => {});
+        fetch(`https://everyone-2de50-default-rtdb.firebaseio.com/rides/${rideId}/driver.json`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(driverProfile)
+        }).catch(() => {});
+      } catch(e) {}
 
       // Show Active Trip Overlay with passenger info
       document.getElementById('trip-overlay').style.display = 'block';
@@ -1192,8 +1364,7 @@
       
       const tripCoords = [
         driverState.coords,
-        [-8.8500, 13.2200],
-        [-8.8800, 13.2000],
+        driverState._lastRouteOriginCoords || [-8.8500, 13.2200],
         driverState.activeTrip.dest
       ];
 
@@ -1205,20 +1376,82 @@
 
       map.fitBounds(tripRouteLayer.getBounds(), { padding: [80, 80] });
 
-      // Build navigation links with full addresses (origin → destination)
+      // Build navigation links with full addresses
       const originEnc = encodeURIComponent(pickupName + ', Angola');
       const destEnc = encodeURIComponent(destName + ', Angola');
       const destLat = driverState.activeTrip.dest[0];
       const destLng = driverState.activeTrip.dest[1];
 
-      // Waze: navigate to destination address
       document.getElementById('waze-btn').href = `https://waze.com/ul?q=${destEnc}&ll=${destLat},${destLng}&navigate=yes`;
-      // Google Maps: full route from pickup to destination
       document.getElementById('gmaps-btn').href = `https://www.google.com/maps/dir/?api=1&origin=${originEnc}&destination=${destEnc}&travelmode=driving`;
+
+      // Iniciar transmissão de localização do motorista em tempo real
+      if (driverLocationBroadcastInterval) clearInterval(driverLocationBroadcastInterval);
+      const pDest = driverState.activeTrip.dest;
+      let step = 0;
+      const totalSteps = 8;
+      
+      driverLocationBroadcastInterval = setInterval(() => {
+        if (!driverState.activeTrip) {
+          clearInterval(driverLocationBroadcastInterval);
+          return;
+        }
+        step++;
+        if (step <= totalSteps) {
+          const curLat = driverState.coords[0] + (pDest[0] - driverState.coords[0]) * (step / totalSteps);
+          const curLng = driverState.coords[1] + (pDest[1] - driverState.coords[1]) * (step / totalSteps);
+          const currentLoc = [curLat, curLng];
+          
+          if (driverMarker) driverMarker.setLatLng(currentLoc);
+          
+          if (driverBroadcastChannel) {
+            try {
+              driverBroadcastChannel.postMessage({
+                type: 'DRIVER_LOCATION_UPDATE',
+                rideId: rideId,
+                coords: currentLoc
+              });
+            } catch(e) {}
+          }
+          fetch(`https://everyone-2de50-default-rtdb.firebaseio.com/rides/${rideId}/driver/coords.json`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(currentLoc)
+          }).catch(() => {});
+        } else {
+          clearInterval(driverLocationBroadcastInterval);
+        }
+      }, 2500);
     }
 
     function completeTrip() {
       if (!driverState.activeTrip) return;
+
+      const rideId = driverState.activeTrip.rideId;
+      if (driverLocationBroadcastInterval) {
+        clearInterval(driverLocationBroadcastInterval);
+        driverLocationBroadcastInterval = null;
+      }
+
+      // Notificar conclusão ao passageiro
+      if (driverBroadcastChannel) {
+        try {
+          driverBroadcastChannel.postMessage({ type: 'RIDE_COMPLETED', rideId: rideId });
+        } catch(e) {}
+      }
+      try {
+        localStorage.setItem('giro_active_ride_status', JSON.stringify({
+          rideId: rideId,
+          status: 'COMPLETED'
+        }));
+      } catch(e) {}
+      try {
+        fetch(`https://everyone-2de50-default-rtdb.firebaseio.com/rides/${rideId}/status.json`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify('COMPLETED')
+        }).catch(() => {});
+      } catch(e) {}
 
       // Add earnings
       const tripGross = driverState.activeTrip.price;
@@ -1230,10 +1463,7 @@
       // Check 30K bonus
       if (driverState.dailyGross >= driverState.dailyTarget && !driverState.bonusAwarded) {
         driverState.bonusAwarded = true;
-        driverState.dailyGross += driverState.dailyBonus; // award +1500 Kz
-        alert(`🎉 PARABÉNS! Você completou o DESAFIO DIÁRIO 30K!
-
-Bônus de +1.500 Kz creditado imediatamente na sua Carteira Express sem cortes!`);
+        driverState.dailyGross += driverState.dailyBonus;
       }
 
       updateUI();
@@ -1242,6 +1472,7 @@ Bônus de +1.500 Kz creditado imediatamente na sua Carteira Express sem cortes!`
       document.getElementById('trip-overlay').style.display = 'none';
       if (tripRouteLayer) map.removeLayer(tripRouteLayer);
       driverState.activeTrip = null;
+      driverState.pendingRide = null;
 
       alert(`✅ Corrida concluída com sucesso!
 Faturamento bruto: +${tripGross.toLocaleString('pt-AO')} Kz

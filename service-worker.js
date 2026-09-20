@@ -1,5 +1,5 @@
 // GIRO Angola Service Worker — PWA Live (Network First for HTML & Auto-Purge)
-const CACHE_NAME = 'giro-live-v2026-clean';
+const CACHE_NAME = 'giro-live-v2026-v4-uber-sync';
 
 // Install — forçar ativação imediata sem esperar fechar abas
 self.addEventListener('install', event => {
