@@ -2,6 +2,25 @@
 <html lang="pt">
 <head>
 <script>
+// Auto-purga imediata de caches de versões antigas do navegador
+(function purgeStaleGiroCaches() {
+  const GIRO_BUILD_SIG = 'giro_build_2026_09_20_1930_drv_logout_fix';
+  try {
+    if (localStorage.getItem('giro_last_build_driver') !== GIRO_BUILD_SIG) {
+      localStorage.setItem('giro_last_build_driver', GIRO_BUILD_SIG);
+      if ('caches' in window) {
+        caches.keys().then(keys => Promise.all(keys.map(k => caches.delete(k)))).catch(() => {});
+      }
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.getRegistrations().then(regs => {
+          for (let r of regs) r.unregister();
+        }).catch(() => {});
+      }
+    }
+  } catch(e) {}
+})();
+</script>
+<script>
 // Auth Guard Motorista: Garante sessão ativa
 (function checkGiroDriverAuth() {
   const GIRO_SESSION_KEY = 'giro_session';
@@ -1860,7 +1879,13 @@ const GiroAuth={
       return s;
     }catch{return null;}
   },
-  clear(){localStorage.removeItem(GIRO_DRIVER_SESSION_KEY);localStorage.removeItem('giro_session');localStorage.removeItem('giro_driver_online');},
+  clear(){
+    localStorage.removeItem(GIRO_DRIVER_SESSION_KEY);
+    localStorage.removeItem('giro_session');
+    localStorage.removeItem('giro_driver_online');
+    localStorage.removeItem('giro_pax_session');
+    localStorage.removeItem('giro_active_ride_request');
+  },
   logout(){
     this.clear();
     if('serviceWorker' in navigator){
@@ -1870,7 +1895,10 @@ const GiroAuth={
   },
   requireAuth(){
     const s=this.get();
-    if(!s || s.role !== 'motorista'){openDriverAuthModal();return null;}
+    if(!s || s.role !== 'motorista'){
+      window.location.replace('login.html');
+      return null;
+    }
     return s;
   },
   renderUserPill(containerId){
@@ -1885,23 +1913,18 @@ const GiroAuth={
         <button onclick="GiroAuth.logout()" style="margin-left:4px;background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.3);border-radius:8px;padding:5px 10px;color:#fca5a5;font-size:12px;cursor:pointer;">Sair</button>
       </div>`;
     }else{
-      el.innerHTML='<button onclick="openDriverAuthModal()" style="border:none;outline:none;cursor:pointer;padding:7px 14px;border-radius:20px;background:rgba(212,175,55,.15);border:1px solid rgba(212,175,55,.35);color:#d4af37;font-size:13px;font-weight:700;display:flex;align-items:center;gap:5px;">&#128100; Entrar</button>';
+      el.innerHTML='<button onclick="window.location.href=\'login.html\'" style="border:none;outline:none;cursor:pointer;padding:7px 14px;border-radius:20px;background:rgba(212,175,55,.15);border:1px solid rgba(212,175,55,.35);color:#d4af37;font-size:13px;font-weight:700;display:flex;align-items:center;gap:5px;">&#128100; Entrar</button>';
     }
-  },
-  logout(){
-    this.clear();
-    this.renderUserPill('auth-pill');
-    openDriverAuthModal();
   }
 };
 document.addEventListener('DOMContentLoaded',function(){
   const s = GiroAuth.get();
   if(!s || s.role !== 'motorista') {
-    openDriverAuthModal();
+    window.location.replace('login.html');
+    return;
   }
   GiroAuth.renderUserPill('auth-pill');
-});
-</script>
+});</script>
 
 
   <!-- DRIVER NATIVE TAB SECTIONS -->
