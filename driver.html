@@ -1506,16 +1506,142 @@
 
       updateUI();
 
-      // Clear trip
+      // Guardar dados da corrida para o modal de avaliação
+      const completedTripData = {
+        rideId: rideId,
+        tripGross: tripGross,
+        tripNet: tripNet,
+        originName: driverState.activeTrip.originName,
+        destName: driverState.activeTrip.destName,
+        passengerName: driverState.activeTrip.passengerName
+      };
+
+      // Clear trip do HUD e mapa
       document.getElementById('trip-overlay').style.display = 'none';
       if (tripRouteLayer) map.removeLayer(tripRouteLayer);
       driverState.activeTrip = null;
       driverState.pendingRide = null;
 
-      alert(`✅ Corrida concluída com sucesso!
-Faturamento bruto: +${tripGross.toLocaleString('pt-AO')} Kz
-Comissão GIRO (10%): -${(tripGross * 0.1).toLocaleString('pt-AO')} Kz
-Líquido na carteira: +${tripNet.toLocaleString('pt-AO')} Kz`);
+      // Abrir Modal de Avaliação do Passageiro
+      openPassengerRatingModal(completedTripData);
+    }
+
+
+    /* ==========================================================================
+       AVALIAÇÃO DO PASSAGEIRO PELO MOTORISTA (SISTEMA DE NOTAS E ELOGIOS)
+       ========================================================================== */
+    let currentRatingTripData = null;
+    let currentPaxRatingScore = 5;
+
+    const paxRatingFeedbackTexts = {
+      1: 'Comportamento inadequado ⭐ (Iremos analisar)',
+      2: 'Abaixo do esperado ⭐⭐ (Atrasou no embarque)',
+      3: 'Regular / Neutro ⭐⭐⭐',
+      4: 'Muito bom passageiro! ⭐⭐⭐⭐',
+      5: 'Excelente passageiro! ⭐⭐⭐⭐⭐'
+    };
+
+    function openPassengerRatingModal(tripData) {
+      currentRatingTripData = tripData;
+      currentPaxRatingScore = 5;
+      setPaxRating(5);
+
+      const modal = document.getElementById('passenger-rating-modal');
+      const fareEl = document.getElementById('pax-rating-net-fare');
+      const routeEl = document.getElementById('pax-rating-trip-route');
+      const nameEl = document.getElementById('pax-rating-name');
+
+      if (fareEl) fareEl.innerText = `+${tripData.tripNet.toLocaleString('pt-AO')} Kz`;
+      if (routeEl) routeEl.innerText = `${(tripData.originName || 'Mutamba').split(',')[0]} → ${(tripData.destName || 'Talatona').split(',')[0]}`;
+      if (nameEl) nameEl.innerText = tripData.passengerName || 'Passageiro GIRO';
+
+      // Ocultar barra de navegação durante avaliação
+      const bottomNav = document.getElementById('bottom-tab-bar');
+      if (bottomNav) bottomNav.style.display = 'none';
+
+      if (modal) modal.style.display = 'flex';
+    }
+
+    function closePaxRatingModal(showToast = true) {
+      const modal = document.getElementById('passenger-rating-modal');
+      if (modal) modal.style.display = 'none';
+
+      const bottomNav = document.getElementById('bottom-tab-bar');
+      if (bottomNav) bottomNav.style.display = 'flex';
+
+      if (showToast) {
+        alert(`⭐ Avaliação de ${currentPaxRatingScore} estrelas enviada com sucesso!\n\nSeus ganhos de +${(currentRatingTripData ? currentRatingTripData.tripNet : 2700).toLocaleString('pt-AO')} Kz já estão creditados na sua Carteira Express.`);
+      }
+
+      currentRatingTripData = null;
+    }
+
+    function setPaxRating(rating) {
+      currentPaxRatingScore = rating;
+      const stars = document.querySelectorAll('#pax-star-container .pax-star-icon');
+      stars.forEach((s, idx) => {
+        const val = idx + 1;
+        if (val <= rating) {
+          s.style.color = '#f59e0b';
+          s.style.transform = 'scale(1.18)';
+          setTimeout(() => s.style.transform = 'scale(1)', 150);
+        } else {
+          s.style.color = '#444';
+          s.style.transform = 'scale(1)';
+        }
+      });
+
+      const label = document.getElementById('pax-rating-label');
+      if (label) {
+        label.innerText = paxRatingFeedbackTexts[rating] || 'Avaliação registada';
+      }
+    }
+
+    function togglePaxCompliment(btn) {
+      btn.classList.toggle('active');
+      if (btn.classList.contains('active')) {
+        btn.style.background = '#262626';
+        btn.style.borderColor = '#555';
+        btn.style.color = '#fff';
+      } else {
+        btn.style.background = '#181818';
+        btn.style.borderColor = '#333';
+        btn.style.color = '#888';
+      }
+    }
+
+    function submitPaxRating() {
+      const selectedCompliments = [];
+      document.querySelectorAll('#pax-compliments-list .pax-compliment-chip.active').forEach(chip => {
+        selectedCompliments.push(chip.innerText.trim());
+      });
+
+      const ratingRecord = {
+        rideId: currentRatingTripData ? currentRatingTripData.rideId : ('ride_' + Date.now()),
+        passengerName: currentRatingTripData ? currentRatingTripData.passengerName : 'Passageiro GIRO',
+        rating: currentPaxRatingScore,
+        compliments: selectedCompliments,
+        ratedAt: new Date().toISOString(),
+        driverName: 'Domingos Manuel'
+      };
+
+      // Salvar na nuvem Firebase RTDB
+      try {
+        fetch(`https://everyone-2de50-default-rtdb.firebaseio.com/ratings/passengers/${ratingRecord.rideId}.json`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(ratingRecord)
+        }).catch(() => {});
+      } catch(e) {}
+
+      // Salvar localmente
+      try {
+        const existing = JSON.parse(localStorage.getItem('giro_passenger_ratings') || '[]');
+        existing.push(ratingRecord);
+        localStorage.setItem('giro_passenger_ratings', JSON.stringify(existing));
+      } catch(e) {}
+
+      closePaxRatingModal(true);
     }
 
     function updateUI() {
@@ -1921,5 +2047,62 @@ window.addEventListener('DOMContentLoaded', () => {
 
 
 </script>
+  <!-- Modal de Avaliação do Passageiro (Driver -> Passenger) -->
+  <div class="rating-modal-backdrop" id="passenger-rating-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:600;align-items:flex-end;justify-content:center;">
+    <div class="rating-sheet" style="background:#141414;border-top:2px solid #ffffff;border-radius:24px 24px 0 0;width:100%;max-width:520px;padding:22px 20px calc(26px + env(safe-area-inset-bottom, 16px));box-shadow:0 -16px 50px rgba(0,0,0,0.95);max-height:90vh;overflow-y:auto;">
+      
+      <!-- Resumo Financeiro da Corrida -->
+      <div style="text-align:center;margin-bottom:16px;">
+        <div style="width:48px;height:48px;border-radius:50%;background:#10b981;color:#000;display:flex;align-items:center;justify-content:center;margin:0 auto 10px;font-size:24px;font-weight:900;">✓</div>
+        <h3 style="font-size:20px;font-weight:900;color:#ffffff;margin-bottom:4px;">Corrida Finalizada!</h3>
+        <div id="pax-rating-net-fare" style="font-size:26px;font-weight:900;color:#10b981;margin-bottom:2px;">+2.700 Kz</div>
+        <div id="pax-rating-trip-route" style="font-size:12px;color:#9ca3af;">Mutamba → Talatona</div>
+      </div>
+
+      <!-- Cartão do Passageiro -->
+      <div style="background:#1c1c1c;border:1px solid #2e2e2e;border-radius:14px;padding:12px 16px;display:flex;align-items:center;gap:12px;margin-bottom:18px;">
+        <div style="width:42px;height:42px;border-radius:50%;background:#2e2e2e;display:flex;align-items:center;justify-content:center;font-size:18px;border:1px solid #444;" id="pax-rating-avatar">👤</div>
+        <div style="flex:1;">
+          <div style="display:flex;align-items:center;gap:8px;">
+            <b id="pax-rating-name" style="font-size:15px;color:#fff;">Passageiro GIRO</b>
+            <span style="background:rgba(245,158,11,0.15);color:#f59e0b;font-size:11px;font-weight:800;padding:2px 7px;border-radius:8px;border:1px solid rgba(245,158,11,0.3);">★ 4.9</span>
+          </div>
+          <span style="font-size:12px;color:#9ca3af;">Avalie a conduta do passageiro</span>
+        </div>
+      </div>
+
+      <!-- 5 Estrelas Grandes e Interativas -->
+      <div style="text-align:center;margin-bottom:18px;">
+        <div id="pax-star-container" style="display:flex;justify-content:center;gap:12px;margin-bottom:8px;">
+          <span class="pax-star-icon" onclick="setPaxRating(1)" style="font-size:38px;cursor:pointer;color:#f59e0b;transition:transform .15s, color .15s;user-select:none;">★</span>
+          <span class="pax-star-icon" onclick="setPaxRating(2)" style="font-size:38px;cursor:pointer;color:#f59e0b;transition:transform .15s, color .15s;user-select:none;">★</span>
+          <span class="pax-star-icon" onclick="setPaxRating(3)" style="font-size:38px;cursor:pointer;color:#f59e0b;transition:transform .15s, color .15s;user-select:none;">★</span>
+          <span class="pax-star-icon" onclick="setPaxRating(4)" style="font-size:38px;cursor:pointer;color:#f59e0b;transition:transform .15s, color .15s;user-select:none;">★</span>
+          <span class="pax-star-icon" onclick="setPaxRating(5)" style="font-size:38px;cursor:pointer;color:#f59e0b;transition:transform .15s, color .15s;user-select:none;">★</span>
+        </div>
+        <div id="pax-rating-label" style="font-size:13px;font-weight:800;color:#ffffff;">Excelente passageiro! ⭐⭐⭐⭐⭐</div>
+      </div>
+
+      <!-- Elogios & Observações Rápidas -->
+      <div style="margin-bottom:20px;">
+        <div style="font-size:11px;font-weight:700;color:#888;margin-bottom:8px;text-transform:uppercase;letter-spacing:0.04em;">Elogios / Feedback Rápido</div>
+        <div style="display:flex;flex-wrap:wrap;gap:8px;" id="pax-compliments-list">
+          <button type="button" class="pax-compliment-chip active" onclick="togglePaxCompliment(this)" style="background:#262626;border:1px solid #555;color:#fff;border-radius:20px;padding:7px 13px;font-size:12px;font-weight:600;cursor:pointer;transition:.15s;">⏱️ Pontual no embarque</button>
+          <button type="button" class="pax-compliment-chip active" onclick="togglePaxCompliment(this)" style="background:#262626;border:1px solid #555;color:#fff;border-radius:20px;padding:7px 13px;font-size:12px;font-weight:600;cursor:pointer;transition:.15s;">😊 Educado e respeitoso</button>
+          <button type="button" class="pax-compliment-chip" onclick="togglePaxCompliment(this)" style="background:#181818;border:1px solid #333;color:#888;border-radius:20px;padding:7px 13px;font-size:12px;font-weight:600;cursor:pointer;transition:.15s;">📍 Ponto de fácil acesso</button>
+          <button type="button" class="pax-compliment-chip" onclick="togglePaxCompliment(this)" style="background:#181818;border:1px solid #333;color:#888;border-radius:20px;padding:7px 13px;font-size:12px;font-weight:600;cursor:pointer;transition:.15s;">💳 Pagamento imediato</button>
+          <button type="button" class="pax-compliment-chip" onclick="togglePaxCompliment(this)" style="background:#181818;border:1px solid #333;color:#888;border-radius:20px;padding:7px 13px;font-size:12px;font-weight:600;cursor:pointer;transition:.15s;">✨ Deixou o carro limpo</button>
+        </div>
+      </div>
+
+      <!-- Ações de Enviar e Pular -->
+      <div style="display:flex;gap:12px;">
+        <button type="button" onclick="closePaxRatingModal(false)" style="flex:1;min-height:52px;background:#202020;border:1px solid #383838;color:#9ca3af;font-size:14px;font-weight:700;border-radius:14px;cursor:pointer;transition:.15s;">Pular</button>
+        <button type="button" onclick="submitPaxRating()" style="flex:2;min-height:52px;background:#ffffff;border:none;color:#000000;font-size:15px;font-weight:900;border-radius:14px;cursor:pointer;box-shadow:0 6px 20px rgba(255,255,255,0.25);transition:.15s;">✓ Enviar Avaliação</button>
+      </div>
+
+    </div>
+  </div>
+
 </body>
 </html>
