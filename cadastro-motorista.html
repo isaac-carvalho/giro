@@ -1,66 +1,85 @@
 <!DOCTYPE html>
 <html lang="pt">
 <head>
+<script>
+// Auto-purga imediata de caches de versões antigas do navegador
+(function purgeStaleGiroCaches() {
+  const GIRO_BUILD_SIG = 'giro_build_2026_09_20_monochrome_v1';
+  try {
+    if (localStorage.getItem('giro_last_build_cadastros') !== GIRO_BUILD_SIG) {
+      localStorage.setItem('giro_last_build_cadastros', GIRO_BUILD_SIG);
+      if ('caches' in window) {
+        caches.keys().then(keys => Promise.all(keys.map(k => caches.delete(k)))).catch(() => {});
+      }
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.getRegistrations().then(regs => {
+          for (let r of regs) r.unregister();
+        }).catch(() => {});
+      }
+    }
+  } catch(e) {}
+})();
+</script>
   <title>GIRO — Cadastro Motorista</title>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <meta name="theme-color" content="#070907">
+  <meta name="theme-color" content="#000000">
   <style>
-    :root{--bg:#000000;--bg2:#121212;--bg3:#1a1a1a;--gold:#d4af37;--gold2:#f3cf65;--green:#06C167;--green2:#16a34a;--red:#ef4444;--text:#ffffff;--muted:#888888;--border:#262626;--card:#141414;--radius:16px;--shadow:0 8px 32px rgba(0,0,0,0.85);}
+    :root{--bg:#000000;--bg2:#121212;--bg3:#1a1a1a;--accent:#ffffff;--accent-hover:#e5e5e5;--green:#06C167;--green2:#16a34a;--red:#ef4444;--text:#ffffff;--muted:#888888;--border:#262626;--card:#141414;--radius:16px;--shadow:0 8px 32px rgba(0,0,0,0.85);}
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
     html,body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,system-ui,sans-serif;min-height:100vh;-webkit-font-smoothing:antialiased;}
-    a{color:var(--gold);text-decoration:none;}a:hover{text-decoration:underline;}
+    a{color:#ffffff;text-decoration:underline;}a:hover{color:#cccccc;}
     .auth-wrapper{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding:24px 16px 48px;}
     .auth-logo{margin-bottom:24px;text-align:center;}
-    .auth-logo .logo-g{font-size:48px;font-weight:900;color:var(--gold);letter-spacing:-2px;line-height:1;}
+    .auth-logo .logo-g{font-size:48px;font-weight:900;color:#ffffff;letter-spacing:-2px;line-height:1;}
     .auth-logo .logo-sub{font-size:11px;letter-spacing:4px;color:var(--muted);text-transform:uppercase;}
     .auth-card{width:100%;max-width:420px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:28px 24px 32px;box-shadow:var(--shadow);}
     .auth-title{font-size:20px;font-weight:700;color:var(--text);margin-bottom:6px;}
     .auth-subtitle{font-size:13px;color:var(--muted);margin-bottom:28px;}
     .progress-bar-wrap{display:flex;gap:6px;margin-bottom:24px;}
     .progress-bar-wrap .step-dot{flex:1;height:4px;border-radius:2px;background:var(--bg3);transition:background .3s;}
-    .progress-bar-wrap .step-dot.active{background:var(--gold);}
+    .progress-bar-wrap .step-dot.active{background:#ffffff;}
     .progress-bar-wrap .step-dot.done{background:var(--green);}
     .step-label{font-size:11px;color:var(--muted);margin-bottom:20px;}
     .form-group{margin-bottom:16px;}
     .form-label{display:block;font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:7px;}
     .form-control{width:100%;background:var(--bg3);border:1px solid rgba(255,255,255,.1);border-radius:10px;color:var(--text);font-size:16px;padding:12px 14px;outline:none;transition:border-color .2s;-webkit-appearance:none;}
-    .form-control:focus{border-color:var(--gold);}
+    .form-control:focus{border-color:#ffffff;}
     .form-control.error{border-color:var(--red);}
     .form-control.ok{border-color:var(--green);}
     .form-hint{font-size:11px;color:var(--muted);margin-top:5px;}
     .form-hint.err{color:var(--red);}
     .form-hint.suc{color:var(--green);}
     .phone-row{display:flex;gap:8px;}
-    .phone-prefix{background:var(--bg3);border:1px solid rgba(255,255,255,.1);border-radius:10px;color:var(--gold);font-size:15px;padding:12px 10px;min-width:80px;text-align:center;font-weight:700;}
+    .phone-prefix{background:var(--bg3);border:1px solid rgba(255,255,255,.1);border-radius:10px;color:#ffffff;font-size:15px;padding:12px 10px;min-width:80px;text-align:center;font-weight:700;}
     .pw-wrap{position:relative;}
     .pw-wrap .form-control{padding-right:44px;}
     .pw-eye{position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--muted);font-size:18px;padding:0;line-height:1;}
     .otp-row{display:flex;gap:10px;justify-content:center;}
     .otp-input{width:44px;height:54px;background:var(--bg3);border:1px solid rgba(255,255,255,.1);border-radius:10px;color:var(--text);font-size:22px;font-weight:700;text-align:center;outline:none;transition:border-color .2s;-webkit-appearance:none;}
-    .otp-input:focus{border-color:var(--gold);}
+    .otp-input:focus{border-color:#ffffff;}
     .strength-bar{display:flex;gap:4px;margin-top:8px;}
     .strength-bar span{flex:1;height:4px;border-radius:2px;background:var(--bg3);transition:background .3s;}
     .strength-label{font-size:11px;margin-top:5px;color:var(--muted);}
     .btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:14px;border:none;border-radius:10px;font-size:15px;font-weight:700;cursor:pointer;transition:opacity .2s,transform .1s;-webkit-appearance:none;}
     .btn:active{transform:scale(.98);}
-    .btn-gold{background:linear-gradient(135deg,var(--gold),var(--gold2));color:#000;}
+    .btn-primary{background:#ffffff;color:#000000;font-weight:900;border:none;border-radius:12px;padding:15px;font-size:16px;box-shadow:0 4px 18px rgba(255,255,255,0.12);cursor:pointer;}
     .btn-green{background:linear-gradient(135deg,var(--green),var(--green2));color:#fff;}
     .btn-outline{background:transparent;border:1px solid var(--border);color:var(--text);margin-top:10px;}
     .btn:disabled{opacity:.45;cursor:not-allowed;}
     .btn-sm{padding:10px 16px;font-size:13px;width:auto;border-radius:8px;}
     .nav-btns{display:flex;gap:10px;margin-top:20px;}
     .nav-btns .btn{margin-top:0;}
-    .upload-box{border:2px dashed rgba(212,175,55,.3);border-radius:12px;padding:18px 12px;text-align:center;cursor:pointer;transition:border-color .2s,background .2s;position:relative;}
-    .upload-box:hover,.upload-box.drag{border-color:var(--gold);background:rgba(212,175,55,.04);}
+    .upload-box{border:2px dashed rgba(255,255,255,.2);border-radius:12px;padding:18px 12px;text-align:center;cursor:pointer;transition:border-color .2s,background .2s;position:relative;}
+    .upload-box:hover,.upload-box.drag{border-color:#ffffff;background:rgba(255,255,255,.06);}
     .upload-box input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;}
     .upload-box .up-icon{font-size:28px;margin-bottom:6px;}
     .upload-box .up-label{font-size:13px;color:var(--muted);}
-    .upload-box .up-label strong{color:var(--gold);}
+    .upload-box .up-label strong{color:#ffffff;}
     .upload-preview{margin-top:8px;border-radius:8px;overflow:hidden;max-height:120px;display:none;}
     .upload-preview img{width:100%;object-fit:cover;max-height:120px;}
     .check-group{display:flex;align-items:flex-start;gap:12px;margin-bottom:14px;}
-    .check-group input[type=checkbox]{width:20px;height:20px;accent-color:var(--gold);flex-shrink:0;margin-top:2px;cursor:pointer;}
+    .check-group input[type=checkbox]{width:20px;height:20px;accent-color:#ffffff;flex-shrink:0;margin-top:2px;cursor:pointer;}
     .check-group label{font-size:13px;color:var(--muted);cursor:pointer;line-height:1.5;}
     .divider{display:flex;align-items:center;gap:12px;margin:20px 0;}
     .divider::before,.divider::after{content:'';flex:1;height:1px;background:rgba(255,255,255,.08);}
@@ -68,20 +87,20 @@
     .alert{padding:12px 14px;border-radius:10px;font-size:13px;margin-bottom:16px;display:none;}
     .alert.err{background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.3);color:#fca5a5;}
     .alert.suc{background:rgba(34,197,94,.12);border:1px solid rgba(34,197,94,.3);color:#86efac;}
-    .alert.info{background:rgba(212,175,55,.10);border:1px solid rgba(212,175,55,.3);color:var(--gold2);}
+    .alert.info{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.2);color:#ffffff;}
     .step-pane{display:none;}
     .step-pane.active{display:block;}
     .success-screen{text-align:center;padding:32px 0;}
     .success-screen .big-icon{font-size:64px;margin-bottom:16px;}
     .success-screen h2{font-size:22px;font-weight:800;margin-bottom:10px;}
     .success-screen p{font-size:14px;color:var(--muted);line-height:1.6;}
-    .success-screen .badge-pending{display:inline-block;margin-top:16px;padding:8px 18px;border-radius:20px;background:rgba(212,175,55,.12);border:1px solid var(--border);color:var(--gold);font-size:13px;font-weight:600;}
+    .success-screen .badge-pending{display:inline-block;margin-top:16px;padding:8px 18px;border-radius:20px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.25);color:#ffffff;font-size:13px;font-weight:700;}
     .resend-row{text-align:center;margin-top:16px;font-size:13px;color:var(--muted);}
-    .resend-btn{color:var(--gold);font-weight:600;cursor:pointer;background:none;border:none;font-size:13px;}
+    .resend-btn{color:#ffffff;font-weight:600;cursor:pointer;background:none;border:none;font-size:13px;}
     .resend-btn:disabled{color:var(--muted);cursor:default;}
     .role-cards{display:flex;gap:12px;margin-top:20px;}
     .role-card{flex:1;padding:18px 12px;border-radius:12px;border:2px solid rgba(255,255,255,.08);background:var(--bg3);text-align:center;cursor:pointer;transition:border-color .2s,background .2s;}
-    .role-card:hover{border-color:var(--gold);}
+    .role-card:hover{border-color:#ffffff;}
     .role-card .rc-icon{font-size:34px;margin-bottom:10px;}
     .role-card .rc-label{font-size:14px;font-weight:700;}
     .role-card .rc-desc{font-size:11px;color:var(--muted);margin-top:4px;}
@@ -89,11 +108,11 @@
     .auth-links a{font-weight:600;}
     .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
     .pill-skip{display:inline-block;margin-top:4px;padding:4px 12px;border-radius:20px;background:var(--bg3);border:1px solid rgba(255,255,255,.08);font-size:12px;color:var(--muted);cursor:pointer;}
-    .pill-skip:hover{border-color:var(--gold);color:var(--gold);}
+    .pill-skip:hover{border-color:#ffffff;color:#ffffff;}
     .veh-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
     .veh-btn{padding:10px 8px;border-radius:8px;border:1px solid rgba(255,255,255,.08);background:var(--bg3);color:var(--text);font-size:13px;cursor:pointer;transition:border-color .2s;}
-    .veh-btn.selected{border-color:var(--gold);background:rgba(212,175,55,.08);color:var(--gold);}
-    .kyc-info{background:rgba(212,175,55,.07);border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-bottom:16px;font-size:12px;color:var(--gold2);line-height:1.6;}
+    .veh-btn.selected{border-color:#ffffff;background:#ffffff;color:#000000;font-weight:700;}
+    .kyc-info{background:#181818;border:1px solid #2e2e2e;border-radius:10px;padding:12px 14px;margin-bottom:16px;font-size:12px;color:#cccccc;line-height:1.6;}
     .doc-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
     @media(max-width:380px){.grid-2,.veh-grid,.doc-grid{grid-template-columns:1fr;}}
     .earnings-box{background:var(--bg3);border-radius:12px;padding:16px;margin-bottom:18px;text-align:center;}
@@ -140,7 +159,7 @@
     /* Step dots (bolinhas) */
     .step-dot-row { display:flex; gap:8px; justify-content:center; padding:16px 0 8px; }
     .step-dot-circle { color: #333; font-size: 14px; transition: color .2s; }
-    .step-dot-circle.active { color: #d4af37; }
+    .step-dot-circle.active { color: #ffffff; font-weight: 900; }
     .step-dot-circle.done { color: #22c55e; }
 
     /* Active state — ÚNICA animação permitida */
@@ -161,7 +180,7 @@
 <body>
 <div class="auth-wrapper">
   <div style="padding: calc(env(safe-area-inset-top,0px) + 24px) 20px 12px; text-align:center;">
-    <div style="font-size:38px;font-weight:900;color:#d4af37;letter-spacing:-2px;line-height:1;">GIRO</div>
+    <div style="font-size:38px;font-weight:900;color:#ffffff;letter-spacing:-2px;line-height:1;">GIRO</div>
     <div style="font-size:10px;letter-spacing:4px;color:#8d9e8d;text-transform:uppercase;margin-top:5px;">Seja um Parceiro · Angola</div>
   </div>
 
@@ -196,7 +215,7 @@
           <input class="form-control" id="m-dob" type="date">
         </div>
       </div>
-      <button class="btn btn-gold" onclick="motNext(1)">Continuar →</button>
+      <button class="btn btn-primary" onclick="motNext(1)">Continuar →</button>
     </div>
 
     <!-- STEP 2: Senha + OTP -->
@@ -229,7 +248,7 @@
       </div>
       <div class="nav-btns">
         <button class="btn btn-outline" onclick="motBack(2)">← Voltar</button>
-        <button class="btn btn-gold" id="btn-mot-otp" onclick="handleStep2()">Enviar SMS →</button>
+        <button class="btn btn-primary" id="btn-mot-otp" onclick="handleStep2()">Enviar SMS →</button>
       </div>
     </div>
 
@@ -266,7 +285,7 @@
       </div>
       <div class="nav-btns" style="margin-top:20px">
         <button class="btn btn-outline" onclick="motBack(3)">← Voltar</button>
-        <button class="btn btn-gold" onclick="goMotStep(4)">Continuar →</button>
+        <button class="btn btn-primary" onclick="goMotStep(4)">Continuar →</button>
       </div>
     </div>
 
@@ -302,7 +321,7 @@
       </div>
       <div class="nav-btns">
         <button class="btn btn-outline" onclick="motBack(4)">← Voltar</button>
-        <button class="btn btn-gold" onclick="motNext(4)">Continuar →</button>
+        <button class="btn btn-primary" onclick="motNext(4)">Continuar →</button>
       </div>
     </div>
 
@@ -325,7 +344,7 @@
       <p style="font-size:12px;color:var(--muted);margin-bottom:16px">⚠️ Adicione pelo menos um método de pagamento.</p>
       <div class="nav-btns">
         <button class="btn btn-outline" onclick="motBack(5)">← Voltar</button>
-        <button class="btn btn-gold" onclick="motNext(5)">Continuar →</button>
+        <button class="btn btn-primary" onclick="motNext(5)">Continuar →</button>
       </div>
     </div>
 
@@ -340,16 +359,16 @@
       <!-- Scrollable contract -->
       <div id="contrato-scroll" style="background:var(--bg3);border-radius:12px;padding:16px;max-height:340px;overflow-y:auto;margin-bottom:14px;font-size:11.5px;color:var(--muted);line-height:1.75;border:1px solid var(--border);scroll-behavior:smooth">
         <div style="text-align:center;margin-bottom:14px">
-          <strong style="color:var(--gold);font-size:14px;letter-spacing:1px">CONTRATO DE PARCERIA</strong><br>
+          <strong style="color:#ffffff;font-size:14px;letter-spacing:1px">CONTRATO DE PARCERIA</strong><br>
           <span style="font-size:10px;color:var(--muted)">GIRO Angola — Plataforma de Mobilidade Urbana & Logística</span>
         </div>
 
         <strong style="color:var(--text)">PARTES:</strong><br>
         <strong>EMPRESA:</strong> GIRO Angola, operado por Oaken Technologies, representada por Isaac Carvalho, Fundador & CEO, com sede em Luanda, Angola.<br>
-        <strong>MOTORISTA PARCEIRO:</strong> <span style="color:var(--gold)" id="c-nome">—</span>, telefone <span style="color:var(--gold)" id="c-phone">—</span>, veículo <span style="color:var(--gold)" id="c-veiculo">—</span> <span style="color:var(--gold)" id="c-marca-modelo">—</span>, matrícula <span style="color:var(--gold)" id="c-matricula">—</span>.<br><br>
+        <strong>MOTORISTA PARCEIRO:</strong> <span style="color:#ffffff" id="c-nome">—</span>, telefone <span style="color:#ffffff" id="c-phone">—</span>, veículo <span style="color:#ffffff" id="c-veiculo">—</span> <span style="color:#ffffff" id="c-marca-modelo">—</span>, matrícula <span style="color:#ffffff" id="c-matricula">—</span>.<br><br>
 
         <strong style="color:var(--text)">CLÁUSULA 1.ª — NATUREZA DA RELAÇÃO</strong><br>
-        1.1. O presente contrato estabelece uma relação de colaboração comercial independente, <strong style="color:var(--gold)">sem vínculo laboral</strong>, subordinação hierárquica ou relação de emprego.<br>
+        1.1. O presente contrato estabelece uma relação de colaboração comercial independente, <strong style="color:#ffffff">sem vínculo laboral</strong>, subordinação hierárquica ou relação de emprego.<br>
         1.2. O Motorista Parceiro opera por conta própria, assumindo os seus custos operacionais (combustível, manutenção, comunicação).<br>
         1.3. O Motorista Parceiro não tem poderes de representação legal da EMPRESA.<br>
         1.4. Este contrato não gera qualquer expectativa de vínculo empregatício, indemnização laboral, férias, 13.º salário ou benefícios trabalhistas.<br><br>
@@ -359,11 +378,11 @@
         2.2. O Motorista Parceiro tem liberdade para aceitar ou recusar corridas, definir os seus horários e a sua zona de actuação.<br><br>
 
         <strong style="color:var(--text)">CLÁUSULA 3.ª — COMISSÃO E PAGAMENTOS</strong><br>
-        3.1. <strong style="color:var(--gold)">Comissão GIRO: 10% (dez por cento)</strong> sobre o valor total de cada viagem concluída com sucesso.<br>
+        3.1. <strong style="color:#ffffff">Comissão GIRO: 10% (dez por cento)</strong> sobre o valor total de cada viagem concluída com sucesso.<br>
         3.2. O Motorista Parceiro recebe <strong style="color:var(--green)">90% do valor da viagem</strong>.<br>
         3.3. Pagamentos digitais (Multicaixa Express / Unitel Money): a GIRO retém automaticamente 10% e credita 90% na conta do motorista.<br>
         3.4. Pagamentos em dinheiro: o motorista fica com 100% em mãos; a comissão de 10% é lançada a débito no saldo da conta GIRO e deduzida nas próximas corridas digitais.<br>
-        3.5. <strong style="color:var(--gold)">Bónus "Desafio 30K"</strong>: Ao facturar 30.000 Kz num único dia, o motorista recebe +1.500 Kz de bónus automático.<br>
+        3.5. <strong style="color:#ffffff">Bónus "Desafio 30K"</strong>: Ao facturar 30.000 Kz num único dia, o motorista recebe +1.500 Kz de bónus automático.<br>
         3.6. A EMPRESA reserva-se o direito de alterar a tabela de comissões com aviso prévio de 30 dias.<br><br>
 
         <strong style="color:var(--text)">CLÁUSULA 4.ª — OBRIGAÇÕES DO MOTORISTA PARCEIRO</strong><br>
@@ -429,17 +448,17 @@
         </div>
       </div>
       <!-- Scroll indicator -->
-      <div id="scroll-hint" style="text-align:center;font-size:11px;color:var(--gold);margin-bottom:14px;opacity:1;transition:opacity .3s">
+      <div id="scroll-hint" style="text-align:center;font-size:11px;color:#ffffff;margin-bottom:14px;opacity:1;transition:opacity .3s">
         ↓ Deslize para ler o contrato completo
       </div>
       <!-- Checkboxes -->
       <div class="check-group">
         <input type="checkbox" id="chk-m-termos">
-        <label for="chk-m-termos">Li integralmente e aceito os <a href="termos.html">Termos de Uso</a>, a <a href="privacidade.html">Política de Privacidade</a> e o presente <strong style="color:var(--gold)">Contrato de Parceria GIRO</strong>.</label>
+        <label for="chk-m-termos">Li integralmente e aceito os <a href="termos.html">Termos de Uso</a>, a <a href="privacidade.html">Política de Privacidade</a> e o presente <strong style="color:#ffffff">Contrato de Parceria GIRO</strong>.</label>
       </div>
       <div class="check-group">
         <input type="checkbox" id="chk-m-comissao">
-        <label for="chk-m-comissao">Declaro que estou ciente e aceito a comissão de <strong style="color:var(--gold)">10%</strong> sobre cada corrida concluída.</label>
+        <label for="chk-m-comissao">Declaro que estou ciente e aceito a comissão de <strong style="color:#ffffff">10%</strong> sobre cada corrida concluída.</label>
       </div>
       <div class="check-group">
         <input type="checkbox" id="chk-m-idade">
@@ -456,7 +475,7 @@
       <div class="success-screen">
         <div class="big-icon">🕐</div>
         <h2>Cadastro em Análise</h2>
-        <p>O seu cadastro foi enviado.<br>A nossa equipa valida os documentos em até <strong style="color:var(--gold)">24 horas</strong>.<br>Receberá um SMS quando a conta estiver activa.</p>
+        <p>O seu cadastro foi enviado.<br>A nossa equipa valida os documentos em até <strong style="color:#ffffff">24 horas</strong>.<br>Receberá um SMS quando a conta estiver activa.</p>
         <div class="badge-pending">⏳ Pendente de Validação</div>
         <br><br>
         <button class="btn btn-outline btn-sm" onclick="location.href='login.html'" style="margin:0 auto">Ir para Login</button>
@@ -493,12 +512,12 @@ const GiroAuth={
     if(s){
       const initials=(s.nome||s.phone||'?')[0].toUpperCase();
       el.innerHTML=`<div style="display:flex;align-items:center;gap:8px;">
-        <div style="width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#d4af37,#f0c040);display:flex;align-items:center;justify-content:center;font-weight:900;font-size:14px;color:#000;">${initials}</div>
+        <div style="width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#ffffff,#e5e5e5);display:flex;align-items:center;justify-content:center;font-weight:900;font-size:14px;color:#000;">${initials}</div>
         <div style="line-height:1.2;"><div style="font-size:13px;font-weight:700;color:#f1f5f1;">${s.nome||s.phone}</div><div style="font-size:10px;color:#8d9e8d;text-transform:uppercase;">${s.role==='motorista'?'🚗 Motorista':'🧑 Passageiro'}</div></div>
         <button onclick="GiroAuth.logout()" style="margin-left:4px;background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.3);border-radius:8px;padding:5px 10px;color:#fca5a5;font-size:12px;cursor:pointer;">Sair</button>
       </div>`;
     }else{
-      el.innerHTML='<a href="login.html" style="text-decoration:none;padding:7px 14px;border-radius:20px;background:rgba(212,175,55,.12);border:1px solid rgba(212,175,55,.3);color:#d4af37;font-size:13px;font-weight:700;">&#128100; Entrar</a>';
+      el.innerHTML='<a href="login.html" style="text-decoration:none;padding:7px 14px;border-radius:20px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.3);color:#ffffff;font-size:13px;font-weight:700;">&#128100; Entrar</a>';
     }
   },
   logout(){this.clear();window.location.href='login.html';}
