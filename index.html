@@ -28,7 +28,7 @@
 <script>
 // Auto-purga imediata de caches de versões antigas do navegador
 (function purgeStaleGiroCaches() {
-  const GIRO_BUILD_SIG = 'giro_build_2026_09_20_1800_fix';
+  const GIRO_BUILD_SIG = 'giro_build_2026_09_20_1900_logout_fix';
   try {
     if (localStorage.getItem('giro_last_build') !== GIRO_BUILD_SIG) {
       localStorage.setItem('giro_last_build', GIRO_BUILD_SIG);
@@ -2792,24 +2792,18 @@ const GiroAuth={
   save(user){localStorage.setItem(GIRO_PAX_SESSION_KEY,JSON.stringify({...user,role:'passageiro',ts:Date.now()}));},
   get(){
     try{
-      let raw=localStorage.getItem(GIRO_PAX_SESSION_KEY);
-      if(!raw){
-        const def = { nome: 'Utilizador GIRO', phone: '+244 923 456 789', role: 'passageiro', home: 'Centralidade do Kilamba', work: 'Belas Business Park', ts: Date.now() };
-        localStorage.setItem(GIRO_PAX_SESSION_KEY, JSON.stringify(def));
-        return def;
-      }
+      const raw=localStorage.getItem(GIRO_PAX_SESSION_KEY)||localStorage.getItem('giro_session');
+      if(!raw)return null;
       const s=JSON.parse(raw);
-      if(s.role !== 'passageiro'){
-        const def = { nome: 'Utilizador GIRO', phone: '+244 923 456 789', role: 'passageiro', home: 'Centralidade do Kilamba', work: 'Belas Business Park', ts: Date.now() };
-        localStorage.setItem(GIRO_PAX_SESSION_KEY, JSON.stringify(def));
-        return def;
-      }
+      if(!s||!s.phone)return null;
       if(Date.now()-s.ts>30*24*3600*1000){this.clear();return null;}
       return s;
     }catch{return null;}
   },
   clear(){
     localStorage.removeItem(GIRO_PAX_SESSION_KEY);
+    localStorage.removeItem('giro_session');
+    localStorage.removeItem('giro_active_ride_request');
   },
   requireAuth(){
     return this.get();
@@ -2836,8 +2830,13 @@ const GiroAuth={
     }
   },
   logout(){
-    this.clear();
-    openPaxAuthModal('login');
+    localStorage.removeItem(GIRO_PAX_SESSION_KEY);
+    localStorage.removeItem('giro_session');
+    localStorage.removeItem('giro_active_ride_request');
+    if('serviceWorker' in navigator){
+      navigator.serviceWorker.getRegistrations().then(rs=>rs.forEach(r=>r.unregister())).catch(()=>{});
+    }
+    window.location.replace('login.html');
   }
 };
 document.addEventListener('DOMContentLoaded',function(){

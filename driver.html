@@ -1860,7 +1860,14 @@ const GiroAuth={
       return s;
     }catch{return null;}
   },
-  clear(){localStorage.removeItem(GIRO_DRIVER_SESSION_KEY);},
+  clear(){localStorage.removeItem(GIRO_DRIVER_SESSION_KEY);localStorage.removeItem('giro_session');localStorage.removeItem('giro_driver_online');},
+  logout(){
+    this.clear();
+    if('serviceWorker' in navigator){
+      navigator.serviceWorker.getRegistrations().then(rs=>rs.forEach(r=>r.unregister())).catch(()=>{});
+    }
+    window.location.replace('login.html');
+  },
   requireAuth(){
     const s=this.get();
     if(!s || s.role !== 'motorista'){openDriverAuthModal();return null;}
