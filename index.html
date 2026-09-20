@@ -494,8 +494,8 @@ body { overscroll-behavior: none; }
 
   <!-- 2. VIEWPORT COM MAPA GPS AO VIVO -->
   <main class="viewport-body">
-    <!-- MAPA CARTOGRÁFICO REAL DE ANGOLA (LEAFLET + OPENSTREETMAP / CARTODB) -->
-    <div id="giro-real-map" style="position:absolute;inset:0;width:100%;height:100%;z-index:1;background:#141414;"></div>
+    <!-- MAPA CARTOGRÁFICO REAL DE ANGOLA (LEAFLET + CARTODB POSITRON CLARO / OSM) -->
+    <div id="giro-real-map" style="position:absolute;inset:0;width:100%;height:100%;z-index:1;background:#f2f4f7;"></div>
 
     <!-- BOTÕES FLUTUANTES NO MAPA -->
     <div class="map-floating-bar" style="z-index:40;">
@@ -1546,8 +1546,8 @@ function initRealAngolaMap() {
       attributionControl: false
     });
 
-    // Camada de Ruas com fallback automático para OpenStreetMap
-    const tiles = L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+    // Camada de Ruas 100% CLARA (CartoDB Positron Light + Fallback OpenStreetMap)
+    const tiles = L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
       subdomains: 'abcd',
       maxZoom: 19
     }).addTo(realMap);
