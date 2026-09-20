@@ -756,26 +756,89 @@ body { overscroll-behavior: none; }
     </div>
   </section>
 
-  <!-- TAB: PERFIL & DEFINIÇÕES (PLAY STORE & APPLE STORE COMPLIANT) -->
-  <section id="tab-profile" style="display:none;flex:1;overflow-y:auto;padding:16px 16px 80px;background:#070907;">
-    <h2 style="font-size:20px;font-weight:800;color:#fff;margin-bottom:14px;">Meu Perfil</h2>
+  <!-- TAB: PERFIL & DEFINIÇÕES (PLAY STORE & APPLE STORE COMPLIANT + FULL EDIT PROFILE) -->
+  <section id="tab-profile" style="display:none;flex:1;overflow-y:auto;padding:16px 16px 90px;background:#000000;">
+    <h2 style="font-size:22px;font-weight:900;color:#fff;margin-bottom:16px;">Meu Perfil</h2>
 
-    <div style="background:#121612;border:1px solid #262626;border-radius:14px;padding:16px;margin-bottom:14px;display:flex;align-items:center;gap:14px;">
-      <div style="width:50px;height:50px;border-radius:50%;background:linear-gradient(135deg,#ffffff,#ffffff);display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:900;color:#000;">U</div>
-      <div>
-        <div style="font-size:16px;font-weight:700;color:#fff;" id="profile-user-name">Utilizador GIRO</div>
-        <div style="font-size:12px;color:#8d9e8d;" id="profile-user-phone">+244 9XX XXX XXX</div>
-        <div style="font-size:11px;color:#4fe36a;margin-top:2px;">★ 5.0 · Passageiro Verificado</div>
+    <!-- Card Principal do Utilizador com Upload de Foto -->
+    <div style="background:#141414;border:1px solid #262626;border-radius:18px;padding:18px;margin-bottom:16px;display:flex;align-items:center;gap:16px;">
+      <div style="position:relative;width:64px;height:64px;flex-shrink:0;">
+        <div id="profile-avatar-display" style="width:64px;height:64px;border-radius:50%;background:#ffffff;display:flex;align-items:center;justify-content:center;font-size:26px;font-weight:900;color:#000;overflow:hidden;border:2px solid #333;">
+          <span id="profile-avatar-initials">U</span>
+          <img id="profile-avatar-img" src="" alt="Foto" style="display:none;width:100%;height:100%;object-fit:cover;">
+        </div>
+        <label for="profile-photo-input" style="position:absolute;bottom:-2px;right:-2px;width:24px;height:24px;background:#276EF1;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-size:12px;cursor:pointer;border:2px solid #000;box-shadow:0 2px 6px rgba(0,0,0,0.6);" title="Alterar Foto">
+          📷
+        </label>
+        <input type="file" id="profile-photo-input" accept="image/*" style="display:none;" onchange="handleProfilePhotoUpload(event)">
+      </div>
+
+      <div style="flex:1;min-width:0;">
+        <div style="font-size:17px;font-weight:800;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" id="profile-user-name">Utilizador GIRO</div>
+        <div style="font-size:13px;color:#8c8c8c;margin:2px 0 4px;" id="profile-user-phone">+244 9XX XXX XXX</div>
+        <div style="font-size:11px;color:#06C167;font-weight:700;display:inline-flex;align-items:center;gap:4px;">★ 5.0 · Passageiro Verificado</div>
       </div>
     </div>
 
+    <!-- Formulário de Edição de Dados Pessoais e Moradas -->
+    <div style="background:#141414;border:1px solid #262626;border-radius:18px;padding:18px;margin-bottom:16px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+        <div style="font-size:14px;font-weight:800;color:#fff;">Dados da Conta</div>
+        <span style="font-size:11px;color:#06C167;font-weight:700;">Editar</span>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:12px;">
+        <div>
+          <label style="display:block;font-size:11px;font-weight:700;color:#8c8c8c;text-transform:uppercase;margin-bottom:6px;">Nome Completo</label>
+          <input type="text" id="edit-pax-name" placeholder="Seu nome" value="Utilizador GIRO" style="width:100%;background:#1c1c1c;border:1px solid #2e2e2e;border-radius:10px;padding:11px 12px;color:#fff;font-size:13.5px;outline:none;box-sizing:border-box;">
+        </div>
+
+        <div>
+          <label style="display:block;font-size:11px;font-weight:700;color:#8c8c8c;text-transform:uppercase;margin-bottom:6px;">Telemóvel / WhatsApp (+244)</label>
+          <input type="tel" id="edit-pax-phone" placeholder="923 000 000" value="923 000 000" style="width:100%;background:#1c1c1c;border:1px solid #2e2e2e;border-radius:10px;padding:11px 12px;color:#fff;font-size:13.5px;outline:none;box-sizing:border-box;">
+        </div>
+
+        <div>
+          <label style="display:block;font-size:11px;font-weight:700;color:#8c8c8c;text-transform:uppercase;margin-bottom:6px;">E-mail (opcional)</label>
+          <input type="email" id="edit-pax-email" placeholder="exemplo@gmail.com" style="width:100%;background:#1c1c1c;border:1px solid #2e2e2e;border-radius:10px;padding:11px 12px;color:#fff;font-size:13.5px;outline:none;box-sizing:border-box;">
+        </div>
+      </div>
+    </div>
+
+    <!-- Moradas Frequentes (Favoritos) -->
+    <div style="background:#141414;border:1px solid #262626;border-radius:18px;padding:18px;margin-bottom:16px;">
+      <div style="font-size:14px;font-weight:800;color:#fff;margin-bottom:14px;">Locais Guardados / Moradas</div>
+
+      <div style="display:flex;flex-direction:column;gap:12px;">
+        <div>
+          <label style="display:block;font-size:11px;font-weight:700;color:#8c8c8c;text-transform:uppercase;margin-bottom:6px;">🏠 Morada de Casa</label>
+          <input type="text" id="edit-pax-home" placeholder="Ex: Centralidade do Kilamba, Bloco 12" value="Centralidade do Kilamba" style="width:100%;background:#1c1c1c;border:1px solid #2e2e2e;border-radius:10px;padding:11px 12px;color:#fff;font-size:13.5px;outline:none;box-sizing:border-box;">
+        </div>
+
+        <div>
+          <label style="display:block;font-size:11px;font-weight:700;color:#8c8c8c;text-transform:uppercase;margin-bottom:6px;">💼 Morada do Trabalho</label>
+          <input type="text" id="edit-pax-work" placeholder="Ex: Belas Business Park, Talatona" value="Belas Business Park" style="width:100%;background:#1c1c1c;border:1px solid #2e2e2e;border-radius:10px;padding:11px 12px;color:#fff;font-size:13.5px;outline:none;box-sizing:border-box;">
+        </div>
+
+        <div>
+          <label style="display:block;font-size:11px;font-weight:700;color:#8c8c8c;text-transform:uppercase;margin-bottom:6px;">📍 Ponto de Referência Padrão</label>
+          <input type="text" id="edit-pax-ref" placeholder="Ex: Próximo à bomba Sonangol" style="width:100%;background:#1c1c1c;border:1px solid #2e2e2e;border-radius:10px;padding:11px 12px;color:#fff;font-size:13.5px;outline:none;box-sizing:border-box;">
+        </div>
+      </div>
+
+      <button type="button" onclick="savePassengerProfileData()" style="width:100%;margin-top:16px;padding:13px;border-radius:12px;background:#ffffff;color:#000;font-size:13.5px;font-weight:900;border:none;cursor:pointer;transition:all 0.15s ease;">
+        Guardar Alterações do Perfil
+      </button>
+      <div id="profile-save-status" style="display:none;font-size:12px;color:#06C167;font-weight:700;text-align:center;margin-top:8px;">✓ Dados atualizados com sucesso!</div>
+    </div>
+
     <!-- Definições e Província -->
-    <div style="background:#121612;border:1px solid #262626;border-radius:14px;padding:16px;margin-bottom:14px;">
-      <div style="font-size:13px;font-weight:700;color:#fff;margin-bottom:12px;">Preferências</div>
+    <div style="background:#141414;border:1px solid #262626;border-radius:18px;padding:18px;margin-bottom:16px;">
+      <div style="font-size:14px;font-weight:800;color:#fff;margin-bottom:12px;">Preferências da Aplicação</div>
       
-      <div style="display:flex;justify-content:space-between;align-items:center;padding-bottom:12px;border-bottom:1px solid #1f241f;">
-        <span style="font-size:13px;color:#a6a6a6;">Província / Cidade</span>
-        <select id="profile-prov-select" onchange="changeProvince(this.value)" style="background:#1a211b;border:1px solid #333;color:#fff;padding:6px 10px;border-radius:8px;font-size:12px;outline:none;">
+      <div style="display:flex;justify-content:space-between;align-items:center;padding-bottom:12px;border-bottom:1px solid #222;">
+        <span style="font-size:13px;color:#8c8c8c;">Província / Cidade</span>
+        <select id="profile-prov-select" onchange="changeProvince(this.value)" style="background:#1c1c1c;border:1px solid #2e2e2e;color:#fff;padding:6px 10px;border-radius:8px;font-size:12px;outline:none;">
           <option value="luanda">Luanda</option>
           <option value="benguela">Benguela</option>
           <option value="lobito">Lobito</option>
@@ -785,29 +848,29 @@ body { overscroll-behavior: none; }
       </div>
 
       <div style="display:flex;justify-content:space-between;align-items:center;padding-top:12px;">
-        <span style="font-size:13px;color:#a6a6a6;">Idioma</span>
-        <span style="font-size:12px;color:#fff;font-weight:600;">Português (Angola)</span>
+        <span style="font-size:13px;color:#8c8c8c;">Idioma</span>
+        <span style="font-size:12px;color:#fff;font-weight:700;">Português (Angola)</span>
       </div>
     </div>
 
     <!-- Documentação Legal & Conformidade App Store / Play Store -->
-    <div style="background:#121612;border:1px solid #262626;border-radius:14px;padding:16px;margin-bottom:14px;">
-      <div style="font-size:13px;font-weight:700;color:#fff;margin-bottom:10px;">Segurança & Legal</div>
-      <a href="termos.html" style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid #1f241f;color:#fff;text-decoration:none;">
+    <div style="background:#141414;border:1px solid #262626;border-radius:18px;padding:18px;margin-bottom:16px;">
+      <div style="font-size:14px;font-weight:800;color:#fff;margin-bottom:10px;">Segurança & Legal</div>
+      <a href="termos.html" style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid #222;color:#fff;text-decoration:none;">
         <span style="font-size:13px;">Termos de Uso</span>
-        <span style="color:#8d9e8d;">›</span>
+        <span style="color:#8c8c8c;">›</span>
       </a>
-      <a href="privacidade.html" style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid #1f241f;color:#fff;text-decoration:none;">
+      <a href="privacidade.html" style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid #222;color:#fff;text-decoration:none;">
         <span style="font-size:13px;">Política de Privacidade</span>
-        <span style="color:#8d9e8d;">›</span>
+        <span style="color:#8c8c8c;">›</span>
       </a>
-      <a href="eliminar-conta.html" style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;color:#ef4444;text-decoration:none;">
-        <span style="font-size:13px;font-weight:600;">Eliminar Minha Conta</span>
-        <span style="color:#ef4444;">›</span>
+      <a href="eliminar-conta.html" style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;color:#e11900;text-decoration:none;">
+        <span style="font-size:13px;font-weight:700;">Eliminar Minha Conta</span>
+        <span style="color:#e11900;">›</span>
       </a>
     </div>
 
-    <button onclick="GiroAuth.logout()" style="width:100%;padding:14px;border-radius:10px;background:rgba(239,68,68,0.12);border:1px solid rgba(239,68,68,0.3);color:#fca5a5;font-size:14px;font-weight:700;cursor:pointer;">
+    <button onclick="GiroAuth.logout()" style="width:100%;padding:14px;border-radius:12px;background:rgba(225,25,0,0.12);border:1px solid rgba(225,25,0,0.3);color:#ff6b6b;font-size:14px;font-weight:800;cursor:pointer;">
       Sair da Conta
     </button>
   </section>
@@ -1361,6 +1424,57 @@ window.addEventListener('DOMContentLoaded', () => {
 
 
 <script>
+function handleProfilePhotoUpload(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(evt) {
+    const photoData = evt.target.result;
+    const s = GiroAuth.get() || { role: 'passageiro', nome: 'Utilizador GIRO', phone: '+244 9XX XXX XXX' };
+    s.photo = photoData;
+    GiroAuth.save(s);
+    updateProfileView();
+    GiroAuth.renderUserPill('auth-pill');
+  };
+  reader.readAsDataURL(file);
+}
+
+function savePassengerProfileData() {
+  const name = document.getElementById('edit-pax-name').value.trim();
+  const phone = document.getElementById('edit-pax-phone').value.trim();
+  const email = document.getElementById('edit-pax-email').value.trim();
+  const home = document.getElementById('edit-pax-home').value.trim();
+  const work = document.getElementById('edit-pax-work').value.trim();
+  const ref = document.getElementById('edit-pax-ref').value.trim();
+
+  const s = GiroAuth.get() || { role: 'passageiro' };
+  s.nome = name || 'Utilizador GIRO';
+  s.phone = phone || '+244 9XX XXX XXX';
+  s.email = email;
+  s.home = home;
+  s.work = work;
+  s.ref = ref;
+
+  GiroAuth.save(s);
+  updateProfileView();
+  GiroAuth.renderUserPill('auth-pill');
+
+  if (home) {
+    const chips = document.querySelectorAll('.quick-chips-row .q-chip');
+    if (chips.length >= 2) chips[1].textContent = `🏠 Casa (${home.split(',')[0].slice(0, 10)})`;
+  }
+  if (work) {
+    const chips = document.querySelectorAll('.quick-chips-row .q-chip');
+    if (chips.length >= 3) chips[2].textContent = `💼 Trabalho (${work.split(',')[0].slice(0, 10)})`;
+  }
+
+  const msg = document.getElementById('profile-save-status');
+  if (msg) {
+    msg.style.display = 'block';
+    setTimeout(() => { msg.style.display = 'none'; }, 3000);
+  }
+}
+
 function openPaxAuthModal(tab = 'login') {
   const m = document.getElementById('pax-auth-modal');
   if (m) {
@@ -1378,12 +1492,12 @@ function switchPaxAuthTab(tab) {
   const formL = document.getElementById('form-pax-login');
   const formR = document.getElementById('form-pax-register');
   if (tab === 'login') {
-    if (btnL) { btnL.style.background = 'var(--gold)'; btnL.style.color = '#000'; btnL.style.fontWeight = '700'; }
+    if (btnL) { btnL.style.background = '#ffffff'; btnL.style.color = '#000'; btnL.style.fontWeight = '800'; }
     if (btnR) { btnR.style.background = 'none'; btnR.style.color = '#8d9e8d'; btnR.style.fontWeight = '600'; }
     if (formL) formL.style.display = 'block';
     if (formR) formR.style.display = 'none';
   } else {
-    if (btnR) { btnR.style.background = 'var(--gold)'; btnR.style.color = '#000'; btnR.style.fontWeight = '700'; }
+    if (btnR) { btnR.style.background = '#ffffff'; btnR.style.color = '#000'; btnR.style.fontWeight = '800'; }
     if (btnL) { btnL.style.background = 'none'; btnL.style.color = '#8d9e8d'; btnL.style.fontWeight = '600'; }
     if (formR) formR.style.display = 'block';
     if (formL) formL.style.display = 'none';
@@ -1392,7 +1506,8 @@ function switchPaxAuthTab(tab) {
 function handlePaxLogin(e) {
   e.preventDefault();
   const phone = document.getElementById('pax-login-phone').value.trim();
-  GiroAuth.save({ phone, nome: 'Passageiro GIRO', role: 'passageiro' });
+  const s = GiroAuth.get() || {};
+  GiroAuth.save({ ...s, phone, nome: s.nome || 'Passageiro GIRO', role: 'passageiro' });
   closePaxAuthModal();
   GiroAuth.renderUserPill('auth-pill');
   updateProfileView();
@@ -1401,18 +1516,50 @@ function handlePaxRegister(e) {
   e.preventDefault();
   const name = document.getElementById('pax-reg-name').value.trim();
   const phone = document.getElementById('pax-reg-phone').value.trim();
-  GiroAuth.save({ phone, nome: name || 'Passageiro GIRO', role: 'passageiro' });
+  const s = GiroAuth.get() || {};
+  GiroAuth.save({ ...s, phone, nome: name || 'Passageiro GIRO', role: 'passageiro' });
   closePaxAuthModal();
   GiroAuth.renderUserPill('auth-pill');
   updateProfileView();
 }
 function updateProfileView() {
   const s = (typeof GiroAuth !== 'undefined') ? GiroAuth.get() : null;
-  if (s) {
-    const pn = document.getElementById('profile-user-name');
-    const pp = document.getElementById('profile-user-phone');
-    if (pn) pn.textContent = s.nome || 'Passageiro GIRO';
-    if (pp) pp.textContent = s.phone || '+244 9XX XXX XXX';
+  const pn = document.getElementById('profile-user-name');
+  const pp = document.getElementById('profile-user-phone');
+  const pe = document.getElementById('edit-pax-email');
+  const en = document.getElementById('edit-pax-name');
+  const ep = document.getElementById('edit-pax-phone');
+  const eh = document.getElementById('edit-pax-home');
+  const ew = document.getElementById('edit-pax-work');
+  const er = document.getElementById('edit-pax-ref');
+  
+  const initSpan = document.getElementById('profile-avatar-initials');
+  const imgEl = document.getElementById('profile-avatar-img');
+
+  if (s && s.role === 'passageiro') {
+    const name = s.nome || 'Utilizador GIRO';
+    const phone = s.phone || '+244 9XX XXX XXX';
+    if (pn) pn.textContent = name;
+    if (pp) pp.textContent = phone;
+    if (en) en.value = name;
+    if (ep) ep.value = phone;
+    if (pe && s.email) pe.value = s.email;
+    if (eh && s.home) eh.value = s.home;
+    if (ew && s.work) ew.value = s.work;
+    if (er && s.ref) er.value = s.ref;
+
+    if (s.photo) {
+      if (imgEl) { imgEl.src = s.photo; imgEl.style.display = 'block'; }
+      if (initSpan) initSpan.style.display = 'none';
+    } else {
+      if (imgEl) imgEl.style.display = 'none';
+      if (initSpan) { initSpan.style.display = 'block'; initSpan.textContent = (name[0] || 'U').toUpperCase(); }
+    }
+  } else {
+    if (pn) pn.textContent = 'Utilizador GIRO';
+    if (pp) pp.textContent = '+244 9XX XXX XXX';
+    if (imgEl) imgEl.style.display = 'none';
+    if (initSpan) { initSpan.style.display = 'block'; initSpan.textContent = 'U'; }
   }
 }
 
@@ -1441,10 +1588,17 @@ const GiroAuth={
     if(!el)return;
     if(s && s.role === 'passageiro'){
       const initials=(s.nome||s.phone||'P')[0].toUpperCase();
+      const avatarHtml = s.photo 
+        ? `<img src="${s.photo}" style="width:32px;height:32px;border-radius:50%;object-fit:cover;border:1.5px solid #fff;">`
+        : `<div style="width:32px;height:32px;border-radius:50%;background:#ffffff;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:14px;color:#000;">${initials}</div>`;
+
       el.innerHTML=`<div style="display:flex;align-items:center;gap:8px;">
-        <div style="width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#ffffff,#ffffff);display:flex;align-items:center;justify-content:center;font-weight:900;font-size:14px;color:#000;">${initials}</div>
-        <div style="line-height:1.2;"><div style="font-size:13px;font-weight:700;color:#f1f5f1;">${s.nome||s.phone}</div><div style="font-size:10px;color:#8d9e8d;text-transform:uppercase;">🧑 Passageiro</div></div>
-        <button onclick="GiroAuth.logout()" style="margin-left:4px;background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.3);border-radius:8px;padding:5px 10px;color:#fca5a5;font-size:12px;cursor:pointer;">Sair</button>
+        ${avatarHtml}
+        <div style="line-height:1.2;cursor:pointer;" onclick="switchTab('profile')">
+          <div style="font-size:13px;font-weight:700;color:#ffffff;">${s.nome||s.phone}</div>
+          <div style="font-size:10px;color:#06C167;text-transform:uppercase;font-weight:700;">🧑 Passageiro</div>
+        </div>
+        <button onclick="GiroAuth.logout()" style="margin-left:4px;background:rgba(225,25,0,.15);border:1px solid rgba(225,25,0,.3);border-radius:8px;padding:5px 10px;color:#ff6b6b;font-size:12px;font-weight:700;cursor:pointer;">Sair</button>
       </div>`;
     }else{
       el.innerHTML='<button onclick="openPaxAuthModal()" style="border:none;outline:none;cursor:pointer;padding:7px 14px;border-radius:20px;background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.25);color:#ffffff;font-size:13px;font-weight:700;display:flex;align-items:center;gap:5px;">&#128100; Entrar</button>';
@@ -1457,6 +1611,7 @@ const GiroAuth={
     if (pn) pn.textContent = 'Utilizador GIRO';
     if (pp) pp.textContent = '+244 9XX XXX XXX';
     this.renderUserPill('auth-pill');
+    updateProfileView();
   }
 };
 document.addEventListener('DOMContentLoaded',function(){
