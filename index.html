@@ -71,7 +71,7 @@ html, body{
    ========================================================================== */
 .uber-header{
   padding:calc(10px + var(--safe-top)) 14px 10px;
-  background:rgba(7,9,7,0.95);
+  background:rgba(14,14,14,0.96);
   border-bottom:1px solid var(--line);
   display:flex;align-items:center;justify-content:space-between;
   z-index:100;flex-shrink:0;gap:8px;
@@ -122,7 +122,7 @@ html, body{
    2. VIEWPORT & MAPA GPS AO VIVO (UBER LIVE EXPERIENCE)
    ========================================================================== */
 .viewport-body{flex:1;position:relative;overflow:hidden;display:flex;}
-.map-canvas{position:absolute;inset:0;background:#090b09;overflow:hidden;z-index:1;}
+.map-canvas{position:absolute;inset:0;background:#080808;overflow:hidden;z-index:1;}
 .map-canvas svg{width:100%;height:100%;display:block;}
 
 /* VIATURAS ANIMADAS NO MAPA */
@@ -154,7 +154,7 @@ html, body{
   display:flex;align-items:center;justify-content:space-between;pointer-events:none;
 }
 .map-btn{
-  pointer-events:auto;background:rgba(7,9,7,0.95);
+  pointer-events:auto;background:rgba(14,14,14,0.96);
   border:1px solid var(--line);color:#fff;border-radius:50%;
   width:42px;height:42px;display:flex;align-items:center;justify-content:center;
   cursor:pointer;font-size:16px;box-shadow:0 8px 24px rgba(0,0,0,0.7);
@@ -167,7 +167,7 @@ html, body{
 }
 .map-status-pill{
   pointer-events:auto;background:rgba(18,18,18,0.95);
-  background:rgba(7,9,7,0.95);border:1px solid var(--line);
+  background:rgba(14,14,14,0.96);border:1px solid var(--line);
   padding:8px 14px;border-radius:20px;font-size:11.5px;font-weight:700;
   display:none;align-items:center;gap:7px;box-shadow:0 8px 20px rgba(0,0,0,.6);
 }
@@ -180,12 +180,12 @@ html, body{
 .uber-sheet{
   position:absolute;left:0;right:0;bottom:0;z-index:50;
   background:rgba(14,14,14,0.98);
-  background:rgba(7,9,7,0.95);
+  background:rgba(14,14,14,0.96);
   border-radius:24px 24px 0 0;
   border-top:1px solid var(--line);
   box-shadow:0 -12px 50px rgba(0,0,0,0.95);
   padding:8px 18px calc(14px + var(--safe-bottom));
-  max-height:88%;
+  max-height:60%;
   overflow-y:auto;
   scrollbar-width:none;
   transition:transform .3s cubic-bezier(0.2, 0.9, 0.3, 1);
@@ -212,7 +212,7 @@ html, body{
 
 /* BANNER DE FIDELIDADE & CUPONS PROMO */
 .promo-club-banner{
-  background:linear-gradient(135deg, #1b2417 0%, #111710 100%);
+  background:linear-gradient(135deg, #161616 0%, #121212 100%);
   border:1px solid rgba(79,227,106,0.35);border-radius:14px;
   padding:10px 14px;margin-bottom:12px;display:flex;align-items:center;
   justify-content:space-between;gap:10px;
@@ -374,7 +374,7 @@ html, body{
 /* MODAIS */
 .modal-backdrop{
   position:fixed;inset:0;background:rgba(0,0,0,.88);
-  background:rgba(7,9,7,0.95);
+  background:rgba(14,14,14,0.96);
   z-index:9999;display:none;align-items:flex-start;justify-content:center;
   padding:calc(16px + var(--safe-top)) 16px calc(24px + var(--safe-bottom));
   overflow-y:auto;
@@ -413,9 +413,9 @@ body { overscroll-behavior: none; }
 <body>
 
 
-<div id="giro-splash" style="position:fixed;inset:0;background:#070907;z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;transition:opacity 0.2s ease;">
+<div id="giro-splash" style="position:fixed;inset:0;background:#000000;z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;transition:opacity 0.2s ease;">
   <div style="font-size:48px;font-weight:900;color:#ffffff;letter-spacing:-2px;line-height:1;">GIRO</div>
-  <div style="font-size:11px;letter-spacing:4px;color:#8d9e8d;text-transform:uppercase;margin-top:6px;">Angola · Mobilidade</div>
+  <div style="font-size:11px;letter-spacing:4px;color:#8c8c8c;text-transform:uppercase;margin-top:6px;">Angola · Mobilidade</div>
 </div>
 
 <div id="app-root">
@@ -437,37 +437,57 @@ body { overscroll-behavior: none; }
   <!-- 2. VIEWPORT COM MAPA GPS AO VIVO -->
   <main class="viewport-body">
     <div class="map-canvas">
-      <svg viewBox="0 0 400 800" preserveAspectRatio="xMidYMid slice">
-        <rect width="400" height="800" fill="#090b09"/>
-        <!-- Ruas Principais de Luanda -->
-        <path d="M-20 220 H420" stroke="#1c221c" stroke-width="26"/>
-        <path d="M-20 500 H420" stroke="#1c221c" stroke-width="20"/>
-        <path d="M100 -20 V820" stroke="#1c221c" stroke-width="22"/>
-        <path d="M280 -20 V820" stroke="#1c221c" stroke-width="18"/>
-        <path d="M-20 360 L420 320" stroke="#141814" stroke-width="12"/>
-        <path d="M-20 640 H420" stroke="#141814" stroke-width="12"/>
-        <path d="M190 -20 V820" stroke="#141814" stroke-width="10"/>
+      <svg viewBox="0 0 400 800" preserveAspectRatio="xMidYMid slice" id="uber-map-svg">
+        <rect width="400" height="800" fill="#090909"/>
+        
+        <!-- Quarteirões e Zonas Urbanas de Luanda -->
+        <rect x="20" y="40" width="70" height="150" rx="6" fill="#141414"/>
+        <rect x="115" y="40" width="150" height="150" rx="6" fill="#141414"/>
+        <rect x="295" y="40" width="85" height="150" rx="6" fill="#141414"/>
+        
+        <rect x="20" y="240" width="70" height="120" rx="6" fill="#141414"/>
+        <rect x="115" y="240" width="65" height="120" rx="6" fill="#141414"/>
+        <rect x="200" y="240" width="65" height="120" rx="6" fill="#141414"/>
+        <rect x="295" y="240" width="85" height="120" rx="6" fill="#141414"/>
+        
+        <rect x="20" y="410" width="70" height="120" rx="6" fill="#141414"/>
+        <rect x="115" y="410" width="150" height="120" rx="6" fill="#141414"/>
+        <rect x="295" y="410" width="85" height="120" rx="6" fill="#141414"/>
 
-        <!-- Quarteirões Urbanos -->
-        <rect x="120" y="240" width="60" height="52" fill="#0f130f"/>
-        <rect x="210" y="240" width="40" height="52" fill="#0f130f"/>
-        <rect x="120" y="380" width="40" height="44" fill="#0f130f"/>
-        <rect x="290" y="380" width="60" height="44" fill="#0f130f"/>
-        <rect x="30" y="240" width="52" height="52" fill="#0f130f"/>
-        <rect x="30" y="530" width="52" height="70" fill="#0f130f"/>
-        <rect x="200" y="530" width="50" height="70" fill="#0f130f"/>
+        <!-- Ruas Principais -->
+        <path d="M-20 215 H420" stroke="#222222" stroke-width="26"/>
+        <path d="M-20 385 H420" stroke="#222222" stroke-width="22"/>
+        <path d="M-20 560 H420" stroke="#222222" stroke-width="24"/>
+        
+        <path d="M100 -20 V820" stroke="#222222" stroke-width="22"/>
+        <path d="M280 -20 V820" stroke="#222222" stroke-width="22"/>
+        <path d="M190 200 V400" stroke="#1c1c1c" stroke-width="12"/>
 
-        <!-- Rota Polyline Traçada Dinamicamente -->
-        <path id="pax-route-svg" d="M100 500 L100 220 L280 220 L280 90" stroke="var(--gold)" stroke-width="4.5" fill="none" stroke-linecap="round" opacity="0" style="stroke-dasharray:700;stroke-dashoffset:700;"/>
+        <!-- Linhas divisórias de faixa -->
+        <path d="M-20 215 H420" stroke="#333333" stroke-width="1.5" stroke-dasharray="8 6"/>
+        <path d="M-20 560 H420" stroke="#333333" stroke-width="1.5" stroke-dasharray="8 6"/>
+        <path d="M100 -20 V820" stroke="#333333" stroke-width="1.5" stroke-dasharray="8 6"/>
+        <path d="M280 -20 V820" stroke="#333333" stroke-width="1.5" stroke-dasharray="8 6"/>
+
+        <!-- Rota de Aproximação do Motorista ao Passageiro (Tracejado Azul/Verde) -->
+        <path id="driver-approach-route" d="M280 640 L280 560 L100 560" stroke="#276EF1" stroke-width="4" stroke-linecap="round" fill="none" opacity="0" stroke-dasharray="6 4"/>
+
+        <!-- Rota Principal Passageiro -> Destino (Polyline Branca Uber) -->
+        <path id="pax-route-svg" d="M100 560 L100 215 L280 215 L280 90" stroke="#ffffff" stroke-width="5" fill="none" stroke-linecap="round" opacity="0" style="stroke-dasharray:800;stroke-dashoffset:800;filter:drop-shadow(0 0 6px rgba(255,255,255,0.6));"/>
       </svg>
 
-      <!-- Viaturas Ativas em Circulação (Simulação GPS em Tempo Real) -->
-      <div class="map-car" id="pax-car-el" style="left:280px;top:640px;opacity:0;">
-        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="11" fill="#fff"/><path d="M6.5 13.5v-2.2l1.3-3a1 1 0 0 1 .9-.6h6.6a1 1 0 0 1 .9.6l1.3 3v2.2a.8.8 0 0 1-.8.8h-.6a.8.8 0 0 1-.8-.8v-.4H8.7v.4a.8.8 0 0 1-.8.8h-.6a.8.8 0 0 1-.8-.8Z" fill="#000"/></svg>
+      <!-- Viatura do Motorista com Rastreio em Tempo Real -->
+      <div class="map-car" id="pax-car-el" style="left:280px;top:640px;opacity:0;transition:all 1.2s cubic-bezier(0.4, 0, 0.2, 1);z-index:25;">
+        <div style="position:relative;display:flex;flex-direction:column;align-items:center;">
+          <div style="background:#000;color:#fff;font-size:9.5px;font-weight:800;padding:2px 7px;border-radius:6px;border:1px solid #333;white-space:nowrap;margin-bottom:2px;box-shadow:0 4px 10px rgba(0,0,0,0.8);" id="driver-bubble-eta">🚗 3 min</div>
+          <div style="width:34px;height:34px;border-radius:50%;background:#ffffff;border:2.5px solid #000;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(0,0,0,0.9);">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="#000"><path d="M18.92 6.01C18.72 5.42 18.16 5 17.5 5h-11c-.66 0-1.21.42-1.42 1.01L3 12v8c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1h12v1c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-8l-2.08-5.99zM6.85 7h10.29l1.04 3H5.81l1.04-3zM19 17H5v-4.66l.12-.34h13.77l.11.34V17z"/><circle cx="7.5" cy="14.5" r="1.5"/><circle cx="16.5" cy="14.5" r="1.5"/></svg>
+          </div>
+        </div>
       </div>
 
       <!-- Marcadores de Posição GPS -->
-      <div class="map-pin a" id="pax-pin-a" style="left:100px;top:500px;">
+      <div class="map-pin a" id="pax-pin-a" style="left:100px;top:560px;">
         <div class="pin-label" id="pax-origin-lab">Talatona</div>
         <div class="pin-circle"></div>
       </div>
@@ -668,17 +688,17 @@ body { overscroll-behavior: none; }
   <!-- TAB SECTIONS (NATIVE SHOW / HIDE) -->
 
   <!-- TAB: CORRIDAS (HISTÓRICO) -->
-  <section id="tab-rides" style="display:none;flex:1;overflow-y:auto;padding:16px 16px 80px;background:#070907;">
+  <section id="tab-rides" style="display:none;flex:1;overflow-y:auto;padding:16px 16px 80px;background:#000000;">
     <h2 style="font-size:20px;font-weight:800;color:#fff;margin-bottom:14px;">As Minhas Corridas</h2>
     
     <div style="background:#121612;border:1px solid #262626;border-radius:14px;padding:14px;margin-bottom:12px;">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
         <span style="font-size:11px;font-weight:700;color:#4fe36a;background:rgba(79,227,106,0.12);padding:3px 8px;border-radius:6px;">Concluída</span>
-        <span style="font-size:11px;color:#8d9e8d;">Hoje, 14:20</span>
+        <span style="font-size:11px;color:#8c8c8c;">Hoje, 14:20</span>
       </div>
       <div style="font-size:14px;font-weight:700;color:#fff;margin-bottom:4px;">🚗 GIRO Económico · Domingos M.</div>
       <div style="font-size:12px;color:#a6a6a6;margin-bottom:10px;">Talatona (Rua Principal) → Kilamba (Bloco 12)</div>
-      <div style="display:flex;justify-content:space-between;align-items:center;border-top:1px solid #1f241f;padding-top:10px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;border-top:1px solid #262626;padding-top:10px;">
         <span style="font-size:11px;color:#ffffff;">Multicaixa Express</span>
         <b style="font-size:15px;color:#fff;">2.450 Kz</b>
       </div>
@@ -687,11 +707,11 @@ body { overscroll-behavior: none; }
     <div style="background:#121612;border:1px solid #262626;border-radius:14px;padding:14px;margin-bottom:12px;">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
         <span style="font-size:11px;font-weight:700;color:#4fe36a;background:rgba(79,227,106,0.12);padding:3px 8px;border-radius:6px;">Concluída</span>
-        <span style="font-size:11px;color:#8d9e8d;">Ontem, 08:45</span>
+        <span style="font-size:11px;color:#8c8c8c;">Ontem, 08:45</span>
       </div>
       <div style="font-size:14px;font-weight:700;color:#fff;margin-bottom:4px;">🏍️ GIRO Moto (Kupapata) · Mateus K.</div>
       <div style="font-size:12px;color:#a6a6a6;margin-bottom:10px;">Maianga → Mutamba (Largo)</div>
-      <div style="display:flex;justify-content:space-between;align-items:center;border-top:1px solid #1f241f;padding-top:10px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;border-top:1px solid #262626;padding-top:10px;">
         <span style="font-size:11px;color:#ffffff;">Dinheiro</span>
         <b style="font-size:15px;color:#fff;">1.150 Kz</b>
       </div>
@@ -700,11 +720,11 @@ body { overscroll-behavior: none; }
     <div style="background:#121612;border:1px solid #262626;border-radius:14px;padding:14px;margin-bottom:12px;">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
         <span style="font-size:11px;font-weight:700;color:#4fe36a;background:rgba(79,227,106,0.12);padding:3px 8px;border-radius:6px;">Concluída</span>
-        <span style="font-size:11px;color:#8d9e8d;">14 Set, 19:10</span>
+        <span style="font-size:11px;color:#8c8c8c;">14 Set, 19:10</span>
       </div>
       <div style="font-size:14px;font-weight:700;color:#fff;margin-bottom:4px;">📦 GIRO Flash Moto · André F.</div>
       <div style="font-size:12px;color:#a6a6a6;margin-bottom:10px;">Belas Business Park → Viana</div>
-      <div style="display:flex;justify-content:space-between;align-items:center;border-top:1px solid #1f241f;padding-top:10px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;border-top:1px solid #262626;padding-top:10px;">
         <span style="font-size:11px;color:#ffffff;">Unitel Money</span>
         <b style="font-size:15px;color:#fff;">1.800 Kz</b>
       </div>
@@ -712,7 +732,7 @@ body { overscroll-behavior: none; }
   </section>
 
   <!-- TAB: CARTEIRA -->
-  <section id="tab-wallet" style="display:none;flex:1;overflow-y:auto;padding:16px 16px 80px;background:#070907;">
+  <section id="tab-wallet" style="display:none;flex:1;overflow-y:auto;padding:16px 16px 80px;background:#000000;">
     <h2 style="font-size:20px;font-weight:800;color:#fff;margin-bottom:14px;">Carteira GIRO</h2>
 
     <div style="background:#181818;border:1px solid #ffffff;border-radius:16px;padding:20px;margin-bottom:18px;box-shadow:0 8px 24px rgba(0,0,0,0.5);">
@@ -726,19 +746,19 @@ body { overscroll-behavior: none; }
 
     <div style="background:#121612;border:1px solid #262626;border-radius:14px;padding:16px;margin-bottom:14px;">
       <div style="font-size:13px;font-weight:700;color:#fff;margin-bottom:10px;">Métodos de Pagamento Guardados</div>
-      <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid #1f241f;">
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid #262626;">
         <div style="display:flex;align-items:center;gap:10px;">
           <span style="font-size:20px;">💳</span>
-          <div><div style="font-size:13px;font-weight:600;color:#fff;">Multicaixa Express</div><div style="font-size:11px;color:#8d9e8d;">Principal · 923 ••• •••</div></div>
+          <div><div style="font-size:13px;font-weight:600;color:#fff;">Multicaixa Express</div><div style="font-size:11px;color:#8c8c8c;">Principal · 923 ••• •••</div></div>
         </div>
         <span style="color:#4fe36a;font-weight:700;font-size:12px;">Activo</span>
       </div>
       <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;">
         <div style="display:flex;align-items:center;gap:10px;">
           <span style="font-size:20px;">📱</span>
-          <div><div style="font-size:13px;font-weight:600;color:#fff;">Unitel Money</div><div style="font-size:11px;color:#8d9e8d;">923 ••• •••</div></div>
+          <div><div style="font-size:13px;font-weight:600;color:#fff;">Unitel Money</div><div style="font-size:11px;color:#8c8c8c;">923 ••• •••</div></div>
         </div>
-        <span style="color:#8d9e8d;font-size:12px;">Conectado</span>
+        <span style="color:#8c8c8c;font-size:12px;">Conectado</span>
       </div>
     </div>
 
@@ -752,7 +772,7 @@ body { overscroll-behavior: none; }
       <div style="height:6px;background:#222;border-radius:3px;overflow:hidden;margin-bottom:6px;">
         <div style="width:60%;height:100%;background:#ffffff;"></div>
       </div>
-      <small style="color:#8d9e8d;font-size:10px;">3 de 5 corridas completadas</small>
+      <small style="color:#8c8c8c;font-size:10px;">3 de 5 corridas completadas</small>
     </div>
   </section>
 
@@ -908,24 +928,24 @@ body { overscroll-behavior: none; }
             <span style="font-size:11px;color:var(--gold);">Segurança 24h Luanda</span>
           </div>
         </div>
-        <button onclick="closePaxAuthModal()" style="background:none;border:none;color:#8d9e8d;font-size:22px;cursor:pointer;">✕</button>
+        <button onclick="closePaxAuthModal()" style="background:none;border:none;color:#8c8c8c;font-size:22px;cursor:pointer;">✕</button>
       </div>
 
       <!-- Abas Entrar / Cadastro -->
-      <div style="display:flex;background:#1b221b;border-radius:10px;padding:4px;margin-bottom:18px;">
+      <div style="display:flex;background:#1a1a1a;border-radius:10px;padding:4px;margin-bottom:18px;">
         <button id="tab-btn-login" onclick="switchPaxAuthTab('login')" style="flex:1;background:var(--gold);color:#000;border:none;border-radius:8px;padding:8px;font-size:13px;font-weight:700;cursor:pointer;">Entrar</button>
-        <button id="tab-btn-register" onclick="switchPaxAuthTab('register')" style="flex:1;background:none;color:#8d9e8d;border:none;border-radius:8px;padding:8px;font-size:13px;font-weight:600;cursor:pointer;">Criar Conta</button>
+        <button id="tab-btn-register" onclick="switchPaxAuthTab('register')" style="flex:1;background:none;color:#8c8c8c;border:none;border-radius:8px;padding:8px;font-size:13px;font-weight:600;cursor:pointer;">Criar Conta</button>
       </div>
 
       <!-- Formulário de Login -->
       <form id="form-pax-login" onsubmit="handlePaxLogin(event)">
         <div style="margin-bottom:12px;">
           <label style="display:block;font-size:12px;color:#a6a6a6;margin-bottom:6px;">Telefone / WhatsApp</label>
-          <input type="tel" id="pax-login-phone" placeholder="923 000 000" value="923 456 789" required style="width:100%;background:#090d0a;border:1px solid #262626;border-radius:10px;padding:12px;color:#fff;font-size:14px;outline:none;">
+          <input type="tel" id="pax-login-phone" placeholder="923 000 000" value="923 456 789" required style="width:100%;background:#161616;border:1px solid #262626;border-radius:10px;padding:12px;color:#fff;font-size:14px;outline:none;">
         </div>
         <div style="margin-bottom:18px;">
           <label style="display:block;font-size:12px;color:#a6a6a6;margin-bottom:6px;">Palavra-passe</label>
-          <input type="password" id="pax-login-pass" placeholder="••••••••" value="123456" required style="width:100%;background:#090d0a;border:1px solid #262626;border-radius:10px;padding:12px;color:#fff;font-size:14px;outline:none;">
+          <input type="password" id="pax-login-pass" placeholder="••••••••" value="123456" required style="width:100%;background:#161616;border:1px solid #262626;border-radius:10px;padding:12px;color:#fff;font-size:14px;outline:none;">
         </div>
         <button type="submit" class="btn-uber-main" style="width:100%;padding:14px;border-radius:12px;background:var(--gold-grad);color:#000;font-weight:800;font-size:14px;cursor:pointer;border:none;">Entrar no GIRO</button>
       </form>
@@ -934,15 +954,15 @@ body { overscroll-behavior: none; }
       <form id="form-pax-register" onsubmit="handlePaxRegister(event)" style="display:none;">
         <div style="margin-bottom:12px;">
           <label style="display:block;font-size:12px;color:#a6a6a6;margin-bottom:6px;">Nome Completo</label>
-          <input type="text" id="pax-reg-name" placeholder="Ex: Isaac Carvalho" required style="width:100%;background:#090d0a;border:1px solid #262626;border-radius:10px;padding:12px;color:#fff;font-size:14px;outline:none;">
+          <input type="text" id="pax-reg-name" placeholder="Ex: Isaac Carvalho" required style="width:100%;background:#161616;border:1px solid #262626;border-radius:10px;padding:12px;color:#fff;font-size:14px;outline:none;">
         </div>
         <div style="margin-bottom:12px;">
           <label style="display:block;font-size:12px;color:#a6a6a6;margin-bottom:6px;">Telefone / WhatsApp</label>
-          <input type="tel" id="pax-reg-phone" placeholder="923 000 000" required style="width:100%;background:#090d0a;border:1px solid #262626;border-radius:10px;padding:12px;color:#fff;font-size:14px;outline:none;">
+          <input type="tel" id="pax-reg-phone" placeholder="923 000 000" required style="width:100%;background:#161616;border:1px solid #262626;border-radius:10px;padding:12px;color:#fff;font-size:14px;outline:none;">
         </div>
         <div style="margin-bottom:16px;">
           <label style="display:block;font-size:12px;color:#a6a6a6;margin-bottom:6px;">Palavra-passe</label>
-          <input type="password" id="pax-reg-pass" placeholder="Mínimo 6 dígitos" required style="width:100%;background:#090d0a;border:1px solid #262626;border-radius:10px;padding:12px;color:#fff;font-size:14px;outline:none;">
+          <input type="password" id="pax-reg-pass" placeholder="Mínimo 6 dígitos" required style="width:100%;background:#161616;border:1px solid #262626;border-radius:10px;padding:12px;color:#fff;font-size:14px;outline:none;">
         </div>
         <button type="submit" class="btn-uber-main" style="width:100%;padding:14px;border-radius:12px;background:var(--gold-grad);color:#000;font-weight:800;font-size:14px;cursor:pointer;border:none;">Criar Conta de Passageiro</button>
       </form>
@@ -1259,21 +1279,63 @@ function paxTo(state) {
     paxPinB.style.opacity = 1;
     paxCarEl.style.opacity = 1;
     paxRouteSvg.style.opacity = 1;
-    paxRouteSvg.animate([{ strokeDashoffset: 700 }, { strokeDashoffset: 0 }], { duration: 900, fill: 'forwards' });
+    
+    const approachRoute = document.getElementById('driver-approach-route');
+    if (approachRoute) approachRoute.style.opacity = '1';
+
+    // Desenha rota principal
+    paxRouteSvg.animate([{ strokeDashoffset: 800 }, { strokeDashoffset: 0 }], { duration: 1100, fill: 'forwards' });
     
     document.getElementById('pax-status-ban').classList.add('on');
-    document.getElementById('pax-status-text').textContent = 'Viatura a chegar em 3 min';
+    document.getElementById('pax-status-text').textContent = 'Motorista a caminho · 3 min';
 
-    // Animação de deslocamento do carro no mapa
-    const path = [[280, 640], [280, 500], [190, 500], [100, 500]];
-    path.forEach((p, i) => {
+    const bubbleEta = document.getElementById('driver-bubble-eta');
+
+    // Sequência de acompanhamento em tempo real do motorista até ao passageiro
+    const approachPath = [
+      { pos: [280, 640], eta: '3 min', txt: 'Motorista a caminho · 3 min (900m)' },
+      { pos: [280, 560], eta: '2 min', txt: 'A virar na Avenida Principal · 2 min (500m)' },
+      { pos: [190, 560], eta: '1 min', txt: 'A aproximar-se de si · 1 min (150m)' },
+      { pos: [100, 560], eta: 'Chegou', txt: '🚗 Domingos M. chegou ao local de embarque!' }
+    ];
+
+    approachPath.forEach((step, idx) => {
       paxTimers.push(setTimeout(() => {
-        paxCarEl.style.left = p[0] + 'px';
-        paxCarEl.style.top = p[1] + 'px';
-        if (i === path.length - 1) {
-          document.getElementById('pax-status-text').textContent = 'Viatura no local de embarque';
+        paxCarEl.style.left = step.pos[0] + 'px';
+        paxCarEl.style.top = step.pos[1] + 'px';
+        if (bubbleEta) bubbleEta.textContent = '🚗 ' + step.eta;
+        document.getElementById('pax-status-text').textContent = step.txt;
+        playHaptic('beep');
+
+        if (idx === approachPath.length - 1) {
+          if (approachRoute) approachRoute.style.opacity = '0';
+          // Iniciar rota até ao destino após embarque
+          paxTimers.push(setTimeout(() => {
+            document.getElementById('pax-status-text').textContent = 'Viagem em curso para Kilamba';
+            if (bubbleEta) bubbleEta.textContent = '🚗 Em viagem';
+            
+            const tripPath = [
+              { pos: [100, 380], eta: '10 min', txt: 'Em viagem · 10 min para o destino' },
+              { pos: [100, 215], eta: '6 min', txt: 'Via Expressa · 6 min para o destino' },
+              { pos: [200, 215], eta: '3 min', txt: 'Entrada do Kilamba · 3 min' },
+              { pos: [280, 215], eta: '1 min', txt: 'A chegar ao Bloco 12 · 1 min' },
+              { pos: [280, 90], eta: 'Chegou', txt: 'Destino alcançado!' }
+            ];
+
+            tripPath.forEach((tStep, tIdx) => {
+              paxTimers.push(setTimeout(() => {
+                paxCarEl.style.left = tStep.pos[0] + 'px';
+                paxCarEl.style.top = tStep.pos[1] + 'px';
+                if (bubbleEta) bubbleEta.textContent = '🚗 ' + tStep.eta;
+                document.getElementById('pax-status-text').textContent = tStep.txt;
+                if (tIdx === tripPath.length - 1) {
+                  setTimeout(() => paxTo('end'), 1500);
+                }
+              }, (tIdx + 1) * 2000));
+            });
+          }, 2500));
         }
-      }, i * 1200));
+      }, idx * 1600));
     });
   }
   else if (state === 'end') {
@@ -1493,12 +1555,12 @@ function switchPaxAuthTab(tab) {
   const formR = document.getElementById('form-pax-register');
   if (tab === 'login') {
     if (btnL) { btnL.style.background = '#ffffff'; btnL.style.color = '#000'; btnL.style.fontWeight = '800'; }
-    if (btnR) { btnR.style.background = 'none'; btnR.style.color = '#8d9e8d'; btnR.style.fontWeight = '600'; }
+    if (btnR) { btnR.style.background = 'none'; btnR.style.color = '#8c8c8c'; btnR.style.fontWeight = '600'; }
     if (formL) formL.style.display = 'block';
     if (formR) formR.style.display = 'none';
   } else {
     if (btnR) { btnR.style.background = '#ffffff'; btnR.style.color = '#000'; btnR.style.fontWeight = '800'; }
-    if (btnL) { btnL.style.background = 'none'; btnL.style.color = '#8d9e8d'; btnL.style.fontWeight = '600'; }
+    if (btnL) { btnL.style.background = 'none'; btnL.style.color = '#8c8c8c'; btnL.style.fontWeight = '600'; }
     if (formR) formR.style.display = 'block';
     if (formL) formL.style.display = 'none';
   }
