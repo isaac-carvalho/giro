@@ -1432,22 +1432,23 @@ function handleDriverRegister(e) {
   GiroAuth.renderUserPill('auth-pill');
 }
 
-const GIRO_SESSION_KEY='giro_session';
+const GIRO_DRIVER_SESSION_KEY='giro_driver_session';
 const GiroAuth={
-  save(user){localStorage.setItem(GIRO_SESSION_KEY,JSON.stringify({...user,ts:Date.now()}));},
+  save(user){localStorage.setItem(GIRO_DRIVER_SESSION_KEY,JSON.stringify({...user,role:'motorista',ts:Date.now()}));},
   get(){
     try{
-      const raw=localStorage.getItem(GIRO_SESSION_KEY);
+      const raw=localStorage.getItem(GIRO_DRIVER_SESSION_KEY);
       if(!raw)return null;
       const s=JSON.parse(raw);
+      if(s.role !== 'motorista') return null;
       if(Date.now()-s.ts>30*24*3600*1000){this.clear();return null;}
       return s;
     }catch{return null;}
   },
-  clear(){localStorage.removeItem(GIRO_SESSION_KEY);},
-  requireAuth(role){
+  clear(){localStorage.removeItem(GIRO_DRIVER_SESSION_KEY);},
+  requireAuth(){
     const s=this.get();
-    if(!s || (role && s.role !== role)){openDriverAuthModal();return null;}
+    if(!s || s.role !== 'motorista'){openDriverAuthModal();return null;}
     return s;
   },
   renderUserPill(containerId){
@@ -1455,7 +1456,7 @@ const GiroAuth={
     const el=document.getElementById(containerId);
     if(!el)return;
     if(s && s.role==='motorista'){
-      const initials=(s.nome||s.phone||'?')[0].toUpperCase();
+      const initials=(s.nome||s.phone||'M')[0].toUpperCase();
       el.innerHTML=`<div style="display:flex;align-items:center;gap:8px;">
         <div style="width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#d4af37,#f0c040);display:flex;align-items:center;justify-content:center;font-weight:900;font-size:14px;color:#000;">${initials}</div>
         <div style="line-height:1.2;"><div style="font-size:13px;font-weight:700;color:#f1f5f1;">${s.nome||s.phone}</div><div style="font-size:10px;color:#8d9e8d;text-transform:uppercase;">🚗 Motorista</div></div>

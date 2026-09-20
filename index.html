@@ -1416,34 +1416,34 @@ function updateProfileView() {
   }
 }
 
-const GIRO_SESSION_KEY='giro_session';
+const GIRO_PAX_SESSION_KEY='giro_pax_session';
 const GiroAuth={
-  save(user){localStorage.setItem(GIRO_SESSION_KEY,JSON.stringify({...user,ts:Date.now()}));},
+  save(user){localStorage.setItem(GIRO_PAX_SESSION_KEY,JSON.stringify({...user,role:'passageiro',ts:Date.now()}));},
   get(){
     try{
-      const raw=localStorage.getItem(GIRO_SESSION_KEY);
+      const raw=localStorage.getItem(GIRO_PAX_SESSION_KEY);
       if(!raw)return null;
       const s=JSON.parse(raw);
+      if(s.role !== 'passageiro') return null;
       if(Date.now()-s.ts>30*24*3600*1000){this.clear();return null;}
       return s;
     }catch{return null;}
   },
-  clear(){localStorage.removeItem(GIRO_SESSION_KEY);},
-  requireAuth(role){
+  clear(){localStorage.removeItem(GIRO_PAX_SESSION_KEY);},
+  requireAuth(){
     const s=this.get();
-    if(!s){openPaxAuthModal();return null;}
-    if(role&&s.role!==role){openPaxAuthModal();return null;}
+    if(!s || s.role!=='passageiro'){openPaxAuthModal();return null;}
     return s;
   },
   renderUserPill(containerId){
     const s=this.get();
     const el=document.getElementById(containerId);
     if(!el)return;
-    if(s){
-      const initials=(s.nome||s.phone||'?')[0].toUpperCase();
+    if(s && s.role === 'passageiro'){
+      const initials=(s.nome||s.phone||'P')[0].toUpperCase();
       el.innerHTML=`<div style="display:flex;align-items:center;gap:8px;">
         <div style="width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#d4af37,#f0c040);display:flex;align-items:center;justify-content:center;font-weight:900;font-size:14px;color:#000;">${initials}</div>
-        <div style="line-height:1.2;"><div style="font-size:13px;font-weight:700;color:#f1f5f1;">${s.nome||s.phone}</div><div style="font-size:10px;color:#8d9e8d;text-transform:uppercase;">${s.role==='motorista'?'🚗 Motorista':'🧑 Passageiro'}</div></div>
+        <div style="line-height:1.2;"><div style="font-size:13px;font-weight:700;color:#f1f5f1;">${s.nome||s.phone}</div><div style="font-size:10px;color:#8d9e8d;text-transform:uppercase;">🧑 Passageiro</div></div>
         <button onclick="GiroAuth.logout()" style="margin-left:4px;background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.3);border-radius:8px;padding:5px 10px;color:#fca5a5;font-size:12px;cursor:pointer;">Sair</button>
       </div>`;
     }else{
