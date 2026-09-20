@@ -22,6 +22,28 @@
 })();
 </script>
 <meta charset="UTF-8">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate, max-age=0">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<script>
+// Auto-purga imediata de caches de versões antigas do navegador
+(function purgeStaleGiroCaches() {
+  const GIRO_BUILD_SIG = 'giro_build_2026_09_20_1550_clean';
+  try {
+    if (localStorage.getItem('giro_last_build') !== GIRO_BUILD_SIG) {
+      localStorage.setItem('giro_last_build', GIRO_BUILD_SIG);
+      if ('caches' in window) {
+        caches.keys().then(keys => Promise.all(keys.map(k => caches.delete(k)))).catch(() => {});
+      }
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.getRegistrations().then(regs => {
+          for (let r of regs) r.unregister();
+        }).catch(() => {});
+      }
+    }
+  } catch(e) {}
+})();
+</script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>GIRO — Viagens, Entregas & Carga em Angola</title>
 
@@ -2160,9 +2182,11 @@ function playHaptic(type) {
   if (navigator.vibrate) navigator.vibrate(type === 'sos' ? [200, 100, 200] : 30);
 }
 
-// Registro do Service Worker PWA para Google Play Store
+// Registro do Service Worker PWA com Atualização Automática Forçada
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('service-worker.js').catch(() => {});
+  navigator.serviceWorker.register('service-worker.js?t=' + Date.now(), { updateViaCache: 'none' }).then(reg => {
+    reg.update();
+  }).catch(() => {});
 }
 
 renderTiers();
@@ -2362,6 +2386,7 @@ function submitRatingAndFinish() {
 
 // Iniciar após DOM carregar
 window.addEventListener('DOMContentLoaded', () => {
+  paxTo('idle');
   initSheetDragGesture();
   try {
     initRealAngolaMap();
