@@ -1267,21 +1267,20 @@ function swapOriginDestination() {
   originName = destName;
   destName = temp;
   
-  const tempCoords = currentOrigCoords;
-  currentOrigCoords = currentDestCoords;
-  currentDestCoords = tempCoords;
+  const tempPlace = activeOrigPlace;
+  activeOrigPlace = activeDestPlace;
+  activeDestPlace = tempPlace;
 
-  document.getElementById('inp-pax-orig').value = originName;
-  document.getElementById('inp-pax-dest').value = destName;
+  const inpOrig = document.getElementById('inp-pax-orig');
+  const inpDest = document.getElementById('inp-pax-dest');
+  if (inpOrig) inpOrig.value = originName;
+  if (inpDest) inpDest.value = destName;
+
   if (document.getElementById('pax-origin-lab')) document.getElementById('pax-origin-lab').textContent = originName.split(',')[0];
   if (document.getElementById('pax-dest-lab')) document.getElementById('pax-dest-lab').textContent = destName.split(',')[0];
   
-  if (origMarker) origMarker.setLatLng(currentOrigCoords);
-  if (destMarker) destMarker.setLatLng(currentDestCoords);
-  updateRealRouteMap();
-
+  recalculateRealRoute();
   playHaptic('beep');
-  renderTiers();
 }
 
 function setRouteFocus(field) {
@@ -1601,15 +1600,25 @@ function calculateGeoDistance(lat1, lon1, lat2, lon2) {
 }
 
 function recalculateRealRoute() {
-  if (!realMap || !origMarker || !destMarker) return;
+  const origInput = document.getElementById('inp-pax-orig');
+  const destInput = document.getElementById('inp-pax-dest');
+  const origVal = origInput ? origInput.value : originName;
+  const destVal = destInput ? destInput.value : destName;
 
-  const p1 = activeOrigPlace.coords;
-  const p2 = activeDestPlace.coords;
+  // Garantir que activeOrigPlace e activeDestPlace correspondem ao texto dos campos
+  if (!activeOrigPlace || (origVal && !activeOrigPlace.name.toLowerCase().includes(origVal.toLowerCase().slice(0, 4)))) {
+    const mOrig = findBestPlaceMatch(origVal);
+    if (mOrig) activeOrigPlace = mOrig;
+  }
+  if (!activeDestPlace || (destVal && !activeDestPlace.name.toLowerCase().includes(destVal.toLowerCase().slice(0, 4)))) {
+    const mDest = findBestPlaceMatch(destVal);
+    if (mDest) activeDestPlace = mDest;
+  }
 
-  origMarker.setLatLng(p1);
-  destMarker.setLatLng(p2);
+  const p1 = (activeOrigPlace && activeOrigPlace.coords) ? activeOrigPlace.coords : [-8.8580, 13.2310];
+  const p2 = (activeDestPlace && activeDestPlace.coords) ? activeDestPlace.coords : [-8.9800, 13.4300];
 
-  // Calcular distância real precisa
+  // 1. Sempre calcular a distância real precisa e o tempo matematicamente
   const realKm = calculateGeoDistance(p1[0], p1[1], p2[0], p2[1]);
   tripKm = parseFloat(Math.max(1.8, realKm).toFixed(1));
 
@@ -1625,7 +1634,7 @@ function recalculateRealRoute() {
     ? `~${Math.floor(tripMins / 60)}h ${tripMins % 60}m` 
     : `~${tripMins} min`;
 
-  // Atualizar indicadores no ecrã
+  // Atualizar indicadores no ecrã imediatamente
   const kmEl = document.getElementById('route-km-display');
   const durEl = document.getElementById('route-duration-display');
   const trafficEl = document.getElementById('route-traffic-display');
@@ -1642,26 +1651,38 @@ function recalculateRealRoute() {
     }
   }
 
-  // Gerar Rota com Waypoints pelas vias reais
-  if (mainRoutePolyline) realMap.removeLayer(mainRoutePolyline);
+  // 2. Se o mapa Leaflet estiver carregado, atualiza pinos e traçado visual
+  if (typeof L !== 'undefined' && !realMap) {
+    initRealAngolaMap();
+  }
 
-  // Waypoints intermediários para simular trajetos pelas estradas reais
-  const midLat = (p1[0] + p2[0]) / 2;
-  const midLng = (p1[1] + p2[1]) / 2 + 0.01;
-  const waypoints = [p1, [midLat, midLng], p2];
+  if (realMap && origMarker && destMarker) {
+    try {
+      origMarker.setLatLng(p1);
+      destMarker.setLatLng(p2);
 
-  mainRoutePolyline = L.polyline(waypoints, {
-    color: '#000000',
-    weight: 5.5,
-    opacity: 0.95,
-    lineCap: 'round',
-    lineJoin: 'round'
-  }).addTo(realMap);
+      if (mainRoutePolyline) realMap.removeLayer(mainRoutePolyline);
 
-  // Enquadrar perfeitamente a rota no ecrã (zoom adaptativo para viagens interprovinciais)
-  const bounds = L.latLngBounds([p1, p2]);
-  realMap.fitBounds(bounds, { padding: [50, 50], maxZoom: (tripKm > 100 ? 9 : 15) });
+      const midLat = (p1[0] + p2[0]) / 2;
+      const midLng = (p1[1] + p2[1]) / 2 + 0.01;
+      const waypoints = [p1, [midLat, midLng], p2];
 
+      mainRoutePolyline = L.polyline(waypoints, {
+        color: '#000000',
+        weight: 5.5,
+        opacity: 0.95,
+        lineCap: 'round',
+        lineJoin: 'round'
+      }).addTo(realMap);
+
+      const bounds = L.latLngBounds([p1, p2]);
+      realMap.fitBounds(bounds, { padding: [50, 50], maxZoom: (tripKm > 100 ? 9 : 15) });
+    } catch (err) {
+      console.warn('Erro ao atualizar traçado no mapa:', err);
+    }
+  }
+
+  // 3. Atualizar tabela de veículos e preços com o novo valor de km
   renderTiers();
 }
 
@@ -2322,6 +2343,12 @@ function submitRatingAndFinish() {
 // Iniciar após DOM carregar
 window.addEventListener('DOMContentLoaded', () => {
   initSheetDragGesture();
+  try {
+    initRealAngolaMap();
+    recalculateRealRoute();
+  } catch (e) {
+    console.warn('Init map/route error:', e);
+  }
 });
 
 

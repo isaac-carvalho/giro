@@ -15,31 +15,28 @@
 
   <style>
     /* ==========================================================================
-       GIRO ANGOLA — UNIFIED LUXURY DARK DESIGN SYSTEM (MATCHING INDEX & PASSENGER)
+       GIRO ANGOLA — 100% UBER BLACK & WHITE OFFICIAL DESIGN SYSTEM
+       Zero Amarelo / Dourado — Minimalismo Monocromático, Alto Contraste & Elegância
        ========================================================================== */
     :root {
-      --bg-dark: #000000;
-      --card-dark: #121212;
-      --card-inner: #1a1a1a;
-      --line: #262626;
-      --line-focus: #d4af37;
+      --bg: #000000;
+      --card: #141414;
+      --card-inner: #1c1c1c;
+      --border: #2c2c2c;
+      --border-focus: #ffffff;
       
-      --gold: #d4af37;
-      --gold-light: #f3cf65;
-      --gold-grad: linear-gradient(135deg, #d4af37 0%, #f3cf65 100%);
-      --gold-glow: rgba(212, 175, 55, 0.25);
+      --wht: #ffffff;
+      --blk: #000000;
+      --gray-muted: #8c8c8c;
+      --gray-subtle: #a6a6a6;
+      --gray-dark: #242424;
       
-      --green: #06C167;
       --red: #ef4444;
       --red-bg: rgba(239, 68, 68, 0.12);
       
-      --wht: #ffffff;
-      --text-muted: #888888;
-      --text-sub: #aaaaaa;
-      
-      --radius-lg: 20px;
-      --radius-md: 14px;
-      --radius-sm: 10px;
+      --radius-lg: 16px;
+      --radius-md: 12px;
+      --radius-sm: 8px;
       
       --safe-top: env(safe-area-inset-top, 0px);
       --safe-bottom: env(safe-area-inset-bottom, 0px);
@@ -63,7 +60,7 @@
 
     html, body {
       min-height: 100%;
-      background: var(--bg-dark);
+      background: var(--bg);
       color: var(--wht);
       font-family: var(--font-system);
       display: flex;
@@ -73,52 +70,35 @@
       -webkit-font-smoothing: antialiased;
     }
 
-    /* Background Ambient Glow */
-    body::before {
-      content: '';
-      position: fixed;
-      top: -100px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 320px;
-      height: 280px;
-      background: radial-gradient(circle, rgba(212, 175, 55, 0.12) 0%, transparent 70%);
-      pointer-events: none;
-      z-index: 0;
-    }
-
-    /* Header & Branding */
-    .app-header {
-      padding: calc(var(--safe-top) + 20px) 20px 12px;
+    /* Uber Top Header */
+    .uber-header {
+      padding: calc(var(--safe-top) + 24px) 20px 14px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
       text-align: center;
-      position: relative;
-      z-index: 10;
     }
 
     .brand-wrap {
       display: inline-flex;
       align-items: center;
-      gap: 12px;
+      gap: 10px;
       margin-bottom: 8px;
     }
 
-    .brand-icon {
-      width: 44px;
-      height: 44px;
-      border-radius: 12px;
-      background: #ffffff;
-      color: #000000;
+    .brand-box {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      background: var(--wht);
+      color: var(--blk);
       font-weight: 900;
-      font-size: 24px;
+      font-size: 22px;
       display: flex;
       align-items: center;
       justify-content: center;
-      box-shadow: 0 4px 20px rgba(255, 255, 255, 0.2);
       letter-spacing: -0.5px;
-    }
-
-    .brand-text {
-      text-align: left;
+      box-shadow: 0 2px 10px rgba(255, 255, 255, 0.2);
     }
 
     .brand-name {
@@ -129,38 +109,37 @@
       line-height: 1;
     }
 
-    .brand-tagline {
-      font-size: 10px;
-      font-weight: 700;
-      letter-spacing: 2px;
-      color: var(--gold);
+    .brand-tag {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 1.5px;
+      color: var(--gray-muted);
       text-transform: uppercase;
-      margin-top: 3px;
+      margin-top: 4px;
     }
 
-    .status-chip {
+    .status-badge {
       display: inline-flex;
       align-items: center;
       gap: 6px;
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid var(--line);
-      padding: 4px 12px;
+      background: #121212;
+      border: 1px solid var(--border);
+      padding: 5px 12px;
       border-radius: 20px;
       font-size: 11px;
-      color: var(--text-muted);
-      margin-top: 6px;
+      color: var(--gray-subtle);
+      margin-top: 8px;
     }
 
     .status-dot {
-      width: 7px;
-      height: 7px;
+      width: 6px;
+      height: 6px;
       border-radius: 50%;
-      background: var(--green);
-      box-shadow: 0 0 8px var(--green);
+      background: var(--wht);
     }
 
     /* Main Container */
-    .main-wrap {
+    .uber-container {
       flex: 1;
       padding: 10px 20px 24px;
       max-width: 440px;
@@ -169,75 +148,68 @@
       display: flex;
       flex-direction: column;
       justify-content: center;
-      position: relative;
-      z-index: 10;
     }
 
-    /* Segmented Navigation Tab (Entrar vs Criar Conta) */
-    .tab-switcher {
+    /* Uber Segmented Switcher (Tab) */
+    .uber-tabs {
       display: flex;
-      background: #141414;
-      border: 1px solid var(--line);
+      background: #121212;
+      border: 1px solid var(--border);
       border-radius: var(--radius-md);
       padding: 4px;
       margin-bottom: 16px;
       gap: 4px;
     }
 
-    .tab-btn {
+    .uber-tab-btn {
       flex: 1;
       background: transparent;
       border: none;
-      color: var(--text-muted);
+      color: var(--gray-muted);
       font-size: 14px;
       font-weight: 700;
-      padding: 11px 0;
-      border-radius: 10px;
+      padding: 12px 0;
+      border-radius: 8px;
       cursor: pointer;
-      transition: all 0.25s ease;
+      transition: all 0.2s ease;
       display: flex;
       align-items: center;
       justify-content: center;
       gap: 6px;
     }
 
-    .tab-btn.active {
-      background: #242424;
-      color: var(--wht);
-      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
-      border: 1px solid rgba(255, 255, 255, 0.08);
+    .uber-tab-btn.active {
+      background: var(--wht);
+      color: var(--blk);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
     }
 
-    /* Auth Card */
-    .auth-card {
-      background: var(--card-dark);
-      border: 1px solid var(--line);
+    /* Uber Main Card */
+    .uber-card {
+      background: var(--card);
+      border: 1px solid var(--border);
       border-radius: var(--radius-lg);
       padding: 24px 20px;
-      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.85);
-      position: relative;
+      box-shadow: 0 12px 36px rgba(0, 0, 0, 0.85);
     }
 
-    .auth-card-title {
+    .uber-card-title {
       font-size: 20px;
       font-weight: 800;
       color: var(--wht);
       letter-spacing: -0.02em;
       margin-bottom: 6px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
     }
 
-    .auth-card-desc {
+    .uber-card-desc {
       font-size: 13px;
-      color: var(--text-muted);
+      color: var(--gray-muted);
       line-height: 1.45;
       margin-bottom: 20px;
     }
 
-    /* Alert / Error Box */
-    .alert-box {
+    /* Alert Message */
+    .uber-alert {
       background: var(--red-bg);
       border: 1px solid rgba(239, 68, 68, 0.35);
       color: #fca5a5;
@@ -247,75 +219,66 @@
       line-height: 1.4;
       margin-bottom: 16px;
       display: none;
-      animation: fadeIn 0.2s ease;
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(-4px); }
-      to { opacity: 1; transform: translateY(0); }
     }
 
     /* Form Fields */
-    .field-group {
+    .form-group {
       margin-bottom: 16px;
     }
 
-    .field-label {
+    .form-label {
       display: flex;
       align-items: center;
       justify-content: space-between;
       font-size: 11px;
       font-weight: 700;
       text-transform: uppercase;
-      letter-spacing: 0.8px;
-      color: var(--text-sub);
+      letter-spacing: 0.6px;
+      color: var(--gray-subtle);
       margin-bottom: 8px;
     }
 
-    .input-box {
+    .uber-input {
       width: 100%;
       background: var(--card-inner);
-      border: 1px solid var(--line);
+      border: 1px solid var(--border);
       border-radius: var(--radius-md);
       padding: 15px 14px;
       font-size: 16px;
       color: var(--wht);
       outline: none;
-      transition: all 0.2s ease;
-      box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.4);
+      transition: border-color 0.2s ease;
     }
 
-    .input-box:focus {
-      border-color: var(--gold);
-      box-shadow: 0 0 0 1px var(--gold), inset 0 2px 4px rgba(0, 0, 0, 0.4);
+    .uber-input:focus {
+      border-color: var(--border-focus);
     }
 
-    .input-box::placeholder {
+    .uber-input::placeholder {
       color: #555555;
     }
 
-    /* Angolan Phone Group */
-    .phone-group {
+    /* Phone Row */
+    .phone-row {
       display: flex;
       gap: 8px;
     }
 
     .phone-code {
       background: var(--card-inner);
-      border: 1px solid var(--line);
+      border: 1px solid var(--border);
       border-radius: var(--radius-md);
       padding: 0 12px;
       display: flex;
       align-items: center;
       gap: 6px;
       font-size: 15px;
-      font-weight: 800;
-      color: var(--gold);
+      font-weight: 700;
+      color: var(--wht);
       flex-shrink: 0;
-      letter-spacing: 0.5px;
     }
 
-    /* Role Selector Cards */
+    /* Role Grid (Passageiro vs Motorista) */
     .role-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -325,9 +288,9 @@
 
     .role-card {
       background: var(--card-inner);
-      border: 2px solid var(--line);
+      border: 1.5px solid var(--border);
       border-radius: var(--radius-md);
-      padding: 14px 12px;
+      padding: 14px 10px;
       cursor: pointer;
       transition: all 0.2s ease;
       display: flex;
@@ -339,30 +302,29 @@
     }
 
     .role-card:active {
-      transform: scale(0.97);
+      transform: scale(0.98);
     }
 
     .role-card.active {
-      border-color: var(--gold);
-      background: rgba(212, 175, 55, 0.1);
-      box-shadow: 0 0 16px rgba(212, 175, 55, 0.15);
+      border-color: var(--wht);
+      background: var(--gray-dark);
     }
 
-    .role-card-badge {
+    .role-badge {
       position: absolute;
       top: 6px;
       right: 6px;
-      background: var(--green);
-      color: #000;
+      background: var(--wht);
+      color: var(--blk);
       font-size: 9px;
       font-weight: 800;
       padding: 2px 5px;
-      border-radius: 6px;
+      border-radius: 4px;
       line-height: 1;
     }
 
     .role-icon {
-      font-size: 26px;
+      font-size: 24px;
       margin-bottom: 2px;
     }
 
@@ -374,24 +336,23 @@
     }
 
     .role-card.active .role-title {
-      color: var(--gold);
+      color: var(--wht);
     }
 
-    .role-subtitle {
+    .role-desc {
       font-size: 11px;
-      color: var(--text-muted);
+      color: var(--gray-muted);
       line-height: 1.3;
     }
 
-    /* Primary CTA Button */
-    .btn-submit {
+    /* Uber Pure White Button */
+    .uber-btn-submit {
       width: 100%;
       height: 52px;
-      background: var(--gold-grad);
-      color: #000000;
+      background: var(--wht);
+      color: var(--blk);
       font-size: 16px;
-      font-weight: 900;
-      letter-spacing: -0.01em;
+      font-weight: 800;
       border: none;
       border-radius: var(--radius-md);
       cursor: pointer;
@@ -399,239 +360,211 @@
       align-items: center;
       justify-content: center;
       gap: 10px;
-      box-shadow: 0 6px 24px var(--gold-glow);
-      transition: all 0.2s ease;
-      position: relative;
-      overflow: hidden;
+      transition: all 0.15s ease;
     }
 
-    .btn-submit:active {
+    .uber-btn-submit:active {
       transform: scale(0.98);
-      opacity: 0.9;
+      background: #e2e2e2;
     }
 
-    .btn-submit:disabled {
-      opacity: 0.5;
+    .uber-btn-submit:disabled {
+      opacity: 0.4;
       cursor: not-allowed;
       transform: none;
-      box-shadow: none;
     }
 
-    /* Sub Links */
-    .footer-help {
+    /* Footer Links */
+    .uber-links {
       margin-top: 18px;
       text-align: center;
       font-size: 12px;
-      color: var(--text-muted);
+      color: var(--gray-muted);
       display: flex;
       flex-direction: column;
-      gap: 10px;
+      gap: 8px;
       line-height: 1.4;
     }
 
-    .footer-help a {
-      color: var(--gold);
-      text-decoration: none;
-      font-weight: 700;
-    }
-
-    .footer-help a:hover {
+    .uber-links a {
+      color: var(--wht);
       text-decoration: underline;
+      font-weight: 600;
     }
 
-    /* Trust & Value Bar (Bottom) */
-    .trust-strip {
+    /* Bottom Trust Bar */
+    .uber-trust-bar {
       padding: 14px 20px calc(var(--safe-bottom) + 14px);
       background: #0d0d0d;
-      border-top: 1px solid var(--line);
+      border-top: 1px solid var(--border);
       display: grid;
       grid-template-columns: 1fr 1fr 1fr;
-      gap: 10px;
+      gap: 8px;
       text-align: center;
       font-size: 11px;
-      position: relative;
-      z-index: 10;
     }
 
-    .trust-item b {
+    .trust-col b {
       display: block;
-      color: var(--gold);
+      color: var(--wht);
       font-weight: 800;
       font-size: 12px;
       margin-bottom: 2px;
     }
 
-    .trust-item span {
-      color: var(--text-muted);
+    .trust-col span {
+      color: var(--gray-muted);
       font-size: 10px;
-      line-height: 1.2;
     }
 
-    /* Mode Switching Form Display */
-    .mode-form {
+    .mode-pane {
       display: none;
     }
-    .mode-form.active {
+    .mode-pane.active {
       display: block;
     }
   </style>
 </head>
 <body>
 
-  <!-- Top App Branding -->
-  <header class="app-header">
+  <!-- Top Header Uber Style -->
+  <header class="uber-header">
     <div class="brand-wrap">
-      <div class="brand-icon">G</div>
-      <div class="brand-text">
-        <div class="brand-name">GIRO</div>
-        <div class="brand-tagline">Angola · Mobilidade & Carga</div>
-      </div>
+      <div class="brand-box">G</div>
+      <div class="brand-name">GIRO</div>
     </div>
-    <div>
-      <div class="status-chip">
-        <span class="status-dot"></span>
-        <span>Rede Nacional · 18 Províncias Online</span>
-      </div>
+    <div class="brand-tag">Angola · Mobilidade & Carga</div>
+    <div class="status-badge">
+      <span class="status-dot"></span>
+      <span>18 Províncias · Luanda Online</span>
     </div>
   </header>
 
   <!-- Main Card Container -->
-  <main class="main-wrap">
+  <main class="uber-container">
     
-    <!-- Tab Switcher: Entrar vs Criar Conta -->
-    <div class="tab-switcher">
-      <button class="tab-btn active" id="tab-login" onclick="switchMode('login')">
-        <span>🔑 Já Tenho Conta</span>
+    <!-- Uber Tabs: Entrar vs Criar Conta -->
+    <div class="uber-tabs">
+      <button class="uber-tab-btn active" id="tab-login" onclick="switchMode('login')">
+        <span>Já Tenho Conta</span>
       </button>
-      <button class="tab-btn" id="tab-register" onclick="switchMode('register')">
-        <span>✨ Novo Usuário</span>
+      <button class="uber-tab-btn" id="tab-register" onclick="switchMode('register')">
+        <span>Criar Conta</span>
       </button>
     </div>
 
     <!-- Auth Card -->
-    <div class="auth-card">
+    <div class="uber-card">
 
-      <div id="auth-alert" class="alert-box"></div>
+      <div id="auth-alert" class="uber-alert"></div>
 
-      <!-- ================= FORMULÁRIO 1: ENTRAR (LOGIN) ================= -->
-      <div id="form-login" class="mode-form active">
-        <div class="auth-card-title">
-          <span>Bem-vindo de volta</span> 👋
-        </div>
-        <div class="auth-card-desc">
-          Introduza o seu telemóvel para aceder diretamente à sua conta.
-        </div>
+      <!-- ================= PANE: LOGIN ================= -->
+      <div id="pane-login" class="mode-pane active">
+        <div class="uber-card-title">Entrar na conta</div>
+        <div class="uber-card-desc">Introduza o seu número de telemóvel para aceder.</div>
 
-        <div class="field-group">
-          <label class="field-label" for="login-phone">
+        <div class="form-group">
+          <label class="form-label" for="login-phone">
             <span>Número de Telemóvel</span>
-            <span style="color:var(--gold); font-size:10px;">Angola (Unitel/Africell/Movicel)</span>
+            <span style="color:var(--gray-muted); font-size:10px;">Angola (9 dígitos)</span>
           </label>
-          <div class="phone-group">
+          <div class="phone-row">
             <div class="phone-code">🇦🇴 +244</div>
-            <input class="input-box" id="login-phone" type="tel" inputmode="numeric" placeholder="9XX XXX XXX" maxlength="11" autocomplete="tel-national">
+            <input class="uber-input" id="login-phone" type="tel" inputmode="numeric" placeholder="9XX XXX XXX" maxlength="11" autocomplete="tel-national">
           </div>
         </div>
 
-        <div class="field-group">
-          <label class="field-label">Aceder Como</label>
+        <div class="form-group">
+          <label class="form-label">Aceder como</label>
           <div class="role-grid">
             <div class="role-card active" id="login-role-pax" onclick="selectLoginRole('passageiro')">
               <div class="role-icon">🧑‍💼</div>
               <div class="role-title">Passageiro</div>
-              <div class="role-subtitle">Viagens & Carga</div>
+              <div class="role-desc">Viagens & Carga</div>
             </div>
             <div class="role-card" id="login-role-driver" onclick="selectLoginRole('motorista')">
-              <div class="role-card-badge">10%</div>
+              <div class="role-badge">10%</div>
               <div class="role-icon">🚗</div>
               <div class="role-title">Motorista</div>
-              <div class="role-subtitle">Receber Corridas</div>
+              <div class="role-desc">Conduzir</div>
             </div>
           </div>
         </div>
 
-        <button class="btn-submit" id="btn-login-submit" onclick="handleLogin()">
-          <span>Entrar no GIRO</span>
+        <button class="uber-btn-submit" id="btn-login-submit" onclick="handleLogin()">
+          <span>Continuar</span>
           <span style="font-size:18px;">➔</span>
         </button>
 
-        <div class="footer-help">
-          <div>Ainda não tem conta? <a href="javascript:void(0)" onclick="switchMode('register')">Criar conta em 10 segundos</a></div>
-          <div>Motorista parceiro com viatura? <a href="cadastro-motorista.html">Registo Oficial de Motorista</a></div>
+        <div class="uber-links">
+          <div>Não tem conta? <a href="javascript:void(0)" onclick="switchMode('register')">Criar conta</a></div>
+          <div>Registo formal de viatura? <a href="cadastro-motorista.html">Registo de Motorista</a></div>
         </div>
       </div>
 
-      <!-- ================= FORMULÁRIO 2: CRIAR CONTA (PRÉ-CADASTRO) ================= -->
-      <div id="form-register" class="mode-form">
-        <div class="auth-card-title">
-          <span>Criar Nova Conta</span> 🚀
-        </div>
-        <div class="auth-card-desc">
-          Registo simplificado e imediato para começar a viajar ou faturar.
+      <!-- ================= PANE: REGISTO (CRIAR CONTA) ================= -->
+      <div id="pane-register" class="mode-pane">
+        <div class="uber-card-title">Criar nova conta</div>
+        <div class="uber-card-desc">Cadastro rápido para passageiros e motoristas parceiros.</div>
+
+        <div class="form-group">
+          <label class="form-label" for="reg-name">Nome Completo</label>
+          <input class="uber-input" id="reg-name" type="text" placeholder="Ex: Isaac Carvalho" autocomplete="name">
         </div>
 
-        <!-- Nome Completo -->
-        <div class="field-group">
-          <label class="field-label" for="reg-name">Nome Completo</label>
-          <input class="input-box" id="reg-name" type="text" placeholder="Ex: Isaac Carvalho" autocomplete="name">
-        </div>
-
-        <!-- Telefone -->
-        <div class="field-group">
-          <label class="field-label" for="reg-phone">
+        <div class="form-group">
+          <label class="form-label" for="reg-phone">
             <span>Número de Telemóvel</span>
-            <span style="color:var(--gold); font-size:10px;">🇦🇴 +244</span>
+            <span style="color:var(--gray-muted); font-size:10px;">🇦🇴 +244</span>
           </label>
-          <div class="phone-group">
+          <div class="phone-row">
             <div class="phone-code">🇦🇴 +244</div>
-            <input class="input-box" id="reg-phone" type="tel" inputmode="numeric" placeholder="9XX XXX XXX" maxlength="11" autocomplete="tel-national">
+            <input class="uber-input" id="reg-phone" type="tel" inputmode="numeric" placeholder="9XX XXX XXX" maxlength="11" autocomplete="tel-national">
           </div>
         </div>
 
-        <!-- Tipo de Conta -->
-        <div class="field-group">
-          <label class="field-label">Tipo de Perfil</label>
+        <div class="form-group">
+          <label class="form-label">Perfil de Utilizador</label>
           <div class="role-grid">
             <div class="role-card active" id="reg-role-pax" onclick="selectRegRole('passageiro')">
               <div class="role-icon">🧑‍💼</div>
               <div class="role-title">Passageiro</div>
-              <div class="role-subtitle">Pedir viagens e entregas</div>
+              <div class="role-desc">Viagens & entregas</div>
             </div>
             <div class="role-card" id="reg-role-driver" onclick="selectRegRole('motorista')">
-              <div class="role-card-badge">10%</div>
+              <div class="role-badge">10%</div>
               <div class="role-icon">🚗</div>
               <div class="role-title">Motorista</div>
-              <div class="role-subtitle">Conduzir e lucrar mais</div>
+              <div class="role-desc">10% de taxa fixa</div>
             </div>
           </div>
         </div>
 
-        <!-- Botão Criar -->
-        <button class="btn-submit" id="btn-reg-submit" onclick="handleRegister()">
-          <span>Registar & Aceder</span>
+        <button class="uber-btn-submit" id="btn-reg-submit" onclick="handleRegister()">
+          <span>Registar & Entrar</span>
           <span style="font-size:18px;">➔</span>
         </button>
 
-        <div class="footer-help">
-          <div>Já tem conta registada? <a href="javascript:void(0)" onclick="switchMode('login')">Aceder com o telemóvel</a></div>
-          <div>Ao registar-se concorda com os <a href="termos.html">Termos</a> e a <a href="privacidade.html">Privacidade</a> da GIRO Angola.</div>
+        <div class="uber-links">
+          <div>Já tem conta? <a href="javascript:void(0)" onclick="switchMode('login')">Aceder com telemóvel</a></div>
+          <div>Ao registar-se concorda com os <a href="termos.html">Termos</a> e a <a href="privacidade.html">Privacidade</a>.</div>
         </div>
       </div>
 
     </div>
   </main>
 
-  <!-- Bottom Fast Trust Stats -->
-  <footer class="trust-strip">
-    <div class="trust-item">
+  <!-- Bottom Trust Bar -->
+  <footer class="uber-trust-bar">
+    <div class="trust-col">
       <b>10% Taxa Fixa</b>
-      <span>Mais lucro p/ motorista</span>
+      <span>Sem surpresas</span>
     </div>
-    <div class="trust-item">
+    <div class="trust-col">
       <b>100% Kwanza</b>
-      <span>Tarifas sem surpresa</span>
+      <span>Preço transparente</span>
     </div>
-    <div class="trust-item">
+    <div class="trust-col">
       <b>Central 24h</b>
       <span>Segurança integrada</span>
     </div>
@@ -639,11 +572,10 @@
 
   <script>
     const GIRO_SESSION_KEY = 'giro_session';
-    let currentMode = 'login'; // 'login' | 'register'
+    let currentMode = 'login';
     let loginRole = 'passageiro';
     let regRole = 'passageiro';
 
-    // Auto-redirecionamento se já houver sessão ativa
     (function checkExistingSession() {
       try {
         const urlParams = new URLSearchParams(window.location.search);
@@ -656,12 +588,10 @@
         if (raw) {
           const session = JSON.parse(raw);
           if (session && session.phone) {
-            // Se veio com ?force=1, não faz auto-redirect
             if (!urlParams.has('force')) {
               window.location.replace(session.role === 'motorista' ? 'driver.html' : 'index.html');
               return;
             } else {
-              // Preenche campos se veio com force
               const p = (session.rawPhone || session.phone.replace('+244', '')).trim();
               if (document.getElementById('login-phone')) document.getElementById('login-phone').value = p;
               if (document.getElementById('reg-name') && session.nome) document.getElementById('reg-name').value = session.nome;
@@ -672,7 +602,6 @@
       } catch (e) {}
     })();
 
-    // Alternar entre Abas (Entrar / Novo Usuário)
     function switchMode(mode) {
       currentMode = mode;
       showAlert('');
@@ -680,11 +609,10 @@
       document.getElementById('tab-login').classList.toggle('active', mode === 'login');
       document.getElementById('tab-register').classList.toggle('active', mode === 'register');
       
-      document.getElementById('form-login').classList.toggle('active', mode === 'login');
-      document.getElementById('form-register').classList.toggle('active', mode === 'register');
+      document.getElementById('pane-login').classList.toggle('active', mode === 'login');
+      document.getElementById('pane-register').classList.toggle('active', mode === 'register');
     }
 
-    // Seletores de Perfil
     function selectLoginRole(role) {
       loginRole = role;
       document.getElementById('login-role-pax').classList.toggle('active', role === 'passageiro');
@@ -697,7 +625,6 @@
       document.getElementById('reg-role-driver').classList.toggle('active', role === 'motorista');
     }
 
-    // Mensagens de Alerta
     function showAlert(msg) {
       const el = document.getElementById('auth-alert');
       if (!msg) {
@@ -710,7 +637,6 @@
       el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }
 
-    // Validador de Telemóvel Angolano (9 dígitos iniciando por 9)
     function cleanPhone(num) {
       return (num || '').replace(/\D/g, '');
     }
@@ -720,14 +646,12 @@
       return /^9[0-9]{8}$/.test(c);
     }
 
-    // Máscara Automática de Digitação para Telemóvel
     function attachPhoneMask(inputEl) {
       if (!inputEl) return;
       inputEl.addEventListener('input', function(e) {
         let v = cleanPhone(e.target.value);
         if (v.length > 9) v = v.slice(0, 9);
         
-        // Formato: 9XX XXX XXX
         let formatted = v;
         if (v.length > 3 && v.length <= 6) {
           formatted = v.slice(0, 3) + ' ' + v.slice(3);
@@ -741,7 +665,6 @@
     attachPhoneMask(document.getElementById('login-phone'));
     attachPhoneMask(document.getElementById('reg-phone'));
 
-    // Ação: Login
     function handleLogin() {
       const phoneInput = document.getElementById('login-phone');
       const rawDigits = cleanPhone(phoneInput.value);
@@ -754,7 +677,6 @@
 
       showAlert('');
 
-      // Recupera ou cria sessão rápida
       let existingName = 'Utilizador GIRO';
       try {
         const prev = JSON.parse(localStorage.getItem(GIRO_SESSION_KEY) || '{}');
@@ -781,7 +703,6 @@
       }, 350);
     }
 
-    // Ação: Registo / Novo Cadastro
     function handleRegister() {
       const nameInput = document.getElementById('reg-name');
       const phoneInput = document.getElementById('reg-phone');
