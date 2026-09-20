@@ -547,24 +547,23 @@ body { overscroll-behavior: none; }
         <span class="sheet-drag-hint" id="sheet-drag-hint">Deslize para baixo para ver o mapa completo ▾</span>
       </div>
 
-      <!-- SELETOR DE SERVIÇOS: VIAGEM / ENTREGA / CARGA -->
-      <div class="uber-mode-tabs">
-        <button class="u-tab on" id="tab-pax-mode" onclick="setAppMode('pax')">🚗 Viagem</button>
-        <button class="u-tab" id="tab-deliv-mode" onclick="setAppMode('delivery')">📦 Entrega</button>
-        <button class="u-tab" id="tab-cargo-mode" onclick="setAppMode('cargo')">🚛 Carga</button>
-      </div>
-
-      <!-- BANNER GIRO CLUBE & FIDELIDADE -->
-      <div class="promo-club-banner" id="pax-promo-banner">
-        <div class="promo-club-text">
-          <b>🎁 GIRO Clube: 3/5 Corridas Feitas</b>
-          <span>Faça mais 2 viagens e ganhe 10% de desconto automático!</span>
-        </div>
-        <span class="promo-badge-tag">−10% BÓNUS</span>
-      </div>
-
       <!-- PANE 1: ENTRADA DE MORADA (IDLE / DESTINO) -->
       <div class="sheet-pane on" id="pane-idle">
+        <!-- SELETOR DE SERVIÇOS: VIAGEM / ENTREGA / CARGA -->
+        <div class="uber-mode-tabs">
+          <button class="u-tab on" id="tab-pax-mode" onclick="setAppMode('pax')">🚗 Viagem</button>
+          <button class="u-tab" id="tab-deliv-mode" onclick="setAppMode('delivery')">📦 Entrega</button>
+          <button class="u-tab" id="tab-cargo-mode" onclick="setAppMode('cargo')">🚛 Carga</button>
+        </div>
+
+        <!-- BANNER GIRO CLUBE & FIDELIDADE -->
+        <div class="promo-club-banner" id="pax-promo-banner">
+          <div class="promo-club-text">
+            <b>🎁 GIRO Clube: 3/5 Corridas Feitas</b>
+            <span>Faça mais 2 viagens e ganhe 10% de desconto automático!</span>
+          </div>
+          <span class="promo-badge-tag">−10% BÓNUS</span>
+        </div>
         <!-- ROTA UBER (PONTO DE PARTIDA & DESTINO) -->
         <div class="uber-route-box">
           <div class="route-trail"></div>
@@ -695,26 +694,65 @@ body { overscroll-behavior: none; }
 
       <!-- PANE 4: CHEGADA & AVALIAÇÃO UBER -->
       <div class="sheet-pane" id="pane-end">
-        <div style="text-align:center;padding:16px 0;">
-          <div style="font-size:36px;margin-bottom:8px;">✅</div>
-          <h3 style="font-size:18px;font-weight:900;color:#fff;margin-bottom:4px;">Chegou ao seu destino!</h3>
-          <p style="font-size:12px;color:var(--txt-mut);margin-bottom:16px;" id="end-trip-summary-text">Talatona → Centralidade do Kilamba · 6,2 km</p>
+        <div style="text-align:center;padding:10px 0;">
+          <div style="width:54px;height:54px;border-radius:50%;background:#06C167;display:flex;align-items:center;justify-content:center;margin:0 auto 10px;font-size:26px;color:#000;box-shadow:0 0 24px rgba(6,193,103,0.35);">
+            ✓
+          </div>
+          <h3 style="font-size:19px;font-weight:900;color:#fff;margin-bottom:3px;">Chegou ao seu destino!</h3>
+          <p style="font-size:12px;color:var(--txt-mut);margin-bottom:12px;" id="end-trip-summary-text">Talatona → Centralidade do Kilamba · 6,2 km</p>
 
-          <div style="background:var(--card-inner);border:1px solid var(--line);border-radius:14px;padding:14px;margin-bottom:16px;text-align:left;" id="end-fare-breakdown">
+          <div style="background:var(--card-inner);border:1px solid var(--line);border-radius:14px;padding:12px 14px;margin-bottom:14px;text-align:left;" id="end-fare-breakdown">
             <!-- Resumo da tarifa -->
           </div>
 
-          <!-- ESTRELAS DE AVALIAÇÃO UBER -->
-          <div style="font-size:13px;color:var(--gold);font-weight:700;margin-bottom:8px;">Como correu a sua viagem com Domingos?</div>
-          <div style="display:flex;justify-content:center;gap:8px;font-size:26px;margin-bottom:20px;cursor:pointer;" id="pax-star-rating">
-            <span class="star-rating-icon" data-v="1">★</span>
-            <span class="star-rating-icon" data-v="2">★</span>
-            <span class="star-rating-icon" data-v="3">★</span>
-            <span class="star-rating-icon" data-v="4">★</span>
-            <span class="star-rating-icon" data-v="5" style="color:var(--gold);">★</span>
+          <!-- MOTORISTA PERFIL MINI -->
+          <div style="background:#1c1c1c;border:1px solid #2a2a2a;border-radius:14px;padding:10px 14px;margin-bottom:14px;display:flex;align-items:center;gap:12px;text-align:left;">
+            <div style="width:42px;height:42px;border-radius:50%;background:#333;border:2px solid #fff;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:16px;color:#fff;">DM</div>
+            <div style="flex:1;">
+              <b style="font-size:14px;color:#fff;display:block;">Domingos Manuel</b>
+              <span style="font-size:11px;color:#888;">Toyota Corolla cinza · LD-23-45-AA</span>
+            </div>
+            <span style="font-size:11px;background:#262626;border:1px solid #444;padding:3px 8px;border-radius:6px;font-weight:700;color:#fff;">★ 4.9</span>
           </div>
 
-          <button class="btn-uber-main" onclick="paxTo('idle')">Fazer Nova Viagem</button>
+          <!-- ESTRELAS DE AVALIAÇÃO UBER INTERATIVAS -->
+          <div style="font-size:13.5px;color:#ffffff;font-weight:800;margin-bottom:6px;">Como correu a sua viagem com Domingos?</div>
+          <div id="star-feedback-label" style="font-size:12px;color:#f59e0b;font-weight:700;min-height:18px;margin-bottom:8px;">Excelente! ⭐⭐⭐⭐⭐</div>
+          
+          <div style="display:flex;justify-content:center;gap:10px;font-size:32px;margin-bottom:14px;cursor:pointer;" id="pax-star-rating">
+            <span class="star-rating-icon" data-v="1" onclick="setDriverRating(1)" style="color:#f59e0b;transition:transform .15s, color .15s;">★</span>
+            <span class="star-rating-icon" data-v="2" onclick="setDriverRating(2)" style="color:#f59e0b;transition:transform .15s, color .15s;">★</span>
+            <span class="star-rating-icon" data-v="3" onclick="setDriverRating(3)" style="color:#f59e0b;transition:transform .15s, color .15s;">★</span>
+            <span class="star-rating-icon" data-v="4" onclick="setDriverRating(4)" style="color:#f59e0b;transition:transform .15s, color .15s;">★</span>
+            <span class="star-rating-icon" data-v="5" onclick="setDriverRating(5)" style="color:#f59e0b;transition:transform .15s, color .15s;">★</span>
+          </div>
+
+          <!-- PÍLULAS DE ELOGIO -->
+          <div style="display:flex;flex-wrap:wrap;justify-content:center;gap:6px;margin-bottom:14px;" id="rating-compliments-box">
+            <button type="button" class="rating-tag-btn active" onclick="toggleCompliment(this)" style="background:#262626;border:1px solid #555;color:#fff;font-size:11px;padding:5px 10px;border-radius:16px;cursor:pointer;">✨ Condução Suave</button>
+            <button type="button" class="rating-tag-btn active" onclick="toggleCompliment(this)" style="background:#262626;border:1px solid #555;color:#fff;font-size:11px;padding:5px 10px;border-radius:16px;cursor:pointer;">🧼 Carro Limpo</button>
+            <button type="button" class="rating-tag-btn" onclick="toggleCompliment(this)" style="background:#181818;border:1px solid #333;color:#888;font-size:11px;padding:5px 10px;border-radius:16px;cursor:pointer;">⏱️ Super Pontual</button>
+            <button type="button" class="rating-tag-btn" onclick="toggleCompliment(this)" style="background:#181818;border:1px solid #333;color:#888;font-size:11px;padding:5px 10px;border-radius:16px;cursor:pointer;">💬 Educado</button>
+            <button type="button" class="rating-tag-btn" onclick="toggleCompliment(this)" style="background:#181818;border:1px solid #333;color:#888;font-size:11px;padding:5px 10px;border-radius:16px;cursor:pointer;">❄️ Ar Fresco</button>
+          </div>
+
+          <!-- GORJETA OPCIONAL -->
+          <div style="background:#141414;border:1px solid #262626;border-radius:12px;padding:10px;margin-bottom:14px;text-align:left;">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+              <span style="font-size:11.5px;font-weight:700;color:#ccc;">Deixar Gorjeta (Opcional):</span>
+              <span id="tip-chosen-val" style="font-size:11.5px;font-weight:800;color:#06C167;">0 Kz</span>
+            </div>
+            <div style="display:flex;gap:6px;">
+              <button type="button" class="tip-btn active" onclick="selectTip(0, this)" style="flex:1;background:#262626;border:1px solid #555;color:#fff;font-size:11px;padding:7px 4px;border-radius:8px;cursor:pointer;font-weight:700;">Sem gorjeta</button>
+              <button type="button" class="tip-btn" onclick="selectTip(200, this)" style="flex:1;background:#181818;border:1px solid #333;color:#aaa;font-size:11px;padding:7px 4px;border-radius:8px;cursor:pointer;font-weight:700;">+200 Kz</button>
+              <button type="button" class="tip-btn" onclick="selectTip(500, this)" style="flex:1;background:#181818;border:1px solid #333;color:#aaa;font-size:11px;padding:7px 4px;border-radius:8px;cursor:pointer;font-weight:700;">+500 Kz</button>
+              <button type="button" class="tip-btn" onclick="selectTip(1000, this)" style="flex:1;background:#181818;border:1px solid #333;color:#aaa;font-size:11px;padding:7px 4px;border-radius:8px;cursor:pointer;font-weight:700;">+1.000 Kz</button>
+            </div>
+          </div>
+
+          <button class="btn-uber-main" id="btn-submit-rating" onclick="submitRatingAndFinish()">
+            Avaliar & Concluir Viagem
+          </button>
         </div>
       </div>
     </div>
@@ -1576,6 +1614,98 @@ function initSheetDragGesture() {
   handle.addEventListener('mousedown', onTouchStart);
   window.addEventListener('mousemove', onTouchMove);
   window.addEventListener('mouseup', onTouchEnd);
+}
+
+
+/* ==========================================================================
+   AVALIAÇÃO DE MOTORISTA INTERATIVA (ESTRELAS, ELOGIOS & GORJETA)
+   ========================================================================== */
+let selectedDriverRating = 5;
+let selectedTipAmount = 0;
+
+const ratingFeedbackTexts = {
+  1: 'Abaixo do esperado ⭐ (Iremos analisar)',
+  2: 'Razoável ⭐⭐',
+  3: 'Bom / Satisfatório ⭐⭐⭐',
+  4: 'Muito bom! ⭐⭐⭐⭐',
+  5: 'Excelente serviço! ⭐⭐⭐⭐⭐'
+};
+
+function setDriverRating(rating) {
+  selectedDriverRating = rating;
+  const stars = document.querySelectorAll('#pax-star-rating .star-rating-icon');
+  stars.forEach((s, idx) => {
+    const val = idx + 1;
+    if (val <= rating) {
+      s.style.color = '#f59e0b';
+      s.style.transform = 'scale(1.15)';
+      setTimeout(() => s.style.transform = 'scale(1)', 150);
+    } else {
+      s.style.color = '#444';
+      s.style.transform = 'scale(1)';
+    }
+  });
+
+  const label = document.getElementById('star-feedback-label');
+  if (label) {
+    label.textContent = ratingFeedbackTexts[rating] || 'Avaliação registada';
+  }
+  playHaptic('beep');
+}
+
+function toggleCompliment(btn) {
+  btn.classList.toggle('active');
+  if (btn.classList.contains('active')) {
+    btn.style.background = '#262626';
+    btn.style.borderColor = '#555';
+    btn.style.color = '#fff';
+  } else {
+    btn.style.background = '#181818';
+    btn.style.borderColor = '#333';
+    btn.style.color = '#888';
+  }
+  playHaptic('beep');
+}
+
+function selectTip(amount, btn) {
+  selectedTipAmount = amount;
+  document.querySelectorAll('.tip-btn').forEach(b => {
+    b.classList.remove('active');
+    b.style.background = '#181818';
+    b.style.borderColor = '#333';
+    b.style.color = '#aaa';
+  });
+  btn.classList.add('active');
+  btn.style.background = '#262626';
+  btn.style.borderColor = '#06C167';
+  btn.style.color = '#fff';
+
+  const tipValEl = document.getElementById('tip-chosen-val');
+  if (tipValEl) {
+    tipValEl.textContent = (amount > 0) ? `+${amount} Kz` : '0 Kz';
+  }
+  playHaptic('beep');
+}
+
+function submitRatingAndFinish() {
+  const btn = document.getElementById('btn-submit-rating');
+  if (btn) {
+    btn.disabled = true;
+    btn.textContent = '✓ Avaliação Enviada com Sucesso!';
+    btn.style.background = '#06C167';
+    btn.style.color = '#000';
+  }
+  playHaptic('radar');
+
+  setTimeout(() => {
+    paxTo('idle');
+    if (btn) {
+      btn.disabled = false;
+      btn.textContent = 'Avaliar & Concluir Viagem';
+      btn.style.background = '#fff';
+      btn.style.color = '#000';
+    }
+  }, 1200);
 }
 
 // Iniciar após DOM carregar
