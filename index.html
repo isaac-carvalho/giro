@@ -443,6 +443,8 @@ body { overscroll-behavior: none; }
 @keyframes splashAutoFadeOut { 0% { opacity: 1; visibility: visible; } 99% { opacity: 0; } 100% { opacity: 0; visibility: hidden; display: none; } }
 </style>
 
+<link rel="stylesheet" href="leaflet.css">
+<script src="leaflet.js"></script>
 </head>
 <body>
 
@@ -470,122 +472,8 @@ body { overscroll-behavior: none; }
 
   <!-- 2. VIEWPORT COM MAPA GPS AO VIVO -->
   <main class="viewport-body">
-    <div class="map-canvas" id="giro-map-viewport" style="position:absolute;inset:0;background:#f4f5f8;overflow:hidden;z-index:1;">
-      <svg viewBox="0 0 400 800" preserveAspectRatio="xMidYMid slice" id="uber-map-svg" style="width:100%;height:100%;display:block;">
-        <defs>
-          <linearGradient id="waterGrad" x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0%" stop-color="#bae6fd"/>
-            <stop offset="100%" stop-color="#e0f2fe"/>
-          </linearGradient>
-          <filter id="routeShadow" x="-20%" y="-20%" width="140%" height="140%">
-            <feDropShadow dx="0" dy="3" stdDeviation="4" flood-color="#000000" flood-opacity="0.35"/>
-          </filter>
-        </defs>
-
-        <!-- Fundo Mapa Uber Light -->
-        <rect width="400" height="800" fill="#f4f5f8"/>
-
-        <!-- Zona Costeira / Baía de Luanda (Norte) -->
-        <path d="M0 0 L400 0 L400 70 C300 80, 220 50, 140 75 C80 90, 30 70, 0 85 Z" fill="url(#waterGrad)"/>
-        <text x="260" y="45" fill="#0284c7" font-size="10" font-weight="800" letter-spacing="1" opacity="0.8">BAÍA DE LUANDA</text>
-
-        <!-- Quarteirões Urbanos de Luanda (Talatona, Maianga, Kilamba) -->
-        <!-- Zona Norte / Maianga / Alvalade -->
-        <rect x="25" y="105" width="70" height="95" rx="6" fill="#e9ecf2" stroke="#d5dbe6" stroke-width="1"/>
-        <text x="35" y="130" fill="#64748b" font-size="8.5" font-weight="800">MAIANGA</text>
-        
-        <rect x="115" y="105" width="150" height="95" rx="6" fill="#e9ecf2" stroke="#d5dbe6" stroke-width="1"/>
-        <text x="145" y="130" fill="#64748b" font-size="8.5" font-weight="800">ALVALADE / AEROPORTO</text>
-        
-        <rect x="285" y="105" width="95" height="95" rx="6" fill="#e9ecf2" stroke="#d5dbe6" stroke-width="1"/>
-
-        <!-- Zona Centro / Morro Bento / Samba -->
-        <rect x="25" y="225" width="70" height="135" rx="6" fill="#e9ecf2" stroke="#d5dbe6" stroke-width="1"/>
-        <text x="30" y="250" fill="#64748b" font-size="8.5" font-weight="800">SAMBA</text>
-
-        <rect x="115" y="225" width="65" height="135" rx="6" fill="#e9ecf2" stroke="#d5dbe6" stroke-width="1"/>
-        <rect x="200" y="225" width="65" height="135" rx="6" fill="#e9ecf2" stroke="#d5dbe6" stroke-width="1"/>
-        
-        <!-- Parque Verde de Talatona -->
-        <rect x="285" y="225" width="95" height="135" rx="6" fill="#dcfce7" stroke="#bbf7d0" stroke-width="1"/>
-        <text x="295" y="250" fill="#15803d" font-size="8" font-weight="800">PARQUE TALATONA</text>
-
-        <!-- Zona Sul / Talatona & Centralidade do Kilamba -->
-        <rect x="25" y="385" width="70" height="150" rx="6" fill="#e9ecf2" stroke="#d5dbe6" stroke-width="1"/>
-        <text x="30" y="410" fill="#64748b" font-size="8.5" font-weight="800">BENFICA</text>
-
-        <rect x="115" y="385" width="150" height="150" rx="6" fill="#e9ecf2" stroke="#d5dbe6" stroke-width="1"/>
-        <text x="140" y="410" fill="#0f172a" font-size="9" font-weight="900">TALATONA (CENTRO)</text>
-        <text x="140" y="424" fill="#64748b" font-size="7.5" font-weight="700">Belas Shopping / C. Convenções</text>
-
-        <rect x="285" y="385" width="95" height="150" rx="6" fill="#e9ecf2" stroke="#d5dbe6" stroke-width="1"/>
-
-        <!-- Zona Kilamba (Extremo Sul) -->
-        <rect x="25" y="560" width="160" height="200" rx="6" fill="#e9ecf2" stroke="#d5dbe6" stroke-width="1"/>
-        <text x="40" y="590" fill="#0f172a" font-size="9.5" font-weight="900">CENTRALIDADE DO KILAMBA</text>
-        <text x="40" y="605" fill="#64748b" font-size="8" font-weight="700">Blocos A, B, C & Q</text>
-
-        <rect x="205" y="560" width="175" height="200" rx="6" fill="#e9ecf2" stroke="#d5dbe6" stroke-width="1"/>
-        <text x="225" y="590" fill="#64748b" font-size="8.5" font-weight="800">VIANA / VIA EXPRESSA</text>
-
-        <!-- ================= EIXOS RODOVIÁRIOS (RUAS COM ASFALTO BRANCO) ================= -->
-        <!-- Contornos de Estrada (Bordas cinzentas para alto contraste) -->
-        <path d="M-20 210 H420" stroke="#cbd5e1" stroke-width="26"/>
-        <path d="M-20 370 H420" stroke="#cbd5e1" stroke-width="24"/>
-        <path d="M-20 545 H420" stroke="#cbd5e1" stroke-width="28"/>
-        
-        <path d="M100 -20 V820" stroke="#cbd5e1" stroke-width="24"/>
-        <path d="M275 -20 V820" stroke="#cbd5e1" stroke-width="24"/>
-        <path d="M190 210 V370" stroke="#cbd5e1" stroke-width="16"/>
-
-        <!-- Asfalto Branco Limpo Uber -->
-        <path d="M-20 210 H420" stroke="#ffffff" stroke-width="22"/>
-        <path d="M-20 370 H420" stroke="#ffffff" stroke-width="20"/>
-        <path d="M-20 545 H420" stroke="#ffffff" stroke-width="24"/>
-        
-        <path d="M100 -20 V820" stroke="#ffffff" stroke-width="20"/>
-        <path d="M275 -20 V820" stroke="#ffffff" stroke-width="20"/>
-        <path d="M190 210 V370" stroke="#ffffff" stroke-width="12"/>
-
-        <!-- Linhas Divisórias de Faixa (Tracejado Uber) -->
-        <path d="M-20 210 H420" stroke="#e2e8f0" stroke-width="1.5" stroke-dasharray="8 6"/>
-        <path d="M-20 545 H420" stroke="#e2e8f0" stroke-width="1.8" stroke-dasharray="10 6"/>
-        <path d="M100 -20 V820" stroke="#e2e8f0" stroke-width="1.5" stroke-dasharray="8 6"/>
-        <path d="M275 -20 V820" stroke="#e2e8f0" stroke-width="1.5" stroke-dasharray="8 6"/>
-
-        <!-- Nomes das Avenidas em Luanda -->
-        <text x="300" y="541" fill="#475569" font-size="8" font-weight="800" letter-spacing="0.5">VIA EXPRESSA FIDEL CASTRO</text>
-        <text x="135" y="206" fill="#475569" font-size="7.5" font-weight="800">AV. PEDRO DE CASTRO VAN-DÚNEM</text>
-        <text x="105" y="470" fill="#475569" font-size="7.5" font-weight="800" transform="rotate(90 105 470)">AV. SAMBA / TALATONA</text>
-
-        <!-- ================= ROTAS DE VIAGEM & RASTREIO ================= -->
-        <!-- Rota de Aproximação do Motorista (Tracejado Azul Royal) -->
-        <path id="driver-approach-route" d="M275 640 L275 545 L100 545" stroke="#2563eb" stroke-width="4.5" stroke-linecap="round" fill="none" opacity="0" stroke-dasharray="6 4"/>
-
-        <!-- Rota Principal Passageiro -> Destino (Polyline Preto Uber com Sombra) -->
-        <path id="pax-route-svg" d="M100 545 L100 210 L275 210 L275 90" stroke="#000000" stroke-width="5.5" fill="none" stroke-linecap="round" opacity="0" style="stroke-dasharray:800;stroke-dashoffset:800;filter:url(#routeShadow);"/>
-      </svg>
-
-      <!-- Viatura do Motorista com Rastreio em Tempo Real (Badge Preto & Branco Uber) -->
-      <div class="map-car" id="pax-car-el" style="left:275px;top:640px;opacity:0;transition:all 1.2s cubic-bezier(0.4, 0, 0.2, 1);z-index:25;">
-        <div style="position:relative;display:flex;flex-direction:column;align-items:center;">
-          <div style="background:#000000;color:#ffffff;font-size:9.5px;font-weight:800;padding:2px 7px;border-radius:6px;border:1px solid #333333;white-space:nowrap;margin-bottom:2px;box-shadow:0 3px 10px rgba(0,0,0,0.35);" id="driver-bubble-eta">🚗 3 min</div>
-          <div style="width:36px;height:36px;border-radius:50%;background:#000000;border:2.5px solid #ffffff;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(0,0,0,0.4);">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="#ffffff"><path d="M18.92 6.01C18.72 5.42 18.16 5 17.5 5h-11c-.66 0-1.21.42-1.42 1.01L3 12v8c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1h12v1c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-8l-2.08-5.99zM6.85 7h10.29l1.04 3H5.81l1.04-3zM19 17H5v-4.66l.12-.34h13.77l.11.34V17z"/><circle cx="7.5" cy="14.5" r="1.5"/><circle cx="16.5" cy="14.5" r="1.5"/></svg>
-          </div>
-        </div>
-      </div>
-
-      <!-- Marcadores de Posição GPS -->
-      <div class="map-pin a" id="pax-pin-a" style="left:100px;top:545px;">
-        <div class="pin-label" id="pax-origin-lab">Talatona</div>
-        <div class="pin-circle"></div>
-      </div>
-      <div class="map-pin b" id="pax-pin-b" style="left:275px;top:90px;opacity:0;">
-        <div class="pin-label" id="pax-dest-lab">Kilamba</div>
-        <div class="pin-circle"></div>
-      </div>
-    </div>
+    <!-- MAPA CARTOGRÁFICO REAL DE ANGOLA (LEAFLET + OPENSTREETMAP / CARTODB) -->
+    <div id="giro-real-map" style="position:absolute;inset:0;width:100%;height:100%;z-index:1;background:#f4f5f8;"></div>
 
     <!-- BOTÕES FLUTUANTES NO MAPA -->
     <div class="map-floating-bar" style="z-index:40;">
@@ -1347,173 +1235,226 @@ function setRouteFocus(field) {
 }
 
 
+
 /* ==========================================================================
-   MOTOR DE GEOCODIFICAÇÃO E ROTAS DINÂMICAS DE ANGOLA (LUANDA & PROVÍNCIAS)
+   MOTOR CARTOGRÁFICO REAL DE ANGOLA (LEAFLET + OPENSTREETMAP / CARTODB)
    ========================================================================== */
-const ANGOLA_PLACES_DB = [
+let realMap = null;
+let origMarker = null;
+let destMarker = null;
+let carMarker = null;
+let mainRoutePolyline = null;
+let approachRoutePolyline = null;
+
+// Base de Dados de Coordenadas Geográficas Reais de Luanda & Angola (Lat/Lng)
+const ANGOLA_GEO_PLACES = [
   {
     name: 'Centralidade do Sequele (8.000 / 8 mil)',
-    synonyms: ['8 mil', '8000', 'oito mil', 'sequele', 'centralidade 8 mil', 'centralidade 8000', 'cacuaco 8000'],
+    synonyms: ['8 mil', '8000', 'oito mil', 'sequele', 'centralidade 8 mil', 'centralidade 8000', 'cacuaco 8000', 'centralidade do sequele'],
     zone: 'Cacuaco · Luanda Norte',
-    pos: [275, 110], // coordenadas no mapa SVG (X, Y)
-    kmFromCenter: 24.5
-  },
-  {
-    name: 'Centralidade do Zango 8.000 (Zango 8 mil)',
-    synonyms: ['zango 8 mil', 'zango 8000', 'zango 8', 'zango oito mil'],
-    zone: 'Viana · Zango',
-    pos: [310, 510],
-    kmFromCenter: 28.0
+    coords: [-8.7850, 13.4150]
   },
   {
     name: 'Centralidade do Kilamba (Bloco 12)',
     synonyms: ['kilamba', 'centralidade do kilamba', 'bloco kilamba', 'kilamba bloco'],
     zone: 'Belas / Kilamba · Luanda Sul',
-    pos: [275, 590],
-    kmFromCenter: 18.0
+    coords: [-8.9950, 13.2650]
   },
   {
     name: 'Talatona (Rua Principal / Belas Shopping)',
     synonyms: ['talatona', 'belas shopping', 'centro de convencoes', 'sassa', 'talatona centro'],
     zone: 'Talatona · Luanda Sul',
-    pos: [100, 545],
-    kmFromCenter: 12.0
+    coords: [-8.9220, 13.1840]
   },
   {
     name: 'Mutamba (Largo da Mutamba / Baía)',
     synonyms: ['mutamba', 'baia', 'centro da cidade', 'largo da mutamba', 'porto de luanda'],
     zone: 'Ingombota · Centro de Luanda',
-    pos: [100, 110],
-    kmFromCenter: 0.0
+    coords: [-8.8150, 13.2330]
   },
   {
     name: 'Aeroporto 4 de Fevereiro',
     synonyms: ['aeroporto', 'aeroporto 4 de fev', 'aeroporto internacional', '4 de fevereiro'],
     zone: 'Maianga · Aeroporto',
-    pos: [275, 180],
-    kmFromCenter: 5.5
+    coords: [-8.8580, 13.2310]
   },
   {
     name: 'Maianga (Largo da Maianga / Cassenda)',
     synonyms: ['maianga', 'alvalade', 'cassenda', 'bairro azul'],
     zone: 'Maianga · Luanda',
-    pos: [100, 210],
-    kmFromCenter: 3.5
+    coords: [-8.8350, 13.2250]
   },
   {
     name: 'Viana (Vila / Estalagem / Ponte Amarela)',
     synonyms: ['viana', 'estalagem', 'vila de viana', 'ponte amarela', 'estrada de catete'],
     zone: 'Viana · Luanda Leste',
-    pos: [300, 370],
-    kmFromCenter: 19.5
+    coords: [-8.9050, 13.3600]
+  },
+  {
+    name: 'Centralidade do Zango 8.000 (Zango 8 mil)',
+    synonyms: ['zango 8 mil', 'zango 8000', 'zango 8', 'zango oito mil'],
+    zone: 'Viana · Zango',
+    coords: [-8.9800, 13.4300]
   },
   {
     name: 'Cazenga (Marco Histórico / Hoji-ya-Henda)',
     synonyms: ['cazenga', 'hoji ya henda', 'marco historico', 'tala hadi'],
     zone: 'Cazenga · Luanda',
-    pos: [190, 210],
-    kmFromCenter: 8.0
+    coords: [-8.8150, 13.2850]
   },
   {
     name: 'Benfica / Lar do Patriota',
     synonyms: ['benfica', 'patriota', 'lar do patriota', 'kifica'],
     zone: 'Talatona / Belas',
-    pos: [50, 580],
-    kmFromCenter: 16.0
+    coords: [-8.9600, 13.1600]
   },
   {
     name: 'Ilha de Luanda (Farol / Ponto Final)',
     synonyms: ['ilha', 'ilha de luanda', 'chicala', 'farol da ilha', 'ponto final'],
     zone: 'Ingombota · Ilha',
-    pos: [60, 60],
-    kmFromCenter: 4.0
+    coords: [-8.7900, 13.2400]
   },
   {
     name: 'Morro Bento / Gamek / Samba',
     synonyms: ['morro bento', 'gamek', 'samba', 'estrada da samba'],
     zone: 'Samba · Luanda',
-    pos: [100, 370],
-    kmFromCenter: 9.0
+    coords: [-8.8800, 13.2000]
   }
 ];
 
-let originGeoPlace = ANGOLA_PLACES_DB[3]; // Talatona default
-let destGeoPlace = ANGOLA_PLACES_DB[2];   // Kilamba default
+let activeOrigPlace = ANGOLA_GEO_PLACES[2]; // Talatona default
+let activeDestPlace = ANGOLA_GEO_PLACES[1]; // Kilamba default
 
-function normalizeStr(str) {
-  return (str || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').trim();
+function initRealAngolaMap() {
+  if (typeof L === 'undefined') {
+    console.warn('Leaflet ainda não carregado');
+    return;
+  }
+  const mapEl = document.getElementById('giro-real-map');
+  if (!mapEl || realMap) return;
+
+  // Inicializar mapa centrado em Luanda
+  realMap = L.map('giro-real-map', {
+    center: [-8.9220, 13.1840],
+    zoom: 13,
+    zoomControl: false,
+    attributionControl: false
+  });
+
+  // Camada de Ruas Reais com estilo Uber Light (CartoDB Positron / OSM)
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+    subdomains: 'abcd',
+    maxZoom: 19
+  }).addTo(realMap);
+
+  // Criar Marcadores
+  const createUberPin = (title, isDest = false) => {
+    return L.divIcon({
+      className: 'giro-map-pin',
+      html: `
+        <div style="display:flex;flex-direction:column;align-items:center;transform:translate(-50%,-100%);">
+          <div style="background:#000000;color:#ffffff;font-size:10.5px;font-weight:900;padding:4px 9px;border-radius:6px;box-shadow:0 3px 12px rgba(0,0,0,0.35);white-space:nowrap;margin-bottom:3px;border:1px solid #333333;">${title}</div>
+          <div style="width:14px;height:14px;border-radius:${isDest ? '3px' : '50%'};background:#000000;border:3px solid #ffffff;box-shadow:0 2px 8px rgba(0,0,0,0.4);"></div>
+        </div>
+      `,
+      iconSize: [0, 0]
+    });
+  };
+
+  const createCarPin = (eta = '3 min') => {
+    return L.divIcon({
+      className: 'giro-car-pin',
+      html: `
+        <div style="display:flex;flex-direction:column;align-items:center;transform:translate(-50%,-50%);">
+          <div id="driver-bubble-eta" style="background:#000000;color:#ffffff;font-size:9.5px;font-weight:800;padding:2px 7px;border-radius:6px;border:1px solid #333333;white-space:nowrap;margin-bottom:2px;box-shadow:0 3px 10px rgba(0,0,0,0.35);">🚗 ${eta}</div>
+          <div style="width:36px;height:36px;border-radius:50%;background:#000000;border:2.5px solid #ffffff;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(0,0,0,0.4);">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="#ffffff"><path d="M18.92 6.01C18.72 5.42 18.16 5 17.5 5h-11c-.66 0-1.21.42-1.42 1.01L3 12v8c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1h12v1c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-8l-2.08-5.99zM6.85 7h10.29l1.04 3H5.81l1.04-3zM19 17H5v-4.66l.12-.34h13.77l.11.34V17z"/><circle cx="7.5" cy="14.5" r="1.5"/><circle cx="16.5" cy="14.5" r="1.5"/></svg>
+          </div>
+        </div>
+      `,
+      iconSize: [0, 0]
+    });
+  };
+
+  origMarker = L.marker(activeOrigPlace.coords, { icon: createUberPin(activeOrigPlace.name.split('(')[0].trim(), false) }).addTo(realMap);
+  destMarker = L.marker(activeDestPlace.coords, { icon: createUberPin(activeDestPlace.name.split('(')[0].trim(), true) }).addTo(realMap);
+  carMarker = L.marker([-8.9320, 13.1870], { icon: createCarPin('3 min') });
+
+  setTimeout(() => {
+    realMap.invalidateSize();
+    recalculateRealRoute();
+  }, 250);
 }
 
-function findBestPlaceMatch(query) {
-  const q = normalizeStr(query);
-  if (!q) return null;
-
-  for (const p of ANGOLA_PLACES_DB) {
-    if (normalizeStr(p.name).includes(q)) return p;
-    for (const syn of p.synonyms) {
-      if (q.includes(syn) || syn.includes(q)) return p;
-    }
-  }
-  return null;
+function calculateGeoDistance(lat1, lon1, lat2, lon2) {
+  const R = 6371; // Raio da Terra em km
+  const dLat = (lat2 - lat1) * Math.PI / 180;
+  const dLon = (lon2 - lon1) * Math.PI / 180;
+  const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+            Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+            Math.sin(dLon/2) * Math.sin(dLon/2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+  return R * c * 1.35; // Fator viário real de Luanda (curvas e avenidas)
 }
 
-function calculateDynamicDistanceAndFare(origPlace, destPlace) {
-  if (!origPlace || !destPlace) return;
+function recalculateRealRoute() {
+  if (!realMap || !origMarker || !destMarker) return;
 
-  // Distância euclidiana escalada para o mapa real de Luanda
-  const dx = (origPlace.pos[0] - destPlace.pos[0]);
-  const dy = (origPlace.pos[1] - destPlace.pos[1]);
-  const distPixels = Math.sqrt(dx * dx + dy * dy);
+  const p1 = activeOrigPlace.coords;
+  const p2 = activeDestPlace.coords;
 
-  // Escala: 100px aprox = 5.2 km em Luanda
-  let calculatedKm = parseFloat((distPixels * 0.052).toFixed(1));
-  if (calculatedKm < 1.8) calculatedKm = 1.8;
+  origMarker.setLatLng(p1);
+  destMarker.setLatLng(p2);
 
-  // Casos especiais de rotas de longa distância (ex: Sequele / 8 mil para Kilamba / Viana)
-  const isSequele = origPlace.synonyms.some(s => s.includes('8 mil') || s.includes('sequele')) || destPlace.synonyms.some(s => s.includes('8 mil') || s.includes('sequele'));
-  const isKilamba = origPlace.synonyms.some(s => s.includes('kilamba')) || destPlace.synonyms.some(s => s.includes('kilamba'));
-  if (isSequele && isKilamba) {
-    calculatedKm = 34.8;
-  } else if (isSequele && (origPlace.synonyms.some(s => s.includes('talatona')) || destPlace.synonyms.some(s => s.includes('talatona')))) {
-    calculatedKm = 31.2;
-  }
+  // Calcular distância real precisa
+  const realKm = calculateGeoDistance(p1[0], p1[1], p2[0], p2[1]);
+  tripKm = parseFloat(Math.max(1.8, realKm).toFixed(1));
+  tripMins = Math.max(7, Math.round(tripKm * 1.6 + 4));
 
-  tripKm = calculatedKm;
-  tripMins = Math.max(7, Math.round(calculatedKm * 1.6 + 4));
-
-  // Atualizar visualizador de Distância (KM) e Duração no ecrã
+  // Atualizar indicadores no ecrã
   const kmEl = document.getElementById('route-km-display');
   const durEl = document.getElementById('route-duration-display');
   const trafficEl = document.getElementById('route-traffic-display');
   
   if (kmEl) kmEl.textContent = `${tripKm.toLocaleString('pt-AO')} km`;
   if (durEl) durEl.textContent = `~${tripMins} min`;
-  if (trafficEl) {
-    trafficEl.innerHTML = (tripKm > 20) ? '🟡 Moderado' : '🟢 Fluido';
-  }
+  if (trafficEl) trafficEl.innerHTML = (tripKm > 20) ? '🟡 Trânsito Moderado' : '🟢 Fluido';
 
-  // Redesenhar traçado SVG dinâmico conectando os pontos reais
-  const routeSvg = document.getElementById('pax-route-svg');
-  if (routeSvg) {
-    const midY = (origPlace.pos[1] > 370 && destPlace.pos[1] < 370) ? 370 : (origPlace.pos[1] > 210 && destPlace.pos[1] < 210) ? 210 : 545;
-    const pathD = `M${origPlace.pos[0]} ${origPlace.pos[1]} L${origPlace.pos[0]} ${midY} L${destPlace.pos[0]} ${midY} L${destPlace.pos[0]} ${destPlace.pos[1]}`;
-    routeSvg.setAttribute('d', pathD);
-  }
+  // Gerar Rota com Waypoints pelas vias reais
+  if (mainRoutePolyline) realMap.removeLayer(mainRoutePolyline);
 
-  // Mover marcadores GPS no mapa
-  const pinA = document.getElementById('pax-pin-a');
-  const pinB = document.getElementById('pax-pin-b');
-  if (pinA) {
-    pinA.style.left = origPlace.pos[0] + 'px';
-    pinA.style.top = origPlace.pos[1] + 'px';
-  }
-  if (pinB) {
-    pinB.style.left = destPlace.pos[0] + 'px';
-    pinB.style.top = destPlace.pos[1] + 'px';
-  }
+  // Waypoints intermediários para simular vias reais de Luanda
+  const midLat = (p1[0] + p2[0]) / 2;
+  const midLng = (p1[1] + p2[1]) / 2 + 0.01;
+  const waypoints = [p1, [midLat, midLng], p2];
 
-  // Recalcular lista de veículos e valores
+  mainRoutePolyline = L.polyline(waypoints, {
+    color: '#000000',
+    weight: 5.5,
+    opacity: 0.95,
+    lineCap: 'round',
+    lineJoin: 'round'
+  }).addTo(realMap);
+
+  // Enquadrar perfeitamente a rota no ecrã
+  const bounds = L.latLngBounds([p1, p2]);
+  realMap.fitBounds(bounds, { padding: [60, 60], maxZoom: 15 });
+
   renderTiers();
+}
+
+function findBestPlaceMatch(query) {
+  const q = (query || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').trim();
+  if (!q) return null;
+
+  for (const p of ANGOLA_GEO_PLACES) {
+    const nameNorm = p.name.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
+    if (nameNorm.includes(q)) return p;
+    for (const syn of p.synonyms) {
+      if (q.includes(syn) || syn.includes(q)) return p;
+    }
+  }
+  return null;
 }
 
 function onRouteInputTyped(field) {
@@ -1522,23 +1463,20 @@ function onRouteInputTyped(field) {
   
   if (field === 'origin') {
     originName = query;
-    if (document.getElementById('pax-origin-lab')) document.getElementById('pax-origin-lab').textContent = query.split(',')[0] || 'Origem';
   } else {
     destName = query;
-    if (document.getElementById('pax-dest-lab')) document.getElementById('pax-dest-lab').textContent = destName.split(',')[0] || 'Destino';
   }
 
   showRouteSuggestions(field, query);
 
-  // Busca imediata se o utilizador digitou algo correspondente
   const matched = findBestPlaceMatch(query);
   if (matched) {
     if (field === 'origin') {
-      originGeoPlace = matched;
+      activeOrigPlace = matched;
     } else {
-      destGeoPlace = matched;
+      activeDestPlace = matched;
     }
-    calculateDynamicDistanceAndFare(originGeoPlace, destGeoPlace);
+    recalculateRealRoute();
   }
 }
 
@@ -1546,14 +1484,15 @@ function showRouteSuggestions(field, query) {
   const box = document.getElementById('route-suggestions-box');
   if (!box) return;
 
-  const q = normalizeStr(query);
+  const q = (query || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').trim();
   if (!q || q.length < 2) {
     box.style.display = 'none';
     return;
   }
 
-  const matches = ANGOLA_PLACES_DB.filter(p => {
-    return normalizeStr(p.name).includes(q) || p.synonyms.some(s => s.includes(q) || q.includes(s));
+  const matches = ANGOLA_GEO_PLACES.filter(p => {
+    const nameNorm = p.name.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
+    return nameNorm.includes(q) || p.synonyms.some(s => s.includes(q) || q.includes(s));
   });
 
   if (matches.length === 0) {
@@ -1562,10 +1501,10 @@ function showRouteSuggestions(field, query) {
   }
 
   box.innerHTML = matches.map(p => `
-    <div onclick="selectSuggestedPlace('${field}', '${p.name.replace(/'/g, "\'")}')" style="padding:10px 14px;border-bottom:1px solid #282828;display:flex;align-items:center;gap:10px;cursor:pointer;transition:background .15s;">
-      <span style="font-size:16px;">📍</span>
+    <div onclick="selectSuggestedPlace('${field}', '${p.name.replace(/'/g, "\'")}')" style="padding:12px 14px;border-bottom:1px solid #282828;display:flex;align-items:center;gap:12px;cursor:pointer;transition:background .15s;">
+      <span style="font-size:18px;">📍</span>
       <div style="flex:1;">
-        <b style="font-size:13px;color:#fff;display:block;">${p.name}</b>
+        <b style="font-size:13.5px;color:#fff;display:block;">${p.name}</b>
         <span style="font-size:11px;color:#888;">${p.zone}</span>
       </div>
     </div>
@@ -1575,38 +1514,90 @@ function showRouteSuggestions(field, query) {
 }
 
 function selectSuggestedPlace(field, placeName) {
-  const place = ANGOLA_PLACES_DB.find(p => p.name === placeName);
+  const place = ANGOLA_GEO_PLACES.find(p => p.name === placeName);
   if (!place) return;
 
   const inputEl = (field === 'origin') ? document.getElementById('inp-pax-orig') : document.getElementById('inp-pax-dest');
-  const labelEl = (field === 'origin') ? document.getElementById('pax-origin-lab') : document.getElementById('pax-dest-lab');
-  
   if (inputEl) inputEl.value = place.name;
-  if (labelEl) labelEl.textContent = place.name.split('(')[0].trim();
 
   if (field === 'origin') {
     originName = place.name;
-    originGeoPlace = place;
+    activeOrigPlace = place;
   } else {
     destName = place.name;
-    destGeoPlace = place;
+    activeDestPlace = place;
   }
 
   const box = document.getElementById('route-suggestions-box');
   if (box) box.style.display = 'none';
 
-  calculateDynamicDistanceAndFare(originGeoPlace, destGeoPlace);
+  recalculateRealRoute();
   playHaptic('beep');
 }
 
-// Fechar sugestões ao clicar fora
-document.addEventListener('click', (e) => {
-  const box = document.getElementById('route-suggestions-box');
-  const routeBox = document.querySelector('.uber-route-box');
-  if (box && routeBox && !routeBox.contains(e.target)) {
-    box.style.display = 'none';
-  }
-});
+function startRealDriverTrackingSequence() {
+  if (!realMap || !carMarker) return;
+
+  carMarker.addTo(realMap);
+
+  const pOrig = activeOrigPlace.coords;
+  const pDest = activeDestPlace.coords;
+
+  // 1. Aproximação do motorista ao ponto de recolha
+  const approachStart = [pOrig[0] - 0.008, pOrig[1] + 0.005];
+  const approachMid = [pOrig[0] - 0.004, pOrig[1] + 0.002];
+  const approachPts = [approachStart, approachMid, pOrig];
+
+  if (approachRoutePolyline) realMap.removeLayer(approachRoutePolyline);
+  approachRoutePolyline = L.polyline(approachPts, {
+    color: '#2563eb',
+    weight: 4.5,
+    dashArray: '6, 6',
+    opacity: 0.95
+  }).addTo(realMap);
+
+  approachPts.forEach((pt, idx) => {
+    paxTimers.push(setTimeout(() => {
+      carMarker.setLatLng(pt);
+      const bubble = document.getElementById('driver-bubble-eta');
+      if (bubble) bubble.textContent = `🚗 ${3 - idx} min`;
+      
+      const txt = (idx === approachPts.length - 1)
+        ? '🚗 Domingos M. chegou ao local de embarque!'
+        : `Motorista a caminho · ${3 - idx} min`;
+      document.getElementById('pax-status-text').textContent = txt;
+      playHaptic('beep');
+
+      if (idx === approachPts.length - 1) {
+        if (approachRoutePolyline) realMap.removeLayer(approachRoutePolyline);
+        
+        paxTimers.push(setTimeout(() => {
+          document.getElementById('pax-status-text').textContent = `Viagem em curso para ${activeDestPlace.name.split('(')[0]}`;
+          if (bubble) bubble.textContent = '🚗 Em viagem';
+
+          const midLat = (pOrig[0] + pDest[0]) / 2;
+          const midLng = (pOrig[1] + pDest[1]) / 2 + 0.01;
+          const tripSteps = [
+            pOrig,
+            [(pOrig[0] * 2 + midLat) / 3, (pOrig[1] * 2 + midLng) / 3],
+            [midLat, midLng],
+            [(pDest[0] * 2 + midLat) / 3, (pDest[1] * 2 + midLng) / 3],
+            pDest
+          ];
+
+          tripSteps.forEach((tPt, tIdx) => {
+            paxTimers.push(setTimeout(() => {
+              carMarker.setLatLng(tPt);
+              if (tIdx === tripSteps.length - 1) {
+                setTimeout(() => paxTo('end'), 1500);
+              }
+            }, (tIdx + 1) * 2000));
+          });
+        }, 2500));
+      }
+    }, idx * 1600));
+  });
+}
 
 
 function fillActiveWithShortcut(type) {
@@ -1728,6 +1719,12 @@ function paxTo(state) {
   else if (state === 'trip') {
     showPane('pane-trip');
     playHaptic('beep');
+    const statusBan = document.getElementById('pax-status-ban');
+    const statusText = document.getElementById('pax-status-text');
+    if (statusBan) statusBan.classList.add('on');
+    if (statusText) statusText.textContent = 'Motorista a caminho · 3 min';
+    startRealDriverTrackingSequence();
+    return;
 
     if (paxPinB) paxPinB.style.opacity = 1;
     if (paxCarEl) {
