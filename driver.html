@@ -1967,47 +1967,163 @@ document.addEventListener('DOMContentLoaded',function(){
     </div>
   </section>
 
-  <!-- TAB: PERFIL DO MOTORISTA (STORE COMPLIANT) -->
-  <section id="driver-tab-profile" style="display:none;position:fixed;top:60px;bottom:54px;left:0;right:0;overflow-y:auto;padding:16px;background:#070907;z-index:150;">
-    <h2 style="font-size:20px;font-weight:800;color:#fff;margin-bottom:14px;">Perfil do Motorista</h2>
+  <!-- TAB: PERFIL DO MOTORISTA (EDITÁVEL - FULL EDIT) -->
+  <section id="driver-tab-profile" style="display:none;position:fixed;top:60px;bottom:54px;left:0;right:0;overflow-y:auto;background:#070707;z-index:150;">
+    <div style="padding:16px 16px 32px 16px;">
 
-    <div style="background:#121612;border:1px solid #262626;border-radius:14px;padding:16px;margin-bottom:14px;display:flex;align-items:center;gap:14px;">
-      <div style="width:50px;height:50px;border-radius:50%;background:linear-gradient(135deg,#d4af37,#f0c040);display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:900;color:#000;">D</div>
-      <div>
-        <div style="font-size:16px;font-weight:700;color:#fff;">Domingos Manuel</div>
-        <div style="font-size:12px;color:#8d9e8d;">+244 923 456 789</div>
-        <div style="font-size:11px;color:#4fe36a;margin-top:2px;">★ 4.9 · Motorista Verificado KYC ✓</div>
+      <!-- Header -->
+      <h2 style="font-size:20px;font-weight:900;color:#fff;margin:0 0 18px 0;letter-spacing:-0.3px;">Perfil do Motorista</h2>
+
+      <!-- Card Avatar + Nome + Telefone -->
+      <div style="background:#111;border:1px solid #222;border-radius:20px;padding:20px;margin-bottom:14px;text-align:center;">
+        <!-- Avatar com upload -->
+        <div style="position:relative;display:inline-block;margin-bottom:14px;">
+          <div id="drv-avatar-display" onclick="document.getElementById('drv-photo-input').click()"
+               style="width:80px;height:80px;border-radius:50%;background:linear-gradient(135deg,#d4af37,#f0c040);display:flex;align-items:center;justify-content:center;cursor:pointer;overflow:hidden;border:3px solid #d4af37;margin:0 auto;position:relative;">
+            <span id="drv-avatar-initials" style="font-size:32px;font-weight:900;color:#000;">D</span>
+            <img id="drv-avatar-img" src="" style="display:none;width:100%;height:100%;object-fit:cover;position:absolute;top:0;left:0;border-radius:50%;">
+          </div>
+          <div onclick="document.getElementById('drv-photo-input').click()"
+               style="position:absolute;bottom:-2px;right:-2px;width:26px;height:26px;background:#d4af37;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;border:2px solid #070707;font-size:13px;">✏️</div>
+        </div>
+        <input type="file" id="drv-photo-input" accept="image/*" style="display:none;" onchange="handleDrvPhotoUpload(event)">
+
+        <div id="drv-profile-name" style="font-size:18px;font-weight:800;color:#fff;margin-bottom:4px;">Motorista GIRO</div>
+        <div id="drv-profile-phone" style="font-size:13px;color:#888;margin-bottom:6px;">+244 9XX XXX XXX</div>
+        <div style="display:inline-flex;align-items:center;gap:6px;background:#1a1a0a;border:1px solid #3a3000;border-radius:20px;padding:4px 12px;">
+          <span style="color:#d4af37;font-size:13px;">★</span>
+          <span id="drv-profile-rating" style="font-size:13px;font-weight:700;color:#fff;">4.9</span>
+          <span style="font-size:11px;color:#888;">· Verificado KYC ✓</span>
+        </div>
       </div>
-    </div>
 
-    <!-- Veículo -->
-    <div style="background:#121612;border:1px solid #262626;border-radius:14px;padding:16px;margin-bottom:14px;">
-      <div style="font-size:13px;font-weight:700;color:#fff;margin-bottom:10px;">Viatura Registada</div>
-      <div style="font-size:13px;color:#fff;font-weight:600;">Toyota Corolla (Cinzento)</div>
-      <div style="font-size:12px;color:#d4af37;margin-top:2px;">Matrícula: LD-23-45-AA</div>
-      <div style="font-size:11px;color:#8d9e8d;margin-top:4px;">Seguro & Inspecção válidos até Nov/2026</div>
-    </div>
+      <!-- Estatísticas -->
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:14px;">
+        <div style="background:#111;border:1px solid #222;border-radius:14px;padding:12px;text-align:center;">
+          <div id="drv-stat-trips" style="font-size:20px;font-weight:900;color:#d4af37;">0</div>
+          <div style="font-size:10px;color:#666;margin-top:2px;font-weight:600;">CORRIDAS</div>
+        </div>
+        <div style="background:#111;border:1px solid #222;border-radius:14px;padding:12px;text-align:center;">
+          <div id="drv-stat-earnings" style="font-size:18px;font-weight:900;color:#06C167;">0</div>
+          <div style="font-size:10px;color:#666;margin-top:2px;font-weight:600;">GANHOS (Kz)</div>
+        </div>
+        <div style="background:#111;border:1px solid #222;border-radius:14px;padding:12px;text-align:center;">
+          <div id="drv-stat-accept" style="font-size:20px;font-weight:900;color:#fff;">—</div>
+          <div style="font-size:10px;color:#666;margin-top:2px;font-weight:600;">ACEITAÇÃO</div>
+        </div>
+      </div>
 
-    <!-- Documentação Legal & Eliminação de Conta -->
-    <div style="background:#121612;border:1px solid #262626;border-radius:14px;padding:16px;margin-bottom:14px;">
-      <div style="font-size:13px;font-weight:700;color:#fff;margin-bottom:10px;">Legal & Contrato</div>
-      <a href="termos.html" style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid #1f241f;color:#fff;text-decoration:none;">
-        <span style="font-size:13px;">Contrato de Parceria & Termos</span>
-        <span style="color:#8d9e8d;">›</span>
-      </a>
-      <a href="privacidade.html" style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid #1f241f;color:#fff;text-decoration:none;">
-        <span style="font-size:13px;">Política de Privacidade</span>
-        <span style="color:#8d9e8d;">›</span>
-      </a>
-      <a href="eliminar-conta.html" style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;color:#ef4444;text-decoration:none;">
-        <span style="font-size:13px;font-weight:600;">Eliminar Conta de Motorista</span>
-        <span style="color:#ef4444;">›</span>
-      </a>
-    </div>
+      <!-- Editar Dados Pessoais -->
+      <div style="background:#111;border:1px solid #222;border-radius:20px;padding:18px;margin-bottom:14px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+          <div style="font-size:15px;font-weight:800;color:#fff;">Dados Pessoais</div>
+          <div id="drv-save-status" style="display:none;font-size:12px;color:#06C167;font-weight:700;">✓ Guardado</div>
+        </div>
 
-    <button onclick="GiroAuth.logout()" style="width:100%;padding:14px;border-radius:10px;background:rgba(239,68,68,0.12);border:1px solid rgba(239,68,68,0.3);color:#fca5a5;font-size:14px;font-weight:700;cursor:pointer;">
-      Sair da Conta
-    </button>
+        <div style="display:flex;flex-direction:column;gap:14px;">
+          <div>
+            <label style="display:block;font-size:11px;font-weight:700;color:#666;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;">Nome Completo</label>
+            <input type="text" id="edit-drv-name" placeholder="Seu nome completo"
+                   style="width:100%;background:#1a1a1a;border:1px solid #2e2e2e;border-radius:12px;padding:12px 14px;color:#fff;font-size:16px;outline:none;box-sizing:border-box;font-family:inherit;"
+                   oninput="drvAutoSave()">
+          </div>
+          <div>
+            <label style="display:block;font-size:11px;font-weight:700;color:#666;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;">Telemóvel / WhatsApp (+244)</label>
+            <input type="tel" id="edit-drv-phone" placeholder="923 000 000"
+                   style="width:100%;background:#1a1a1a;border:1px solid #2e2e2e;border-radius:12px;padding:12px 14px;color:#fff;font-size:16px;outline:none;box-sizing:border-box;font-family:inherit;"
+                   oninput="drvAutoSave()">
+          </div>
+          <div>
+            <label style="display:block;font-size:11px;font-weight:700;color:#666;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;">E-mail (opcional)</label>
+            <input type="email" id="edit-drv-email" placeholder="exemplo@gmail.com"
+                   style="width:100%;background:#1a1a1a;border:1px solid #2e2e2e;border-radius:12px;padding:12px 14px;color:#fff;font-size:16px;outline:none;box-sizing:border-box;font-family:inherit;"
+                   oninput="drvAutoSave()">
+          </div>
+          <div>
+            <label style="display:block;font-size:11px;font-weight:700;color:#666;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;">Cidade / Localização Base</label>
+            <input type="text" id="edit-drv-city" placeholder="Ex: Luanda, Viana, Cacuaco..."
+                   style="width:100%;background:#1a1a1a;border:1px solid #2e2e2e;border-radius:12px;padding:12px 14px;color:#fff;font-size:16px;outline:none;box-sizing:border-box;font-family:inherit;"
+                   oninput="drvAutoSave()">
+          </div>
+        </div>
+      </div>
+
+      <!-- Editar Dados do Veículo -->
+      <div style="background:#111;border:1px solid #222;border-radius:20px;padding:18px;margin-bottom:14px;">
+        <div style="font-size:15px;font-weight:800;color:#fff;margin-bottom:16px;">🚗 Viatura Registada</div>
+
+        <div style="display:flex;flex-direction:column;gap:14px;">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+            <div>
+              <label style="display:block;font-size:11px;font-weight:700;color:#666;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;">Marca</label>
+              <input type="text" id="edit-drv-car-brand" placeholder="Toyota, Hyundai..."
+                     style="width:100%;background:#1a1a1a;border:1px solid #2e2e2e;border-radius:12px;padding:12px 10px;color:#fff;font-size:14px;outline:none;box-sizing:border-box;font-family:inherit;"
+                     oninput="drvAutoSave()">
+            </div>
+            <div>
+              <label style="display:block;font-size:11px;font-weight:700;color:#666;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;">Modelo</label>
+              <input type="text" id="edit-drv-car-model" placeholder="Corolla, Elantra..."
+                     style="width:100%;background:#1a1a1a;border:1px solid #2e2e2e;border-radius:12px;padding:12px 10px;color:#fff;font-size:14px;outline:none;box-sizing:border-box;font-family:inherit;"
+                     oninput="drvAutoSave()">
+            </div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+            <div>
+              <label style="display:block;font-size:11px;font-weight:700;color:#666;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;">Matrícula</label>
+              <input type="text" id="edit-drv-car-plate" placeholder="LD-00-00-AA"
+                     style="width:100%;background:#1a1a1a;border:1px solid #2e2e2e;border-radius:12px;padding:12px 10px;color:#fff;font-size:14px;outline:none;box-sizing:border-box;font-family:inherit;text-transform:uppercase;"
+                     oninput="this.value=this.value.toUpperCase();drvAutoSave()">
+            </div>
+            <div>
+              <label style="display:block;font-size:11px;font-weight:700;color:#666;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;">Cor</label>
+              <input type="text" id="edit-drv-car-color" placeholder="Branco, Preto..."
+                     style="width:100%;background:#1a1a1a;border:1px solid #2e2e2e;border-radius:12px;padding:12px 10px;color:#fff;font-size:14px;outline:none;box-sizing:border-box;font-family:inherit;"
+                     oninput="drvAutoSave()">
+            </div>
+          </div>
+          <div>
+            <label style="display:block;font-size:11px;font-weight:700;color:#666;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;">Categoria do Serviço</label>
+            <select id="edit-drv-car-category" onchange="drvAutoSave()"
+                    style="width:100%;background:#1a1a1a;border:1px solid #2e2e2e;border-radius:12px;padding:12px 14px;color:#fff;font-size:14px;outline:none;box-sizing:border-box;font-family:inherit;appearance:none;">
+              <option value="">Seleccionar categoria...</option>
+              <option value="eco">GIRO Eco (Sedan/Hatch compacto)</option>
+              <option value="conf">GIRO Confort (Sedan executivo)</option>
+              <option value="sete">GIRO 7 Lugares (SUV/Van)</option>
+              <option value="moto">GIRO Moto (Kupapata)</option>
+              <option value="deliv_moto">GIRO Delivery Moto</option>
+              <option value="deliv_car">GIRO Delivery Carro</option>
+              <option value="deliv_van">GIRO Delivery Van</option>
+              <option value="cargo_pickup">GIRO Cargo Pick-up</option>
+              <option value="cargo_canter">GIRO Cargo Canter</option>
+              <option value="cargo_heavy">GIRO Cargo Pesado 10T</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Legal & Contrato -->
+      <div style="background:#111;border:1px solid #222;border-radius:20px;padding:4px 18px;margin-bottom:14px;">
+        <a href="contrato-motorista.html" style="display:flex;justify-content:space-between;align-items:center;padding:14px 0;border-bottom:1px solid #1f1f1f;color:#fff;text-decoration:none;">
+          <span style="font-size:14px;">📄 Contrato de Parceria</span>
+          <span style="color:#555;font-size:18px;">›</span>
+        </a>
+        <a href="privacidade.html" style="display:flex;justify-content:space-between;align-items:center;padding:14px 0;border-bottom:1px solid #1f1f1f;color:#fff;text-decoration:none;">
+          <span style="font-size:14px;">🔒 Política de Privacidade</span>
+          <span style="color:#555;font-size:18px;">›</span>
+        </a>
+        <a href="eliminar-conta.html" style="display:flex;justify-content:space-between;align-items:center;padding:14px 0;color:#ef4444;text-decoration:none;">
+          <span style="font-size:14px;font-weight:600;">🗑️ Eliminar Conta de Motorista</span>
+          <span style="font-size:18px;">›</span>
+        </a>
+      </div>
+
+      <!-- Sair da Conta -->
+      <button onclick="GiroAuth.logout()"
+              style="width:100%;padding:16px;border-radius:14px;background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.3);color:#fca5a5;font-size:15px;font-weight:700;cursor:pointer;letter-spacing:0.3px;">
+        Sair da Conta
+      </button>
+
+    </div>
   </section>
 
 <nav id="bottom-tab-bar" style="position:fixed;bottom:0;left:0;right:0;height:54px;background:#111;border-top:1px solid #262626;display:flex;align-items:stretch;z-index:200;padding-bottom:env(safe-area-inset-bottom,0px);">
@@ -2111,5 +2227,126 @@ window.addEventListener('DOMContentLoaded', () => {
     </div>
   </div>
 
+
+  <!-- DRIVER PROFILE JS -->
+  <script>
+  function updateDriverProfileView() {
+    const s = GiroAuth.get();
+    const nameEl = document.getElementById('drv-profile-name');
+    const phoneEl = document.getElementById('drv-profile-phone');
+    const initEl = document.getElementById('drv-avatar-initials');
+    const imgEl = document.getElementById('drv-avatar-img');
+    const editName = document.getElementById('edit-drv-name');
+    const editPhone = document.getElementById('edit-drv-phone');
+    const editEmail = document.getElementById('edit-drv-email');
+    const editCity = document.getElementById('edit-drv-city');
+    const editBrand = document.getElementById('edit-drv-car-brand');
+    const editModel = document.getElementById('edit-drv-car-model');
+    const editPlate = document.getElementById('edit-drv-car-plate');
+    const editColor = document.getElementById('edit-drv-car-color');
+    const editCat = document.getElementById('edit-drv-car-category');
+    const statTrips = document.getElementById('drv-stat-trips');
+    const statEarn = document.getElementById('drv-stat-earnings');
+    const statAccept = document.getElementById('drv-stat-accept');
+
+    const nome = s ? (s.nome || s.name || 'Motorista GIRO') : 'Motorista GIRO';
+    const phone = s ? (s.phone || '+244 9XX XXX XXX') : '+244 9XX XXX XXX';
+    const initial = nome[0].toUpperCase();
+
+    if (nameEl) nameEl.textContent = nome;
+    if (phoneEl) phoneEl.textContent = phone;
+    if (initEl) initEl.textContent = initial;
+
+    if (s && s.photo) {
+      if (imgEl) { imgEl.src = s.photo; imgEl.style.display = 'block'; }
+      if (initEl) initEl.style.display = 'none';
+    } else {
+      if (imgEl) imgEl.style.display = 'none';
+      if (initEl) initEl.style.display = 'flex';
+    }
+
+    if (editName) editName.value = s ? (s.nome || s.name || '') : '';
+    if (editPhone) editPhone.value = s ? (s.phone || '') : '';
+    if (editEmail) editEmail.value = s ? (s.email || '') : '';
+    if (editCity) editCity.value = s ? (s.city || '') : '';
+
+    const veh = s ? (s.veiculo || {}) : {};
+    if (editBrand) editBrand.value = veh.marca || '';
+    if (editModel) editModel.value = veh.modelo || '';
+    if (editPlate) editPlate.value = veh.matricula || '';
+    if (editColor) editColor.value = veh.cor || '';
+    if (editCat) editCat.value = veh.categoria || '';
+
+    // Stats from localStorage
+    const trips = parseInt(localStorage.getItem('giro_driver_total_trips') || '0');
+    const earn = parseInt(localStorage.getItem('giro_driver_total_earnings') || '0');
+    if (statTrips) statTrips.textContent = trips;
+    if (statEarn) statEarn.textContent = earn.toLocaleString('pt-AO');
+    if (statAccept) statAccept.textContent = trips > 0 ? '98%' : '—';
+  }
+
+  let _drvSaveTimer = null;
+  function drvAutoSave() {
+    clearTimeout(_drvSaveTimer);
+    _drvSaveTimer = setTimeout(() => {
+      const s = GiroAuth.get() || {};
+      const nome = (document.getElementById('edit-drv-name') || {}).value || s.nome || '';
+      const phone = (document.getElementById('edit-drv-phone') || {}).value || s.phone || '';
+      const email = (document.getElementById('edit-drv-email') || {}).value || s.email || '';
+      const city = (document.getElementById('edit-drv-city') || {}).value || s.city || '';
+      const brand = (document.getElementById('edit-drv-car-brand') || {}).value || '';
+      const model = (document.getElementById('edit-drv-car-model') || {}).value || '';
+      const plate = (document.getElementById('edit-drv-car-plate') || {}).value || '';
+      const color = (document.getElementById('edit-drv-car-color') || {}).value || '';
+      const category = (document.getElementById('edit-drv-car-category') || {}).value || '';
+
+      const updated = {
+        ...s,
+        nome, phone, email, city,
+        veiculo: { marca: brand, modelo: model, matricula: plate, cor: color, categoria: category }
+      };
+      GiroAuth.save(updated);
+
+      // Update header pill
+      const nameEl = document.getElementById('drv-profile-name');
+      const phoneEl = document.getElementById('drv-profile-phone');
+      const initEl = document.getElementById('drv-avatar-initials');
+      if (nameEl && nome) nameEl.textContent = nome;
+      if (phoneEl && phone) phoneEl.textContent = phone;
+      if (initEl && nome) initEl.textContent = nome[0].toUpperCase();
+
+      // Show saved status
+      const statusEl = document.getElementById('drv-save-status');
+      if (statusEl) {
+        statusEl.style.display = 'block';
+        clearTimeout(statusEl._hideTimer);
+        statusEl._hideTimer = setTimeout(() => { statusEl.style.display = 'none'; }, 2500);
+      }
+
+      // Sync GiroAuth.renderUserPill
+      if (typeof GiroAuth !== 'undefined' && GiroAuth.renderUserPill) {
+        GiroAuth.renderUserPill('driver-user-pill');
+      }
+    }, 600);
+  }
+
+  function handleDrvPhotoUpload(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    if (file.size > 3 * 1024 * 1024) { alert('Foto muito grande. Máx 3MB.'); return; }
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      const dataUrl = e.target.result;
+      const imgEl = document.getElementById('drv-avatar-img');
+      const initEl = document.getElementById('drv-avatar-initials');
+      if (imgEl) { imgEl.src = dataUrl; imgEl.style.display = 'block'; }
+      if (initEl) initEl.style.display = 'none';
+      // Save photo to session
+      const s = GiroAuth.get() || {};
+      GiroAuth.save({ ...s, photo: dataUrl });
+      drvAutoSave();
+    };
+    reader.readAsDataURL(file);
+  }
+  </script>
 </body>
-</html>
