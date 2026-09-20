@@ -1,12 +1,12 @@
-// GIRO Angola Service Worker — PWA Live (Network First for HTML & Auto-Purge)
-const CACHE_NAME = 'giro-live-v2026-v4-uber-sync';
+// GIRO Angola Service Worker — PWA Live (Network First for HTML, Push & Auto-Purge)
+const CACHE_NAME = 'giro-live-v2026-v5-firebase-suite';
 
 // Install — forçar ativação imediata sem esperar fechar abas
 self.addEventListener('install', event => {
   self.skipWaiting();
 });
 
-// Activate — eliminar TODOS os caches antigos (v1, v2, v3, etc.)
+// Activate — eliminar TODOS os caches antigos
 self.addEventListener('activate', event => {
   event.waitUntil(
     caches.keys().then(keys => {
@@ -65,6 +65,52 @@ self.addEventListener('fetch', event => {
         .catch(() => null);
 
       return cached || netPromise;
+    })
+  );
+});
+
+// Push Notifications — Suporte a notificações nativas do sistema
+self.addEventListener('push', event => {
+  let data = { title: 'GIRO Angola', body: 'Nova atualização na sua viagem.', url: './' };
+  try {
+    if (event.data) {
+      data = event.data.json();
+    }
+  } catch(e) {
+    data.body = event.data ? event.data.text() : data.body;
+  }
+
+  const options = {
+    body: data.body,
+    icon: './icons/icon-192.png',
+    badge: './icons/icon-192.png',
+    vibrate: [200, 100, 200, 100, 200],
+    data: { url: data.url || './' },
+    actions: [
+      { action: 'open', title: 'Abrir App' }
+    ]
+  };
+
+  event.waitUntil(
+    self.registration.showNotification(data.title || 'GIRO Angola', options)
+  );
+});
+
+// Ao clicar na notificação, abrir ou focar a janela do app
+self.addEventListener('notificationclick', event => {
+  event.notification.close();
+  const targetUrl = (event.notification.data && event.notification.data.url) ? event.notification.data.url : './';
+
+  event.waitUntil(
+    clients.matchAll({ type: 'window', includeUncontrolled: true }).then(windowClients => {
+      for (let client of windowClients) {
+        if (client.url.includes(targetUrl) && 'focus' in client) {
+          return client.focus();
+        }
+      }
+      if (clients.openWindow) {
+        return clients.openWindow(targetUrl);
+      }
     })
   );
 });
