@@ -122,31 +122,31 @@ html, body{
    2. VIEWPORT & MAPA GPS AO VIVO (UBER LIVE EXPERIENCE)
    ========================================================================== */
 .viewport-body{flex:1;position:relative;overflow:hidden;display:flex;}
-.map-canvas{position:absolute;inset:0;background:#080808;overflow:hidden;z-index:1;}
+.map-canvas{position:absolute;inset:0;background:#f3f4f6;overflow:hidden;z-index:1;}
 .map-canvas svg{width:100%;height:100%;display:block;}
 
-/* VIATURAS ANIMADAS NO MAPA */
+/* VIATURAS ANIMADAS NO MAPA (ESTILO UBER LIGHT) */
 .map-car{
   position:absolute;width:24px;height:24px;margin-left:-12px;margin-top:-12px;
-  z-index:10;transition:all 1s linear;filter:drop-shadow(0 2px 8px rgba(0,0,0,0.8));
+  z-index:10;transition:all 1s linear;filter:drop-shadow(0 3px 10px rgba(0,0,0,0.35));
 }
 .map-pin{
   position:absolute;z-index:15;transform:translate(-50%,-100%);
   display:flex;flex-direction:column;align-items:center;transition:opacity .3s;
 }
 .pin-label{
-  background:#fff;color:#000;font-size:10px;font-weight:800;
-  padding:3px 8px;border-radius:6px;box-shadow:0 4px 12px rgba(0,0,0,.6);
-  white-space:nowrap;margin-bottom:2px;
+  background:#000000;color:#ffffff;font-size:10px;font-weight:800;
+  padding:3px 8px;border-radius:6px;box-shadow:0 3px 10px rgba(0,0,0,0.25);
+  white-space:nowrap;margin-bottom:3px;border:1px solid #333333;
 }
 .pin-circle{
-  width:14px;height:14px;border-radius:50%;background:#fff;
-  border:3px solid #000;box-shadow:0 0 10px rgba(255,255,255,.6);
+  width:14px;height:14px;border-radius:50%;background:#000000;
+  border:3px solid #ffffff;box-shadow:0 2px 8px rgba(0,0,0,0.3);
 }
-.map-pin.b .pin-circle{background:var(--gold);border-radius:2px;}
-.map-pin.b .pin-label{background:var(--gold);color:#000;}
-.map-pin.stop .pin-circle{background:var(--cargo);border-radius:2px;}
-.map-pin.stop .pin-label{background:var(--cargo);color:#000;}
+.map-pin.b .pin-circle{background:#000000;border-radius:3px;border-color:#ffffff;}
+.map-pin.b .pin-label{background:#000000;color:#ffffff;}
+.map-pin.stop .pin-circle{background:#2563eb;border-radius:3px;}
+.map-pin.stop .pin-label{background:#2563eb;color:#ffffff;}
 
 /* BOTÕES FLUTUANTES NO MAPA */
 .map-floating-bar{
@@ -154,25 +154,25 @@ html, body{
   display:flex;align-items:center;justify-content:space-between;pointer-events:none;
 }
 .map-btn{
-  pointer-events:auto;background:rgba(14,14,14,0.96);
-  border:1px solid var(--line);color:#fff;border-radius:50%;
+  pointer-events:auto;background:rgba(255,255,255,0.98);
+  border:1px solid #d1d5db;color:#000000;border-radius:50%;
   width:42px;height:42px;display:flex;align-items:center;justify-content:center;
-  cursor:pointer;font-size:16px;box-shadow:0 8px 24px rgba(0,0,0,0.7);
+  cursor:pointer;font-size:16px;box-shadow:0 4px 16px rgba(0,0,0,0.15);
   transition:.15s;
 }
-.map-btn:hover{border-color:var(--gold);color:var(--gold);}
+.map-btn:hover{background:#f8fafc;border-color:#94a3b8;transform:scale(1.05);}
 .map-btn.sos{
-  border-color:var(--red);color:var(--red);font-weight:900;
-  background:rgba(58,14,19,0.9);box-shadow:0 0 16px rgba(255,59,78,0.4);
+  border-color:#fca5a5;color:#dc2626;font-weight:900;
+  background:rgba(254,242,242,0.98);box-shadow:0 4px 16px rgba(220,38,38,0.25);
 }
 .map-status-pill{
-  pointer-events:auto;background:rgba(18,18,18,0.95);
-  background:rgba(14,14,14,0.96);border:1px solid var(--line);
+  pointer-events:auto;background:rgba(255,255,255,0.98);
+  border:1px solid #d1d5db;color:#000000;
   padding:8px 14px;border-radius:20px;font-size:11.5px;font-weight:700;
-  display:none;align-items:center;gap:7px;box-shadow:0 8px 20px rgba(0,0,0,.6);
+  display:none;align-items:center;gap:7px;box-shadow:0 4px 16px rgba(0,0,0,0.15);
 }
 .map-status-pill.on{display:flex;}
-.net-blip{width:7px;height:7px;border-radius:50%;background:var(--grn);box-shadow:0 0 8px var(--grn);}
+.net-blip{width:7px;height:7px;border-radius:50%;background:#16a34a;box-shadow:0 0 8px #16a34a;}
 
 /* ==========================================================================
    3. BOTTOM SHEET UBER (GAVETA DESLIZANTE DE ALTO PADRÃO)
@@ -470,55 +470,63 @@ body { overscroll-behavior: none; }
   <main class="viewport-body">
     <div class="map-canvas">
       <svg viewBox="0 0 400 800" preserveAspectRatio="xMidYMid slice" id="uber-map-svg">
-        <rect width="400" height="800" fill="#090909"/>
+        <!-- Fundo Claro Mapa Uber -->
+        <rect width="400" height="800" fill="#f3f4f6"/>
         
         <!-- Quarteirões e Zonas Urbanas de Luanda -->
-        <rect x="20" y="40" width="70" height="150" rx="6" fill="#141414"/>
-        <rect x="115" y="40" width="150" height="150" rx="6" fill="#141414"/>
-        <rect x="295" y="40" width="85" height="150" rx="6" fill="#141414"/>
+        <rect x="20" y="40" width="70" height="150" rx="8" fill="#e5e7eb" stroke="#d1d5db" stroke-width="0.8"/>
+        <rect x="115" y="40" width="150" height="150" rx="8" fill="#e5e7eb" stroke="#d1d5db" stroke-width="0.8"/>
+        <rect x="295" y="40" width="85" height="150" rx="8" fill="#dcfce7" stroke="#bbf7d0" stroke-width="0.8"/>
         
-        <rect x="20" y="240" width="70" height="120" rx="6" fill="#141414"/>
-        <rect x="115" y="240" width="65" height="120" rx="6" fill="#141414"/>
-        <rect x="200" y="240" width="65" height="120" rx="6" fill="#141414"/>
-        <rect x="295" y="240" width="85" height="120" rx="6" fill="#141414"/>
+        <rect x="20" y="240" width="70" height="120" rx="8" fill="#e5e7eb" stroke="#d1d5db" stroke-width="0.8"/>
+        <rect x="115" y="240" width="65" height="120" rx="8" fill="#e5e7eb" stroke="#d1d5db" stroke-width="0.8"/>
+        <rect x="200" y="240" width="65" height="120" rx="8" fill="#dcfce7" stroke="#bbf7d0" stroke-width="0.8"/>
+        <rect x="295" y="240" width="85" height="120" rx="8" fill="#e5e7eb" stroke="#d1d5db" stroke-width="0.8"/>
         
-        <rect x="20" y="410" width="70" height="120" rx="6" fill="#141414"/>
-        <rect x="115" y="410" width="150" height="120" rx="6" fill="#141414"/>
-        <rect x="295" y="410" width="85" height="120" rx="6" fill="#141414"/>
+        <rect x="20" y="410" width="70" height="120" rx="8" fill="#e0f2fe" stroke="#bae6fd" stroke-width="0.8"/>
+        <rect x="115" y="410" width="150" height="120" rx="8" fill="#e5e7eb" stroke="#d1d5db" stroke-width="0.8"/>
+        <rect x="295" y="410" width="85" height="120" rx="8" fill="#e5e7eb" stroke="#d1d5db" stroke-width="0.8"/>
 
-        <!-- Ruas Principais -->
-        <path d="M-20 215 H420" stroke="#222222" stroke-width="26"/>
-        <path d="M-20 385 H420" stroke="#222222" stroke-width="22"/>
-        <path d="M-20 560 H420" stroke="#222222" stroke-width="24"/>
-        
-        <path d="M100 -20 V820" stroke="#222222" stroke-width="22"/>
-        <path d="M280 -20 V820" stroke="#222222" stroke-width="22"/>
-        <path d="M190 200 V400" stroke="#1c1c1c" stroke-width="12"/>
+        <!-- Bordas das Vias Principais (Contorno para Alto Contraste) -->
+        <path d="M-20 215 H420" stroke="#d1d5db" stroke-width="28"/>
+        <path d="M-20 385 H420" stroke="#d1d5db" stroke-width="24"/>
+        <path d="M-20 560 H420" stroke="#d1d5db" stroke-width="26"/>
+        <path d="M100 -20 V820" stroke="#d1d5db" stroke-width="24"/>
+        <path d="M280 -20 V820" stroke="#d1d5db" stroke-width="24"/>
+        <path d="M190 200 V400" stroke="#d1d5db" stroke-width="14"/>
 
-        <!-- Linhas divisórias de faixa -->
-        <path d="M-20 215 H420" stroke="#333333" stroke-width="1.5" stroke-dasharray="8 6"/>
-        <path d="M-20 560 H420" stroke="#333333" stroke-width="1.5" stroke-dasharray="8 6"/>
-        <path d="M100 -20 V820" stroke="#333333" stroke-width="1.5" stroke-dasharray="8 6"/>
-        <path d="M280 -20 V820" stroke="#333333" stroke-width="1.5" stroke-dasharray="8 6"/>
+        <!-- Asfalto Branco Limpo Uber -->
+        <path d="M-20 215 H420" stroke="#ffffff" stroke-width="26"/>
+        <path d="M-20 385 H420" stroke="#ffffff" stroke-width="22"/>
+        <path d="M-20 560 H420" stroke="#ffffff" stroke-width="24"/>
+        <path d="M100 -20 V820" stroke="#ffffff" stroke-width="22"/>
+        <path d="M280 -20 V820" stroke="#ffffff" stroke-width="22"/>
+        <path d="M190 200 V400" stroke="#ffffff" stroke-width="12"/>
 
-        <!-- Rota de Aproximação do Motorista ao Passageiro (Tracejado Azul/Verde) -->
-        <path id="driver-approach-route" d="M280 640 L280 560 L100 560" stroke="#276EF1" stroke-width="4" stroke-linecap="round" fill="none" opacity="0" stroke-dasharray="6 4"/>
+        <!-- Linhas divisórias de faixa suaves -->
+        <path d="M-20 215 H420" stroke="#cbd5e1" stroke-width="1.5" stroke-dasharray="8 6"/>
+        <path d="M-20 560 H420" stroke="#cbd5e1" stroke-width="1.5" stroke-dasharray="8 6"/>
+        <path d="M100 -20 V820" stroke="#cbd5e1" stroke-width="1.5" stroke-dasharray="8 6"/>
+        <path d="M280 -20 V820" stroke="#cbd5e1" stroke-width="1.5" stroke-dasharray="8 6"/>
 
-        <!-- Rota Principal Passageiro -> Destino (Polyline Branca Uber) -->
-        <path id="pax-route-svg" d="M100 560 L100 215 L280 215 L280 90" stroke="#ffffff" stroke-width="5" fill="none" stroke-linecap="round" opacity="0" style="stroke-dasharray:800;stroke-dashoffset:800;filter:drop-shadow(0 0 6px rgba(255,255,255,0.6));"/>
+        <!-- Rota de Aproximação do Motorista ao Passageiro (Tracejado Azul Royal) -->
+        <path id="driver-approach-route" d="M280 640 L280 560 L100 560" stroke="#2563eb" stroke-width="4.5" stroke-linecap="round" fill="none" opacity="0" stroke-dasharray="6 4"/>
+
+        <!-- Rota Principal Passageiro -> Destino (Polyline Preta Sólida Uber) -->
+        <path id="pax-route-svg" d="M100 560 L100 215 L280 215 L280 90" stroke="#000000" stroke-width="5.5" fill="none" stroke-linecap="round" opacity="0" style="stroke-dasharray:800;stroke-dashoffset:800;filter:drop-shadow(0 2px 8px rgba(0,0,0,0.35));"/>
       </svg>
 
-      <!-- Viatura do Motorista com Rastreio em Tempo Real -->
+      <!-- Viatura do Motorista com Rastreio em Tempo Real (Badge Preto & Branco Uber) -->
       <div class="map-car" id="pax-car-el" style="left:280px;top:640px;opacity:0;transition:all 1.2s cubic-bezier(0.4, 0, 0.2, 1);z-index:25;">
         <div style="position:relative;display:flex;flex-direction:column;align-items:center;">
-          <div style="background:#000;color:#fff;font-size:9.5px;font-weight:800;padding:2px 7px;border-radius:6px;border:1px solid #333;white-space:nowrap;margin-bottom:2px;box-shadow:0 4px 10px rgba(0,0,0,0.8);" id="driver-bubble-eta">🚗 3 min</div>
-          <div style="width:34px;height:34px;border-radius:50%;background:#ffffff;border:2.5px solid #000;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(0,0,0,0.9);">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="#000"><path d="M18.92 6.01C18.72 5.42 18.16 5 17.5 5h-11c-.66 0-1.21.42-1.42 1.01L3 12v8c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1h12v1c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-8l-2.08-5.99zM6.85 7h10.29l1.04 3H5.81l1.04-3zM19 17H5v-4.66l.12-.34h13.77l.11.34V17z"/><circle cx="7.5" cy="14.5" r="1.5"/><circle cx="16.5" cy="14.5" r="1.5"/></svg>
+          <div style="background:#000000;color:#ffffff;font-size:9.5px;font-weight:800;padding:2px 7px;border-radius:6px;border:1px solid #333333;white-space:nowrap;margin-bottom:2px;box-shadow:0 3px 10px rgba(0,0,0,0.35);" id="driver-bubble-eta">🚗 3 min</div>
+          <div style="width:34px;height:34px;border-radius:50%;background:#000000;border:2.5px solid #ffffff;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(0,0,0,0.4);">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="#ffffff"><path d="M18.92 6.01C18.72 5.42 18.16 5 17.5 5h-11c-.66 0-1.21.42-1.42 1.01L3 12v8c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1h12v1c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-8l-2.08-5.99zM6.85 7h10.29l1.04 3H5.81l1.04-3zM19 17H5v-4.66l.12-.34h13.77l.11.34V17z"/><circle cx="7.5" cy="14.5" r="1.5"/><circle cx="16.5" cy="14.5" r="1.5"/></svg>
           </div>
         </div>
       </div>
-
-      <!-- Marcadores de Posição GPS -->
+    </div>
+    <!-- Marcadores de Posição GPS -->
       <div class="map-pin a" id="pax-pin-a" style="left:100px;top:560px;">
         <div class="pin-label" id="pax-origin-lab">Talatona</div>
         <div class="pin-circle"></div>
