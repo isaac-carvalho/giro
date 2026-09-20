@@ -23,29 +23,29 @@ input, textarea, select{user-select:auto;-webkit-user-select:auto;}
 
 :root{
   --bg-dark:#000000;
-  --card-dark:#121212;
-  --card-inner:#1b1b1b;
-  --line:#262626;
+  --card-dark:#141414;
+  --card-inner:#1c1c1c;
+  --line:#2c2c2c;
   
-  --gold:#d4af37;
-  --gold-glow:#f3e5ab;
-  --gold-deep:#261f06;
-  --gold-grad:linear-gradient(135deg, #f3e5ab 0%, #d4af37 50%, #aa820a 100%);
+  --gold:#ffffff;
+  --gold-glow:#ffffff;
+  --gold-deep:#262626;
+  --gold-grad:#ffffff;
   
-  --grn:#4fe36a;
+  --grn:#06C167;
   --grndeep:#0d2e16;
   
-  --red:#ff3b4e;
-  --reddeep:#3a0e13;
+  --red:#e11900;
+  --reddeep:#2b0c10;
   
-  --cargo:#ffb703;
-  --cargodeep:#352500;
+  --cargo:#ffffff;
+  --cargodeep:#262626;
   
-  --deliv:#48cae4;
-  --delivdeep:#0b2e36;
+  --deliv:#276EF1;
+  --delivdeep:#0b2246;
   
   --wht:#ffffff;
-  --txt-mut:#a6a6a6;
+  --txt-mut:#8c8c8c;
   --f:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,system-ui,sans-serif;
   --safe-top: env(safe-area-inset-top, 0px);
   --safe-bottom: env(safe-area-inset-bottom, 0px);
@@ -83,7 +83,7 @@ html, body{
   background:var(--gold-grad);color:#000;
   font-weight:900;font-size:16px;display:flex;
   align-items:center;justify-content:center;
-  box-shadow:0 0 14px rgba(212,175,55,0.35);
+  box-shadow:0 0 14px rgba(255,255,255,0.2);
   flex-shrink:0;
 }
 .brand-text b{font-size:17px;font-weight:900;letter-spacing:-.03em;display:block;line-height:1;}
@@ -281,8 +281,8 @@ html, body{
 }
 .uber-tier-card:hover{border-color:#444;}
 .uber-tier-card.on{
-  background:linear-gradient(135deg, #1f1a05 0%, #161304 100%);
-  border-color:var(--gold);box-shadow:0 4px 18px rgba(212,175,55,0.18);
+  background:#262626;
+  border-color:var(--gold);box-shadow:0 4px 18px rgba(255,255,255,0.15);
 }
 .tier-badge-pop{
   position:absolute;top:-8px;right:14px;background:var(--gold);
@@ -291,8 +291,8 @@ html, body{
 }
 .tier-icon-box{width:56px;height:36px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
 .tier-icon-box svg{width:54px;height:34px;transition:transform .2s ease, filter .2s ease;}
-.uber-tier-card:hover .tier-icon-box svg{transform:scale(1.05);filter:drop-shadow(0 2px 8px rgba(212,175,55,0.25));}
-.uber-tier-card.on .tier-icon-box svg{transform:scale(1.06);filter:drop-shadow(0 4px 12px rgba(212,175,55,0.35));}
+.uber-tier-card:hover .tier-icon-box svg{transform:scale(1.05);filter:drop-shadow(0 2px 8px rgba(255,255,255,0.15));}
+.uber-tier-card.on .tier-icon-box svg{transform:scale(1.06);filter:drop-shadow(0 4px 12px rgba(255,255,255,0.2));}
 .tier-info-box{flex:1;min-width:0;overflow:hidden;}
 .tier-title-row{display:flex;align-items:center;gap:6px;min-width:0;}
 .tier-name{font-size:14.5px;font-weight:800;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
@@ -331,10 +331,10 @@ html, body{
   width:100%;padding:15px;border-radius:14px;
   background:var(--gold-grad);color:#000;
   font-family:var(--f);font-size:15px;font-weight:900;
-  border:none;cursor:pointer;box-shadow:0 6px 20px rgba(212,175,55,0.35);
+  border:none;cursor:pointer;box-shadow:0 6px 20px rgba(255,255,255,0.2);
   transition:.15s;text-align:center;display:block;
 }
-.btn-uber-main:hover{filter:brightness(1.1);box-shadow:0 8px 25px rgba(212,175,55,0.5);}
+.btn-uber-main:hover{filter:brightness(1.1);box-shadow:0 8px 25px rgba(255,255,255,0.3);}
 
 /* ACTIVE TRIP HUD (UBER DRIVER PROFILE CARD) */
 .active-trip-card{
@@ -357,7 +357,7 @@ html, body{
 .driver-plate-pill small{font-size:9.5px;color:var(--txt-mut);}
 
 .trip-code-box{
-  background:#000;border:1px dashed var(--gold);border-radius:12px;
+  background:#000;border:1px solid var(--line);border-radius:12px;
   padding:10px 14px;text-align:center;margin-bottom:12px;
 }
 .trip-code-box small{font-size:10px;color:var(--txt-mut);display:block;}
@@ -414,7 +414,7 @@ body { overscroll-behavior: none; }
 
 
 <div id="giro-splash" style="position:fixed;inset:0;background:#070907;z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;transition:opacity 0.2s ease;">
-  <div style="font-size:48px;font-weight:900;color:#d4af37;letter-spacing:-2px;line-height:1;">GIRO</div>
+  <div style="font-size:48px;font-weight:900;color:#ffffff;letter-spacing:-2px;line-height:1;">GIRO</div>
   <div style="font-size:11px;letter-spacing:4px;color:#8d9e8d;text-transform:uppercase;margin-top:6px;">Angola · Mobilidade</div>
 </div>
 
@@ -536,7 +536,7 @@ body { overscroll-behavior: none; }
         </div>
 
         <!-- PONTO DE REFERÊNCIA -->
-        <div style="background:var(--card-inner);border:1px dashed var(--gold);border-radius:12px;padding:8px 12px;margin-bottom:10px;display:flex;align-items:center;gap:8px;">
+        <div style="background:var(--card-inner);border:1px solid var(--line);border-radius:12px;padding:8px 12px;margin-bottom:10px;display:flex;align-items:center;gap:8px;">
           <span style="font-size:13px;">📍</span>
           <input type="text" id="inp-ponto-ref" placeholder="Ponto de referência (ex: próx. à bomba Sonangol / Kero)" style="background:none;border:none;color:#fff;font-size:12px;width:100%;outline:none;">
         </div>
@@ -584,7 +584,7 @@ body { overscroll-behavior: none; }
       <!-- PANE 2: BUSCA DE MOTORISTA (RADAR ANIMADO) -->
       <div class="sheet-pane" id="pane-search">
         <div style="text-align:center;padding:24px 0;">
-          <div style="width:64px;height:64px;border-radius:50%;background:var(--gold-deep);border:2px solid var(--gold);display:flex;align-items:center;justify-content:center;margin:0 auto 16px;box-shadow:0 0 30px rgba(212,175,55,0.4);font-size:26px;">
+          <div style="width:64px;height:64px;border-radius:50%;background:var(--gold-deep);border:2px solid var(--gold);display:flex;align-items:center;justify-content:center;margin:0 auto 16px;box-shadow:0 0 30px rgba(255,255,255,0.2);font-size:26px;">
             📡
           </div>
           <h3 style="font-size:18px;font-weight:900;color:#fff;margin-bottom:6px;" id="search-pane-head">A contactar motoristas próximos…</h3>
@@ -679,7 +679,7 @@ body { overscroll-behavior: none; }
       <div style="font-size:14px;font-weight:700;color:#fff;margin-bottom:4px;">🚗 GIRO Económico · Domingos M.</div>
       <div style="font-size:12px;color:#a6a6a6;margin-bottom:10px;">Talatona (Rua Principal) → Kilamba (Bloco 12)</div>
       <div style="display:flex;justify-content:space-between;align-items:center;border-top:1px solid #1f241f;padding-top:10px;">
-        <span style="font-size:11px;color:#d4af37;">Multicaixa Express</span>
+        <span style="font-size:11px;color:#ffffff;">Multicaixa Express</span>
         <b style="font-size:15px;color:#fff;">2.450 Kz</b>
       </div>
     </div>
@@ -692,7 +692,7 @@ body { overscroll-behavior: none; }
       <div style="font-size:14px;font-weight:700;color:#fff;margin-bottom:4px;">🏍️ GIRO Moto (Kupapata) · Mateus K.</div>
       <div style="font-size:12px;color:#a6a6a6;margin-bottom:10px;">Maianga → Mutamba (Largo)</div>
       <div style="display:flex;justify-content:space-between;align-items:center;border-top:1px solid #1f241f;padding-top:10px;">
-        <span style="font-size:11px;color:#d4af37;">Dinheiro</span>
+        <span style="font-size:11px;color:#ffffff;">Dinheiro</span>
         <b style="font-size:15px;color:#fff;">1.150 Kz</b>
       </div>
     </div>
@@ -705,7 +705,7 @@ body { overscroll-behavior: none; }
       <div style="font-size:14px;font-weight:700;color:#fff;margin-bottom:4px;">📦 GIRO Flash Moto · André F.</div>
       <div style="font-size:12px;color:#a6a6a6;margin-bottom:10px;">Belas Business Park → Viana</div>
       <div style="display:flex;justify-content:space-between;align-items:center;border-top:1px solid #1f241f;padding-top:10px;">
-        <span style="font-size:11px;color:#d4af37;">Unitel Money</span>
+        <span style="font-size:11px;color:#ffffff;">Unitel Money</span>
         <b style="font-size:15px;color:#fff;">1.800 Kz</b>
       </div>
     </div>
@@ -715,11 +715,11 @@ body { overscroll-behavior: none; }
   <section id="tab-wallet" style="display:none;flex:1;overflow-y:auto;padding:16px 16px 80px;background:#070907;">
     <h2 style="font-size:20px;font-weight:800;color:#fff;margin-bottom:14px;">Carteira GIRO</h2>
 
-    <div style="background:linear-gradient(135deg, #1b241c 0%, #0d140e 100%);border:1px solid #d4af37;border-radius:16px;padding:20px;margin-bottom:18px;box-shadow:0 8px 24px rgba(0,0,0,0.5);">
-      <div style="font-size:11px;text-transform:uppercase;letter-spacing:1px;color:#d4af37;font-weight:700;">Saldo Disponível</div>
-      <div style="font-size:32px;font-weight:900;color:#fff;margin:6px 0 14px;">12.500 <span style="font-size:18px;color:#d4af37;">Kz</span></div>
+    <div style="background:#181818;border:1px solid #ffffff;border-radius:16px;padding:20px;margin-bottom:18px;box-shadow:0 8px 24px rgba(0,0,0,0.5);">
+      <div style="font-size:11px;text-transform:uppercase;letter-spacing:1px;color:#ffffff;font-weight:700;">Saldo Disponível</div>
+      <div style="font-size:32px;font-weight:900;color:#fff;margin:6px 0 14px;">12.500 <span style="font-size:18px;color:#ffffff;">Kz</span></div>
       <div style="display:flex;gap:10px;">
-        <button onclick="alert('Carregamento via Multicaixa Express iniciado.')" style="flex:1;background:#d4af37;color:#000;border:none;border-radius:10px;padding:10px;font-weight:700;font-size:13px;cursor:pointer;">+ Adicionar Saldo</button>
+        <button onclick="alert('Carregamento via Multicaixa Express iniciado.')" style="flex:1;background:#ffffff;color:#000;border:none;border-radius:10px;padding:10px;font-weight:700;font-size:13px;cursor:pointer;">+ Adicionar Saldo</button>
         <button onclick="alert('Histórico financeiro detalhado.')" style="flex:1;background:rgba(255,255,255,0.08);color:#fff;border:1px solid #333;border-radius:10px;padding:10px;font-weight:600;font-size:13px;cursor:pointer;">Extrato</button>
       </div>
     </div>
@@ -743,14 +743,14 @@ body { overscroll-behavior: none; }
     </div>
 
     <!-- GIRO Clube Card -->
-    <div style="background:rgba(212,175,55,0.08);border:1px solid rgba(212,175,55,0.25);border-radius:14px;padding:16px;">
+    <div style="background:rgba(212,175,55,0.08);border:1px solid rgba(255,255,255,0.15);border-radius:14px;padding:16px;">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
-        <b style="font-size:13px;color:#d4af37;">🎁 GIRO Clube — Programa Fidelidade</b>
-        <span style="font-size:11px;background:#d4af37;color:#000;padding:2px 6px;border-radius:4px;font-weight:800;">−10% BÓNUS</span>
+        <b style="font-size:13px;color:#ffffff;">🎁 GIRO Clube — Programa Fidelidade</b>
+        <span style="font-size:11px;background:#ffffff;color:#000;padding:2px 6px;border-radius:4px;font-weight:800;">−10% BÓNUS</span>
       </div>
       <p style="font-size:12px;color:#a6a6a6;margin-bottom:8px;">Faça 5 viagens e ganhe 10% de desconto automático na próxima!</p>
       <div style="height:6px;background:#222;border-radius:3px;overflow:hidden;margin-bottom:6px;">
-        <div style="width:60%;height:100%;background:#d4af37;"></div>
+        <div style="width:60%;height:100%;background:#ffffff;"></div>
       </div>
       <small style="color:#8d9e8d;font-size:10px;">3 de 5 corridas completadas</small>
     </div>
@@ -761,7 +761,7 @@ body { overscroll-behavior: none; }
     <h2 style="font-size:20px;font-weight:800;color:#fff;margin-bottom:14px;">Meu Perfil</h2>
 
     <div style="background:#121612;border:1px solid #262626;border-radius:14px;padding:16px;margin-bottom:14px;display:flex;align-items:center;gap:14px;">
-      <div style="width:50px;height:50px;border-radius:50%;background:linear-gradient(135deg,#d4af37,#f0c040);display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:900;color:#000;">U</div>
+      <div style="width:50px;height:50px;border-radius:50%;background:linear-gradient(135deg,#ffffff,#ffffff);display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:900;color:#000;">U</div>
       <div>
         <div style="font-size:16px;font-weight:700;color:#fff;" id="profile-user-name">Utilizador GIRO</div>
         <div style="font-size:12px;color:#8d9e8d;" id="profile-user-phone">+244 9XX XXX XXX</div>
@@ -888,7 +888,7 @@ body { overscroll-behavior: none; }
 
 <!-- BOTTOM TAB BAR - PWA ANGOLA-FIRST -->
 <nav id="bottom-tab-bar" style="position:fixed;bottom:0;left:0;right:0;height:54px;background:#111;border-top:1px solid #262626;display:flex;align-items:stretch;z-index:200;padding-bottom:env(safe-area-inset-bottom,0px);">
-  <button class="tab-btn active" data-tab="home" onclick="switchTab('home')" style="flex:1;background:none;border:none;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;cursor:pointer;color:#d4af37;font-size:20px;padding:0;">&#127968;<span style="font-size:10px;font-weight:600;">In&#237;cio</span></button>
+  <button class="tab-btn active" data-tab="home" onclick="switchTab('home')" style="flex:1;background:none;border:none;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;cursor:pointer;color:#ffffff;font-size:20px;padding:0;">&#127968;<span style="font-size:10px;font-weight:600;">In&#237;cio</span></button>
   <button class="tab-btn" data-tab="rides" onclick="switchTab('rides')" style="flex:1;background:none;border:none;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;cursor:pointer;color:#666;font-size:20px;padding:0;">&#128664;<span style="font-size:10px;font-weight:600;">Corridas</span></button>
   <button class="tab-btn" data-tab="wallet" onclick="switchTab('wallet')" style="flex:1;background:none;border:none;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;cursor:pointer;color:#666;font-size:20px;padding:0;">&#128179;<span style="font-size:10px;font-weight:600;">Carteira</span></button>
   <button class="tab-btn" data-tab="profile" onclick="switchTab('profile')" style="flex:1;background:none;border:none;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;cursor:pointer;color:#666;font-size:20px;padding:0;">&#128100;<span style="font-size:10px;font-weight:600;">Perfil</span></button>
@@ -909,7 +909,7 @@ const TIERS_PAX = [
   { id: 'eco', nome: 'GIRO Económico', desc: '4 lugares · ar condicionado · o mais pedido', mult: 1.0, eta: 4, cap: '4 lug', pop: true,
     svg: '<svg viewBox="0 0 60 36" fill="none" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="paxEcoBody" x1="0" y1="8" x2="0" y2="28" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#ffffff"/><stop offset="30%" stop-color="#f1f5f9"/><stop offset="70%" stop-color="#cbd5e1"/><stop offset="100%" stop-color="#64748b"/></linearGradient><linearGradient id="paxEcoGlass" x1="16" y1="10" x2="40" y2="18" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#0f172a"/><stop offset="60%" stop-color="#1e293b"/><stop offset="100%" stop-color="#0284c7"/></linearGradient><radialGradient id="paxEcoRim" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="#f8fafc"/><stop offset="60%" stop-color="#94a3b8"/><stop offset="100%" stop-color="#334155"/></radialGradient></defs><ellipse cx="29" cy="32.5" rx="27" ry="2.2" fill="#000000" opacity="0.45"/><path d="M4 22 C3.5 19.5, 6 18, 9 17.5 L17 11.5 C20 9.2, 25 8, 34 8 C40 8, 44 9.5, 47 13 L54 17.5 C57 19, 57.5 21, 56.5 24 C55.5 25.5, 53 26, 49 26 C48 22.5, 43 22.5, 42 26 L19 26 C18 22.5, 13 22.5, 12 26 L6 26 C4.5 26, 3.8 24.5, 4 22 Z" fill="url(#paxEcoBody)"/><path d="M8 18 C16 17.5, 36 17, 54 19.5" stroke="#ffffff" stroke-width="0.8" stroke-linecap="round" opacity="0.9"/><path d="M18 12 C20.5 10, 24.5 9.2, 33 9.2 C38.5 9.2, 42 10.5, 44.8 13.5 L50 17 C45 17.2, 23 17.2, 12.5 17 Z" fill="url(#paxEcoGlass)"/><rect x="29.5" y="9.5" width="2" height="7.5" fill="#0f172a"/><polygon points="25,9.5 29,9.5 23,16.8 19,16.8" fill="#ffffff" opacity="0.2"/><path d="M43 14.5 C45 14.5, 46 15.5, 44.5 16.5 L42.5 16 Z" fill="#cbd5e1" stroke="#475569" stroke-width="0.5"/><path d="M29 17.5 L28.5 25" stroke="#94a3b8" stroke-width="0.7"/><path d="M41 17.5 L40.5 24.5" stroke="#94a3b8" stroke-width="0.7"/><rect x="32" y="19" width="3.5" height="1" rx="0.5" fill="#64748b"/><rect x="22" y="19" width="3.5" height="1" rx="0.5" fill="#64748b"/><path d="M51 18 L56 19 C56.5 20.5, 54.5 21.5, 52 21.5 Z" fill="#e0f2fe"/><path d="M52 18.5 L55.5 19.5" stroke="#38bdf8" stroke-width="0.8"/><path d="M4.5 19.5 C4.2 21, 5.5 22, 7 22 L7.5 19.5 Z" fill="#ef4444"/><path d="M19 25.5 L42 25.5" stroke="#334155" stroke-width="1.2"/><circle cx="15.5" cy="25.5" r="6.8" fill="#090d16"/><circle cx="15.5" cy="25.5" r="4.6" fill="url(#paxEcoRim)"/><circle cx="15.5" cy="25.5" r="2.2" fill="#0f172a"/><line x1="15.5" y1="21.5" x2="15.5" y2="29.5" stroke="#f8fafc" stroke-width="0.9"/><line x1="12" y1="23.5" x2="19" y2="27.5" stroke="#f8fafc" stroke-width="0.9"/><line x1="12" y1="27.5" x2="19" y2="23.5" stroke="#f8fafc" stroke-width="0.9"/><circle cx="15.5" cy="25.5" r="1" fill="#cbd5e1"/><circle cx="45.5" cy="25.5" r="6.8" fill="#090d16"/><circle cx="45.5" cy="25.5" r="4.6" fill="url(#paxEcoRim)"/><circle cx="45.5" cy="25.5" r="2.2" fill="#0f172a"/><line x1="45.5" y1="21.5" x2="45.5" y2="29.5" stroke="#f8fafc" stroke-width="0.9"/><line x1="42" y1="23.5" x2="49" y2="27.5" stroke="#f8fafc" stroke-width="0.9"/><line x1="42" y1="27.5" x2="49" y2="23.5" stroke="#f8fafc" stroke-width="0.9"/><circle cx="45.5" cy="25.5" r="1" fill="#cbd5e1"/></svg>' },
   { id: 'conf', nome: 'GIRO Conforto', desc: 'Viatura recente · espaço extra · climatizado', mult: 1.14, eta: 6, cap: '4 lug',
-    svg: '<svg viewBox="0 0 60 36" fill="none" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="paxConfBody" x1="0" y1="6" x2="0" y2="28" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#fffbeb"/><stop offset="25%" stop-color="#fef08a"/><stop offset="55%" stop-color="#d4af37"/><stop offset="85%" stop-color="#996515"/><stop offset="100%" stop-color="#451a03"/></linearGradient><linearGradient id="paxConfGlass" x1="14" y1="9" x2="44" y2="17" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#09090b"/><stop offset="70%" stop-color="#18181b"/><stop offset="100%" stop-color="#d4af37" stop-opacity="0.35"/></linearGradient><radialGradient id="paxConfGoldRim" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="#fef08a"/><stop offset="50%" stop-color="#d4af37"/><stop offset="100%" stop-color="#78350f"/></radialGradient></defs><ellipse cx="29" cy="32.5" rx="28" ry="2.2" fill="#000000" opacity="0.55"/><path d="M3 23 C2.5 20, 5 18, 8 17.5 L16 11 C19.5 8.5, 25 7.2, 35 7.2 C43 7.2, 47 8.8, 50 12.5 L57 17 C59 18.5, 59.5 21, 58 23.5 C57 25.5, 54 26, 50 26 C49 22, 43.5 22, 42.5 26 L18 26 C17 22, 11.5 22, 10.5 26 L5 26 C3.5 26, 2.8 24.8, 3 23 Z" fill="url(#paxConfBody)"/><path d="M7 17.8 C18 16.8, 38 16.5, 56.5 18.5" stroke="#fef08a" stroke-width="0.9" stroke-linecap="round"/><path d="M12 21 C22 20.5, 36 20.5, 48 21.2" stroke="rgba(255,255,255,0.4)" stroke-width="0.6"/><path d="M17 11.5 C19.8 9.5, 24.5 8.5, 34 8.5 C40.5 8.5, 44.5 9.8, 47.5 13 L52.5 16.5 C47 16.8, 23 16.8, 12 16.5 Z" fill="url(#paxConfGlass)" stroke="#fef08a" stroke-width="0.75"/><rect x="30" y="9" width="2.2" height="7.5" fill="#000000"/><polygon points="23,9 28,9 21,16.2 16,16.2" fill="#fef08a" opacity="0.3"/><polygon points="36,9 41,9 35,16.2 30,16.2" fill="#fef08a" opacity="0.2"/><path d="M20 8.5 L22 7 L23 8.5 Z" fill="#d4af37"/><path d="M45.5 13.8 C48 13.8, 49 15, 47 16 L44.8 15.5 Z" fill="#fef08a" stroke="#996515" stroke-width="0.5"/><rect x="33" y="18.5" width="4" height="1" rx="0.5" fill="#fef08a"/><rect x="22" y="18.5" width="4" height="1" rx="0.5" fill="#fef08a"/><path d="M53.5 17.5 L58.2 18.8 C58.5 20.2, 56.5 21.2, 54 21.2 Z" fill="#ffffff"/><path d="M54 18.2 L57.5 19.2" stroke="#d4af37" stroke-width="0.9"/><circle cx="55.5" cy="19.2" r="0.8" fill="#38bdf8"/><path d="M3.5 19 C3.2 20.8, 4.5 22, 6.5 22 L7 19 Z" fill="#dc2626"/><line x1="4" y1="20.5" x2="6.5" y2="20.5" stroke="#fca5a5" stroke-width="0.7"/><line x1="18.5" y1="25.2" x2="42" y2="25.2" stroke="#fef08a" stroke-width="1"/><circle cx="14.5" cy="25.5" r="7" fill="#020617"/><circle cx="14.5" cy="25.5" r="4.9" fill="url(#paxConfGoldRim)"/><circle cx="14.5" cy="25.5" r="2.4" fill="#09090b"/><line x1="14.5" y1="21" x2="14.5" y2="30" stroke="#fffbeb" stroke-width="0.8"/><line x1="10" y1="25.5" x2="19" y2="25.5" stroke="#fffbeb" stroke-width="0.8"/><line x1="11.3" y1="22.3" x2="17.7" y2="28.7" stroke="#fffbeb" stroke-width="0.8"/><line x1="11.3" y1="28.7" x2="17.7" y2="22.3" stroke="#fffbeb" stroke-width="0.8"/><circle cx="14.5" cy="25.5" r="1.1" fill="#fef08a"/><circle cx="46.5" cy="25.5" r="7" fill="#020617"/><circle cx="46.5" cy="25.5" r="4.9" fill="url(#paxConfGoldRim)"/><circle cx="46.5" cy="25.5" r="2.4" fill="#09090b"/><line x1="46.5" y1="21" x2="46.5" y2="30" stroke="#fffbeb" stroke-width="0.8"/><line x1="42" y1="25.5" x2="51" y2="25.5" stroke="#fffbeb" stroke-width="0.8"/><line x1="43.3" y1="22.3" x2="49.7" y2="28.7" stroke="#fffbeb" stroke-width="0.8"/><line x1="43.3" y1="28.7" x2="49.7" y2="22.3" stroke="#fffbeb" stroke-width="0.8"/><circle cx="46.5" cy="25.5" r="1.1" fill="#fef08a"/></svg>' },
+    svg: '<svg viewBox="0 0 60 36" fill="none" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="paxConfBody" x1="0" y1="6" x2="0" y2="28" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#fffbeb"/><stop offset="25%" stop-color="#fef08a"/><stop offset="55%" stop-color="#ffffff"/><stop offset="85%" stop-color="#996515"/><stop offset="100%" stop-color="#451a03"/></linearGradient><linearGradient id="paxConfGlass" x1="14" y1="9" x2="44" y2="17" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#09090b"/><stop offset="70%" stop-color="#18181b"/><stop offset="100%" stop-color="#ffffff" stop-opacity="0.35"/></linearGradient><radialGradient id="paxConfGoldRim" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="#fef08a"/><stop offset="50%" stop-color="#ffffff"/><stop offset="100%" stop-color="#78350f"/></radialGradient></defs><ellipse cx="29" cy="32.5" rx="28" ry="2.2" fill="#000000" opacity="0.55"/><path d="M3 23 C2.5 20, 5 18, 8 17.5 L16 11 C19.5 8.5, 25 7.2, 35 7.2 C43 7.2, 47 8.8, 50 12.5 L57 17 C59 18.5, 59.5 21, 58 23.5 C57 25.5, 54 26, 50 26 C49 22, 43.5 22, 42.5 26 L18 26 C17 22, 11.5 22, 10.5 26 L5 26 C3.5 26, 2.8 24.8, 3 23 Z" fill="url(#paxConfBody)"/><path d="M7 17.8 C18 16.8, 38 16.5, 56.5 18.5" stroke="#fef08a" stroke-width="0.9" stroke-linecap="round"/><path d="M12 21 C22 20.5, 36 20.5, 48 21.2" stroke="rgba(255,255,255,0.4)" stroke-width="0.6"/><path d="M17 11.5 C19.8 9.5, 24.5 8.5, 34 8.5 C40.5 8.5, 44.5 9.8, 47.5 13 L52.5 16.5 C47 16.8, 23 16.8, 12 16.5 Z" fill="url(#paxConfGlass)" stroke="#fef08a" stroke-width="0.75"/><rect x="30" y="9" width="2.2" height="7.5" fill="#000000"/><polygon points="23,9 28,9 21,16.2 16,16.2" fill="#fef08a" opacity="0.3"/><polygon points="36,9 41,9 35,16.2 30,16.2" fill="#fef08a" opacity="0.2"/><path d="M20 8.5 L22 7 L23 8.5 Z" fill="#ffffff"/><path d="M45.5 13.8 C48 13.8, 49 15, 47 16 L44.8 15.5 Z" fill="#fef08a" stroke="#996515" stroke-width="0.5"/><rect x="33" y="18.5" width="4" height="1" rx="0.5" fill="#fef08a"/><rect x="22" y="18.5" width="4" height="1" rx="0.5" fill="#fef08a"/><path d="M53.5 17.5 L58.2 18.8 C58.5 20.2, 56.5 21.2, 54 21.2 Z" fill="#ffffff"/><path d="M54 18.2 L57.5 19.2" stroke="#ffffff" stroke-width="0.9"/><circle cx="55.5" cy="19.2" r="0.8" fill="#38bdf8"/><path d="M3.5 19 C3.2 20.8, 4.5 22, 6.5 22 L7 19 Z" fill="#dc2626"/><line x1="4" y1="20.5" x2="6.5" y2="20.5" stroke="#fca5a5" stroke-width="0.7"/><line x1="18.5" y1="25.2" x2="42" y2="25.2" stroke="#fef08a" stroke-width="1"/><circle cx="14.5" cy="25.5" r="7" fill="#020617"/><circle cx="14.5" cy="25.5" r="4.9" fill="url(#paxConfGoldRim)"/><circle cx="14.5" cy="25.5" r="2.4" fill="#09090b"/><line x1="14.5" y1="21" x2="14.5" y2="30" stroke="#fffbeb" stroke-width="0.8"/><line x1="10" y1="25.5" x2="19" y2="25.5" stroke="#fffbeb" stroke-width="0.8"/><line x1="11.3" y1="22.3" x2="17.7" y2="28.7" stroke="#fffbeb" stroke-width="0.8"/><line x1="11.3" y1="28.7" x2="17.7" y2="22.3" stroke="#fffbeb" stroke-width="0.8"/><circle cx="14.5" cy="25.5" r="1.1" fill="#fef08a"/><circle cx="46.5" cy="25.5" r="7" fill="#020617"/><circle cx="46.5" cy="25.5" r="4.9" fill="url(#paxConfGoldRim)"/><circle cx="46.5" cy="25.5" r="2.4" fill="#09090b"/><line x1="46.5" y1="21" x2="46.5" y2="30" stroke="#fffbeb" stroke-width="0.8"/><line x1="42" y1="25.5" x2="51" y2="25.5" stroke="#fffbeb" stroke-width="0.8"/><line x1="43.3" y1="22.3" x2="49.7" y2="28.7" stroke="#fffbeb" stroke-width="0.8"/><line x1="43.3" y1="28.7" x2="49.7" y2="22.3" stroke="#fffbeb" stroke-width="0.8"/><circle cx="46.5" cy="25.5" r="1.1" fill="#fef08a"/></svg>' },
   { id: 'sete', nome: 'GIRO 7 (Familiar)', desc: '7 lugares · família ou malas para o aeroporto', mult: 1.40, eta: 9, cap: '7 lug',
     svg: '<svg viewBox="0 0 60 36" fill="none" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="paxSuvBody" x1="0" y1="6" x2="0" y2="28" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#f8fafc"/><stop offset="35%" stop-color="#cbd5e1"/><stop offset="75%" stop-color="#64748b"/><stop offset="100%" stop-color="#1e293b"/></linearGradient><linearGradient id="paxSuvGlass" x1="14" y1="9" x2="44" y2="16" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#0f172a"/><stop offset="80%" stop-color="#1e293b"/><stop offset="100%" stop-color="#38bdf8" stop-opacity="0.3"/></linearGradient><radialGradient id="paxSuvRim" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="#e2e8f0"/><stop offset="60%" stop-color="#64748b"/><stop offset="100%" stop-color="#0f172a"/></radialGradient></defs><ellipse cx="29" cy="32.5" rx="27" ry="2.2" fill="#000000" opacity="0.45"/><line x1="16" y1="5.5" x2="44" y2="5.5" stroke="#94a3b8" stroke-width="1.3" stroke-linecap="round"/><line x1="19" y1="5.5" x2="19" y2="7.5" stroke="#64748b" stroke-width="1.2"/><line x1="30" y1="5.5" x2="30" y2="7.5" stroke="#64748b" stroke-width="1.2"/><line x1="41" y1="5.5" x2="41" y2="7.5" stroke="#64748b" stroke-width="1.2"/><path d="M3 24 C2.5 21, 4 19, 7 18 L11 9 C12.5 7.2, 16 6.8, 22 6.8 L42 6.8 C45.5 6.8, 48 8.5, 50 12 L56 16.5 C58 18, 58.5 20.5, 57.5 23.5 C56.5 25.5, 53.5 26, 49.5 26 C48.5 22, 42.5 22, 41.5 26 L18 26 C17 22, 11 22, 10 26 L5 26 C3.5 26, 2.8 25, 3 24 Z" fill="url(#paxSuvBody)"/><path d="M12 9.5 L22 9.5 L22 16 L10 16 Z" fill="url(#paxSuvGlass)"/><path d="M24 9.5 L34 9.5 L34 16 L24 16 Z" fill="url(#paxSuvGlass)"/><path d="M36 9.5 L43 9.5 L48 13 L48.5 16 L36 16 Z" fill="url(#paxSuvGlass)"/><polygon points="26,9.5 30,9.5 28,16 24,16" fill="#ffffff" opacity="0.2"/><polygon points="38,9.5 42,9.5 44,16 40,16" fill="#ffffff" opacity="0.2"/><path d="M6 18.5 C16 18, 36 17.5, 55 19.5" stroke="#ffffff" stroke-width="0.8" opacity="0.8"/><path d="M8 26 C9 22.5, 12 22.5, 13 26" stroke="#1e293b" stroke-width="1.8" fill="none"/><path d="M39.5 26 C40.5 22.5, 43.5 22.5, 44.5 26" stroke="#1e293b" stroke-width="1.8" fill="none"/><path d="M44 13.5 C46.5 13.5, 47 15, 45 16 L43 15.5 Z" fill="#94a3b8" stroke="#334155" stroke-width="0.5"/><rect x="35" y="18" width="3.5" height="1" rx="0.5" fill="#475569"/><rect x="25" y="18" width="3.5" height="1" rx="0.5" fill="#475569"/><path d="M51 17 L56.5 18 C57 19.5, 55 21, 52 21 Z" fill="#f8fafc"/><path d="M52 17.5 L56 18.5" stroke="#38bdf8" stroke-width="1"/><path d="M3.5 19.5 C3.2 21.5, 4.5 23, 6 23 L6.5 19.5 Z" fill="#ef4444"/><line x1="18.5" y1="25.5" x2="41" y2="25.5" stroke="#1e293b" stroke-width="1.5"/><circle cx="14" cy="25" r="7.5" fill="#020617"/><circle cx="14" cy="25" r="5.2" fill="url(#paxSuvRim)"/><circle cx="14" cy="25" r="2.5" fill="#0f172a"/><line x1="14" y1="20" x2="14" y2="30" stroke="#f1f5f9" stroke-width="1"/><line x1="9.5" y1="22.5" x2="18.5" y2="27.5" stroke="#f1f5f9" stroke-width="1"/><line x1="9.5" y1="27.5" x2="18.5" y2="22.5" stroke="#f1f5f9" stroke-width="1"/><circle cx="14" cy="25" r="1.2" fill="#cbd5e1"/><circle cx="45" cy="25" r="7.5" fill="#020617"/><circle cx="45" cy="25" r="5.2" fill="url(#paxSuvRim)"/><circle cx="45" cy="25" r="2.5" fill="#0f172a"/><line x1="45" y1="20" x2="45" y2="30" stroke="#f1f5f9" stroke-width="1"/><line x1="40.5" y1="22.5" x2="49.5" y2="27.5" stroke="#f1f5f9" stroke-width="1"/><line x1="40.5" y1="27.5" x2="49.5" y2="22.5" stroke="#f1f5f9" stroke-width="1"/><circle cx="45" cy="25" r="1.2" fill="#cbd5e1"/></svg>' }
 ];
@@ -1321,7 +1321,7 @@ renderTiers();
 
 function switchTab(tab) {
   document.querySelectorAll('#bottom-tab-bar .tab-btn').forEach(b => {
-    b.style.color = (b.dataset.tab === tab) ? '#d4af37' : '#666';
+    b.style.color = (b.dataset.tab === tab) ? '#ffffff' : '#666';
   });
 
   const mainViewport = document.querySelector('.viewport-body');
@@ -1442,12 +1442,12 @@ const GiroAuth={
     if(s && s.role === 'passageiro'){
       const initials=(s.nome||s.phone||'P')[0].toUpperCase();
       el.innerHTML=`<div style="display:flex;align-items:center;gap:8px;">
-        <div style="width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#d4af37,#f0c040);display:flex;align-items:center;justify-content:center;font-weight:900;font-size:14px;color:#000;">${initials}</div>
+        <div style="width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#ffffff,#ffffff);display:flex;align-items:center;justify-content:center;font-weight:900;font-size:14px;color:#000;">${initials}</div>
         <div style="line-height:1.2;"><div style="font-size:13px;font-weight:700;color:#f1f5f1;">${s.nome||s.phone}</div><div style="font-size:10px;color:#8d9e8d;text-transform:uppercase;">🧑 Passageiro</div></div>
         <button onclick="GiroAuth.logout()" style="margin-left:4px;background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.3);border-radius:8px;padding:5px 10px;color:#fca5a5;font-size:12px;cursor:pointer;">Sair</button>
       </div>`;
     }else{
-      el.innerHTML='<button onclick="openPaxAuthModal()" style="border:none;outline:none;cursor:pointer;padding:7px 14px;border-radius:20px;background:rgba(212,175,55,.15);border:1px solid rgba(212,175,55,.35);color:#d4af37;font-size:13px;font-weight:700;display:flex;align-items:center;gap:5px;">&#128100; Entrar</button>';
+      el.innerHTML='<button onclick="openPaxAuthModal()" style="border:none;outline:none;cursor:pointer;padding:7px 14px;border-radius:20px;background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.25);color:#ffffff;font-size:13px;font-weight:700;display:flex;align-items:center;gap:5px;">&#128100; Entrar</button>';
     }
   },
   logout(){
