@@ -648,6 +648,31 @@ body { overscroll-behavior: none; }
           </div>
         </div>
 
+        
+        <!-- INDICADOR DE DISTÂNCIA & TEMPO ESTIMADO DE TRAJETO -->
+        <div id="route-distance-summary-bar" style="background:#1c1c1c;border:1.5px solid #2e2e2e;border-radius:14px;padding:10px 14px;margin-bottom:10px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 4px 16px rgba(0,0,0,0.4);">
+          <div style="display:flex;align-items:center;gap:8px;">
+            <span style="font-size:18px;">📏</span>
+            <div>
+              <span style="font-size:10px;color:#8c8c8c;text-transform:uppercase;font-weight:800;display:block;letter-spacing:0.04em;">Distância</span>
+              <b style="font-size:15px;color:#ffffff;font-weight:900;" id="route-km-display">6,2 km</b>
+            </div>
+          </div>
+          <div style="height:26px;width:1px;background:#333;"></div>
+          <div style="display:flex;align-items:center;gap:8px;">
+            <span style="font-size:18px;">⏱️</span>
+            <div>
+              <span style="font-size:10px;color:#8c8c8c;text-transform:uppercase;font-weight:800;display:block;letter-spacing:0.04em;">Tempo Estimado</span>
+              <b style="font-size:15px;color:#06C167;font-weight:900;" id="route-duration-display">~14 min</b>
+            </div>
+          </div>
+          <div style="height:26px;width:1px;background:#333;"></div>
+          <div style="text-align:right;">
+            <span style="font-size:10px;color:#8c8c8c;text-transform:uppercase;font-weight:800;display:block;letter-spacing:0.04em;">Trânsito</span>
+            <b style="font-size:12.5px;color:#fff;font-weight:800;" id="route-traffic-display">🟢 Fluido</b>
+          </div>
+        </div>
+
         <!-- PONTO DE REFERÊNCIA -->
         <div style="background:var(--card-inner);border:1px solid var(--line);border-radius:12px;padding:8px 12px;margin-bottom:10px;display:flex;align-items:center;gap:8px;">
           <span style="font-size:13px;">📍</span>
@@ -1215,6 +1240,11 @@ function renderTiers() {
   const container = document.getElementById('tier-list-container');
   container.innerHTML = tiers.map((t, i) => {
     const isSel = (i === tierIdx);
+    // Atualizar barra de KM se necessário
+    const kmBadge = document.getElementById('route-km-display');
+    if (kmBadge && kmBadge.textContent !== `${tripKm.toLocaleString('pt-AO')} km`) {
+      kmBadge.textContent = `${tripKm.toLocaleString('pt-AO')} km`;
+    }
     const fare = calculatePrice(t);
     const oldFare = (couponDiscount > 0) ? Math.round(calculatePrice(t) / (1 - couponDiscount)) : null;
     return `
@@ -1435,24 +1465,36 @@ function calculateDynamicDistanceAndFare(origPlace, destPlace) {
   const dy = (origPlace.pos[1] - destPlace.pos[1]);
   const distPixels = Math.sqrt(dx * dx + dy * dy);
 
-  // Escala: 100px aprox = 5 km em Luanda
+  // Escala: 100px aprox = 5.2 km em Luanda
   let calculatedKm = parseFloat((distPixels * 0.052).toFixed(1));
   if (calculatedKm < 1.8) calculatedKm = 1.8;
 
-  // Casos de rotas longas (ex: Sequele para Kilamba / Viana)
-  const isSequele = origPlace.synonyms.includes('8 mil') || destPlace.synonyms.includes('8 mil');
-  const isKilamba = origPlace.synonyms.includes('kilamba') || destPlace.synonyms.includes('kilamba');
+  // Casos especiais de rotas de longa distância (ex: Sequele / 8 mil para Kilamba / Viana)
+  const isSequele = origPlace.synonyms.some(s => s.includes('8 mil') || s.includes('sequele')) || destPlace.synonyms.some(s => s.includes('8 mil') || s.includes('sequele'));
+  const isKilamba = origPlace.synonyms.some(s => s.includes('kilamba')) || destPlace.synonyms.some(s => s.includes('kilamba'));
   if (isSequele && isKilamba) {
     calculatedKm = 34.8;
+  } else if (isSequele && (origPlace.synonyms.some(s => s.includes('talatona')) || destPlace.synonyms.some(s => s.includes('talatona')))) {
+    calculatedKm = 31.2;
   }
 
   tripKm = calculatedKm;
   tripMins = Math.max(7, Math.round(calculatedKm * 1.6 + 4));
 
+  // Atualizar visualizador de Distância (KM) e Duração no ecrã
+  const kmEl = document.getElementById('route-km-display');
+  const durEl = document.getElementById('route-duration-display');
+  const trafficEl = document.getElementById('route-traffic-display');
+  
+  if (kmEl) kmEl.textContent = `${tripKm.toLocaleString('pt-AO')} km`;
+  if (durEl) durEl.textContent = `~${tripMins} min`;
+  if (trafficEl) {
+    trafficEl.innerHTML = (tripKm > 20) ? '🟡 Moderado' : '🟢 Fluido';
+  }
+
   // Redesenhar traçado SVG dinâmico conectando os pontos reais
   const routeSvg = document.getElementById('pax-route-svg');
   if (routeSvg) {
-    // Gerar caminho pelas avenidas principais (via de cruzamento ortogonal)
     const midY = (origPlace.pos[1] > 370 && destPlace.pos[1] < 370) ? 370 : (origPlace.pos[1] > 210 && destPlace.pos[1] < 210) ? 210 : 545;
     const pathD = `M${origPlace.pos[0]} ${origPlace.pos[1]} L${origPlace.pos[0]} ${midY} L${destPlace.pos[0]} ${midY} L${destPlace.pos[0]} ${destPlace.pos[1]}`;
     routeSvg.setAttribute('d', pathD);
