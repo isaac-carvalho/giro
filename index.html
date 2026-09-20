@@ -619,7 +619,7 @@ body { overscroll-behavior: none; }
           <span class="promo-badge-tag">−10% BÓNUS</span>
         </div>
         <!-- ROTA UBER (PONTO DE PARTIDA & DESTINO) -->
-        <div class="uber-route-box">
+        <div class="uber-route-box" style="position:relative;">
           <div class="route-trail"></div>
 
           <!-- RECOLHA (ORIGEM) -->
@@ -640,6 +640,11 @@ body { overscroll-behavior: none; }
               <input type="text" id="inp-pax-dest" placeholder="Introduzir destino em Luanda..." value="Centralidade do Kilamba" onfocus="setRouteFocus('dest')" oninput="onRouteInputTyped('dest')">
             </div>
             <button type="button" class="btn-mini-gps" onclick="swapOriginDestination()" title="Inverter trajecto">⇅</button>
+          </div>
+
+          <!-- AUTOCOMPLETE SUGESTÕES INTELIGENTES ANGOLA -->
+          <div id="route-suggestions-box" style="display:none;position:absolute;left:0;right:0;top:100%;background:#1a1a1a;border:1px solid #333;border-radius:12px;margin-top:6px;max-height:220px;overflow-y:auto;z-index:999;box-shadow:0 8px 30px rgba(0,0,0,0.9);">
+            <!-- Itens injectados dinamicamente via JS -->
           </div>
         </div>
 
@@ -1311,16 +1316,256 @@ function setRouteFocus(field) {
   activeRouteField = field;
 }
 
-function onRouteInputTyped(field) {
-  if (field === 'origin') {
-    originName = document.getElementById('inp-pax-orig').value;
-    document.getElementById('pax-origin-lab').textContent = originName.split(',')[0] || 'Origem';
-  } else {
-    destName = document.getElementById('inp-pax-dest').value;
-    document.getElementById('pax-dest-lab').textContent = destName.split(',')[0] || 'Destino';
+
+/* ==========================================================================
+   MOTOR DE GEOCODIFICAÇÃO E ROTAS DINÂMICAS DE ANGOLA (LUANDA & PROVÍNCIAS)
+   ========================================================================== */
+const ANGOLA_PLACES_DB = [
+  {
+    name: 'Centralidade do Sequele (8.000 / 8 mil)',
+    synonyms: ['8 mil', '8000', 'oito mil', 'sequele', 'centralidade 8 mil', 'centralidade 8000', 'cacuaco 8000'],
+    zone: 'Cacuaco · Luanda Norte',
+    pos: [275, 110], // coordenadas no mapa SVG (X, Y)
+    kmFromCenter: 24.5
+  },
+  {
+    name: 'Centralidade do Zango 8.000 (Zango 8 mil)',
+    synonyms: ['zango 8 mil', 'zango 8000', 'zango 8', 'zango oito mil'],
+    zone: 'Viana · Zango',
+    pos: [310, 510],
+    kmFromCenter: 28.0
+  },
+  {
+    name: 'Centralidade do Kilamba (Bloco 12)',
+    synonyms: ['kilamba', 'centralidade do kilamba', 'bloco kilamba', 'kilamba bloco'],
+    zone: 'Belas / Kilamba · Luanda Sul',
+    pos: [275, 590],
+    kmFromCenter: 18.0
+  },
+  {
+    name: 'Talatona (Rua Principal / Belas Shopping)',
+    synonyms: ['talatona', 'belas shopping', 'centro de convencoes', 'sassa', 'talatona centro'],
+    zone: 'Talatona · Luanda Sul',
+    pos: [100, 545],
+    kmFromCenter: 12.0
+  },
+  {
+    name: 'Mutamba (Largo da Mutamba / Baía)',
+    synonyms: ['mutamba', 'baia', 'centro da cidade', 'largo da mutamba', 'porto de luanda'],
+    zone: 'Ingombota · Centro de Luanda',
+    pos: [100, 110],
+    kmFromCenter: 0.0
+  },
+  {
+    name: 'Aeroporto 4 de Fevereiro',
+    synonyms: ['aeroporto', 'aeroporto 4 de fev', 'aeroporto internacional', '4 de fevereiro'],
+    zone: 'Maianga · Aeroporto',
+    pos: [275, 180],
+    kmFromCenter: 5.5
+  },
+  {
+    name: 'Maianga (Largo da Maianga / Cassenda)',
+    synonyms: ['maianga', 'alvalade', 'cassenda', 'bairro azul'],
+    zone: 'Maianga · Luanda',
+    pos: [100, 210],
+    kmFromCenter: 3.5
+  },
+  {
+    name: 'Viana (Vila / Estalagem / Ponte Amarela)',
+    synonyms: ['viana', 'estalagem', 'vila de viana', 'ponte amarela', 'estrada de catete'],
+    zone: 'Viana · Luanda Leste',
+    pos: [300, 370],
+    kmFromCenter: 19.5
+  },
+  {
+    name: 'Cazenga (Marco Histórico / Hoji-ya-Henda)',
+    synonyms: ['cazenga', 'hoji ya henda', 'marco historico', 'tala hadi'],
+    zone: 'Cazenga · Luanda',
+    pos: [190, 210],
+    kmFromCenter: 8.0
+  },
+  {
+    name: 'Benfica / Lar do Patriota',
+    synonyms: ['benfica', 'patriota', 'lar do patriota', 'kifica'],
+    zone: 'Talatona / Belas',
+    pos: [50, 580],
+    kmFromCenter: 16.0
+  },
+  {
+    name: 'Ilha de Luanda (Farol / Ponto Final)',
+    synonyms: ['ilha', 'ilha de luanda', 'chicala', 'farol da ilha', 'ponto final'],
+    zone: 'Ingombota · Ilha',
+    pos: [60, 60],
+    kmFromCenter: 4.0
+  },
+  {
+    name: 'Morro Bento / Gamek / Samba',
+    synonyms: ['morro bento', 'gamek', 'samba', 'estrada da samba'],
+    zone: 'Samba · Luanda',
+    pos: [100, 370],
+    kmFromCenter: 9.0
   }
+];
+
+let originGeoPlace = ANGOLA_PLACES_DB[3]; // Talatona default
+let destGeoPlace = ANGOLA_PLACES_DB[2];   // Kilamba default
+
+function normalizeStr(str) {
+  return (str || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').trim();
+}
+
+function findBestPlaceMatch(query) {
+  const q = normalizeStr(query);
+  if (!q) return null;
+
+  for (const p of ANGOLA_PLACES_DB) {
+    if (normalizeStr(p.name).includes(q)) return p;
+    for (const syn of p.synonyms) {
+      if (q.includes(syn) || syn.includes(q)) return p;
+    }
+  }
+  return null;
+}
+
+function calculateDynamicDistanceAndFare(origPlace, destPlace) {
+  if (!origPlace || !destPlace) return;
+
+  // Distância euclidiana escalada para o mapa real de Luanda
+  const dx = (origPlace.pos[0] - destPlace.pos[0]);
+  const dy = (origPlace.pos[1] - destPlace.pos[1]);
+  const distPixels = Math.sqrt(dx * dx + dy * dy);
+
+  // Escala: 100px aprox = 5 km em Luanda
+  let calculatedKm = parseFloat((distPixels * 0.052).toFixed(1));
+  if (calculatedKm < 1.8) calculatedKm = 1.8;
+
+  // Casos de rotas longas (ex: Sequele para Kilamba / Viana)
+  const isSequele = origPlace.synonyms.includes('8 mil') || destPlace.synonyms.includes('8 mil');
+  const isKilamba = origPlace.synonyms.includes('kilamba') || destPlace.synonyms.includes('kilamba');
+  if (isSequele && isKilamba) {
+    calculatedKm = 34.8;
+  }
+
+  tripKm = calculatedKm;
+  tripMins = Math.max(7, Math.round(calculatedKm * 1.6 + 4));
+
+  // Redesenhar traçado SVG dinâmico conectando os pontos reais
+  const routeSvg = document.getElementById('pax-route-svg');
+  if (routeSvg) {
+    // Gerar caminho pelas avenidas principais (via de cruzamento ortogonal)
+    const midY = (origPlace.pos[1] > 370 && destPlace.pos[1] < 370) ? 370 : (origPlace.pos[1] > 210 && destPlace.pos[1] < 210) ? 210 : 545;
+    const pathD = `M${origPlace.pos[0]} ${origPlace.pos[1]} L${origPlace.pos[0]} ${midY} L${destPlace.pos[0]} ${midY} L${destPlace.pos[0]} ${destPlace.pos[1]}`;
+    routeSvg.setAttribute('d', pathD);
+  }
+
+  // Mover marcadores GPS no mapa
+  const pinA = document.getElementById('pax-pin-a');
+  const pinB = document.getElementById('pax-pin-b');
+  if (pinA) {
+    pinA.style.left = origPlace.pos[0] + 'px';
+    pinA.style.top = origPlace.pos[1] + 'px';
+  }
+  if (pinB) {
+    pinB.style.left = destPlace.pos[0] + 'px';
+    pinB.style.top = destPlace.pos[1] + 'px';
+  }
+
+  // Recalcular lista de veículos e valores
   renderTiers();
 }
+
+function onRouteInputTyped(field) {
+  const inputEl = (field === 'origin') ? document.getElementById('inp-pax-orig') : document.getElementById('inp-pax-dest');
+  const query = inputEl.value;
+  
+  if (field === 'origin') {
+    originName = query;
+    if (document.getElementById('pax-origin-lab')) document.getElementById('pax-origin-lab').textContent = query.split(',')[0] || 'Origem';
+  } else {
+    destName = query;
+    if (document.getElementById('pax-dest-lab')) document.getElementById('pax-dest-lab').textContent = destName.split(',')[0] || 'Destino';
+  }
+
+  showRouteSuggestions(field, query);
+
+  // Busca imediata se o utilizador digitou algo correspondente
+  const matched = findBestPlaceMatch(query);
+  if (matched) {
+    if (field === 'origin') {
+      originGeoPlace = matched;
+    } else {
+      destGeoPlace = matched;
+    }
+    calculateDynamicDistanceAndFare(originGeoPlace, destGeoPlace);
+  }
+}
+
+function showRouteSuggestions(field, query) {
+  const box = document.getElementById('route-suggestions-box');
+  if (!box) return;
+
+  const q = normalizeStr(query);
+  if (!q || q.length < 2) {
+    box.style.display = 'none';
+    return;
+  }
+
+  const matches = ANGOLA_PLACES_DB.filter(p => {
+    return normalizeStr(p.name).includes(q) || p.synonyms.some(s => s.includes(q) || q.includes(s));
+  });
+
+  if (matches.length === 0) {
+    box.style.display = 'none';
+    return;
+  }
+
+  box.innerHTML = matches.map(p => `
+    <div onclick="selectSuggestedPlace('${field}', '${p.name.replace(/'/g, "\'")}')" style="padding:10px 14px;border-bottom:1px solid #282828;display:flex;align-items:center;gap:10px;cursor:pointer;transition:background .15s;">
+      <span style="font-size:16px;">📍</span>
+      <div style="flex:1;">
+        <b style="font-size:13px;color:#fff;display:block;">${p.name}</b>
+        <span style="font-size:11px;color:#888;">${p.zone}</span>
+      </div>
+    </div>
+  `).join('');
+
+  box.style.display = 'block';
+}
+
+function selectSuggestedPlace(field, placeName) {
+  const place = ANGOLA_PLACES_DB.find(p => p.name === placeName);
+  if (!place) return;
+
+  const inputEl = (field === 'origin') ? document.getElementById('inp-pax-orig') : document.getElementById('inp-pax-dest');
+  const labelEl = (field === 'origin') ? document.getElementById('pax-origin-lab') : document.getElementById('pax-dest-lab');
+  
+  if (inputEl) inputEl.value = place.name;
+  if (labelEl) labelEl.textContent = place.name.split('(')[0].trim();
+
+  if (field === 'origin') {
+    originName = place.name;
+    originGeoPlace = place;
+  } else {
+    destName = place.name;
+    destGeoPlace = place;
+  }
+
+  const box = document.getElementById('route-suggestions-box');
+  if (box) box.style.display = 'none';
+
+  calculateDynamicDistanceAndFare(originGeoPlace, destGeoPlace);
+  playHaptic('beep');
+}
+
+// Fechar sugestões ao clicar fora
+document.addEventListener('click', (e) => {
+  const box = document.getElementById('route-suggestions-box');
+  const routeBox = document.querySelector('.uber-route-box');
+  if (box && routeBox && !routeBox.contains(e.target)) {
+    box.style.display = 'none';
+  }
+});
+
 
 function fillActiveWithShortcut(type) {
   const d = DESTINOS[currentProv];
