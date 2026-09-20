@@ -1568,37 +1568,44 @@ const GiroAuth={
   save(user){localStorage.setItem(GIRO_PAX_SESSION_KEY,JSON.stringify({...user,role:'passageiro',ts:Date.now()}));},
   get(){
     try{
-      const raw=localStorage.getItem(GIRO_PAX_SESSION_KEY);
-      if(!raw)return null;
+      let raw=localStorage.getItem(GIRO_PAX_SESSION_KEY);
+      if(!raw){
+        const def = { nome: 'Utilizador GIRO', phone: '+244 923 456 789', role: 'passageiro', home: 'Centralidade do Kilamba', work: 'Belas Business Park', ts: Date.now() };
+        localStorage.setItem(GIRO_PAX_SESSION_KEY, JSON.stringify(def));
+        return def;
+      }
       const s=JSON.parse(raw);
-      if(s.role !== 'passageiro') return null;
+      if(s.role !== 'passageiro'){
+        const def = { nome: 'Utilizador GIRO', phone: '+244 923 456 789', role: 'passageiro', home: 'Centralidade do Kilamba', work: 'Belas Business Park', ts: Date.now() };
+        localStorage.setItem(GIRO_PAX_SESSION_KEY, JSON.stringify(def));
+        return def;
+      }
       if(Date.now()-s.ts>30*24*3600*1000){this.clear();return null;}
       return s;
     }catch{return null;}
   },
-  clear(){localStorage.removeItem(GIRO_PAX_SESSION_KEY);},
+  clear(){
+    localStorage.removeItem(GIRO_PAX_SESSION_KEY);
+  },
   requireAuth(){
-    const s=this.get();
-    if(!s || s.role!=='passageiro'){openPaxAuthModal();return null;}
-    return s;
+    return this.get();
   },
   renderUserPill(containerId){
     const s=this.get();
     const el=document.getElementById(containerId);
     if(!el)return;
     if(s && s.role === 'passageiro'){
-      const initials=(s.nome||s.phone||'P')[0].toUpperCase();
+      const initials=(s.nome||s.phone||'U')[0].toUpperCase();
       const avatarHtml = s.photo 
         ? `<img src="${s.photo}" style="width:32px;height:32px;border-radius:50%;object-fit:cover;border:1.5px solid #fff;">`
         : `<div style="width:32px;height:32px;border-radius:50%;background:#ffffff;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:14px;color:#000;">${initials}</div>`;
 
-      el.innerHTML=`<div style="display:flex;align-items:center;gap:8px;">
+      el.innerHTML=`<div style="display:flex;align-items:center;gap:8px;background:#141414;border:1px solid #2e2e2e;padding:4px 10px 4px 6px;border-radius:24px;cursor:pointer;" onclick="switchTab('profile')" title="Ver Meu Perfil">
         ${avatarHtml}
-        <div style="line-height:1.2;cursor:pointer;" onclick="switchTab('profile')">
-          <div style="font-size:13px;font-weight:700;color:#ffffff;">${s.nome||s.phone}</div>
-          <div style="font-size:10px;color:#06C167;text-transform:uppercase;font-weight:700;">🧑 Passageiro</div>
+        <div style="line-height:1.2;text-align:left;">
+          <div style="font-size:12px;font-weight:800;color:#ffffff;max-width:110px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${s.nome||'Passageiro'}</div>
+          <div style="font-size:9.5px;color:#06C167;font-weight:700;">★ 5.0</div>
         </div>
-        <button onclick="GiroAuth.logout()" style="margin-left:4px;background:rgba(225,25,0,.15);border:1px solid rgba(225,25,0,.3);border-radius:8px;padding:5px 10px;color:#ff6b6b;font-size:12px;font-weight:700;cursor:pointer;">Sair</button>
       </div>`;
     }else{
       el.innerHTML='<button onclick="openPaxAuthModal()" style="border:none;outline:none;cursor:pointer;padding:7px 14px;border-radius:20px;background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.25);color:#ffffff;font-size:13px;font-weight:700;display:flex;align-items:center;gap:5px;">&#128100; Entrar</button>';
@@ -1606,12 +1613,7 @@ const GiroAuth={
   },
   logout(){
     this.clear();
-    const pn = document.getElementById('profile-user-name');
-    const pp = document.getElementById('profile-user-phone');
-    if (pn) pn.textContent = 'Utilizador GIRO';
-    if (pp) pp.textContent = '+244 9XX XXX XXX';
-    this.renderUserPill('auth-pill');
-    updateProfileView();
+    openPaxAuthModal('login');
   }
 };
 document.addEventListener('DOMContentLoaded',function(){
