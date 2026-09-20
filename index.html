@@ -1546,14 +1546,14 @@ function initRealAngolaMap() {
       attributionControl: false
     });
 
-    // Camada de Ruas 100% CLARA (CartoDB Positron Light + Fallback OpenStreetMap)
-    const tiles = L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
-      subdomains: 'abcd',
+    // Camada de Ruas Oficial 100% Livre e Limpa (Sem Marcas de Água / Sem API Key)
+    const tiles = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
       maxZoom: 19
     }).addTo(realMap);
 
     tiles.on('tileerror', function() {
-      L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      // Fallback para Esri World Street Map (100% limpo, sem marcas de água)
+      L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', {
         maxZoom: 19
       }).addTo(realMap);
     });

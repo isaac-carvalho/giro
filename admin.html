@@ -1737,7 +1737,78 @@
       }
     }
 
-    // ── DRIVER MANAGEMENT ──
+    // ── DRIVER MANAGEMENT & FIREBASE CLOUD SYNC ──
+    const FIREBASE_DB_URL = 'https://everyone-2de50-default-rtdb.firebaseio.com';
+
+    async function syncCloudData() {
+      // 1. Sincronizar Motoristas da Nuvem (Firebase Realtime DB)
+      try {
+        const res = await fetch(`${FIREBASE_DB_URL}/drivers.json`);
+        if (res.ok) {
+          const data = await res.json();
+          if (data && typeof data === 'object') {
+            let localList = getDrivers();
+            const map = new Map(localList.map(d => [d.id, d]));
+            Object.keys(data).forEach(k => {
+              const fb = data[k];
+              if (!fb) return;
+              const id = fb.id || k;
+              const vInfo = fb.vehicleInfo || {};
+              const fbDriver = {
+                id: id,
+                nome: fb.nome || ((fb.firstName || '') + ' ' + (fb.secondName || '')).trim() || ('Motorista ' + id.slice(-4)),
+                phone: fb.phoneNumber || fb.phone || 'Sem Telefone',
+                email: fb.email || '',
+                cat: fb.cat || vInfo.type || 'Carro',
+                plate: fb.plate || vInfo.registrationPlateNumber || 'S/ MATRÍCULA',
+                car: fb.car || `${vInfo.brand || ''} ${vInfo.model || ''} ${vInfo.productionYear ? '('+vInfo.productionYear+')' : ''}`.trim() || 'Viatura Padrão',
+                status: fb.status || (fb.blockStatus === 'yes' ? 'bloqueado' : (fb.newTripStatus === 'waiting' || fb.isOnline ? 'ativo' : 'pendente')),
+                date: fb.date || (fb.createdAt ? new Date(fb.createdAt).toLocaleDateString('pt-AO') : 'Nuvem Realtime')
+              };
+              map.set(id, { ...(map.get(id) || {}), ...fbDriver });
+            });
+            const merged = Array.from(map.values());
+            localStorage.setItem(STORAGE_DRIVERS, JSON.stringify(merged));
+            renderDriversTable();
+          }
+        }
+      } catch (err) {
+        console.warn('Sync drivers cloud err:', err);
+      }
+
+      // 2. Sincronizar Passageiros da Nuvem (Firebase Realtime DB)
+      try {
+        const res = await fetch(`${FIREBASE_DB_URL}/users.json`);
+        if (res.ok) {
+          const data = await res.json();
+          if (data && typeof data === 'object') {
+            let localList = getPassengers();
+            const map = new Map(localList.map(p => [p.id, p]));
+            Object.keys(data).forEach(k => {
+              const fb = data[k];
+              if (!fb) return;
+              const id = fb.id || k;
+              const fbPax = {
+                id: id,
+                nome: fb.nome || fb.name || ('Passageiro ' + id.slice(-4)),
+                phone: fb.phoneNumber || fb.phone || 'Sem Telefone',
+                date: fb.date || (fb.createdAt ? new Date(fb.createdAt).toLocaleDateString('pt-AO') : 'Nuvem Realtime'),
+                rides: fb.rides || 0,
+                totalKz: fb.totalKz || '0 Kz',
+                status: fb.status || 'ativo'
+              };
+              map.set(id, { ...(map.get(id) || {}), ...fbPax });
+            });
+            const merged = Array.from(map.values());
+            localStorage.setItem(STORAGE_PASSENGERS, JSON.stringify(merged));
+            renderPassengersTable();
+          }
+        }
+      } catch (err) {
+        console.warn('Sync passengers cloud err:', err);
+      }
+    }
+
     function getDrivers() {
       try { return JSON.parse(localStorage.getItem(STORAGE_DRIVERS) || '[]'); } catch(e) { return []; }
     }
@@ -1755,9 +1826,9 @@
 
       const q = (document.getElementById('filter-driver-input')?.value || '').toLowerCase().trim();
       const filtered = list.filter(d => 
-        d.nome.toLowerCase().includes(q) || 
-        d.plate.toLowerCase().includes(q) || 
-        d.phone.includes(q) ||
+        (d.nome && d.nome.toLowerCase().includes(q)) || 
+        (d.plate && d.plate.toLowerCase().includes(q)) || 
+        (d.phone && d.phone.includes(q)) ||
         (d.car && d.car.toLowerCase().includes(q))
       );
 
@@ -1769,11 +1840,11 @@
       tbody.innerHTML = filtered.map(d => {
         const statusBadge = d.status === 'ativo' ? '<span class="badge green">● Ativo</span>' :
                             (d.status === 'pendente' ? '<span class="badge gold">⏳ Pendente KYC</span>' : '<span class="badge red">🔴 Bloqueado</span>');
-        const safeNome = escapeHtml(d.nome);
-        const safePhone = escapeHtml(d.phone);
-        const safeCat = escapeHtml(d.cat);
-        const safeCar = escapeHtml(d.car);
-        const safePlate = escapeHtml(d.plate);
+        const safeNome = escapeHtml(d.nome || 'Sem Nome');
+        const safePhone = escapeHtml(d.phone || 'Sem Telefone');
+        const safeCat = escapeHtml(d.cat || 'Carro');
+        const safeCar = escapeHtml(d.car || 'Viatura');
+        const safePlate = escapeHtml(d.plate || 'S/ MATRÍCULA');
         return `
           <tr>
             <td><b>${safeNome}</b><br><small style="color:var(--muted);">${escapeHtml(d.date) || 'Cadastrado'}</small></td>
@@ -1806,13 +1877,21 @@
       const status = document.getElementById('drv-status').value;
 
       const list = getDrivers();
+      const driverId = 'drv-' + Date.now();
       const newD = {
-        id: 'drv-' + Date.now(),
+        id: driverId,
         nome, phone, email, cat, plate, car, status,
         date: 'Registado via Painel Admin'
       };
       list.unshift(newD);
       saveDrivers(list);
+      // Sincronizar criação para a nuvem Firebase
+      fetch(`${FIREBASE_DB_URL}/drivers/${driverId}.json`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(newD)
+      }).catch(e => console.warn(e));
+
       closeAddDriverModal();
       alert('✓ Motorista ' + nome + ' cadastrado com sucesso!');
     }
@@ -1824,6 +1903,15 @@
       if (item) {
         item.status = item.status === 'ativo' ? 'bloqueado' : 'ativo';
         saveDrivers(list);
+        // Sincronizar alteração de status para o Firebase
+        fetch(`${FIREBASE_DB_URL}/drivers/${id}.json`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            status: item.status,
+            blockStatus: item.status === 'bloqueado' ? 'yes' : 'no'
+          })
+        }).catch(e => console.warn(e));
       }
     }
 
@@ -1833,6 +1921,8 @@
         let list = getDrivers();
         list = list.filter(d => d.id !== id);
         saveDrivers(list);
+        // Remover do Firebase
+        fetch(`${FIREBASE_DB_URL}/drivers/${id}.json`, { method: 'DELETE' }).catch(e => console.warn(e));
       }
     }
 
@@ -2052,6 +2142,10 @@
       renderVigiaFailuresTable();
       renderVigiaSuccessTable();
       refreshVigiaLiveMetrics();
+
+      // Sincronização em tempo real com o banco de dados Firebase
+      syncCloudData();
+      setInterval(syncCloudData, 12000);
     });
 
 

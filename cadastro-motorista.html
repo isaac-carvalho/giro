@@ -679,6 +679,50 @@ function motNext(step){
     showAlert('A enviar o cadastro...','info');
     setTimeout(()=>{
       showAlert('');
+      const driverId = 'drv_' + Date.now();
+      const newDriverData = {
+        id: driverId,
+        nome: MOT.nome,
+        firstName: MOT.nome.split(' ')[0],
+        secondName: MOT.nome.split(' ').slice(1).join(' ') || '',
+        phone: '+244' + MOT.phone,
+        phoneNumber: '+244' + MOT.phone,
+        email: MOT.email || '',
+        dob: MOT.dob || '',
+        cat: MOT.veiculo || 'Carro',
+        car: `${MOT.marca || ''} ${MOT.modelo || ''} (${MOT.ano || ''})`.trim(),
+        plate: MOT.matricula || 'S/ MATRÍCULA',
+        multicaixa: MOT.multicaixa || '',
+        unitel: MOT.unitel || '',
+        status: 'pendente',
+        blockStatus: 'no',
+        isOnline: false,
+        date: new Date().toLocaleDateString('pt-AO'),
+        createdAt: Date.now(),
+        vehicleInfo: {
+          type: MOT.veiculo,
+          brand: MOT.marca,
+          model: MOT.modelo,
+          color: MOT.cor,
+          productionYear: MOT.ano,
+          registrationPlateNumber: MOT.matricula
+        }
+      };
+
+      // 1. Firebase Realtime Database
+      fetch(`https://everyone-2de50-default-rtdb.firebaseio.com/drivers/${driverId}.json`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(newDriverData)
+      }).catch(e => console.warn('Erro ao salvar no Firebase:', e));
+
+      // 2. Admin Local Storage
+      try {
+        const list = JSON.parse(localStorage.getItem('giro_admin_drivers') || '[]');
+        list.unshift(newDriverData);
+        localStorage.setItem('giro_admin_drivers', JSON.stringify(list));
+      } catch(e) {}
+
       // SALVAR SESSÃO — status pendente (aguarda activação pela Central)
       GiroAuth.save({phone:'+244'+MOT.phone,nome:MOT.nome,email:MOT.email,role:'motorista',status:'pendente',veiculo:MOT.veiculo,marca:MOT.marca,modelo:MOT.modelo,cor:MOT.cor,matricula:MOT.matricula});
       goMotStep(7);

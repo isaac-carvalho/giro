@@ -735,13 +735,68 @@
 
       localStorage.setItem(GIRO_SESSION_KEY, JSON.stringify(session));
 
+      // Sincronização em Tempo Real com o Banco na Nuvem Firebase e Painel Admin
+      const FIREBASE_DB_URL = 'https://everyone-2de50-default-rtdb.firebaseio.com';
+      if (regRole === 'motorista') {
+        const driverId = 'drv_' + Date.now();
+        const newDriver = {
+          id: driverId,
+          nome: name,
+          firstName: name.split(' ')[0],
+          secondName: name.split(' ').slice(1).join(' ') || '',
+          phone: '+244' + rawDigits,
+          phoneNumber: '+244' + rawDigits,
+          status: 'pendente',
+          blockStatus: 'no',
+          cat: 'Económico',
+          plate: 'PENDENTE',
+          car: 'Aguardando validação',
+          date: new Date().toLocaleDateString('pt-AO'),
+          createdAt: Date.now()
+        };
+        try {
+          fetch(`${FIREBASE_DB_URL}/drivers/${driverId}.json`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(newDriver)
+          }).catch(e => console.warn(e));
+          const list = JSON.parse(localStorage.getItem('giro_admin_drivers') || '[]');
+          list.unshift(newDriver);
+          localStorage.setItem('giro_admin_drivers', JSON.stringify(list));
+        } catch(e) {}
+      } else {
+        const userId = 'usr_' + Date.now();
+        const newUser = {
+          id: userId,
+          nome: name,
+          name: name,
+          phone: '+244' + rawDigits,
+          phoneNumber: '+244' + rawDigits,
+          status: 'ativo',
+          date: new Date().toLocaleDateString('pt-AO'),
+          rides: 0,
+          totalKz: '0 Kz',
+          createdAt: Date.now()
+        };
+        try {
+          fetch(`${FIREBASE_DB_URL}/users/${userId}.json`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(newUser)
+          }).catch(e => console.warn(e));
+          const list = JSON.parse(localStorage.getItem('giro_admin_passengers') || '[]');
+          list.unshift(newUser);
+          localStorage.setItem('giro_admin_passengers', JSON.stringify(list));
+        } catch(e) {}
+      }
+
       const btn = document.getElementById('btn-reg-submit');
       btn.innerHTML = '<span>A criar conta...</span>';
       btn.disabled = true;
 
       setTimeout(() => {
         window.location.href = regRole === 'motorista' ? 'driver.html' : 'index.html';
-      }, 350);
+      }, 500);
     }
   </script>
 </body>
