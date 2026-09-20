@@ -1105,6 +1105,126 @@ const TIERS_CARGO = [
     svg: '<svg viewBox="0 0 60 36" fill="none" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="heavyCabGrad" x1="0" y1="4" x2="0" y2="28" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#fef08a"/><stop offset="35%" stop-color="#f59e0b"/><stop offset="70%" stop-color="#b45309"/><stop offset="100%" stop-color="#451a03"/></linearGradient><linearGradient id="heavyContGrad" x1="0" y1="3" x2="0" y2="24" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#334155"/><stop offset="40%" stop-color="#1e293b"/><stop offset="85%" stop-color="#0f172a"/><stop offset="100%" stop-color="#020617"/></linearGradient><linearGradient id="heavyChromeTank" x1="0" y1="21" x2="0" y2="26" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#ffffff"/><stop offset="50%" stop-color="#94a3b8"/><stop offset="100%" stop-color="#334155"/></linearGradient><radialGradient id="heavyWheel" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="#f8fafc"/><stop offset="50%" stop-color="#475569"/><stop offset="100%" stop-color="#020617"/></radialGradient></defs><ellipse cx="29" cy="33" rx="28" ry="2.2" fill="#000000" opacity="0.6"/><rect x="2.5" y="3.5" width="37" height="19.5" rx="1.5" fill="url(#heavyContGrad)" stroke="#475569" stroke-width="0.8"/><line x1="9" y1="3.5" x2="9" y2="23" stroke="#334155" stroke-width="0.8"/><line x1="16" y1="3.5" x2="16" y2="23" stroke="#334155" stroke-width="0.8"/><line x1="23" y1="3.5" x2="23" y2="23" stroke="#334155" stroke-width="0.8"/><line x1="30" y1="3.5" x2="30" y2="23" stroke="#334155" stroke-width="0.8"/><path d="M5 12 L37 12" stroke="#f59e0b" stroke-width="1.2"/><rect x="13" y="10" width="13" height="4" rx="1" fill="#f59e0b"/><text x="19.5" y="13" font-size="2.6" font-family="sans-serif" font-weight="900" fill="#000" text-anchor="middle">GIRO 10T</text><rect x="21" y="22.5" width="9" height="4.5" rx="2.2" fill="url(#heavyChromeTank)" stroke="#1e293b" stroke-width="0.5"/><path d="M40 3.5 L46 3.5 L50 6 L52 10 L58 14.5 C59 16, 59.5 19, 58.5 24 C57.5 26, 54 26.5, 52 26.5 C51 23, 46 23, 45 26.5 L40 26.5 Z" fill="url(#heavyCabGrad)"/><path d="M48 6.5 L51 9.5 L54 13.5 L47 13.5 L45 8 Z" fill="#0f172a"/><path d="M46 5.5 L53 8.5" stroke="#f59e0b" stroke-width="1.2" stroke-linecap="round"/><rect x="55" y="10" width="2" height="7" rx="0.5" fill="#1e293b"/><path d="M54 20 L58.5 20.5 C59 22.5, 57 24, 54 24 Z" fill="#ffffff"/><path d="M55 21 L58 21.5" stroke="#f59e0b" stroke-width="0.9"/><circle cx="9" cy="26" r="6.2" fill="#020617"/><circle cx="9" cy="26" r="3.8" fill="url(#heavyWheel)"/> <circle cx="9" cy="26" r="1.6" fill="#0f172a"/><circle cx="17" cy="26" r="6.2" fill="#020617"/><circle cx="17" cy="26" r="3.8" fill="url(#heavyWheel)"/><circle cx="17" cy="26" r="1.6" fill="#0f172a"/><circle cx="48.5" cy="26" r="6.2" fill="#020617"/><circle cx="48.5" cy="26" r="3.8" fill="url(#heavyWheel)"/><circle cx="48.5" cy="26" r="1.6" fill="#0f172a"/></svg>' }
 ];
 
+/* ==========================================================================
+   DYNAMIC PRICING ENGINE (FIREBASE RTDB /config/pricing) — 3-TIER FALLBACK
+   ========================================================================== */
+const RTDB_PRICING_URL = 'https://giro-4ed50-default-rtdb.europe-west1.firebasedatabase.app/config/pricing.json';
+const STORAGE_PRICING_KEY = 'giro_pricing_config';
+
+function applyPricingConfig(data) {
+  if (!data || typeof data !== 'object') return false;
+  let changed = false;
+
+  // 1. Atualizar T_PAX global
+  if (data.global && typeof data.global === 'object') {
+    const g = data.global;
+    if (g.defaultBaseFare !== undefined || g.base !== undefined) {
+      T_PAX.base = Number(g.defaultBaseFare !== undefined ? g.defaultBaseFare : g.base);
+      changed = true;
+    }
+    if (g.defaultPerKm !== undefined || g.km !== undefined) {
+      T_PAX.km = Number(g.defaultPerKm !== undefined ? g.defaultPerKm : g.km);
+      changed = true;
+    }
+    if (g.defaultPerMin !== undefined || g.min !== undefined) {
+      T_PAX.min = Number(g.defaultPerMin !== undefined ? g.defaultPerMin : g.min);
+      changed = true;
+    }
+    if (g.defaultMinimum !== undefined || g.minimo !== undefined) {
+      T_PAX.minimo = Number(g.defaultMinimum !== undefined ? g.defaultMinimum : g.minimo);
+      changed = true;
+    }
+    if (g.defaultCommission !== undefined || g.comissao !== undefined) {
+      T_PAX.comissao = Number(g.defaultCommission !== undefined ? g.defaultCommission : g.comissao);
+      changed = true;
+    }
+  }
+
+  // 2. Atualizar categorias individuais (10 categorias)
+  const cats = data.categories || data.tiers;
+  if (cats && typeof cats === 'object') {
+    const allGroups = [TIERS_PAX, TIERS_DELIVERY, TIERS_CARGO];
+    allGroups.forEach(tierGroup => {
+      tierGroup.forEach(t => {
+        const cat = cats[t.id];
+        if (cat) {
+          if (cat.baseFare !== undefined || cat.base !== undefined) {
+            t.baseFare = Number(cat.baseFare !== undefined ? cat.baseFare : cat.base);
+            t.base = t.baseFare;
+          }
+          if (cat.perKm !== undefined || cat.km !== undefined) {
+            t.perKm = Number(cat.perKm !== undefined ? cat.perKm : cat.km);
+            t.km = t.perKm;
+          }
+          if (cat.perMin !== undefined || cat.min !== undefined) {
+            t.perMin = Number(cat.perMin !== undefined ? cat.perMin : cat.min);
+            t.min = t.perMin;
+          }
+          if (cat.minimum !== undefined || cat.minimo !== undefined) {
+            t.minimo = Number(cat.minimum !== undefined ? cat.minimum : cat.minimo);
+            t.minimum = t.minimo;
+          }
+          if (cat.multiplier !== undefined || cat.mult !== undefined) {
+            t.mult = Number(cat.multiplier !== undefined ? cat.multiplier : cat.mult);
+            t.multiplier = t.mult;
+          }
+          if (cat.commission !== undefined || cat.comissao !== undefined) {
+            t.commission = Number(cat.commission !== undefined ? cat.commission : cat.comissao);
+            t.comissao = t.commission;
+          }
+          if (cat.longDistancePerKm !== undefined) {
+            t.longDistancePerKm = Number(cat.longDistancePerKm);
+          }
+          changed = true;
+        }
+      });
+    });
+  }
+  return changed;
+}
+
+// Nível 1: Hidratação síncrona do cache local (0ms latência)
+function hydratePricingFromCache() {
+  try {
+    const raw = localStorage.getItem(STORAGE_PRICING_KEY);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      applyPricingConfig(parsed);
+    }
+  } catch(e) {
+    console.warn('[GIRO Pricing] Erro ao ler cache local de tarifas:', e);
+  }
+}
+
+// Nível 2: Sincronização assíncrona com a nuvem Firebase RTDB REST
+async function fetchDynamicPricing() {
+  try {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 4500);
+    const res = await fetch(RTDB_PRICING_URL, { signal: controller.signal });
+    clearTimeout(timeoutId);
+    if (res.ok) {
+      const data = await res.json();
+      if (data && typeof data === 'object') {
+        const changed = applyPricingConfig(data);
+        localStorage.setItem(STORAGE_PRICING_KEY, JSON.stringify(data));
+        if (changed && typeof renderTiers === 'function') {
+          renderTiers();
+        }
+      }
+    }
+  } catch(err) {
+    // Nível 3: Fallback gracioso para cache local e constantes padrão
+    console.info('[GIRO Pricing] Modo offline ou conexão lenta, tarifas locais mantidas:', err.message);
+  }
+}
+
+// Inicializar ciclo de vida de 3 níveis de fallback
+hydratePricingFromCache();
+fetchDynamicPricing();
+window.addEventListener('DOMContentLoaded', fetchDynamicPricing);
+window.addEventListener('focus', fetchDynamicPricing);
+
 const DESTINOS = {
   luanda: {
     origem: 'Talatona, Rua Principal',
@@ -1159,31 +1279,46 @@ function calculatePrice(t) {
   const isMoto = (t.id === 'moto' || t.id === 'deliv_moto');
   const isCargo = (appMode === 'cargo');
   let baseMin = T_PAX.minimo;
-  if (t.minimo) {
+  if (t.minimo !== undefined) {
     baseMin = t.minimo;
+  } else if (t.minimum !== undefined) {
+    baseMin = t.minimum;
   } else if (isMoto) {
     baseMin = T_PAX.minimo * 0.85;
   } else if (isCargo) {
     baseMin = 7500;
   }
 
+  // Preço base, km e minuto da categoria (com fallback para fórmula padrão)
+  const catBase = (t.baseFare !== undefined) ? t.baseFare : ((t.base !== undefined) ? t.base : (T_PAX.base * (t.mult || 1)));
+  const catKm = (t.perKm !== undefined) ? t.perKm : ((t.km !== undefined) ? t.km : (T_PAX.km * (t.mult || 1)));
+  const catMin = (t.perMin !== undefined) ? t.perMin : ((t.min !== undefined) ? t.min : (T_PAX.min * (t.mult || 1)));
+
   let bruto = 0;
-  // Cálculo inteligente: Urbano (< 50 km) vs Interprovincial Longa Distância (> 50 km)
+  // Cálculo inteligente: Urbano (<= 50 km) vs Interprovincial Longa Distância (> 50 km)
   if (tripKm <= 50) {
-    bruto = (T_PAX.base + T_PAX.km * tripKm + T_PAX.min * tripMins) * provMult * t.mult;
+    bruto = (catBase + catKm * tripKm + catMin * tripMins) * provMult;
   } else {
     // Tarifa Interprovincial de Longo Curso justa e escalável
+    let longDistRate = t.longDistancePerKm;
+    if (!longDistRate) {
+      if (isCargo) {
+        // Carga interprovincial calibrada (10% abaixo do mercado de camionistas de Angola)
+        longDistRate = (t.id === 'cargo_pickup') ? 320 : (t.id === 'cargo_canter' ? 750 : 1600);
+      } else if (isMoto) {
+        // Motos limitadas a viagens intermunicipais próximas
+        longDistRate = 110;
+      } else {
+        // Passageiros em carro particular/familiar inteiro (ex: Luanda -> Benguela ~105.000 Kz)
+        longDistRate = (t.id === 'conf') ? 225 : (t.id === 'sete' ? 275 : 190);
+      }
+    }
     if (isCargo) {
-      // Carga interprovincial calibrada (10% abaixo do mercado de camionistas de Angola)
-      const perKmRate = (t.id === 'cargo_pickup') ? 320 : (t.id === 'cargo_canter' ? 750 : 1600);
-      bruto = (baseMin + tripKm * perKmRate) * provMult;
+      bruto = (baseMin + tripKm * longDistRate) * provMult;
     } else if (isMoto) {
-      // Motos limitadas a viagens intermunicipais próximas
-      bruto = (T_PAX.base + tripKm * 110) * provMult;
+      bruto = (catBase + tripKm * longDistRate) * provMult;
     } else {
-      // Passageiros em carro particular/familiar inteiro (ex: Luanda -> Benguela ~105.000 Kz)
-      const paxKmRate = (t.id === 'conf') ? 225 : (t.id === 'sete' ? 275 : 190);
-      bruto = (T_PAX.base + 50 * T_PAX.km + (tripKm - 50) * paxKmRate) * provMult;
+      bruto = (catBase + 50 * catKm + (tripKm - 50) * longDistRate) * provMult;
     }
   }
 
@@ -1198,6 +1333,7 @@ function renderTiers() {
   const tiers = getActiveTiers();
   if (tierIdx >= tiers.length) tierIdx = 0;
   const container = document.getElementById('tier-list-container');
+  if (!container) return;
   container.innerHTML = tiers.map((t, i) => {
     const isSel = (i === tierIdx);
     // Atualizar barra de KM se necessário
@@ -1227,8 +1363,9 @@ function renderTiers() {
   }).join('');
   
   const chosen = tiers[tierIdx];
-  if (chosen) {
-    document.getElementById('btn-confirm-tier').textContent = `Confirmar ${chosen.nome} · ${kz(calculatePrice(chosen))}`;
+  const btnConfirm = document.getElementById('btn-confirm-tier');
+  if (chosen && btnConfirm) {
+    btnConfirm.textContent = `Confirmar ${chosen.nome} · ${kz(calculatePrice(chosen))}`;
   }
 }
 

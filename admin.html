@@ -647,6 +647,9 @@
         <button class="nav-item" onclick="switchNav('fleet')">
           <span>📍</span> Radar de Frotas ao Vivo
         </button>
+        <button class="nav-item" onclick="switchNav('pricing')">
+          <span>🏷️</span> Tarifas & Preços Dinâmicos
+        </button>
         <button class="nav-item" onclick="switchNav('config')">
           <span>⚙️</span> Definições & API VPS
         </button>
@@ -1174,6 +1177,68 @@
           </div>
         </section>
 
+        <!-- ABA: GESTÃO DE TARIFAS & PREÇOS DINÂMICOS (FIREBASE RTDB) -->
+        <section id="view-pricing" class="tab-view">
+          <div class="kpi-grid">
+            <div class="kpi-card gold">
+              <div class="kpi-label">Comissão Padrão Plataforma</div>
+              <div class="kpi-value" id="kpi-pricing-comm">10.0%</div>
+              <div class="kpi-sub">Fixa em todas as corridas GIRO</div>
+            </div>
+            <div class="kpi-card green">
+              <div class="kpi-label">Bandeirada Base Económico</div>
+              <div class="kpi-value" id="kpi-pricing-base">50 Kz</div>
+              <div class="kpi-sub">Tarifa inicial de partida</div>
+            </div>
+            <div class="kpi-card blue">
+              <div class="kpi-label">Taxa por KM (Económico)</div>
+              <div class="kpi-value" id="kpi-pricing-km">243 Kz</div>
+              <div class="kpi-sub">Referência urbana Luanda</div>
+            </div>
+            <div class="kpi-card">
+              <div class="kpi-label">Sincronização Firebase RTDB</div>
+              <div class="kpi-value" style="font-size:18px;color:var(--green);display:flex;align-items:center;gap:6px;">
+                <span style="font-size:10px;">●</span> /config/pricing
+              </div>
+              <div class="kpi-sub" id="kpi-pricing-updated">Sincronizado em tempo real</div>
+            </div>
+          </div>
+
+          <div class="data-table-wrap">
+            <div class="table-head-bar">
+              <div>
+                <b style="font-size:16px;color:#fff;display:block;">Tabela Tarifária Oficial GIRO (10 Categorias)</b>
+                <span style="font-size:12px;color:var(--muted);">Alterações gravadas no Firebase RTDB atualizam a estimativa dos passageiros instantaneamente.</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:10px;">
+                <button class="btn-action outline" onclick="loadAdminPricing(true)">🔄 Recarregar</button>
+                <button class="btn-action gold" onclick="saveAdminPricing()">💾 Gravar Todas as Alterações</button>
+              </div>
+            </div>
+
+            <div style="overflow-x:auto;">
+              <table id="pricing-admin-table">
+                <thead>
+                  <tr>
+                    <th>Categoria</th>
+                    <th>Modalidade</th>
+                    <th>Bandeirada (Kz)</th>
+                    <th>Taxa/Km (Kz)</th>
+                    <th>Taxa/Min (Kz)</th>
+                    <th>Tarifa Mínima (Kz)</th>
+                    <th>Longo Curso >50km (Kz/km)</th>
+                    <th>Comissão (%)</th>
+                    <th>Ações</th>
+                  </tr>
+                </thead>
+                <tbody id="pricing-tbody">
+                  <!-- Carregado dinamicamente via loadAdminPricing() -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
       </div>
     </main>
   </div>
@@ -1506,6 +1571,7 @@
       disputes: '⚖️ Disputas & Reembolsos',
       sos: '🚨 Monitor Tático & PNA (111)',
       fleet: '📍 Radar de Frotas ao Vivo',
+      pricing: '🏷️ Gestão de Tarifas & Comissões (Firebase RTDB)',
       config: '⚙️ Definições & Conexão VPS'
     };
 
@@ -1532,6 +1598,7 @@
 
       if (view === 'sos') setTimeout(initRadarMap, 150);
       if (view === 'fleet') setTimeout(initFleetMap, 150);
+      if (view === 'pricing') loadAdminPricing();
       if (view === 'operators') renderVigiaFailuresTable();
       renderVigiaSuccessTable();
       refreshVigiaLiveMetrics();
@@ -2338,6 +2405,252 @@
       refreshVigiaLiveMetrics();
       }
     }
+
+    /* ==========================================================================
+       GESTÃO DE TARIFAS & PREÇOS DINÂMICOS (/config/pricing)
+       ========================================================================== */
+    let adminPricingCache = null;
+
+    const DEFAULT_PRICING_SEED = {
+      global: {
+        defaultCommission: 0.10,
+        defaultBaseFare: 50,
+        defaultPerKm: 243,
+        defaultPerMin: 1,
+        defaultMinimum: 900,
+        currency: 'Kz',
+        country: 'Angola'
+      },
+      categories: {
+        moto: { id: 'moto', name: 'GIRO Moto (Kupapata)', mode: 'pax', capacity: '1 lug', description: '1 lugar · rápido no trânsito · tarifa económica', baseFare: 25, perKm: 115, perMin: 1, minimum: 765, mult: 0.47, commission: 0.10, longDistancePerKm: 110, active: true },
+        eco: { id: 'eco', name: 'GIRO Económico', mode: 'pax', capacity: '4 lug', description: '4 lugares · ar condicionado · o mais pedido', baseFare: 50, perKm: 243, perMin: 1, minimum: 900, mult: 1.0, commission: 0.10, longDistancePerKm: 190, active: true },
+        conf: { id: 'conf', name: 'GIRO Conforto', mode: 'pax', capacity: '4 lug', description: 'Viatura recente · espaço extra · climatizado', baseFare: 60, perKm: 277, perMin: 2, minimum: 1000, mult: 1.14, commission: 0.10, longDistancePerKm: 225, active: true },
+        sete: { id: 'sete', name: 'GIRO 7 (Familiar)', mode: 'pax', capacity: '7 lug', description: '7 lugares · família ou malas para o aeroporto', baseFare: 70, perKm: 340, perMin: 2, minimum: 1300, mult: 1.40, commission: 0.10, longDistancePerKm: 275, active: true },
+        deliv_moto: { id: 'deliv_moto', name: 'GIRO Flash Moto', mode: 'delivery', capacity: '10 kg', description: 'Até 10 kg · encomendas, refeições e documentos', baseFare: 25, perKm: 117, perMin: 1, minimum: 765, mult: 0.48, commission: 0.10, longDistancePerKm: 110, active: true },
+        deliv_car: { id: 'deliv_car', name: 'GIRO Express Carro', mode: 'delivery', capacity: '60 kg', description: 'Até 60 kg · caixas médias, compras de mercado', baseFare: 55, perKm: 255, perMin: 1, minimum: 950, mult: 1.05, commission: 0.10, longDistancePerKm: 190, active: true },
+        deliv_van: { id: 'deliv_van', name: 'GIRO Van Encomendas', mode: 'delivery', capacity: '300 kg', description: 'Até 300 kg · volumes comerciais e mercadorias', baseFare: 70, perKm: 328, perMin: 2, minimum: 1200, mult: 1.35, commission: 0.10, longDistancePerKm: 210, active: true },
+        cargo_pickup: { id: 'cargo_pickup', name: 'GIRO Pick-Up / Caixa Aberta', mode: 'cargo', capacity: '1 Ton', description: 'Até 1 Tonelada · mobília, materiais e compras', baseFare: 270, perKm: 1312, perMin: 5, minimum: 7500, mult: 5.4, commission: 0.10, longDistancePerKm: 320, active: true },
+        cargo_canter: { id: 'cargo_canter', name: 'GIRO Camião Canter (3.5T)', mode: 'cargo', capacity: '3.5 Ton', description: 'Até 3.5 Toneladas · obras, comércio e mercadorias', baseFare: 700, perKm: 3402, perMin: 14, minimum: 22500, mult: 14.0, commission: 0.10, longDistancePerKm: 750, active: true },
+        cargo_heavy: { id: 'cargo_heavy', name: 'GIRO Camião Pesado (Mudanças)', mode: 'cargo', capacity: '10 Ton', description: 'Até 10 Toneladas · mudanças residenciais e industriais', baseFare: 1800, perKm: 8748, perMin: 36, minimum: 70000, mult: 36.0, commission: 0.10, longDistancePerKm: 1600, active: true }
+      }
+    };
+
+    async function loadAdminPricing(forceAlert = false) {
+      try {
+        const res = await fetch(`${FIREBASE_DB_URL}/config/pricing.json`);
+        if (res.ok) {
+          const data = await res.json();
+          if (data && (data.categories || data.tiers)) {
+            adminPricingCache = data;
+            renderAdminPricingTable(data);
+            updatePricingKpis(data);
+            if (forceAlert) alert('✓ Tarifas recarregadas do Firebase RTDB com sucesso!');
+            return;
+          }
+        }
+      } catch(e) {
+        console.warn('Erro ao carregar tarifas do Firebase:', e);
+      }
+      if (!adminPricingCache) {
+        adminPricingCache = DEFAULT_PRICING_SEED;
+        renderAdminPricingTable(adminPricingCache);
+        updatePricingKpis(adminPricingCache);
+      }
+    }
+
+    function updatePricingKpis(data) {
+      const cats = data.categories || data.tiers || {};
+      const eco = cats['eco'] || {};
+      const commEl = document.getElementById('kpi-pricing-comm');
+      const baseEl = document.getElementById('kpi-pricing-base');
+      const kmEl = document.getElementById('kpi-pricing-km');
+      const updEl = document.getElementById('kpi-pricing-updated');
+
+      const comm = eco.commission !== undefined ? eco.commission : (eco.comissao !== undefined ? eco.comissao : (data.global?.defaultCommission || 0.10));
+      if (commEl) commEl.textContent = (comm * 100).toFixed(1) + '%';
+      if (baseEl) baseEl.textContent = (eco.baseFare !== undefined ? eco.baseFare : (eco.base || 50)) + ' Kz';
+      if (kmEl) kmEl.textContent = (eco.perKm !== undefined ? eco.perKm : (eco.km || 243)) + ' Kz';
+      if (updEl && data.updatedAt) {
+        const d = new Date(data.updatedAt);
+        updEl.textContent = 'Atualizado: ' + d.toLocaleDateString('pt-AO') + ' ' + d.toLocaleTimeString('pt-AO');
+      }
+    }
+
+    function renderAdminPricingTable(pricingDoc) {
+      const tbody = document.getElementById('pricing-tbody');
+      if (!tbody) return;
+
+      const cats = pricingDoc.categories || pricingDoc.tiers || {};
+      const mergedCats = { ...DEFAULT_PRICING_SEED.categories, ...cats };
+      const order = ['moto', 'eco', 'conf', 'sete', 'deliv_moto', 'deliv_car', 'deliv_van', 'cargo_pickup', 'cargo_canter', 'cargo_heavy'];
+
+      tbody.innerHTML = order.map(catId => {
+        const c = mergedCats[catId] || { id: catId, name: catId };
+        const base = c.baseFare !== undefined ? c.baseFare : (c.base !== undefined ? c.base : 0);
+        const km = c.perKm !== undefined ? c.perKm : (c.km !== undefined ? c.km : 0);
+        const min = c.perMin !== undefined ? c.perMin : (c.min !== undefined ? c.min : 0);
+        const minimo = c.minimum !== undefined ? c.minimum : (c.minimo !== undefined ? c.minimo : 0);
+        const commPct = Math.round((c.commission !== undefined ? c.commission : (c.comissao !== undefined ? c.comissao : 0.10)) * 100);
+        const ldist = c.longDistancePerKm !== undefined ? c.longDistancePerKm : 0;
+        const mode = c.mode || (catId.startsWith('cargo') ? 'cargo' : catId.startsWith('deliv') ? 'delivery' : 'pax');
+        const badgeColor = mode === 'pax' ? 'gold' : mode === 'delivery' ? 'green' : 'blue';
+        const modeLabel = mode === 'pax' ? 'Passageiro' : mode === 'delivery' ? 'Entrega' : 'Carga';
+
+        return `
+          <tr data-cat-id="${catId}">
+            <td>
+              <b style="color:#fff;display:block;">${c.name || catId}</b>
+              <span style="font-size:11px;color:var(--muted);">${c.capacity || ''} · ${c.description || ''}</span>
+            </td>
+            <td>
+              <span class="badge ${badgeColor}">${modeLabel}</span>
+            </td>
+            <td>
+              <input type="number" class="search-input input-pricing" style="width:90px;" data-field="baseFare" value="${base}" min="0" step="5">
+            </td>
+            <td>
+              <input type="number" class="search-input input-pricing" style="width:100px;" data-field="perKm" value="${km}" min="0" step="1">
+            </td>
+            <td>
+              <input type="number" class="search-input input-pricing" style="width:80px;" data-field="perMin" value="${min}" min="0" step="0.5">
+            </td>
+            <td>
+              <input type="number" class="search-input input-pricing" style="width:110px;" data-field="minimum" value="${minimo}" min="0" step="50">
+            </td>
+            <td>
+              <input type="number" class="search-input input-pricing" style="width:100px;" data-field="longDistancePerKm" value="${ldist}" min="0" step="5">
+            </td>
+            <td>
+              <input type="number" class="search-input input-pricing" style="width:80px;" data-field="commission" value="${commPct}" min="1" max="50" step="1">
+            </td>
+            <td>
+              <button class="btn-action outline" onclick="saveSingleCategoryPricing('${catId}')" title="Gravar alterações desta categoria no Firebase">💾 Salvar</button>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    async function saveAdminPricing() {
+      if (!verifyAdminAuthorized()) return;
+
+      const rows = document.querySelectorAll('#pricing-tbody tr');
+      const updatedCategories = { ...(adminPricingCache?.categories || DEFAULT_PRICING_SEED.categories) };
+
+      rows.forEach(tr => {
+        const catId = tr.dataset.catId;
+        if (!updatedCategories[catId]) {
+          updatedCategories[catId] = { ...(DEFAULT_PRICING_SEED.categories[catId] || { id: catId }) };
+        }
+
+        tr.querySelectorAll('.input-pricing').forEach(inp => {
+          const field = inp.dataset.field;
+          let val = parseFloat(inp.value);
+          if (isNaN(val)) val = 0;
+          if (field === 'commission') {
+            val = val / 100;
+            updatedCategories[catId]['commission'] = val;
+            updatedCategories[catId]['comissao'] = val;
+          } else {
+            updatedCategories[catId][field] = val;
+            if (field === 'baseFare') updatedCategories[catId]['base'] = val;
+            if (field === 'perKm') updatedCategories[catId]['km'] = val;
+            if (field === 'perMin') updatedCategories[catId]['min'] = val;
+            if (field === 'minimum') updatedCategories[catId]['minimo'] = val;
+          }
+        });
+      });
+
+      const eco = updatedCategories['eco'] || {};
+      const payload = {
+        updatedAt: Date.now(),
+        updatedBy: 'Isaac Carvalho (Admin Master)',
+        version: (adminPricingCache?.version || 1) + 1,
+        global: {
+          defaultCommission: eco.commission || 0.10,
+          defaultBaseFare: eco.baseFare || 50,
+          defaultPerKm: eco.perKm || 243,
+          defaultPerMin: eco.perMin || 1,
+          defaultMinimum: eco.minimum || 900,
+          currency: 'Kz',
+          country: 'Angola'
+        },
+        provinces: adminPricingCache?.provinces || {
+          luanda: { name: 'Luanda', multiplier: 1.0 },
+          benguela: { name: 'Benguela', multiplier: 0.90 },
+          lobito: { name: 'Lobito', multiplier: 0.90 },
+          huambo: { name: 'Huambo', multiplier: 0.85 },
+          lubango: { name: 'Lubango', multiplier: 0.85 }
+        },
+        categories: updatedCategories
+      };
+
+      try {
+        const res = await fetch(`${FIREBASE_DB_URL}/config/pricing.json`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+
+        if (res.ok) {
+          adminPricingCache = payload;
+          updatePricingKpis(payload);
+          alert('✓ Tarifas oficiais gravadas no Firebase RTDB com sucesso!\nTodos os passageiros e motoristas atualizarão as tarifas em tempo real.');
+        } else {
+          alert('Erro ao gravar no Firebase: ' + res.status + ' ' + res.statusText);
+        }
+      } catch(err) {
+        alert('Erro de conexão ao Firebase RTDB: ' + err.message);
+      }
+    }
+
+    async function saveSingleCategoryPricing(catId) {
+      if (!verifyAdminAuthorized()) return;
+      const tr = document.querySelector(`#pricing-tbody tr[data-cat-id="${catId}"]`);
+      if (!tr) return;
+
+      const updates = {};
+      tr.querySelectorAll('.input-pricing').forEach(inp => {
+        const field = inp.dataset.field;
+        let val = parseFloat(inp.value);
+        if (isNaN(val)) val = 0;
+        if (field === 'commission') {
+          val = val / 100;
+          updates['commission'] = val;
+          updates['comissao'] = val;
+        } else {
+          updates[field] = val;
+          if (field === 'baseFare') updates['base'] = val;
+          if (field === 'perKm') updates['km'] = val;
+          if (field === 'perMin') updates['min'] = val;
+          if (field === 'minimum') updates['minimo'] = val;
+        }
+      });
+      updates['updatedAt'] = Date.now();
+
+      try {
+        const res = await fetch(`${FIREBASE_DB_URL}/config/pricing/categories/${catId}.json`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(updates)
+        });
+
+        if (res.ok) {
+          if (adminPricingCache && adminPricingCache.categories && adminPricingCache.categories[catId]) {
+            Object.assign(adminPricingCache.categories[catId], updates);
+            updatePricingKpis(adminPricingCache);
+          }
+          alert(`✓ Categoria ${catId} atualizada com sucesso no Firebase RTDB!`);
+        } else {
+          alert('Erro ao atualizar categoria: ' + res.statusText);
+        }
+      } catch(err) {
+        alert('Erro de rede: ' + err.message);
+      }
+    }
+
+    // Carregar tarifas na inicialização do Admin
+    loadAdminPricing();
 
   </script>
 </body>
