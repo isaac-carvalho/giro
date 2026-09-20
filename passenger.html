@@ -187,10 +187,39 @@ html, body{
   max-height:calc(100% - 70px - var(--safe-top));
   overflow-y:auto;
   scrollbar-width:none;
-  transition:transform .3s cubic-bezier(0.2, 0.9, 0.3, 1);
+  transition:transform .3s cubic-bezier(0.2, 0.9, 0.3, 1), max-height .3s ease;
+  touch-action:pan-y;
+  will-change:transform;
 }
 .uber-sheet::-webkit-scrollbar{display:none;}
-.sheet-grabber{width:40px;height:4px;border-radius:4px;background:#383838;margin:4px auto 14px;}
+.uber-sheet.collapsed{
+  transform:translateY(calc(100% - 64px)) !important;
+  overflow:hidden !important;
+}
+.sheet-grabber-area{
+  cursor:pointer;
+  padding:6px 0 10px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:4px;
+  user-select:none;
+  touch-action:none;
+}
+.sheet-grabber{
+  width:44px;height:5px;border-radius:4px;
+  background:#444;transition:background .2s, transform .2s;
+}
+.sheet-grabber-area:hover .sheet-grabber,
+.sheet-grabber-area:active .sheet-grabber{
+  background:#888;transform:scaleX(1.15);
+}
+.sheet-drag-hint{
+  font-size:10px;font-weight:700;color:#777;letter-spacing:0.02em;transition:.2s;
+}
+.uber-sheet.collapsed .sheet-drag-hint{
+  color:var(--gold);
+}
 .sheet-pane{display:none;}
 .sheet-pane.on{display:block;}
 
@@ -513,7 +542,10 @@ body { overscroll-behavior: none; }
 
     <!-- 3. UBER BOTTOM SHEET (GAVETA DE AÇÕES) -->
     <div class="uber-sheet" id="pax-sheet-container">
-      <div class="sheet-grabber"></div>
+      <div class="sheet-grabber-area" id="sheet-drag-handle" onclick="toggleSheetCollapse()">
+        <div class="sheet-grabber"></div>
+        <span class="sheet-drag-hint" id="sheet-drag-hint">Deslize para baixo para ver o mapa completo ▾</span>
+      </div>
 
       <!-- SELETOR DE SERVIÇOS: VIAGEM / ENTREGA / CARGA -->
       <div class="uber-mode-tabs">
@@ -1443,8 +1475,114 @@ if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('service-worker.js').catch(() => {});
 }
 
-// Inicialização
 renderTiers();
+
+/* ==========================================================================
+   DRAG-TO-COLLAPSE BOTTOM SHEET (VER MAPA COMPLETO)
+   ========================================================================== */
+let isSheetCollapsed = false;
+let startY = 0;
+let currentY = 0;
+let isDraggingSheet = false;
+
+function toggleSheetCollapse() {
+  const sheet = document.getElementById('pax-sheet-container');
+  const hint = document.getElementById('sheet-drag-hint');
+  if (!sheet) return;
+  
+  isSheetCollapsed = !isSheetCollapsed;
+  if (isSheetCollapsed) {
+    sheet.classList.add('collapsed');
+    if (hint) hint.textContent = '▲ Pressione para ver detalhes da viagem';
+    playHaptic('beep');
+  } else {
+    sheet.classList.remove('collapsed');
+    sheet.style.transform = '';
+    if (hint) hint.textContent = 'Deslize para baixo para ver o mapa completo ▾';
+    playHaptic('beep');
+  }
+}
+
+function initSheetDragGesture() {
+  const sheet = document.getElementById('pax-sheet-container');
+  const handle = document.getElementById('sheet-drag-handle');
+  if (!sheet || !handle) return;
+
+  const onTouchStart = (e) => {
+    if (!isSheetCollapsed && e.target !== handle && !handle.contains(e.target) && sheet.scrollTop > 5) {
+      return;
+    }
+    startY = e.touches ? e.touches[0].clientY : e.clientY;
+    currentY = startY;
+    isDraggingSheet = true;
+    sheet.style.transition = 'none';
+  };
+
+  const onTouchMove = (e) => {
+    if (!isDraggingSheet) return;
+    currentY = e.touches ? e.touches[0].clientY : e.clientY;
+    const deltaY = currentY - startY;
+
+    if (!isSheetCollapsed) {
+      if (deltaY > 0) {
+        sheet.style.transform = `translateY(${deltaY}px)`;
+        if (e.cancelable) e.preventDefault();
+      }
+    } else {
+      if (deltaY < 0) {
+        const sheetH = sheet.offsetHeight;
+        const target = Math.max(0, (sheetH - 64) + deltaY);
+        sheet.style.transform = `translateY(${target}px)`;
+        if (e.cancelable) e.preventDefault();
+      }
+    }
+  };
+
+  const onTouchEnd = () => {
+    if (!isDraggingSheet) return;
+    isDraggingSheet = false;
+    sheet.style.transition = 'transform .3s cubic-bezier(0.2, 0.9, 0.3, 1)';
+    const deltaY = currentY - startY;
+
+    if (!isSheetCollapsed) {
+      if (deltaY > 50) {
+        isSheetCollapsed = true;
+        sheet.classList.add('collapsed');
+        sheet.style.transform = '';
+        const hint = document.getElementById('sheet-drag-hint');
+        if (hint) hint.textContent = '▲ Pressione para ver detalhes da viagem';
+        playHaptic('beep');
+      } else {
+        sheet.style.transform = '';
+      }
+    } else {
+      if (deltaY < -40) {
+        isSheetCollapsed = false;
+        sheet.classList.remove('collapsed');
+        sheet.style.transform = '';
+        const hint = document.getElementById('sheet-drag-hint');
+        if (hint) hint.textContent = 'Deslize para baixo para ver o mapa completo ▾';
+        playHaptic('beep');
+      } else {
+        sheet.style.transform = '';
+      }
+    }
+  };
+
+  handle.addEventListener('touchstart', onTouchStart, { passive: false });
+  window.addEventListener('touchmove', onTouchMove, { passive: false });
+  window.addEventListener('touchend', onTouchEnd);
+
+  handle.addEventListener('mousedown', onTouchStart);
+  window.addEventListener('mousemove', onTouchMove);
+  window.addEventListener('mouseup', onTouchEnd);
+}
+
+// Iniciar após DOM carregar
+window.addEventListener('DOMContentLoaded', () => {
+  initSheetDragGesture();
+});
+
 
 
 function switchTab(tab) {
