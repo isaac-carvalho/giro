@@ -865,8 +865,8 @@ body { overscroll-behavior: none; }
       <div style="font-size:11px;text-transform:uppercase;letter-spacing:1px;color:#ffffff;font-weight:700;">Saldo Disponível</div>
       <div style="font-size:32px;font-weight:900;color:#fff;margin:6px 0 14px;">12.500 <span style="font-size:18px;color:#ffffff;">Kz</span></div>
       <div style="display:flex;gap:10px;">
-        <button onclick="alert('Carregamento via Multicaixa Express iniciado.')" style="flex:1;background:#ffffff;color:#000;border:none;border-radius:10px;padding:10px;font-weight:700;font-size:13px;cursor:pointer;">+ Adicionar Saldo</button>
-        <button onclick="alert('Histórico financeiro detalhado.')" style="flex:1;background:rgba(255,255,255,0.08);color:#fff;border:1px solid #333;border-radius:10px;padding:10px;font-weight:600;font-size:13px;cursor:pointer;">Extrato</button>
+        <button onclick="openAddFundsModal()" style="flex:1;background:#ffffff;color:#000;border:none;border-radius:10px;padding:12px;font-weight:800;font-size:13.5px;cursor:pointer;box-shadow:0 4px 14px rgba(255,255,255,0.2);">+ Adicionar Saldo</button>
+        <button onclick="openWalletStatementModal()" style="flex:1;background:rgba(255,255,255,0.1);color:#fff;border:1px solid #444;border-radius:10px;padding:12px;font-weight:700;font-size:13.5px;cursor:pointer;">📄 Extrato</button>
       </div>
     </div>
 
@@ -2063,6 +2063,301 @@ document.addEventListener('DOMContentLoaded',function(){
   GiroAuth.renderUserPill('auth-pill');
   updateProfileView();
 });
+</script>
+
+  <!-- ================= MODAL DE EXTRATO FINANCEIRO DETALHADO ================= -->
+  <div id="wallet-statement-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:9999;align-items:flex-end;justify-content:center;">
+    <div style="background:#141414;border-top:1px solid #333;border-radius:24px 24px 0 0;width:100%;max-width:500px;max-height:85vh;overflow-y:auto;padding:20px;box-sizing:border-box;box-shadow:0 -10px 40px rgba(0,0,0,0.9);">
+      
+      <!-- Cabeçalho do Extrato -->
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+        <div>
+          <h3 style="font-size:19px;font-weight:900;color:#fff;">Extrato de Movimentos</h3>
+          <span style="font-size:11.5px;color:#888;">Histórico financeiro detalhado da sua conta</span>
+        </div>
+        <button onclick="closeWalletStatementModal()" style="background:#262626;border:none;color:#fff;font-size:18px;width:34px;height:34px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;">✕</button>
+      </div>
+
+      <!-- Resumo do Saldo -->
+      <div style="background:#1c1c1c;border:1px solid #2c2c2c;border-radius:14px;padding:14px;margin-bottom:16px;display:flex;justify-content:space-between;align-items:center;">
+        <div>
+          <span style="font-size:11px;color:#888;text-transform:uppercase;font-weight:700;">Saldo Atual</span>
+          <div style="font-size:22px;font-weight:900;color:#fff;" id="statement-balance-val">12.500 Kz</div>
+        </div>
+        <button onclick="closeWalletStatementModal(); openAddFundsModal();" style="background:#fff;color:#000;border:none;border-radius:8px;padding:8px 14px;font-size:11.5px;font-weight:800;cursor:pointer;">+ Recarregar</button>
+      </div>
+
+      <!-- Filtros de Extrato -->
+      <div style="display:flex;gap:6px;overflow-x:auto;padding-bottom:10px;margin-bottom:12px;" id="statement-filter-chips">
+        <button class="statement-tab active" onclick="filterStatement('all', this)" style="background:#fff;color:#000;border:none;border-radius:20px;padding:6px 14px;font-size:11.5px;font-weight:700;cursor:pointer;">Todos</button>
+        <button class="statement-tab" onclick="filterStatement('rides', this)" style="background:#222;color:#aaa;border:1px solid #333;border-radius:20px;padding:6px 14px;font-size:11.5px;font-weight:700;cursor:pointer;">Viagens</button>
+        <button class="statement-tab" onclick="filterStatement('topups', this)" style="background:#222;color:#aaa;border:1px solid #333;border-radius:20px;padding:6px 14px;font-size:11.5px;font-weight:700;cursor:pointer;">Carregamentos</button>
+        <button class="statement-tab" onclick="filterStatement('bonus', this)" style="background:#222;color:#aaa;border:1px solid #333;border-radius:20px;padding:6px 14px;font-size:11.5px;font-weight:700;cursor:pointer;">Bónus</button>
+      </div>
+
+      <!-- Lista de Movimentos Reais -->
+      <div id="statement-tx-list" style="display:flex;flex-direction:column;gap:10px;">
+        
+        <!-- TX 1 -->
+        <div class="tx-item" data-type="rides" style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:12px;padding:12px 14px;display:flex;justify-content:space-between;align-items:center;">
+          <div style="display:flex;align-items:center;gap:12px;">
+            <div style="width:38px;height:38px;border-radius:50%;background:#262626;display:flex;align-items:center;justify-content:center;font-size:18px;">🚗</div>
+            <div>
+              <b style="font-size:13px;color:#fff;display:block;">GIRO Económico · Talatona → Kilamba</b>
+              <span style="font-size:11px;color:#888;">Hoje, 12:35 · Ref: #TX-89214 · Multicaixa</span>
+            </div>
+          </div>
+          <div style="text-align:right;">
+            <b style="font-size:14px;color:#ef4444;">− 1.571 Kz</b>
+            <span style="font-size:10px;color:#06C167;display:block;">Liquidado</span>
+          </div>
+        </div>
+
+        <!-- TX 2 -->
+        <div class="tx-item" data-type="topups" style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:12px;padding:12px 14px;display:flex;justify-content:space-between;align-items:center;">
+          <div style="display:flex;align-items:center;gap:12px;">
+            <div style="width:38px;height:38px;border-radius:50%;background:#0d2e16;display:flex;align-items:center;justify-content:center;font-size:18px;color:#06C167;">💳</div>
+            <div>
+              <b style="font-size:13px;color:#fff;display:block;">Recarga Multicaixa Express</b>
+              <span style="font-size:11px;color:#888;">Hoje, 10:15 · Ref: #MCX-55102</span>
+            </div>
+          </div>
+          <div style="text-align:right;">
+            <b style="font-size:14px;color:#06C167;">+ 10.000 Kz</b>
+            <span style="font-size:10px;color:#06C167;display:block;">Aprovado</span>
+          </div>
+        </div>
+
+        <!-- TX 3 -->
+        <div class="tx-item" data-type="rides" style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:12px;padding:12px 14px;display:flex;justify-content:space-between;align-items:center;">
+          <div style="display:flex;align-items:center;gap:12px;">
+            <div style="width:38px;height:38px;border-radius:50%;background:#262626;display:flex;align-items:center;justify-content:center;font-size:18px;">🏍️</div>
+            <div>
+              <b style="font-size:13px;color:#fff;display:block;">GIRO Moto (Kupapata) · Maianga → Mutamba</b>
+              <span style="font-size:11px;color:#888;">Ontem, 08:45 · Ref: #TX-88930 · Dinheiro</span>
+            </div>
+          </div>
+          <div style="text-align:right;">
+            <b style="font-size:14px;color:#ef4444;">− 1.150 Kz</b>
+            <span style="font-size:10px;color:#06C167;display:block;">Liquidado</span>
+          </div>
+        </div>
+
+        <!-- TX 4 -->
+        <div class="tx-item" data-type="bonus" style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:12px;padding:12px 14px;display:flex;justify-content:space-between;align-items:center;">
+          <div style="display:flex;align-items:center;gap:12px;">
+            <div style="width:38px;height:38px;border-radius:50%;background:#2b2608;display:flex;align-items:center;justify-content:center;font-size:18px;color:#f59e0b;">🎁</div>
+            <div>
+              <b style="font-size:13px;color:#fff;display:block;">Bónus GIRO Clube (Fidelidade)</b>
+              <span style="font-size:11px;color:#888;">18 Set, 14:00 · Ref: #BONUS-441</span>
+            </div>
+          </div>
+          <div style="text-align:right;">
+            <b style="font-size:14px;color:#f59e0b;">+ 500 Kz</b>
+            <span style="font-size:10px;color:#f59e0b;display:block;">Creditado</span>
+          </div>
+        </div>
+
+        <!-- TX 5 -->
+        <div class="tx-item" data-type="rides" style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:12px;padding:12px 14px;display:flex;justify-content:space-between;align-items:center;">
+          <div style="display:flex;align-items:center;gap:12px;">
+            <div style="width:38px;height:38px;border-radius:50%;background:#262626;display:flex;align-items:center;justify-content:center;font-size:18px;">📦</div>
+            <div>
+              <b style="font-size:13px;color:#fff;display:block;">GIRO Flash Moto · Belas → Viana</b>
+              <span style="font-size:11px;color:#888;">14 Set, 19:10 · Ref: #TX-87422 · Unitel Money</span>
+            </div>
+          </div>
+          <div style="text-align:right;">
+            <b style="font-size:14px;color:#ef4444;">− 1.800 Kz</b>
+            <span style="font-size:10px;color:#06C167;display:block;">Liquidado</span>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Botão de Exportar / Partilhar -->
+      <button onclick="shareWalletStatement()" style="width:100%;background:#262626;border:1px solid #333;color:#fff;border-radius:12px;padding:13px;margin-top:18px;font-weight:700;font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;">
+        <span>📥</span> Baixar Relatório / Partilhar Extrato
+      </button>
+
+    </div>
+  </div>
+
+  <!-- ================= MODAL DE ADICIONAR SALDO (RECARGA) ================= -->
+  <div id="wallet-add-funds-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:9999;align-items:flex-end;justify-content:center;">
+    <div style="background:#141414;border-top:1px solid #333;border-radius:24px 24px 0 0;width:100%;max-width:500px;max-height:85vh;overflow-y:auto;padding:20px;box-sizing:border-box;box-shadow:0 -10px 40px rgba(0,0,0,0.9);">
+      
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+        <div>
+          <h3 style="font-size:19px;font-weight:900;color:#fff;">Carregar Carteira GIRO</h3>
+          <span style="font-size:11.5px;color:#888;">Adicione saldo instantâneo para viagens e entregas</span>
+        </div>
+        <button onclick="closeAddFundsModal()" style="background:#262626;border:none;color:#fff;font-size:18px;width:34px;height:34px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;">✕</button>
+      </div>
+
+      <!-- Seleção de Valor Rápido -->
+      <div style="margin-bottom:16px;">
+        <span style="font-size:12px;font-weight:700;color:#ccc;display:block;margin-bottom:8px;">Escolha o valor de recarga:</span>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px;">
+          <button type="button" class="topup-pill active" onclick="setTopupAmount(2000, this)" style="background:#fff;color:#000;border:none;border-radius:10px;padding:12px;font-weight:800;font-size:14px;cursor:pointer;">2.000 Kz</button>
+          <button type="button" class="topup-pill" onclick="setTopupAmount(5000, this)" style="background:#222;color:#fff;border:1px solid #333;border-radius:10px;padding:12px;font-weight:800;font-size:14px;cursor:pointer;">5.000 Kz</button>
+          <button type="button" class="topup-pill" onclick="setTopupAmount(10000, this)" style="background:#222;color:#fff;border:1px solid #333;border-radius:10px;padding:12px;font-weight:800;font-size:14px;cursor:pointer;">10.000 Kz</button>
+          <button type="button" class="topup-pill" onclick="setTopupAmount(20000, this)" style="background:#222;color:#fff;border:1px solid #333;border-radius:10px;padding:12px;font-weight:800;font-size:14px;cursor:pointer;">20.000 Kz</button>
+        </div>
+      </div>
+
+      <!-- Seleção do Método de Pagamento -->
+      <div style="margin-bottom:18px;">
+        <span style="font-size:12px;font-weight:700;color:#ccc;display:block;margin-bottom:8px;">Pagar através de:</span>
+        <div style="display:flex;flex-direction:column;gap:8px;">
+          <label style="background:#1e1e1e;border:1.5px solid #06C167;border-radius:12px;padding:12px 14px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;">
+            <div style="display:flex;align-items:center;gap:10px;">
+              <span style="font-size:20px;">💳</span>
+              <div>
+                <b style="font-size:13px;color:#fff;display:block;">Multicaixa Express (Instantâneo)</b>
+                <span style="font-size:11px;color:#888;">Notificação push no seu telemóvel</span>
+              </div>
+            </div>
+            <input type="radio" name="topup-method" value="mcx" checked style="accent-color:#06C167;">
+          </label>
+          <label style="background:#1e1e1e;border:1px solid #333;border-radius:12px;padding:12px 14px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;">
+            <div style="display:flex;align-items:center;gap:10px;">
+              <span style="font-size:20px;">📱</span>
+              <div>
+                <b style="font-size:13px;color:#fff;display:block;">Unitel Money</b>
+                <span style="font-size:11px;color:#888;">Pagamento direto pela carteira Unitel</span>
+              </div>
+            </div>
+            <input type="radio" name="topup-method" value="unitel" style="accent-color:#06C167;">
+          </label>
+        </div>
+      </div>
+
+      <button id="btn-confirm-topup" onclick="executeTopupRecharge()" style="width:100%;background:#fff;color:#000;border:none;border-radius:14px;padding:15px;font-weight:900;font-size:15px;cursor:pointer;box-shadow:0 6px 20px rgba(255,255,255,0.25);">
+        Confirmar Recarga de 2.000 Kz
+      </button>
+
+    </div>
+  </div>
+
+<script>
+
+/* ==========================================================================
+   CARTEIRA GIRO & EXTRATO FINANCEIRO INTERATIVO
+   ========================================================================== */
+let currentWalletBalance = 12500;
+let currentTopupAmount = 2000;
+
+function openWalletStatementModal() {
+  const modal = document.getElementById('wallet-statement-modal');
+  if (modal) {
+    modal.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+    const balEl = document.getElementById('statement-balance-val');
+    if (balEl) balEl.textContent = `${currentWalletBalance.toLocaleString('pt-AO')} Kz`;
+    playHaptic('beep');
+  }
+}
+
+function closeWalletStatementModal() {
+  const modal = document.getElementById('wallet-statement-modal');
+  if (modal) {
+    modal.style.display = 'none';
+    document.body.style.overflow = '';
+  }
+}
+
+function filterStatement(type, btn) {
+  document.querySelectorAll('#statement-filter-chips .statement-tab').forEach(b => {
+    b.style.background = '#222';
+    b.style.color = '#aaa';
+    b.style.border = '1px solid #333';
+  });
+  btn.style.background = '#fff';
+  btn.style.color = '#000';
+  btn.style.border = 'none';
+
+  document.querySelectorAll('#statement-tx-list .tx-item').forEach(item => {
+    if (type === 'all' || item.dataset.type === type) {
+      item.style.display = 'flex';
+    } else {
+      item.style.display = 'none';
+    }
+  });
+  playHaptic('beep');
+}
+
+function shareWalletStatement() {
+  playHaptic('radar');
+  alert('📄 EXTRATO GERADO COM SUCESSO!\n\nPeríodo: Últimos 30 Dias\nTotal Movimentado: 25.021 Kz\nSaldo Disponível: ' + currentWalletBalance.toLocaleString('pt-AO') + ' Kz\n\nO comprovativo foi descarregado para o seu dispositivo.');
+}
+
+function openAddFundsModal() {
+  const modal = document.getElementById('wallet-add-funds-modal');
+  if (modal) {
+    modal.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+    playHaptic('beep');
+  }
+}
+
+function closeAddFundsModal() {
+  const modal = document.getElementById('wallet-add-funds-modal');
+  if (modal) {
+    modal.style.display = 'none';
+    document.body.style.overflow = '';
+  }
+}
+
+function setTopupAmount(amt, btn) {
+  currentTopupAmount = amt;
+  document.querySelectorAll('.topup-pill').forEach(b => {
+    b.style.background = '#222';
+    b.style.color = '#fff';
+    b.style.border = '1px solid #333';
+  });
+  btn.style.background = '#fff';
+  btn.style.color = '#000';
+  btn.style.border = 'none';
+
+  const btnConfirm = document.getElementById('btn-confirm-topup');
+  if (btnConfirm) {
+    btnConfirm.textContent = `Confirmar Recarga de ${amt.toLocaleString('pt-AO')} Kz`;
+  }
+  playHaptic('beep');
+}
+
+function executeTopupRecharge() {
+  const btn = document.getElementById('btn-confirm-topup');
+  if (btn) {
+    btn.disabled = true;
+    btn.textContent = '⏳ A processar no Multicaixa Express…';
+    btn.style.background = '#06C167';
+    btn.style.color = '#000';
+  }
+  playHaptic('radar');
+
+  setTimeout(() => {
+    currentWalletBalance += currentTopupAmount;
+    
+    // Atualizar saldo no ecrã da Carteira
+    const balDisplay = document.querySelector('#tab-wallet div[style*="font-size:32px"]');
+    if (balDisplay) {
+      balDisplay.innerHTML = `${currentWalletBalance.toLocaleString('pt-AO')} <span style="font-size:18px;color:#ffffff;">Kz</span>`;
+    }
+
+    alert(`✅ RECARGA CONCLUÍDA COM SUCESSO!\n\nFoi adicionado ${currentTopupAmount.toLocaleString('pt-AO')} Kz à sua carteira GIRO.\nNovo Saldo: ${currentWalletBalance.toLocaleString('pt-AO')} Kz`);
+    
+    closeAddFundsModal();
+    if (btn) {
+      btn.disabled = false;
+      btn.textContent = `Confirmar Recarga de ${currentTopupAmount.toLocaleString('pt-AO')} Kz`;
+      btn.style.background = '#fff';
+      btn.style.color = '#000';
+    }
+  }, 1500);
+}
+
 </script>
 </body>
 </html>
