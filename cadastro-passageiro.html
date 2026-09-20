@@ -444,6 +444,34 @@ function paxNext(step){
     showAlert('A criar a sua conta...','info');
     setTimeout(()=>{
       showAlert('');
+      // SALVAR NO FIREBASE EM TEMPO REAL
+      const paxId = 'pax_' + Date.now();
+      const paxData = {
+        id: paxId,
+        nome: PAX.nome,
+        phoneNumber: '+244' + PAX.phone,
+        phone: '+244' + PAX.phone,
+        email: PAX.email,
+        casa: PAX.casa || '',
+        trabalho: PAX.trabalho || '',
+        role: 'passageiro',
+        status: 'ativo',
+        createdAt: Date.now(),
+        date: new Date().toLocaleDateString('pt-AO')
+      };
+
+      fetch(`https://giro-4ed50-default-rtdb.europe-west1.firebasedatabase.app/cadastros/passageiros/${paxId}.json`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(paxData)
+      }).catch(e => console.warn('Erro ao salvar no Firebase cadastros pax:', e));
+
+      fetch(`https://giro-4ed50-default-rtdb.europe-west1.firebasedatabase.app/users/${paxId}.json`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(paxData)
+      }).catch(e => console.warn('Erro ao salvar no Firebase users pax:', e));
+
       // SALVAR SESSÃO — utilizador fica logado após cadastro
       GiroAuth.save({phone:'+244'+PAX.phone,nome:PAX.nome,email:PAX.email,role:'passageiro'});
       goToStep(6);

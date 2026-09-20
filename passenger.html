@@ -2173,7 +2173,7 @@ function cancelRideRequest() {
     const rId = currentActiveRide.id;
     currentActiveRide.status = 'CANCELLED';
     try {
-      fetch(`https://everyone-2de50-default-rtdb.firebaseio.com/rides/${rId}/status.json`, {
+      fetch(`https://giro-4ed50-default-rtdb.europe-west1.firebasedatabase.app/rides/${rId}/status.json`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify('CANCELLED')
@@ -2250,7 +2250,7 @@ function confirmTripRide() {
 
   // 3. Enviar para Firebase Cloud RTDB (para motoristas noutros telemóveis/dispositivos)
   try {
-    fetch(`https://everyone-2de50-default-rtdb.firebaseio.com/rides/${rideId}.json`, {
+    fetch(`https://giro-4ed50-default-rtdb.europe-west1.firebasedatabase.app/rides/${rideId}.json`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(currentActiveRide)
@@ -2273,7 +2273,7 @@ function confirmTripRide() {
       clearInterval(rideStatusPollInterval);
       return;
     }
-    fetch(`https://everyone-2de50-default-rtdb.firebaseio.com/rides/${rideId}.json`)
+    fetch(`https://giro-4ed50-default-rtdb.europe-west1.firebasedatabase.app/rides/${rideId}.json`)
       .then(res => res.json())
       .then(data => {
         if (data && data.status === 'ACCEPTED' && currentActiveRide && currentActiveRide.status === 'SEARCHING') {
@@ -2294,12 +2294,12 @@ function confirmTripRide() {
         phone: '+244 923 111 222',
         coords: [p1[0] - 0.008, p1[1] + 0.005]
       };
-      fetch(`https://everyone-2de50-default-rtdb.firebaseio.com/rides/${rideId}/status.json`, {
+      fetch(`https://giro-4ed50-default-rtdb.europe-west1.firebasedatabase.app/rides/${rideId}/status.json`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify('ACCEPTED')
       }).catch(() => {});
-      fetch(`https://everyone-2de50-default-rtdb.firebaseio.com/rides/${rideId}/driver.json`, {
+      fetch(`https://giro-4ed50-default-rtdb.europe-west1.firebasedatabase.app/rides/${rideId}/driver.json`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(fallbackDriver)

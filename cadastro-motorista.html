@@ -709,12 +709,18 @@ function motNext(step){
         }
       };
 
-      // 1. Firebase Realtime Database
-      fetch(`https://everyone-2de50-default-rtdb.firebaseio.com/drivers/${driverId}.json`, {
+      // 1. Firebase Realtime Database (/drivers e /cadastros/motoristas)
+      fetch(`https://giro-4ed50-default-rtdb.europe-west1.firebasedatabase.app/drivers/${driverId}.json`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(newDriverData)
       }).catch(e => console.warn('Erro ao salvar no Firebase:', e));
+
+      fetch(`https://giro-4ed50-default-rtdb.europe-west1.firebasedatabase.app/cadastros/motoristas/${driverId}.json`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ...newDriverData, status: 'pendente' })
+      }).catch(e => console.warn('Erro ao salvar no Firebase cadastros:', e));
 
       // 2. Admin Local Storage
       try {

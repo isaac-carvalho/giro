@@ -1738,11 +1738,42 @@
     }
 
     // ── DRIVER MANAGEMENT & FIREBASE CLOUD SYNC ──
-    const FIREBASE_DB_URL = 'https://everyone-2de50-default-rtdb.firebaseio.com';
+    const FIREBASE_DB_URL = 'https://giro-4ed50-default-rtdb.europe-west1.firebasedatabase.app';
 
     async function syncCloudData() {
       // 1. Sincronizar Motoristas da Nuvem (Firebase Realtime DB)
       try {
+        // Sincronizar Drivers e Cadastros Pendentes
+        try {
+          const cadRes = await fetch(`${FIREBASE_DB_URL}/cadastros/motoristas.json`);
+          if (cadRes.ok) {
+            const cadData = await cadRes.json();
+            if (cadData && typeof cadData === 'object') {
+              let localList = getDrivers();
+              const map = new Map(localList.map(d => [d.id, d]));
+              Object.keys(cadData).forEach(k => {
+                const fb = cadData[k];
+                if (!fb) return;
+                const id = fb.id || k;
+                const vInfo = fb.vehicleInfo || {};
+                const fbDriver = {
+                  id: id,
+                  nome: fb.nome || ((fb.firstName || '') + ' ' + (fb.secondName || '')).trim() || ('Motorista ' + id.slice(-4)),
+                  phone: fb.phoneNumber || fb.phone || 'Sem Telefone',
+                  email: fb.email || '',
+                  cat: fb.cat || vInfo.type || 'Carro',
+                  plate: fb.plate || vInfo.registrationPlateNumber || 'S/ MATRÍCULA',
+                  car: fb.car || `${vInfo.brand || ''} ${vInfo.model || ''} ${vInfo.productionYear ? '('+vInfo.productionYear+')' : ''}`.trim() || 'Viatura Padrão',
+                  status: fb.status || 'pendente',
+                  date: fb.date || (fb.createdAt ? new Date(fb.createdAt).toLocaleDateString('pt-AO') : 'Nuvem Realtime')
+                };
+                map.set(id, { ...(map.get(id) || {}), ...fbDriver });
+              });
+              localStorage.setItem(STORAGE_DRIVERS, JSON.stringify(Array.from(map.values())));
+              renderDriversTable();
+            }
+          }
+        } catch(e) {}
         const res = await fetch(`${FIREBASE_DB_URL}/drivers.json`);
         if (res.ok) {
           const data = await res.json();
@@ -1778,6 +1809,34 @@
 
       // 2. Sincronizar Passageiros da Nuvem (Firebase Realtime DB)
       try {
+        // Sincronizar Novos Cadastros de Passageiros
+        try {
+          const cadPaxRes = await fetch(`${FIREBASE_DB_URL}/cadastros/passageiros.json`);
+          if (cadPaxRes.ok) {
+            const paxData = await cadPaxRes.json();
+            if (paxData && typeof paxData === 'object') {
+              let localList = getPassengers();
+              const map = new Map(localList.map(p => [p.id, p]));
+              Object.keys(paxData).forEach(k => {
+                const fb = paxData[k];
+                if (!fb) return;
+                const id = fb.id || k;
+                const fbPax = {
+                  id: id,
+                  nome: fb.nome || fb.name || ('Passageiro ' + id.slice(-4)),
+                  phone: fb.phoneNumber || fb.phone || 'Sem Telefone',
+                  date: fb.date || (fb.createdAt ? new Date(fb.createdAt).toLocaleDateString('pt-AO') : 'Nuvem Realtime'),
+                  rides: fb.rides || 0,
+                  totalKz: fb.totalKz || '0 Kz',
+                  status: fb.status || 'ativo'
+                };
+                map.set(id, { ...(map.get(id) || {}), ...fbPax });
+              });
+              localStorage.setItem(STORAGE_PASSENGERS, JSON.stringify(Array.from(map.values())));
+              renderPassengersTable();
+            }
+          }
+        } catch(e) {}
         const res = await fetch(`${FIREBASE_DB_URL}/users.json`);
         if (res.ok) {
           const data = await res.json();
@@ -1853,7 +1912,7 @@
             <td><span style="font-family:monospace;background:#1a221b;padding:3px 7px;border-radius:4px;color:var(--gold);font-weight:700;">${safePlate}</span></td>
             <td>${statusBadge}</td>
             <td>
-              <button class="btn-toggle-status" onclick="toggleDriverStatus('${d.id}')" title="Alterar Estado">${d.status === 'ativo' ? 'Bloquear' : 'Ativar'}</button>
+              <button class="btn-toggle-status" onclick="toggleDriverStatus('${d.id}')" title="Alterar Estado">${d.status === 'pendente' ? '✓ Aprovar' : (d.status === 'ativo' ? 'Bloquear' : 'Ativar')}</button>
               <button class="btn-action gold" style="padding:6px 10px;font-size:11px;margin-right:4px;" onclick="openKycModal('${safeNome}', '${safePlate}', '${safePhone}', '${safeCar}')">Validar KYC</button>
               <button class="btn-delete" onclick="deleteDriver('${d.id}', '${safeNome}')" title="Excluir Motorista Definitivamente">🗑️ Excluir</button>
             </td>
@@ -2145,7 +2204,7 @@
 
       // Sincronização em tempo real com o banco de dados Firebase
       syncCloudData();
-      setInterval(syncCloudData, 12000);
+      setInterval(syncCloudData, 4000);
     });
 
 

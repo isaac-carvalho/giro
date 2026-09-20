@@ -1197,7 +1197,7 @@
 
     function pollFirebaseForAvailableRides() {
       if (!driverState.isOnline || driverState.activeTrip) return;
-      fetch('https://everyone-2de50-default-rtdb.firebaseio.com/rides.json')
+      fetch('https://giro-4ed50-default-rtdb.europe-west1.firebasedatabase.app/rides.json')
         .then(res => res.json())
         .then(rides => {
           if (!rides || !driverState.isOnline || driverState.activeTrip) return;
@@ -1399,12 +1399,12 @@
 
       // 3. Atualizar no Firebase Realtime Database
       try {
-        fetch(`https://everyone-2de50-default-rtdb.firebaseio.com/rides/${rideId}/status.json`, {
+        fetch(`https://giro-4ed50-default-rtdb.europe-west1.firebasedatabase.app/rides/${rideId}/status.json`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify('ACCEPTED')
         }).catch(() => {});
-        fetch(`https://everyone-2de50-default-rtdb.firebaseio.com/rides/${rideId}/driver.json`, {
+        fetch(`https://giro-4ed50-default-rtdb.europe-west1.firebasedatabase.app/rides/${rideId}/driver.json`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(driverProfile)
@@ -1470,7 +1470,7 @@
               });
             } catch(e) {}
           }
-          fetch(`https://everyone-2de50-default-rtdb.firebaseio.com/rides/${rideId}/driver/coords.json`, {
+          fetch(`https://giro-4ed50-default-rtdb.europe-west1.firebasedatabase.app/rides/${rideId}/driver/coords.json`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(currentLoc)
@@ -1503,7 +1503,7 @@
         }));
       } catch(e) {}
       try {
-        fetch(`https://everyone-2de50-default-rtdb.firebaseio.com/rides/${rideId}/status.json`, {
+        fetch(`https://giro-4ed50-default-rtdb.europe-west1.firebasedatabase.app/rides/${rideId}/status.json`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify('COMPLETED')
@@ -1646,7 +1646,7 @@
 
       // Salvar na nuvem Firebase RTDB
       try {
-        fetch(`https://everyone-2de50-default-rtdb.firebaseio.com/ratings/passengers/${ratingRecord.rideId}.json`, {
+        fetch(`https://giro-4ed50-default-rtdb.europe-west1.firebasedatabase.app/ratings/passengers/${ratingRecord.rideId}.json`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(ratingRecord)

@@ -5,21 +5,20 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>GIRO Angola — CRM & Painel de Administração Central</title>
   <link rel="icon" type="image/x-icon" href="favicon.ico">
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <link rel="stylesheet" href="leaflet.css">
+  <script src="leaflet.js"></script>
 
   <style>
     :root {
-      --bg: #070907;
+      --bg: #070707;
       --bg-side: #0b0f0b;
       --card: #121712;
       --card-inner: #1a221b;
       --border: #222c23;
       --gold: #d4af37;
       --gold-glow: #f5d77f;
-      --green: #22c55e;
+      --green: #06C167;
       --red: #ef4444;
-      --blue: #38bdf8;
       --text: #f1f5f1;
       --muted: #8d9e8d;
       --font: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, system-ui, sans-serif;
@@ -192,7 +191,7 @@
     }
     .kpi-card.green::after { background: var(--green); }
     .kpi-card.red::after { background: var(--red); }
-    .kpi-card.blue::after { background: var(--blue); }
+    .kpi-card.gold::after { background: var(--gold); }
     .kpi-label { font-size: 11px; text-transform: uppercase; color: var(--muted); letter-spacing: 1px; font-weight: 700; }
     .kpi-value { font-size: 26px; font-weight: 900; color: #fff; margin: 6px 0 4px; }
     .kpi-sub { font-size: 12px; color: var(--muted); }
@@ -244,7 +243,6 @@
     .badge.green { background: rgba(34,197,94,0.15); color: var(--green); }
     .badge.gold { background: rgba(212,175,55,0.15); color: var(--gold); }
     .badge.red { background: rgba(239,68,68,0.15); color: var(--red); }
-    .badge.blue { background: rgba(56,189,248,0.15); color: var(--blue); }
 
     /* Buttons */
     .btn-action {
@@ -310,9 +308,9 @@
       border-bottom-right-radius: 2px;
     }
     .msg-bubble.system {
-      background: rgba(56,189,248,0.1);
-      border: 1px dashed var(--blue);
-      color: var(--blue);
+      background: rgba(212,175,55,0.08);
+      border: 1px dashed var(--gold);
+      color: var(--gold);
       align-self: center;
       font-size: 11px;
       text-align: center;
@@ -360,7 +358,7 @@
       border-radius: 10px; padding: 12px; text-align: center;
     }
     .doc-card-img {
-      width: 100%; height: 110px; background: #070907; border-radius: 6px;
+      width: 100%; height: 110px; background: #070707; border-radius: 6px;
       display: flex; align-items: center; justify-content: center;
       margin-bottom: 8px; font-size: 32px; border: 1px dashed #333;
     }
@@ -373,38 +371,11 @@
     /* ── Mobile Responsive Overhaul (Drawer, Touch Tables, Adaptive Grids) ── */
     .menu-toggle-btn { display: none; }
     .side-close-btn { display: none; }
-    #sidebar-overlay { display: none; }
-    .topbar-main-row { display: flex; align-items: center; gap: 12px; }
-
-    @media (max-width: 992px) {
-      body {
-        display: block;
-        height: 100vh;
-        overflow: hidden;
-        position: relative;
-      }
-      #sidebar {
-        position: fixed;
-        top: 0;
-        bottom: 0;
-        left: 0;
-        width: 280px;
-        max-width: 84vw;
-        z-index: 1050;
-        transform: translateX(-100%);
-        transition: transform 0.28s cubic-bezier(0.4, 0, 0.2, 1);
-        box-shadow: 4px 0 28px rgba(0,0,0,0.85);
-      }
-      #sidebar.open {
-        transform: translateX(0);
-      }
-      #sidebar-overlay {
+    #sidebar-overlay {
         display: none;
         position: fixed;
         inset: 0;
-        background: rgba(0,0,0,0.72);
-        backdrop-filter: blur(3px);
-        -webkit-backdrop-filter: blur(3px);
+        background: rgba(0,0,0,0.85);
         z-index: 1040;
       }
       #sidebar-overlay.active {
@@ -536,6 +507,46 @@
         gap: 8px;
       }
     }
+
+    @keyframes sosPulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.82; }
+    }
+    @keyframes sosDotPulse {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.3); opacity: 0.6; }
+    }
+  
+    /* ── Leaflet Uber Black Dark Theme Popups ── */
+    .leaflet-popup-content-wrapper {
+      background: #0b0f0b !important;
+      color: #f1f5f1 !important;
+      border: 1px solid #222c23 !important;
+      border-radius: 10px !important;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.8) !important;
+      padding: 2px !important;
+    }
+    .leaflet-popup-tip {
+      background: #0b0f0b !important;
+      border: 1px solid #222c23 !important;
+    }
+    .leaflet-popup-content {
+      margin: 10px 12px !important;
+      line-height: 1.4 !important;
+    }
+    .leaflet-container a.leaflet-popup-close-button {
+      color: #8d9e8d !important;
+      padding: 6px 6px 0 0 !important;
+    }
+    .leaflet-container a.leaflet-popup-close-button:hover {
+      color: #d4af37 !important;
+    }
+    @keyframes giro-pulse {
+      0% { transform: scale(0.95); opacity: 0.8; }
+      50% { transform: scale(1.35); opacity: 0; }
+      100% { transform: scale(0.95); opacity: 0; }
+    }
+
   </style>
 </head>
 <body>
@@ -584,10 +595,10 @@
     </nav>
 
     <div class="side-footer">
-      <div class="admin-avatar">ADM</div>
-      <div>
-        <div style="font-size:13px;font-weight:700;color:#fff;">Administrador Central</div>
-        <div style="font-size:10px;color:var(--green);">● Online (Luanda HQ)</div>
+      <div class="admin-avatar" id="operator-avatar">O</div>
+      <div style="overflow:hidden;flex:1;">
+        <div id="operator-name" style="font-size:13px;font-weight:700;color:#fff;white-space:nowrap;text-overflow:ellipsis;overflow:hidden;">Operador GIRO</div>
+        <div id="operator-role" style="font-size:10px;color:var(--green);white-space:nowrap;text-overflow:ellipsis;overflow:hidden;">● Online (Central)</div>
       </div>
     </div>
   </aside>
@@ -596,10 +607,19 @@
   <main id="workspace">
     <!-- Topbar -->
     <header id="topbar">
-      <div class="topbar-main-row">
-        <button id="btn-menu-toggle" class="menu-toggle-btn" onclick="toggleSidebar()" aria-label="Menu Principal">☰</button>
-        <div class="top-title" id="page-title">
-          <span>📊</span> Visão Geral Operacional
+      <div class="topbar-main-row" style="display:flex;justify-content:space-between;align-items:center;width:100%;">
+        <div style="display:flex;align-items:center;gap:12px;">
+          <button id="btn-menu-toggle" class="menu-toggle-btn" onclick="toggleSidebar()" aria-label="Menu Principal">☰</button>
+          <div class="top-title" id="page-title">
+            <span>📊</span> Visão Geral Operacional
+          </div>
+        </div>
+        <div id="topbar-operator-chip" style="display:flex;align-items:center;gap:8px;padding:4px 10px;background:var(--card);border:1px solid var(--border);border-radius:20px;">
+          <div id="topbar-operator-avatar" class="admin-avatar" style="width:26px;height:26px;font-size:11px;">O</div>
+          <div style="display:flex;flex-direction:column;">
+            <span id="topbar-operator-name" style="font-size:12px;font-weight:700;color:#fff;line-height:1.2;">Operador GIRO</span>
+            <span id="topbar-operator-role" style="font-size:9.5px;color:var(--green);line-height:1.2;">● Operador Ativo</span>
+          </div>
         </div>
       </div>
 
@@ -614,10 +634,14 @@
           <span>Comissão GIRO (10%):</span> <b style="color:var(--green);" id="stat-net-rev">489.000 Kz</b>
         </div>
         <div class="stat-pill">
-          <span>Motoristas Online:</span> <b style="color:var(--blue);" id="stat-drivers-online">342</b>
+          <span>Motoristas Online:</span> <b style="color:var(--gold);" id="stat-drivers-online">342</b>
         </div>
       </div>
     </header>
+
+    <!-- SOS Active Alert Banner -->
+    <div id="sos-active-banner" style="display:none;background:linear-gradient(90deg,#ef4444,#b91c1c);color:#fff;padding:10px 20px;align-items:center;justify-content:space-between;border-bottom:1px solid #dc2626;animation:sosPulse 1.5s infinite;z-index:100;">
+    </div>
 
     <!-- Content Area -->
     <div id="content-area">
@@ -637,7 +661,7 @@
             <div class="kpi-value">1.428</div>
             <div class="kpi-sub">94% concluídas com sucesso</div>
           </div>
-          <div class="kpi-card blue">
+          <div class="kpi-card">
             <div class="kpi-label">Frotas em Circulação</div>
             <div class="kpi-value">342 viaturas</div>
             <div class="kpi-sub">Luanda, Benguela, Huambo, Lubango</div>
@@ -686,7 +710,7 @@
                 <td>Maianga → Mutamba</td>
                 <td>1.150 Kz</td>
                 <td><b style="color:var(--green);">+115 Kz</b></td>
-                <td><span class="badge blue">Dinheiro</span></td>
+                <td><span class="badge gold">Dinheiro</span></td>
                 <td><span class="badge green">Concluída</span></td>
               </tr>
               <tr>
@@ -822,7 +846,7 @@
                 <td><b>Marta Bento</b></td>
                 <td>+244 931 556 778</td>
                 <td>9 corridas</td>
-                <td><span class="badge blue">4/5 Corridas</span></td>
+                <td><span class="badge gold">4/5 Corridas</span></td>
                 <td>★ 4.8</td>
                 <td>22.100 Kz</td>
                 <td><span class="badge green">Ativo</span></td>
@@ -872,11 +896,11 @@
               </tr>
               <tr>
                 <td><b>#TK-402</b></td>
-                <td><span class="badge blue">Item Perdido</span></td>
+                <td><span class="badge gold">Item Perdido</span></td>
                 <td>Passageira: Clara M.<br>Motorista: Domingos M.</td>
                 <td>Mochila preta com documentos esquecida no banco de trás da viatura.</td>
                 <td>—</td>
-                <td><span style="color:var(--blue);font-size:12px;">Conectar partes via chamada</span></td>
+                <td><span style="color:var(--gold);font-size:12px;">Conectar partes via chamada</span></td>
                 <td>
                   <button class="btn-action gold" onclick="alert('Chamada de ligação segura iniciada entre Clara M. e Domingos M.')">Conectar Partes</button>
                 </td>
@@ -975,7 +999,7 @@
               </tr>
               <tr>
                 <td><b>Mateus K.</b></td>
-                <td><span class="badge blue">Unitel Money</span></td>
+                <td><span class="badge gold">Unitel Money</span></td>
                 <td>+244 923 111 222</td>
                 <td><b style="color:var(--green);">14.200 Kz</b></td>
                 <td>1.420 Kz</td>
@@ -997,7 +1021,7 @@
           <div class="ai-box">
             <div class="ai-box-head">
               <b><span>🔀</span> Orquestrador de Chamados</b>
-              <span class="badge blue">Ativo</span>
+              <span class="badge green">Ativo</span>
             </div>
             <div style="padding:12px;border-bottom:1px solid var(--border);font-size:11px;color:var(--muted);">
               Analisa mensagens recebidas via WhatsApp/App e encaminha para o agente especializado.
@@ -1023,7 +1047,7 @@
 
               <div style="background:var(--card-inner);border:1px solid var(--border);border-radius:10px;padding:12px;cursor:pointer;" onclick="loadConversation('pax-2')">
                 <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:4px;">
-                  <b style="color:var(--blue);">Passageira: Sofia</b>
+                  <b style="color:var(--gold);">Passageira: Sofia</b>
                   <span style="color:var(--muted);">há 8 min</span>
                 </div>
                 <div style="font-size:12px;color:#fff;">«Esqueci o meu telemóvel no carro.»</div>
@@ -1178,7 +1202,10 @@
       document.getElementById('page-title').innerHTML = NAV_TITLES[view] || 'GIRO CRM';
 
       if (view === 'sos') {
-        setTimeout(initRadarMap, 100);
+        setTimeout(() => {
+          initRadarMap();
+          if (radarMap) radarMap.invalidateSize();
+        }, 100);
       }
     }
 
@@ -1216,38 +1243,513 @@
       }
     }
 
-    // ── Live Radar Map ──
+        // ── Constantes & Helpers RTDB ──
+    const FIREBASE_URL = 'https://giro-4ed50-default-rtdb.europe-west1.firebasedatabase.app';
+
+    function escapeHtml(str) {
+      if (str === null || str === undefined) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
+    // ── Perfil do Operador (R3) ──
+    function loadOperatorProfile() {
+      try {
+        const raw = localStorage.getItem('giro_operator_session');
+        let session = null;
+        if (raw) {
+          try { session = JSON.parse(raw); } catch (e) {}
+        }
+
+        const name = (session && session.nome) ? session.nome.trim() : 'Operador GIRO';
+        const role = (session && session.cargo) ? session.cargo.trim() : 'Operador Central';
+        const foto = (session && session.foto) ? session.foto : null;
+        const initial = name ? name.charAt(0).toUpperCase() : 'O';
+
+        const opName = document.getElementById('operator-name');
+        const opRole = document.getElementById('operator-role');
+        const opAvatar = document.getElementById('operator-avatar');
+        const topName = document.getElementById('topbar-operator-name');
+        const topRole = document.getElementById('topbar-operator-role');
+        const topAvatar = document.getElementById('topbar-operator-avatar');
+
+        if (opName) opName.textContent = name;
+        if (opRole) opRole.textContent = '● Online (' + role + ')';
+        if (topName) topName.textContent = name;
+        if (topRole) topRole.textContent = '● ' + role;
+
+        const renderAvatar = (el, size) => {
+          if (!el) return;
+          if (foto) {
+            el.innerHTML = '<img src="' + foto + '" alt="' + escapeHtml(name) + '" style="width:' + size + 'px;height:' + size + 'px;border-radius:50%;object-fit:cover;display:block;">';
+            el.style.background = 'transparent';
+            el.style.padding = '0';
+          } else {
+            el.textContent = initial;
+            el.style.background = 'linear-gradient(135deg, var(--gold), #f0c040)';
+            el.style.color = '#000';
+          }
+        };
+
+        renderAvatar(opAvatar, 34);
+        renderAvatar(topAvatar, 26);
+      } catch (err) {
+        console.warn('Erro ao carregar perfil do operador:', err);
+      }
+    }
+
+    // ── Live Radar Map & Layers (R1) ──
     let radarMap = null;
+    let driversLayer = null;
+    let ridesLayer = null;
+    let emergencyLayer = null;
+
     function initRadarMap() {
-      if (radarMap) return;
-      radarMap = L.map('live-radar-map').setView([-8.8383, 13.2344], 13);
+      const container = document.getElementById('live-radar-map');
+      if (!container || typeof L === 'undefined') return;
+
+      if (radarMap) {
+        radarMap.invalidateSize();
+        return;
+      }
+
+      radarMap = L.map('live-radar-map', {
+        zoomControl: true
+      }).setView([-8.8383, 13.2344], 12);
+
       L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
         attribution: '© OpenStreetMap'
       }).addTo(radarMap);
 
-      // Add fleet markers
-      const fleet = [
-        [-8.8383, 13.2344, 'Toyota Corolla · Domingos M.'],
-        [-8.8450, 13.2410, 'Hyundai i10 · Paulo K.'],
-        [-8.8310, 13.2370, 'Kupapata · Mateus K.'],
-        [-8.8575, 13.2310, 'Pick-Up Carga · André F.']
-      ];
-      fleet.forEach(f => {
-        L.circleMarker([f[0], f[1]], {
-          radius: 8, fillColor: '#22c55e', color: '#fff', weight: 2, fillOpacity: 0.9
-        }).bindPopup('<b>' + f[2] + '</b><br>Estado: Livre / Em patrulha').addTo(radarMap);
+      driversLayer = L.layerGroup().addTo(radarMap);
+      ridesLayer = L.layerGroup().addTo(radarMap);
+      emergencyLayer = L.layerGroup().addTo(radarMap);
+
+      renderDriversOnMap();
+      renderRidesOnMap();
+      renderEmergenciesOnMap();
+    }
+
+    // ── Drivers Telemetry Polling (R1) ──
+    let latestDriversData = null;
+
+    function extractDriverCoords(d) {
+      if (!d) return null;
+      let lat = null, lng = null;
+      if (d.location && typeof d.location.latitude === 'number' && typeof d.location.longitude === 'number') {
+        lat = d.location.latitude;
+        lng = d.location.longitude;
+      } else if (typeof d.lat === 'number' && typeof d.lng === 'number') {
+        lat = d.lat;
+        lng = d.lng;
+      } else if (Array.isArray(d.coords) && d.coords.length >= 2 && typeof d.coords[0] === 'number') {
+        lat = d.coords[0];
+        lng = d.coords[1];
+      } else if (d.latitude && d.longitude) {
+        lat = parseFloat(d.latitude);
+        lng = parseFloat(d.longitude);
+      }
+      if (lat !== null && lng !== null && !isNaN(lat) && !isNaN(lng) && lat >= -90 && lat <= 90 && lng >= -180 && lng <= 180) {
+        return [lat, lng];
+      }
+      return null;
+    }
+
+    function isDriverOnline(d) {
+      if (!d) return false;
+      return d.isOnline === true || d.status === 'online' || d.status === 'Livre' || d.status === 'approved';
+    }
+
+    function updateDriversOnlineStat() {
+      if (!latestDriversData) return;
+      let count = 0;
+      Object.values(latestDriversData).forEach(d => {
+        if (isDriverOnline(d)) count++;
+      });
+      const el = document.getElementById('stat-drivers-online');
+      if (el) el.textContent = count;
+    }
+
+    function renderDriversOnMap() {
+      if (!driversLayer || typeof L === 'undefined') return;
+      driversLayer.clearLayers();
+      if (!latestDriversData) return;
+
+      const goldCarIcon = L.divIcon({
+        className: 'giro-driver-car-icon',
+        html: '<div style="width:32px;height:32px;background:#070707;border:2px solid #d4af37;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;box-shadow:0 0 10px rgba(212,175,55,0.45);cursor:pointer;">🚗</div>',
+        iconSize: [32, 32],
+        iconAnchor: [16, 16],
+        popupAnchor: [0, -16]
+      });
+
+      Object.entries(latestDriversData).forEach(([key, d]) => {
+        if (!d) return;
+        const coords = extractDriverCoords(d);
+        if (!coords) return;
+
+        const online = isDriverOnline(d);
+        const name = d.nome || d.name || (d.firstName ? (d.firstName + ' ' + (d.secondName || '')).trim() : ('Motorista #' + key.slice(0, 6)));
+        const plate = (d.vehicleInfo && d.vehicleInfo.registrationPlateNumber) || d.plate || d.matricula || 'Sem matrícula';
+        const vehicle = (d.vehicleInfo && d.vehicleInfo.brand ? (d.vehicleInfo.brand + (d.vehicleInfo.color ? ' ' + d.vehicleInfo.color : '')) : (d.veiculo || d.car || 'Viatura'));
+
+        const popupHtml = '<div style="font-family:sans-serif;font-size:12px;color:#f1f5f1;padding:4px;min-width:180px;">' +
+          '<div style="font-size:13px;font-weight:700;color:#ffffff;margin-bottom:4px;">🚗 ' + escapeHtml(name) + '</div>' +
+          '<div style="color:#8d9e8d;font-size:11px;">Matrícula: <b style="color:#ffffff;">' + escapeHtml(plate) + '</b></div>' +
+          '<div style="color:#8d9e8d;font-size:11px;">Viatura: ' + escapeHtml(vehicle) + '</div>' +
+          '<div style="margin-top:6px;font-size:11px;">Status: <b style="color:' + (online ? '#06C167' : '#ef4444') + ';">' + (online ? '● Online' : '○ Offline') + '</b></div>' +
+          '</div>';
+
+        L.marker(coords, { icon: goldCarIcon })
+          .bindPopup(popupHtml)
+          .addTo(driversLayer);
+      });
+    }
+
+    async function pollDrivers() {
+      try {
+        const res = await fetch(FIREBASE_URL + '/drivers.json');
+        if (!res.ok) return;
+        const data = await res.json();
+        latestDriversData = data;
+        renderDriversOnMap();
+        updateDriversOnlineStat();
+      } catch (err) {
+        console.warn('Erro ao obter motoristas do Firebase:', err);
+      }
+    }
+
+    // ── Rides Telemetry Polling (R1) ──
+    let latestRidesData = null;
+
+    function renderRidesOnMap() {
+      if (!ridesLayer || typeof L === 'undefined') return;
+      ridesLayer.clearLayers();
+      if (!latestRidesData) return;
+
+      const rideOriginIcon = L.divIcon({
+        className: 'giro-ride-origin-pin',
+        html: '<div style="width:26px;height:26px;background:#06C167;color:#000;border:2px solid #fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:11px;box-shadow:0 0 8px rgba(6,193,103,0.6);cursor:pointer;">A</div>',
+        iconSize: [26, 26],
+        iconAnchor: [13, 13],
+        popupAnchor: [0, -13]
+      });
+
+      const rideDestIcon = L.divIcon({
+        className: 'giro-ride-dest-pin',
+        html: '<div style="width:26px;height:26px;background:#d4af37;color:#000;border:2px solid #fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:11px;box-shadow:0 0 8px rgba(212,175,55,0.6);cursor:pointer;">B</div>',
+        iconSize: [26, 26],
+        iconAnchor: [13, 13],
+        popupAnchor: [0, -13]
+      });
+
+      const activeStatuses = ['SEARCHING', 'ACCEPTED', 'IN_PROGRESS', 'ARRIVED', 'REQUESTED', 'PENDING'];
+
+      Object.entries(latestRidesData).forEach(([rideId, ride]) => {
+        if (!ride) return;
+        const status = (ride.status || '').toUpperCase();
+        if (!activeStatuses.includes(status)) return;
+
+        const origName = (ride.origin && ride.origin.name) || 'Origem';
+        const destName = (ride.dest && ride.dest.name) || 'Destino';
+        const paxName = (ride.passenger && ride.passenger.name) || 'Passageiro';
+        const drvName = (ride.driver && ride.driver.name) || 'A aguardar motorista';
+
+        if (ride.origin && Array.isArray(ride.origin.coords) && ride.origin.coords.length >= 2) {
+          const origCoords = [ride.origin.coords[0], ride.origin.coords[1]];
+          L.marker(origCoords, { icon: rideOriginIcon })
+            .bindPopup('<div style="font-family:sans-serif;font-size:12px;color:#f1f5f1;padding:4px;min-width:170px;">' +
+              '<b style="font-size:13px;color:#06C167;">🟢 Ponto de Partida (A)</b><br>' +
+              '<b>' + escapeHtml(origName) + '</b><br>' +
+              '<span style="font-size:11px;color:#8d9e8d;">Passageiro: ' + escapeHtml(paxName) + '</span><br>' +
+              '<span style="font-size:11px;color:#8d9e8d;">Destino: ' + escapeHtml(destName) + '</span><br>' +
+              '<span style="font-size:11px;color:#f1f5f1;">Status: <b>' + escapeHtml(status) + '</b></span>' +
+              '</div>')
+            .addTo(ridesLayer);
+        }
+
+        if (ride.dest && Array.isArray(ride.dest.coords) && ride.dest.coords.length >= 2) {
+          const destCoords = [ride.dest.coords[0], ride.dest.coords[1]];
+          L.marker(destCoords, { icon: rideDestIcon })
+            .bindPopup('<div style="font-family:sans-serif;font-size:12px;color:#f1f5f1;padding:4px;min-width:170px;">' +
+              '<b style="font-size:13px;color:#d4af37;">🏁 Destino da Corrida (B)</b><br>' +
+              '<b>' + escapeHtml(destName) + '</b><br>' +
+              '<span style="font-size:11px;color:#8d9e8d;">Partida: ' + escapeHtml(origName) + '</span><br>' +
+              '<span style="font-size:11px;color:#8d9e8d;">Motorista: ' + escapeHtml(drvName) + '</span><br>' +
+              '<span style="font-size:11px;color:#f1f5f1;">Status: <b>' + escapeHtml(status) + '</b></span>' +
+              '</div>')
+            .addTo(ridesLayer);
+        }
+      });
+    }
+
+    async function pollRides() {
+      try {
+        const res = await fetch(FIREBASE_URL + '/rides.json');
+        if (!res.ok) return;
+        const data = await res.json();
+        latestRidesData = data;
+        renderRidesOnMap();
+      } catch (err) {
+        console.warn('Erro ao obter corridas do Firebase:', err);
+      }
+    }
+
+    // ── Emergencies Polling & Actions (R2) ──
+    let latestEmergenciesData = null;
+    const alertedEmergencies = new Set();
+    let audioCtx = null;
+
+    function playSosBeep() {
+      try {
+        const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+        if (!AudioContextClass) return;
+        if (!audioCtx) audioCtx = new AudioContextClass();
+        if (audioCtx.state === 'suspended') {
+          audioCtx.resume().catch(() => {});
+        }
+
+        const now = audioCtx.currentTime;
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(880, now);
+        osc.frequency.exponentialRampToValueAtTime(440, now + 0.35);
+
+        gain.gain.setValueAtTime(0.01, now);
+        gain.gain.linearRampToValueAtTime(0.35, now + 0.05);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.4);
+
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+
+        osc.start(now);
+        osc.stop(now + 0.45);
+      } catch (err) {
+        console.warn('Falha no AudioContext beep:', err);
+      }
+    }
+
+    function renderEmergencyBanner(activeEmergencies) {
+      const banner = document.getElementById('sos-active-banner');
+      if (!banner) return;
+
+      if (activeEmergencies.length === 0) {
+        banner.style.display = 'none';
+        return;
+      }
+
+      const em = activeEmergencies[0];
+      const name = em.name || em.nome || em.callerName || 'Utilizador';
+      const phone = em.phone || em.telefone || 'S/ Telemóvel';
+      let coordsText = '';
+      if (Array.isArray(em.coords) && em.coords.length >= 2) {
+        coordsText = ' · GPS: [' + Number(em.coords[0]).toFixed(4) + ', ' + Number(em.coords[1]).toFixed(4) + ']';
+      } else if (em.lat && em.lng) {
+        coordsText = ' · GPS: [' + Number(em.lat).toFixed(4) + ', ' + Number(em.lng).toFixed(4) + ']';
+      }
+
+      banner.style.display = 'flex';
+      banner.innerHTML = '<div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">' +
+        '<span style="display:inline-block;width:12px;height:12px;border-radius:50%;background:#fff;box-shadow:0 0 10px #fff;animation:sosDotPulse 0.8s infinite;"></span>' +
+        '<span style="font-weight:800;font-size:14px;letter-spacing:0.5px;">🚨 ALERTA SOS ATIVO (' + activeEmergencies.length + '):</span>' +
+        '<span style="font-weight:600;">' + escapeHtml(name) + ' · Tel: ' + escapeHtml(phone) + coordsText + '</span>' +
+        '</div>' +
+        '<div style="display:flex;align-items:center;gap:10px;">' +
+        '<button class="btn-action green" style="background:#06C167;color:#000;font-weight:800;padding:7px 16px;border-radius:6px;border:none;cursor:pointer;" onclick="resolveEmergency(\'' + em.id + '\')">✓ Atendido</button>' +
+        '</div>';
+    }
+
+    function renderEmergencyHud(activeEmergencies) {
+      const hud = document.getElementById('sos-hud-status');
+      if (!hud) return;
+
+      if (activeEmergencies.length === 0) {
+        hud.innerHTML = '<div style="font-weight:700;color:var(--red);font-size:13px;">🛡️ Nenhuma Emergência Ativa</div>' +
+          '<div style="font-size:11px;color:var(--muted);margin-top:4px;">Frotas em patrulha e monitoramento normal em Luanda.</div>';
+        return;
+      }
+
+      let html = '';
+      activeEmergencies.forEach(em => {
+        const name = em.name || em.nome || 'Utilizador SOS';
+        const phone = em.phone || em.telefone || 'S/ Tel';
+        const msg = em.message || em.descricao || 'Botão de Pânico acionado';
+        let coordsStr = 'Coordenadas não disponíveis';
+        let coords = null;
+        if (Array.isArray(em.coords) && em.coords.length >= 2) {
+          coords = em.coords;
+          coordsStr = '[' + Number(coords[0]).toFixed(4) + ', ' + Number(coords[1]).toFixed(4) + ']';
+        } else if (em.lat && em.lng) {
+          coords = [em.lat, em.lng];
+          coordsStr = '[' + Number(em.lat).toFixed(4) + ', ' + Number(em.lng).toFixed(4) + ']';
+        }
+
+        html += '<div style="background:rgba(239,68,68,0.12);border:1px solid rgba(239,68,68,0.5);border-radius:10px;padding:14px;margin-bottom:12px;">' +
+          '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">' +
+          '<b style="color:var(--red);font-size:13px;">🚨 PÂNICO: ' + escapeHtml(name) + '</b>' +
+          '<span class="badge red">ATIVO</span>' +
+          '</div>' +
+          '<div style="font-size:12px;color:#fff;margin-bottom:3px;">📞 Contacto: <b>' + escapeHtml(phone) + '</b></div>' +
+          '<div style="font-size:11px;color:var(--muted);margin-bottom:4px;">📍 GPS: ' + coordsStr + '</div>' +
+          '<div style="font-size:11px;color:#fff;margin-bottom:10px;">💬 Detalhe: ' + escapeHtml(msg) + '</div>' +
+          '<button class="btn-action green" style="width:100%;padding:9px;font-size:12px;font-weight:700;background:#06C167;color:#000;border:none;border-radius:6px;cursor:pointer;" onclick="resolveEmergency(\'' + em.id + '\')">' +
+          '✓ Marcar como Atendido' +
+          '</button>' +
+          '</div>';
+      });
+      hud.innerHTML = html;
+    }
+
+    function renderEmergenciesOnMap(activeList) {
+      if (!emergencyLayer || typeof L === 'undefined') return;
+      emergencyLayer.clearLayers();
+      const list = activeList || (latestEmergenciesData ? Object.entries(latestEmergenciesData).filter(([k, v]) => v && ((v.status || '').toLowerCase() === 'active' || (v.status || '').toLowerCase() === 'pending')).map(([k, v]) => ({ id: k, ...v })) : []);
+
+      if (list.length === 0) return;
+
+      const sosPinIcon = L.divIcon({
+        className: 'giro-sos-pin',
+        html: '<div style="width:38px;height:38px;background:#ef4444;color:#fff;border:3px solid #fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:20px;box-shadow:0 0 16px rgba(239,68,68,0.9);animation:sosDotPulse 0.9s infinite;cursor:pointer;">🚨</div>',
+        iconSize: [38, 38],
+        iconAnchor: [19, 19],
+        popupAnchor: [0, -19]
+      });
+
+      list.forEach(em => {
+        let coords = null;
+        if (Array.isArray(em.coords) && em.coords.length >= 2) {
+          coords = [em.coords[0], em.coords[1]];
+        } else if (em.lat && em.lng) {
+          coords = [em.lat, em.lng];
+        } else {
+          coords = [-8.8383, 13.2344];
+        }
+
+        L.circle(coords, {
+          radius: 5000,
+          color: '#ef4444',
+          weight: 2,
+          fillColor: '#ef4444',
+          fillOpacity: 0.15
+        }).addTo(emergencyLayer);
+
+        const name = em.name || em.nome || 'Utilizador SOS';
+        const phone = em.phone || em.telefone || 'S/ Tel';
+
+        L.marker(coords, { icon: sosPinIcon })
+          .bindPopup('<div style="font-family:sans-serif;font-size:12px;color:#f1f5f1;padding:4px;min-width:170px;">' +
+            '<b style="color:#ef4444;font-size:13px;">🚨 ALERTA SOS ATIVO</b><br>' +
+            '<b>' + escapeHtml(name) + '</b><br>' +
+            '<span>Tel: ' + escapeHtml(phone) + '</span><br>' +
+            '<div style="margin-top:6px;">' +
+            '<button onclick="resolveEmergency(\'' + em.id + '\')" style="width:100%;padding:6px;background:#06C167;color:#000;font-weight:700;border:none;border-radius:4px;cursor:pointer;">' +
+            '✓ Marcar Atendido' +
+            '</button>' +
+            '</div></div>')
+          .addTo(emergencyLayer);
+      });
+    }
+
+    function processEmergencies(data) {
+      const activeEmergencies = [];
+
+      if (data && typeof data === 'object') {
+        Object.entries(data).forEach(([key, em]) => {
+          if (!em) return;
+          const status = (em.status || '').toLowerCase();
+          if (status === 'active' || status === 'pending') {
+            activeEmergencies.push({
+              id: key,
+              ...em
+            });
+          }
+        });
+      }
+
+      let hasNew = false;
+      activeEmergencies.forEach(em => {
+        if (!alertedEmergencies.has(em.id)) {
+          alertedEmergencies.add(em.id);
+          hasNew = true;
+        }
+      });
+
+      if (hasNew) {
+        playSosBeep();
+      }
+
+      renderEmergencyBanner(activeEmergencies);
+      renderEmergencyHud(activeEmergencies);
+      renderEmergenciesOnMap(activeEmergencies);
+    }
+
+    async function pollEmergencies() {
+      try {
+        const res = await fetch(FIREBASE_URL + '/emergencies.json');
+        if (!res.ok) return;
+        const data = await res.json();
+        latestEmergenciesData = data;
+        processEmergencies(data);
+      } catch (err) {
+        console.warn('Erro ao obter emergências do Firebase:', err);
+      }
+    }
+
+    function resolveEmergency(id) {
+      if (!id) return;
+      fetch(FIREBASE_URL + '/emergencies/' + id + '.json', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          status: 'resolved',
+          resolvedAt: Date.now()
+        })
+      }).then(res => {
+        if (res.ok) {
+          pollEmergencies();
+        } else {
+          alert('Erro ao atualizar status da emergência no Firebase.');
+        }
+      }).catch(err => {
+        console.error('Erro ao resolver emergência:', err);
+        alert('Erro de conexão ao resolver emergência.');
       });
     }
 
     function simulateSosAlert() {
-      alert('🚨 ALERTA SOS SIMULADO: Pânico acionado em Talatona. Raio de 5km traçado e 14 viaturas notificadas.');
-      document.getElementById('sos-hud-status').innerHTML = `
-        <div style="font-weight:800;color:var(--red);font-size:14px;">🚨 PÂNICO ACIONADO EM TALATONA</div>
-        <div style="font-size:12px;color:#fff;margin-top:4px;">Condutor: Paulo K. (LD-44-12-BB) · 14 viaturas a caminho no raio de 5km.</div>
-      `;
-      if (radarMap) {
-        L.circle([-8.8383, 13.2344], { radius: 5000, color: '#ef4444', fillColor: '#ef4444', fillOpacity: 0.15 }).addTo(radarMap);
-      }
+      const ts = Date.now();
+      const testEmergency = {
+        id: 'sos_' + ts,
+        name: 'Paulo K. (Motorista LD-44-12-BB)',
+        phone: '+244 923 441 222',
+        userType: 'motorista',
+        coords: [-8.8383, 13.2344],
+        status: 'active',
+        timestamp: ts,
+        message: 'Alerta SOS de teste acionado via Central GIRO',
+        address: 'Talatona, Luanda'
+      };
+
+      fetch(FIREBASE_URL + '/emergencies/' + ts + '.json', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(testEmergency)
+      }).then(res => {
+        if (res.ok) {
+          pollEmergencies();
+        } else {
+          console.warn('Falha ao escrever SOS de teste no Firebase');
+        }
+      }).catch(err => {
+        console.error('Erro ao simular SOS no Firebase:', err);
+      });
     }
 
     function callPnaEmergency() {
@@ -1332,6 +1834,33 @@
         list.scrollTop = list.scrollHeight;
       }, 300);
     }
+  
+    // ── Inicialização Global de Telemetria e Sessão ──
+    document.addEventListener('DOMContentLoaded', () => {
+      loadOperatorProfile();
+      pollDrivers();
+      pollRides();
+      pollEmergencies();
+
+      setInterval(pollDrivers, 5000);
+      setInterval(pollRides, 5000);
+      setInterval(pollEmergencies, 3000);
+
+      
+      window.addEventListener('resize', () => {
+        if (radarMap) radarMap.invalidateSize();
+      });
+      window.addEventListener('storage', (e) => {
+        if (e.key === 'giro_operator_session') loadOperatorProfile();
+      });
+      ['click', 'touchstart', 'keydown'].forEach(evt => {
+        document.addEventListener(evt, () => {
+          if (audioCtx && audioCtx.state === 'suspended') {
+            audioCtx.resume().catch(() => {});
+          }
+        }, { once: true });
+      });
+    });
   </script>
 </body>
 </html>
