@@ -441,6 +441,9 @@ body { overscroll-behavior: none; }
   100% { width: 100%; }
 }
 </style>
+<!-- Leaflet OpenStreetMap Real World Map (Lightweight & Offline Cached) -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 </head>
 <body>
 
@@ -468,81 +471,11 @@ body { overscroll-behavior: none; }
 
   <!-- 2. VIEWPORT COM MAPA GPS AO VIVO -->
   <main class="viewport-body">
-    <div class="map-canvas">
-      <svg viewBox="0 0 400 800" preserveAspectRatio="xMidYMid slice" id="uber-map-svg">
-        <!-- Fundo Claro Mapa Uber -->
-        <rect width="400" height="800" fill="#f3f4f6"/>
-        
-        <!-- Quarteirões e Zonas Urbanas de Luanda -->
-        <rect x="20" y="40" width="70" height="150" rx="8" fill="#e5e7eb" stroke="#d1d5db" stroke-width="0.8"/>
-        <rect x="115" y="40" width="150" height="150" rx="8" fill="#e5e7eb" stroke="#d1d5db" stroke-width="0.8"/>
-        <rect x="295" y="40" width="85" height="150" rx="8" fill="#dcfce7" stroke="#bbf7d0" stroke-width="0.8"/>
-        
-        <rect x="20" y="240" width="70" height="120" rx="8" fill="#e5e7eb" stroke="#d1d5db" stroke-width="0.8"/>
-        <rect x="115" y="240" width="65" height="120" rx="8" fill="#e5e7eb" stroke="#d1d5db" stroke-width="0.8"/>
-        <rect x="200" y="240" width="65" height="120" rx="8" fill="#dcfce7" stroke="#bbf7d0" stroke-width="0.8"/>
-        <rect x="295" y="240" width="85" height="120" rx="8" fill="#e5e7eb" stroke="#d1d5db" stroke-width="0.8"/>
-        
-        <rect x="20" y="410" width="70" height="120" rx="8" fill="#e0f2fe" stroke="#bae6fd" stroke-width="0.8"/>
-        <rect x="115" y="410" width="150" height="120" rx="8" fill="#e5e7eb" stroke="#d1d5db" stroke-width="0.8"/>
-        <rect x="295" y="410" width="85" height="120" rx="8" fill="#e5e7eb" stroke="#d1d5db" stroke-width="0.8"/>
-
-        <!-- Bordas das Vias Principais (Contorno para Alto Contraste) -->
-        <path d="M-20 215 H420" stroke="#d1d5db" stroke-width="28"/>
-        <path d="M-20 385 H420" stroke="#d1d5db" stroke-width="24"/>
-        <path d="M-20 560 H420" stroke="#d1d5db" stroke-width="26"/>
-        <path d="M100 -20 V820" stroke="#d1d5db" stroke-width="24"/>
-        <path d="M280 -20 V820" stroke="#d1d5db" stroke-width="24"/>
-        <path d="M190 200 V400" stroke="#d1d5db" stroke-width="14"/>
-
-        <!-- Asfalto Branco Limpo Uber -->
-        <path d="M-20 215 H420" stroke="#ffffff" stroke-width="26"/>
-        <path d="M-20 385 H420" stroke="#ffffff" stroke-width="22"/>
-        <path d="M-20 560 H420" stroke="#ffffff" stroke-width="24"/>
-        <path d="M100 -20 V820" stroke="#ffffff" stroke-width="22"/>
-        <path d="M280 -20 V820" stroke="#ffffff" stroke-width="22"/>
-        <path d="M190 200 V400" stroke="#ffffff" stroke-width="12"/>
-
-        <!-- Linhas divisórias de faixa suaves -->
-        <path d="M-20 215 H420" stroke="#cbd5e1" stroke-width="1.5" stroke-dasharray="8 6"/>
-        <path d="M-20 560 H420" stroke="#cbd5e1" stroke-width="1.5" stroke-dasharray="8 6"/>
-        <path d="M100 -20 V820" stroke="#cbd5e1" stroke-width="1.5" stroke-dasharray="8 6"/>
-        <path d="M280 -20 V820" stroke="#cbd5e1" stroke-width="1.5" stroke-dasharray="8 6"/>
-
-        <!-- Rota de Aproximação do Motorista ao Passageiro (Tracejado Azul Royal) -->
-        <path id="driver-approach-route" d="M280 640 L280 560 L100 560" stroke="#2563eb" stroke-width="4.5" stroke-linecap="round" fill="none" opacity="0" stroke-dasharray="6 4"/>
-
-        <!-- Rota Principal Passageiro -> Destino (Polyline Preta Sólida Uber) -->
-        <path id="pax-route-svg" d="M100 560 L100 215 L280 215 L280 90" stroke="#000000" stroke-width="5.5" fill="none" stroke-linecap="round" opacity="0" style="stroke-dasharray:800;stroke-dashoffset:800;filter:drop-shadow(0 2px 8px rgba(0,0,0,0.35));"/>
-      </svg>
-
-      <!-- Viatura do Motorista com Rastreio em Tempo Real (Badge Preto & Branco Uber) -->
-      <div class="map-car" id="pax-car-el" style="left:280px;top:640px;opacity:0;transition:all 1.2s cubic-bezier(0.4, 0, 0.2, 1);z-index:25;">
-        <div style="position:relative;display:flex;flex-direction:column;align-items:center;">
-          <div style="background:#000000;color:#ffffff;font-size:9.5px;font-weight:800;padding:2px 7px;border-radius:6px;border:1px solid #333333;white-space:nowrap;margin-bottom:2px;box-shadow:0 3px 10px rgba(0,0,0,0.35);" id="driver-bubble-eta">🚗 3 min</div>
-          <div style="width:34px;height:34px;border-radius:50%;background:#000000;border:2.5px solid #ffffff;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(0,0,0,0.4);">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="#ffffff"><path d="M18.92 6.01C18.72 5.42 18.16 5 17.5 5h-11c-.66 0-1.21.42-1.42 1.01L3 12v8c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1h12v1c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-8l-2.08-5.99zM6.85 7h10.29l1.04 3H5.81l1.04-3zM19 17H5v-4.66l.12-.34h13.77l.11.34V17z"/><circle cx="7.5" cy="14.5" r="1.5"/><circle cx="16.5" cy="14.5" r="1.5"/></svg>
-          </div>
-        </div>
-      </div>
-    </div>
-    <!-- Marcadores de Posição GPS -->
-      <div class="map-pin a" id="pax-pin-a" style="left:100px;top:560px;">
-        <div class="pin-label" id="pax-origin-lab">Talatona</div>
-        <div class="pin-circle"></div>
-      </div>
-      <div class="map-pin stop" id="pax-pin-stop" style="left:190px;top:220px;opacity:0;">
-        <div class="pin-label" id="pax-stop-lab">Paragem 1</div>
-        <div class="pin-circle"></div>
-      </div>
-      <div class="map-pin b" id="pax-pin-b" style="left:280px;top:90px;opacity:0;">
-        <div class="pin-label" id="pax-dest-lab">Kilamba</div>
-        <div class="pin-circle"></div>
-      </div>
-    </div>
+    <!-- MAPA REAL DE ANGOLA (LEAFLET + CARTODB POSITRON UBER STYLE) -->
+    <div id="giro-real-map" style="position:absolute;inset:0;width:100%;height:100%;z-index:1;background:#f3f4f6;"></div>
 
     <!-- BOTÕES FLUTUANTES NO MAPA -->
-    <div class="map-floating-bar">
+    <div class="map-floating-bar" style="z-index:40;">
       <button class="map-btn" id="pax-back-btn" style="display:none;" onclick="paxBack()" title="Voltar">‹</button>
       <div class="map-status-pill" id="pax-status-ban"><span class="net-blip"></span><span id="pax-status-text"></span></div>
       <button class="map-btn sos" title="SOS Silencioso para Central 24h" onclick="triggerSilentSos()">⚠</button>
@@ -1223,11 +1156,15 @@ function applyPromoCoupon() {
 function fillOriginWithGPS() {
   if (navigator.geolocation) {
     navigator.geolocation.getCurrentPosition(pos => {
-      const lat = pos.coords.latitude.toFixed(4);
-      const lng = pos.coords.longitude.toFixed(4);
+      const lat = parseFloat(pos.coords.latitude.toFixed(4));
+      const lng = parseFloat(pos.coords.longitude.toFixed(4));
       originName = `Minha Posição GPS (${lat}, ${lng})`;
       document.getElementById('inp-pax-orig').value = originName;
-      document.getElementById('pax-origin-lab').textContent = 'Você (GPS)';
+      if (document.getElementById('pax-origin-lab')) document.getElementById('pax-origin-lab').textContent = 'Você (GPS)';
+      
+      currentOrigCoords = [lat, lng];
+      if (origMarker) origMarker.setLatLng(currentOrigCoords);
+      updateRealRouteMap();
       playHaptic('radar');
     }, () => {
       alert('GPS activo. Coordenadas de ' + currentProv.toUpperCase() + ' mantidas.');
@@ -1239,10 +1176,20 @@ function swapOriginDestination() {
   const temp = originName;
   originName = destName;
   destName = temp;
+  
+  const tempCoords = currentOrigCoords;
+  currentOrigCoords = currentDestCoords;
+  currentDestCoords = tempCoords;
+
   document.getElementById('inp-pax-orig').value = originName;
   document.getElementById('inp-pax-dest').value = destName;
-  document.getElementById('pax-origin-lab').textContent = originName.split(',')[0];
-  document.getElementById('pax-dest-lab').textContent = destName.split(',')[0];
+  if (document.getElementById('pax-origin-lab')) document.getElementById('pax-origin-lab').textContent = originName.split(',')[0];
+  if (document.getElementById('pax-dest-lab')) document.getElementById('pax-dest-lab').textContent = destName.split(',')[0];
+  
+  if (origMarker) origMarker.setLatLng(currentOrigCoords);
+  if (destMarker) destMarker.setLatLng(currentDestCoords);
+  updateRealRouteMap();
+
   playHaptic('beep');
   renderTiers();
 }
@@ -1268,13 +1215,26 @@ function fillActiveWithShortcut(type) {
     fillOriginWithGPS();
     return;
   }
+  
+  if (type === 'casa') {
+    currentDestCoords = LUANDA_GEO.kilamba;
+  } else if (type === 'trab') {
+    currentDestCoords = LUANDA_GEO.belas;
+  } else if (type === 'aero') {
+    currentDestCoords = LUANDA_GEO.aeroporto;
+  }
+
   let target = (type === 'casa') ? d.favs[0] : (type === 'trab') ? d.favs[1] : d.lista[3];
   if (target) {
     destName = target[1] || target[0];
     tripKm = target[2] || 6.2;
     tripMins = target[3] || 14;
     document.getElementById('inp-pax-dest').value = destName;
-    document.getElementById('pax-dest-lab').textContent = destName.split(',')[0];
+    if (document.getElementById('pax-dest-lab')) document.getElementById('pax-dest-lab').textContent = destName.split(',')[0];
+    
+    if (destMarker) destMarker.setLatLng(currentDestCoords);
+    updateRealRouteMap();
+
     playHaptic('beep');
     renderTiers();
   }
@@ -1327,6 +1287,179 @@ const paxCarEl = document.getElementById('pax-car-el');
 const paxRouteSvg = document.getElementById('pax-route-svg');
 const paxPinB = document.getElementById('pax-pin-b');
 
+
+/* ==========================================================================
+   MOTOR DE MAPAS REAL DE ANGOLA (LEAFLET + OPENSTREETMAP / CARTODB POSITRON)
+   ========================================================================== */
+let realMap = null;
+let origMarker = null;
+let destMarker = null;
+let carMarker = null;
+let mainRouteLine = null;
+let approachRouteLine = null;
+
+// Pontos Geográficos Reais em Luanda / Angola
+const LUANDA_GEO = {
+  talatona: [-8.9220, 13.1840],
+  kilamba: [-8.9950, 13.2650],
+  mutamba: [-8.8150, 13.2330],
+  aeroporto: [-8.8580, 13.2310],
+  belas: [-8.9180, 13.1750],
+  viana: [-8.9050, 13.3600],
+  maianga: [-8.8350, 13.2250]
+};
+
+let currentOrigCoords = LUANDA_GEO.talatona;
+let currentDestCoords = LUANDA_GEO.kilamba;
+
+function initLeafletMap() {
+  const mapEl = document.getElementById('giro-real-map');
+  if (!mapEl || realMap) return;
+
+  // Iniciar mapa focado em Talatona / Luanda
+  realMap = L.map('giro-real-map', {
+    center: [-8.9220, 13.1840],
+    zoom: 13,
+    zoomControl: false,
+    attributionControl: false
+  });
+
+  // Camada CartoDB Positron (Estilo Uber Claro, ultra leve e rápido)
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+    subdomains: 'abcd',
+    maxZoom: 19
+  }).addTo(realMap);
+
+  // Ícones Personalizados Uber
+  const createMarkerIcon = (label, isSquare = false, color = '#000000') => {
+    return L.divIcon({
+      className: 'pax-leaflet-pin',
+      html: `
+        <div style="display:flex;flex-direction:column;align-items:center;transform:translate(-50%,-100%);">
+          <div style="background:${color};color:#ffffff;font-size:10px;font-weight:800;padding:3px 8px;border-radius:6px;box-shadow:0 3px 10px rgba(0,0,0,0.3);white-space:nowrap;margin-bottom:3px;border:1px solid #333333;">${label}</div>
+          <div style="width:14px;height:14px;border-radius:${isSquare ? '3px' : '50%'};background:${color};border:3px solid #ffffff;box-shadow:0 2px 8px rgba(0,0,0,0.35);"></div>
+        </div>
+      `,
+      iconSize: [0, 0]
+    });
+  };
+
+  const createCarIcon = (eta = '3 min') => {
+    return L.divIcon({
+      className: 'pax-leaflet-car',
+      html: `
+        <div style="display:flex;flex-direction:column;align-items:center;transform:translate(-50%,-50%);">
+          <div id="driver-bubble-eta" style="background:#000000;color:#ffffff;font-size:9.5px;font-weight:800;padding:2px 7px;border-radius:6px;border:1px solid #333333;white-space:nowrap;margin-bottom:2px;box-shadow:0 3px 10px rgba(0,0,0,0.35);">🚗 ${eta}</div>
+          <div style="width:36px;height:36px;border-radius:50%;background:#000000;border:2.5px solid #ffffff;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(0,0,0,0.4);">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="#ffffff"><path d="M18.92 6.01C18.72 5.42 18.16 5 17.5 5h-11c-.66 0-1.21.42-1.42 1.01L3 12v8c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1h12v1c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-8l-2.08-5.99zM6.85 7h10.29l1.04 3H5.81l1.04-3zM19 17H5v-4.66l.12-.34h13.77l.11.34V17z"/><circle cx="7.5" cy="14.5" r="1.5"/><circle cx="16.5" cy="14.5" r="1.5"/></svg>
+          </div>
+        </div>
+      `,
+      iconSize: [0, 0]
+    });
+  };
+
+  // Adicionar marcadores
+  origMarker = L.marker(currentOrigCoords, { icon: createMarkerIcon('Talatona', false) }).addTo(realMap);
+  destMarker = L.marker(currentDestCoords, { icon: createMarkerIcon('Kilamba', true) }).addTo(realMap);
+  carMarker = L.marker([-8.9350, 13.1890], { icon: createCarIcon('3 min') });
+
+  updateRealRouteMap();
+}
+
+function updateRealRouteMap() {
+  if (!realMap) return;
+
+  // Remover rotas anteriores
+  if (mainRouteLine) realMap.removeLayer(mainRouteLine);
+  if (approachRouteLine) realMap.removeLayer(approachRouteLine);
+
+  // Rota Real Traçada (Waypoints pelas avenidas de Luanda)
+  const waypoints = [
+    currentOrigCoords,
+    [-8.9380, 13.1950],
+    [-8.9550, 13.2200],
+    [-8.9750, 13.2450],
+    currentDestCoords
+  ];
+
+  mainRouteLine = L.polyline(waypoints, {
+    color: '#000000',
+    weight: 5.5,
+    opacity: 0.9,
+    lineCap: 'round',
+    lineJoin: 'round'
+  }).addTo(realMap);
+
+  // Ajustar enquadramento do mapa para ver toda a rota
+  const group = L.featureGroup([origMarker, destMarker]);
+  realMap.fitBounds(group.getBounds(), { padding: [50, 50], maxZoom: 15 });
+}
+
+function startRealDriverTrackingSequence() {
+  if (!realMap || !carMarker) return;
+
+  carMarker.addTo(realMap);
+
+  // 1. Rota de Aproximação do Condutor até ao Passageiro
+  const approachWaypoints = [
+    [-8.9400, 13.1890],
+    [-8.9330, 13.1870],
+    [-8.9270, 13.1850],
+    currentOrigCoords
+  ];
+
+  if (approachRouteLine) realMap.removeLayer(approachRouteLine);
+  approachRouteLine = L.polyline(approachWaypoints, {
+    color: '#2563eb',
+    weight: 4.5,
+    dashArray: '6, 6',
+    opacity: 0.9
+  }).addTo(realMap);
+
+  // Animar aproximação
+  approachWaypoints.forEach((pt, idx) => {
+    paxTimers.push(setTimeout(() => {
+      carMarker.setLatLng(pt);
+      const bubble = document.getElementById('driver-bubble-eta');
+      if (bubble) bubble.textContent = `🚗 ${3 - idx} min`;
+      
+      const txt = (idx === approachWaypoints.length - 1)
+        ? '🚗 Domingos M. chegou ao local de embarque!'
+        : `Motorista a caminho · ${3 - idx} min`;
+      document.getElementById('pax-status-text').textContent = txt;
+      playHaptic('beep');
+
+      // Ao chegar ao passageiro -> Iniciar viagem até ao destino
+      if (idx === approachWaypoints.length - 1) {
+        if (approachRouteLine) realMap.removeLayer(approachRouteLine);
+        
+        paxTimers.push(setTimeout(() => {
+          document.getElementById('pax-status-text').textContent = 'Viagem em curso para o destino';
+          if (bubble) bubble.textContent = '🚗 Em viagem';
+
+          const tripWaypoints = [
+            currentOrigCoords,
+            [-8.9380, 13.1950],
+            [-8.9550, 13.2200],
+            [-8.9750, 13.2450],
+            currentDestCoords
+          ];
+
+          tripWaypoints.forEach((tPt, tIdx) => {
+            paxTimers.push(setTimeout(() => {
+              carMarker.setLatLng(tPt);
+              if (tIdx === tripWaypoints.length - 1) {
+                setTimeout(() => paxTo('end'), 1500);
+              }
+            }, (tIdx + 1) * 2000));
+          });
+        }, 2500));
+      }
+    }, idx * 1600));
+  });
+}
+
 function showPane(paneId) {
   document.querySelectorAll('.uber-sheet .sheet-pane').forEach(p => p.classList.toggle('on', p.id === paneId));
 }
@@ -1357,9 +1490,10 @@ function paxTo(state) {
   else if (state === 'trip') {
     showPane('pane-trip');
     playHaptic('beep');
-    paxPinB.style.opacity = 1;
-    paxCarEl.style.opacity = 1;
-    paxRouteSvg.style.opacity = 1;
+    document.getElementById('pax-status-ban').classList.add('on');
+    document.getElementById('pax-status-text').textContent = 'Motorista a caminho · 3 min';
+    startRealDriverTrackingSequence();
+    return;
     
     const approachRoute = document.getElementById('driver-approach-route');
     if (approachRoute) approachRoute.style.opacity = '1';
