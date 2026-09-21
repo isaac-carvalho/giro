@@ -9,6 +9,29 @@
 <meta name="description" content="GIRO: A plataforma de mobilidade urbana e carga mais segura de Angola. Menor comissão para motoristas (apenas 10%), corridas 10% mais baratas para passageiros e Botão de Pânico ligado a Central 24h e Esquadras.">
 <meta name="theme-color" content="#070907">
 
+<!-- PWA & Mobile Web App Meta Tags -->
+<link rel="manifest" href="./manifest.json">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="GIRO">
+<link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png">
+<link rel="icon" type="image/png" sizes="512x512" href="./icons/icon-512.png">
+<link rel="apple-touch-icon" sizes="192x192" href="./icons/icon-192.png">
+<link rel="apple-touch-icon" sizes="512x512" href="./icons/icon-512.png">
+<link rel="icon" type="image/x-icon" href="./favicon.ico">
+<link rel="shortcut icon" href="./favicon.ico">
+
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./service-worker.js', { scope: './', updateViaCache: 'none' })
+      .then(reg => { reg.update().catch(() => {}); })
+      .catch(err => { console.warn('[SW Landing] Reg note:', err); });
+  });
+}
+</script>
+
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 
@@ -409,6 +432,7 @@ a{color:inherit;text-decoration:none;}
     </nav>
 
     <div class="nav-ctas">
+      <a href="login.html" class="btn-nav-ghost" style="border-color:var(--gold); color:var(--gold);">🔑 Entrar / Registar</a>
       <a href="index.html" class="btn-nav-ghost">App Passageiro</a>
       <a href="driver.html" class="btn-nav-gold">App Motorista (10%)</a>
       <a href="central.html" class="btn-nav-ghost" style="border-color:rgba(239,68,68,0.5); color:#fca5a5;">Central 24h</a>
@@ -447,9 +471,14 @@ a{color:inherit;text-decoration:none;}
           <li><span>✓</span> Pagamento por Multicaixa Express ou Dinheiro</li>
         </ul>
 
-        <a href="index.html" class="btn-cta-full btn-dark">
-          Pedir Táxi Agora na App →
-        </a>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;">
+          <a href="index.html" class="btn-cta-full btn-dark" style="flex:1;min-width:140px;">
+            Pedir Táxi →
+          </a>
+          <a href="login.html?role=pax&mode=register" class="btn-cta-full btn-dark" style="flex:1;min-width:140px;border-color:var(--gold);color:var(--gold);">
+            Criar Conta Pax
+          </a>
+        </div>
       </div>
 
       <!-- CARD DO MOTORISTA -->
@@ -466,9 +495,14 @@ a{color:inherit;text-decoration:none;}
           <li><span>★</span> Aceitamos Carros, Motas e Camiões de Carga</li>
         </ul>
 
-        <a href="driver.html" class="btn-cta-full btn-gold">
-          Abrir App de Motorista (10%) →
-        </a>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;">
+          <a href="driver.html" class="btn-cta-full btn-gold" style="flex:1;min-width:140px;">
+            Abrir App Motorista →
+          </a>
+          <a href="login.html?role=driver&mode=register" class="btn-cta-full btn-dark" style="flex:1;min-width:140px;border-color:var(--gold);color:var(--gold);">
+            Registar Motorista (10%)
+          </a>
+        </div>
       </div>
     </div>
 
@@ -767,11 +801,14 @@ a{color:inherit;text-decoration:none;}
     <p>Junta-te a milhares de angolanos que já escolheram a plataforma mais justa e protegida do país.</p>
 
     <div class="final-btn-row">
-      <a href="index.html?view=pax" class="btn-cta-full btn-dark" style="width:auto;padding:15px 28px;font-size:15px;">
+      <a href="index.html" class="btn-cta-full btn-dark" style="width:auto;padding:15px 28px;font-size:15px;">
         🚗 Pedir Táxi Mais Barato
       </a>
-      <a href="index.html?cadastro=driver" class="btn-cta-full btn-gold" style="width:auto;padding:15px 28px;font-size:15px;">
+      <a href="login.html?role=driver&mode=register" class="btn-cta-full btn-gold" style="width:auto;padding:15px 28px;font-size:15px;">
         💼 Cadastrar Como Motorista (10% Taxa)
+      </a>
+      <a href="login.html" class="btn-cta-full btn-dark" style="width:auto;padding:15px 28px;font-size:15px;border-color:var(--gold);color:var(--gold);">
+        🔑 Entrar na Conta
       </a>
     </div>
   </div>
@@ -792,8 +829,12 @@ a{color:inherit;text-decoration:none;}
       <span>🇦🇴 Desenvolvido para Angola</span> · <span>© 2026 GIRO Mobility. Todos os direitos reservados.</span>
     </div>
 
-    <div>
-      <a href="index.html" style="color:var(--gold);font-weight:700;">Aceder à Aplicação Web →</a>
+    <div style="display:flex;gap:14px;align-items:center;flex-wrap:wrap;justify-content:center;">
+      <a href="login.html" style="color:var(--gold);font-weight:700;">Entrar / Criar Conta</a>
+      <span style="color:var(--line);">·</span>
+      <a href="central.html" style="color:#fca5a5;font-weight:700;">Central 24h</a>
+      <span style="color:var(--line);">·</span>
+      <a href="index.html" style="color:#fff;font-weight:700;">App Web →</a>
     </div>
   </div>
 </footer>
