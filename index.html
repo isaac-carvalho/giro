@@ -775,8 +775,8 @@ body { overscroll-behavior: none; }
           </div>
 
           <div class="trip-actions-row">
-            <button class="trip-action-btn" onclick="alert('Chat com o condutor iniciado.')">💬 Mensagem</button>
-            <button class="trip-action-btn" onclick="alert('Chamada de voz direta iniciada.')">📞 Ligar</button>
+            <button class="trip-action-btn" id="pax-btn-open-chat" onclick="openPaxRideChat()">💬 Mensagem <span id="pax-chat-badge" style="display:none;background:#ef4444;color:#fff;border-radius:10px;padding:1px 6px;font-size:10px;margin-left:4px;">1</span></button>
+            <button class="trip-action-btn" id="pax-btn-call-driver" onclick="callDriverVoice()">📞 Ligar</button>
             <button class="trip-action-btn" onclick="openShareModal()">🔗 Partilhar</button>
           </div>
         </div>
@@ -791,6 +791,70 @@ body { overscroll-behavior: none; }
         </button>
 
         <button class="btn-uber-main" style="margin-top:12px;background:#222;color:#fff;box-shadow:none;" onclick="paxTo('end')">Simular Chegada ao Destino</button>
+      </div>
+
+      <!-- Modal de Chat com o Motorista no Ecrã do Passageiro -->
+      <div id="pax-chat-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.8);z-index:99999;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);align-items:flex-end;justify-content:center;">
+        <div style="background:#141414;border-top:1px solid #333;width:100%;max-width:540px;height:82vh;border-radius:24px 24px 0 0;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 -10px 40px rgba(0,0,0,0.8);">
+          <!-- Header -->
+          <div style="padding:16px 20px;border-bottom:1px solid #222;display:flex;align-items:center;justify-content:space-between;background:#1a1a1a;">
+            <div style="display:flex;align-items:center;gap:12px;">
+              <div style="width:40px;height:40px;border-radius:50%;background:#333;border:2px solid #f0b429;color:#fff;font-weight:900;display:flex;align-items:center;justify-content:center;font-size:16px;" id="pax-chat-driver-avatar">DM</div>
+              <div>
+                <b style="font-size:15px;color:#fff;display:block;" id="pax-chat-driver-name">Domingos Manuel</b>
+                <span style="font-size:11.5px;color:#10b981;" id="pax-chat-driver-status">● A caminho no veículo</span>
+              </div>
+            </div>
+            <button onclick="closePaxRideChat()" style="background:#262626;border:none;color:#aaa;width:36px;height:36px;border-radius:50%;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;">✕</button>
+          </div>
+          <!-- Mensagens Histórico -->
+          <div id="pax-chat-messages" style="flex:1;overflow-y:auto;padding:16px 20px;display:flex;flex-direction:column;gap:10px;">
+            <div style="text-align:center;font-size:11px;color:#666;margin-bottom:8px;">Conversa segura com o motorista parceiro</div>
+          </div>
+          <!-- Chips de Respostas Rápidas Passageiro -->
+          <div style="padding:8px 16px;background:#1a1a1a;border-top:1px solid #222;display:flex;gap:8px;overflow-x:auto;white-space:nowrap;scrollbar-width:none;">
+            <button onclick="sendPaxQuickMsg('Já estou a descer')" style="background:#262626;border:1px solid #444;color:#eee;font-size:11.5px;padding:6px 12px;border-radius:16px;cursor:pointer;flex-shrink:0;">🏃 Já estou a descer</button>
+            <button onclick="sendPaxQuickMsg('Estou no portão principal')" style="background:#262626;border:1px solid #444;color:#eee;font-size:11.5px;padding:6px 12px;border-radius:16px;cursor:pointer;flex-shrink:0;">🚪 Portão principal</button>
+            <button onclick="sendPaxQuickMsg('Estou de camisa branca')" style="background:#262626;border:1px solid #444;color:#eee;font-size:11.5px;padding:6px 12px;border-radius:16px;cursor:pointer;flex-shrink:0;">👕 Camisa branca</button>
+            <button onclick="sendPaxQuickMsg('Pode buzinar quando chegar')" style="background:#262626;border:1px solid #444;color:#eee;font-size:11.5px;padding:6px 12px;border-radius:16px;cursor:pointer;flex-shrink:0;">📢 Pode buzinar</button>
+            <button onclick="sendPaxQuickMsg('Ok, fico a aguardar')" style="background:#262626;border:1px solid #444;color:#eee;font-size:11.5px;padding:6px 12px;border-radius:16px;cursor:pointer;flex-shrink:0;">👍 Ok, aguardo</button>
+          </div>
+          <!-- Input Bar -->
+          <div style="padding:12px 16px;background:#141414;display:flex;gap:10px;align-items:center;border-top:1px solid #222;">
+            <input type="text" id="pax-chat-input" placeholder="Escreva uma mensagem..." style="flex:1;background:#222;border:1px solid #333;color:#fff;padding:12px 16px;border-radius:22px;font-size:14px;outline:none;" onkeypress="if(event.key==='Enter') sendPaxChatMsg()">
+            <button onclick="sendPaxChatMsg()" style="background:#fff;color:#000;border:none;width:44px;height:44px;border-radius:50%;font-weight:900;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;">➤</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Modal de Partilha de Trajeto em Tempo Real -->
+      <div id="pax-share-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.8);z-index:99999;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);align-items:flex-end;justify-content:center;">
+        <div style="background:#181818;border-top:1px solid #333;width:100%;max-width:540px;border-radius:24px 24px 0 0;padding:24px 20px;box-shadow:0 -10px 40px rgba(0,0,0,0.8);">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+            <div style="display:flex;align-items:center;gap:10px;">
+              <span style="font-size:24px;">🛡️</span>
+              <div>
+                <b style="font-size:16px;color:#fff;display:block;">Partilhar Viagem ao Vivo</b>
+                <span style="font-size:11.5px;color:#aaa;">Amigos e familiares acompanham o trajeto em tempo real</span>
+              </div>
+            </div>
+            <button onclick="closeShareModal()" style="background:#262626;border:none;color:#aaa;width:34px;height:34px;border-radius:50%;font-size:16px;cursor:pointer;">✕</button>
+          </div>
+
+          <div style="background:#222;border:1px solid #333;border-radius:14px;padding:12px 14px;margin-bottom:16px;word-break:break-all;">
+            <small style="color:#888;display:block;font-size:11px;margin-bottom:4px;text-transform:uppercase;letter-spacing:0.5px;">Link Público de Rastreio:</small>
+            <div id="share-track-url-preview" style="font-size:12.5px;color:#60a5fa;font-family:monospace;">https://giro.ao/track.html?id=...</div>
+          </div>
+
+          <div style="display:flex;flex-direction:column;gap:10px;">
+            <button onclick="shareViaWhatsApp()" style="width:100%;padding:14px;background:#25D366;color:#000;font-weight:900;border:none;border-radius:14px;font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;">
+              <span style="font-size:18px;">💬</span> Partilhar no WhatsApp
+            </button>
+            <button onclick="copyShareTrackUrl()" style="width:100%;padding:14px;background:#2a2a2a;color:#fff;font-weight:700;border:1px solid #444;border-radius:14px;font-size:14.5px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;">
+              <span style="font-size:18px;">📋</span> <span id="copy-share-btn-text">Copiar Link de Acompanhamento</span>
+            </button>
+          </div>
+        </div>
       </div>
 
       <!-- PANE 4: CHEGADA & AVALIAÇÃO UBER -->
@@ -2429,6 +2493,12 @@ function paxTo(state) {
   if (backBtn) backBtn.style.display = (state === 'idle') ? 'none' : 'flex';
   if (statusBan) statusBan.classList.remove('on');
 
+  if (state === 'end' || state === 'idle') {
+    closePaxRideChat();
+    stopPaxChatSync();
+    closeShareModal();
+  }
+
   if (state === 'idle') {
     showPane('pane-idle');
     if (paxPinB) paxPinB.style.opacity = 0;
@@ -2569,6 +2639,8 @@ try {
         if (data.coords && carMarker) {
           carMarker.setLatLng(data.coords);
         }
+      } else if (data.type === 'RIDE_CHAT_MESSAGE' && currentActiveRide && data.rideId === currentActiveRide.id) {
+        handleIncomingPaxChatMessage(data.message);
       } else if (data.type === 'RIDE_COMPLETED' && currentActiveRide && data.rideId === currentActiveRide.id) {
         paxTo('end');
       }
@@ -2709,7 +2781,260 @@ function handleDriverAcceptedRide(driver) {
     }
   }
 
+  startPaxChatSync(currentActiveRide.id, driver);
   paxTo('trip');
+}
+
+// =========================================================================
+// PARTILHA DE VIAGEM EM TEMPO REAL COM CONTACTOS DE CONFIANÇA
+// =========================================================================
+function openShareModal() {
+  if (!currentActiveRide) return;
+  const baseUrl = window.location.href.split('?')[0].replace(/\/[^/]*$/, '');
+  const trackUrl = `${baseUrl}/track.html?id=${currentActiveRide.id}`;
+  const previewEl = document.getElementById('share-track-url-preview');
+  if (previewEl) previewEl.innerText = trackUrl;
+
+  if (navigator.share) {
+    navigator.share({
+      title: 'Acompanhe a minha viagem GIRO',
+      text: 'Olá! Estou a viajar com a GIRO Angola. Podes acompanhar o meu trajeto em tempo real no mapa:',
+      url: trackUrl
+    }).catch(() => {
+      const modal = document.getElementById('pax-share-modal');
+      if (modal) modal.style.display = 'flex';
+    });
+  } else {
+    const modal = document.getElementById('pax-share-modal');
+    if (modal) modal.style.display = 'flex';
+  }
+}
+
+function closeShareModal() {
+  const m = document.getElementById('pax-share-modal');
+  if (m) m.style.display = 'none';
+}
+
+function shareViaWhatsApp() {
+  if (!currentActiveRide) return;
+  const baseUrl = window.location.href.split('?')[0].replace(/\/[^/]*$/, '');
+  const trackUrl = `${baseUrl}/track.html?id=${currentActiveRide.id}`;
+  const text = encodeURIComponent(`Olá! Estou a viajar com a GIRO Angola. Acompanha o meu trajeto em direto aqui: ${trackUrl}`);
+  window.open(`https://api.whatsapp.com/send?text=${text}`, '_blank');
+}
+
+function copyShareTrackUrl() {
+  if (!currentActiveRide) return;
+  const baseUrl = window.location.href.split('?')[0].replace(/\/[^/]*$/, '');
+  const trackUrl = `${baseUrl}/track.html?id=${currentActiveRide.id}`;
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(trackUrl).then(() => {
+      const btnText = document.getElementById('copy-share-btn-text');
+      if (btnText) btnText.innerText = '✓ Link Copiado!';
+      setTimeout(() => {
+        if (btnText) btnText.innerText = 'Copiar Link de Acompanhamento';
+      }, 2500);
+    }).catch(() => {});
+  } else {
+    prompt('Copie o link abaixo:', trackUrl);
+  }
+}
+
+function callDriverVoice() {
+  if (currentActiveRide && currentActiveRide.driver && currentActiveRide.driver.phone) {
+    window.location.href = 'tel:' + currentActiveRide.driver.phone.replace(/\s+/g, '');
+  } else {
+    alert('Contacto telefónico do motorista: +244 923 111 222');
+  }
+}
+
+// =========================================================================
+// SISTEMA DE CHAT EM TEMPO REAL NO HUD DO PASSAGEIRO
+// =========================================================================
+let paxChatMessages = [];
+let paxChatPollInterval = null;
+let paxChatUnreadCount = 0;
+
+function playPaxChatChime() {
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(587.33, ctx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(880, ctx.currentTime + 0.12);
+    gain.gain.setValueAtTime(0.2, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.25);
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.start();
+    osc.stop(ctx.currentTime + 0.26);
+  } catch(e) {}
+}
+
+function openPaxRideChat() {
+  const modal = document.getElementById('pax-chat-modal');
+  if (!modal) return;
+  modal.style.display = 'flex';
+  paxChatUnreadCount = 0;
+  const badge = document.getElementById('pax-chat-badge');
+  if (badge) badge.style.display = 'none';
+
+  if (currentActiveRide && currentActiveRide.driver) {
+    const drv = currentActiveRide.driver;
+    const nameEl = document.getElementById('pax-chat-driver-name');
+    const avatarEl = document.getElementById('pax-chat-driver-avatar');
+    if (nameEl) nameEl.innerText = drv.name || 'Motorista Parceiro';
+    if (avatarEl) avatarEl.innerText = (drv.name || 'MP').split(' ').map(w => w[0]).join('').slice(0, 2);
+  }
+  renderPaxChatMessages();
+  const input = document.getElementById('pax-chat-input');
+  if (input) setTimeout(() => input.focus(), 100);
+}
+
+function closePaxRideChat() {
+  const modal = document.getElementById('pax-chat-modal');
+  if (!modal) modal.style.display = 'none';
+}
+
+function startPaxChatSync(rideId, driver) {
+  paxChatMessages = [];
+  paxChatUnreadCount = 0;
+  const badge = document.getElementById('pax-chat-badge');
+  if (badge) badge.style.display = 'none';
+
+  if (paxChatPollInterval) clearInterval(paxChatPollInterval);
+  paxChatPollInterval = setInterval(() => {
+    if (!currentActiveRide || currentActiveRide.id !== rideId) {
+      stopPaxChatSync();
+      return;
+    }
+    fetch(`https://giro-4ed50-default-rtdb.europe-west1.firebasedatabase.app/rides/${rideId}/chat.json`)
+      .then(res => res.json())
+      .then(data => {
+        if (!data) return;
+        const msgs = Object.keys(data).map(k => ({ ...data[k], key: k })).sort((a, b) => (a.timestamp || 0) - (b.timestamp || 0));
+        if (msgs.length > paxChatMessages.length) {
+          const newCount = msgs.length - paxChatMessages.length;
+          const hasNewDriverMsg = msgs.slice(paxChatMessages.length).some(m => m.sender === 'driver');
+          paxChatMessages = msgs;
+          renderPaxChatMessages();
+          if (hasNewDriverMsg) {
+            playPaxChatChime();
+            const modal = document.getElementById('pax-chat-modal');
+            if (!modal || modal.style.display === 'none') {
+              paxChatUnreadCount += newCount;
+              if (badge) {
+                badge.innerText = paxChatUnreadCount;
+                badge.style.display = 'inline-block';
+              }
+            }
+          }
+        }
+      })
+      .catch(() => {});
+  }, 2500);
+}
+
+function stopPaxChatSync() {
+  if (paxChatPollInterval) {
+    clearInterval(paxChatPollInterval);
+    paxChatPollInterval = null;
+  }
+}
+
+function handleIncomingPaxChatMessage(msg) {
+  if (!msg) return;
+  if (!paxChatMessages.some(m => m.id === msg.id)) {
+    paxChatMessages.push(msg);
+    renderPaxChatMessages();
+    if (msg.sender === 'driver') {
+      playPaxChatChime();
+      const modal = document.getElementById('pax-chat-modal');
+      if (!modal || modal.style.display === 'none') {
+        paxChatUnreadCount++;
+        const badge = document.getElementById('pax-chat-badge');
+        if (badge) {
+          badge.innerText = paxChatUnreadCount;
+          badge.style.display = 'inline-block';
+        }
+      }
+    }
+  }
+}
+
+function renderPaxChatMessages() {
+  const box = document.getElementById('pax-chat-messages');
+  if (!box) return;
+  if (paxChatMessages.length === 0) {
+    box.innerHTML = '<div style="text-align:center;font-size:11.5px;color:#666;margin:20px 0;">Início da conversa com o motorista. As mensagens são sincronizadas em tempo real.</div>';
+    return;
+  }
+
+  box.innerHTML = paxChatMessages.map(m => {
+    const isMe = (m.sender === 'passenger');
+    const timeStr = new Date(m.timestamp || Date.now()).toLocaleTimeString('pt-AO', { hour: '2-digit', minute: '2-digit' });
+    return `
+      <div style="display:flex;flex-direction:column;align-items:${isMe ? 'flex-end' : 'flex-start'};margin-bottom:6px;">
+        <div style="max-width:80%;padding:10px 14px;border-radius:${isMe ? '18px 18px 4px 18px' : '18px 18px 18px 4px'};background:${isMe ? '#ffffff' : '#262626'};color:${isMe ? '#000000' : '#ffffff'};font-weight:${isMe ? '700' : '500'};font-size:13.5px;line-height:1.4;box-shadow:0 2px 8px rgba(0,0,0,0.35);">
+          ${escapePaxHtml(m.text || '')}
+        </div>
+        <span style="font-size:10px;color:#777;margin-top:2px;padding:0 4px;">${timeStr}</span>
+      </div>
+    `;
+  }).join('');
+
+  box.scrollTop = box.scrollHeight;
+}
+
+function escapePaxHtml(str) {
+  return (str || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+function sendPaxQuickMsg(text) {
+  const input = document.getElementById('pax-chat-input');
+  if (input) input.value = text;
+  sendPaxChatMsg();
+}
+
+function sendPaxChatMsg() {
+  const input = document.getElementById('pax-chat-input');
+  if (!input) return;
+  const text = input.value.trim();
+  if (!text || !currentActiveRide) return;
+
+  const rideId = currentActiveRide.id;
+  const msgObj = {
+    id: 'msg_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6),
+    sender: 'passenger',
+    senderName: (currentActiveRide.passenger && (currentActiveRide.passenger.name || currentActiveRide.passenger.nome)) || 'Passageiro',
+    text: text,
+    timestamp: Date.now()
+  };
+
+  input.value = '';
+  paxChatMessages.push(msgObj);
+  renderPaxChatMessages();
+
+  // Transmitir via BroadcastChannel
+  if (rideBroadcastChannel) {
+    try {
+      rideBroadcastChannel.postMessage({
+        type: 'RIDE_CHAT_MESSAGE',
+        rideId: rideId,
+        message: msgObj
+      });
+    } catch(e) {}
+  }
+
+  // Salvar no Firebase RTDB
+  try {
+    fetch(`https://giro-4ed50-default-rtdb.europe-west1.firebasedatabase.app/rides/${rideId}/chat/${msgObj.id}.json`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(msgObj)
+    }).catch(() => {});
+  } catch(e) {}
 }
 
 

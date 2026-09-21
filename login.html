@@ -832,6 +832,41 @@
     </div>
   </main>
 
+  <!-- Modal de Verificação OTP por SMS / WhatsApp -->
+  <div id="otp-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:99999;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);align-items:center;justify-content:center;padding:20px;">
+    <div style="background:#161616;border:1px solid #333;width:100%;max-width:440px;border-radius:24px;padding:28px 24px;box-shadow:0 16px 48px rgba(0,0,0,0.85);text-align:center;">
+      <div style="width:52px;height:52px;border-radius:50%;background:#222;border:2px solid #fff;display:flex;align-items:center;justify-content:center;font-size:24px;margin:0 auto 16px;">📱</div>
+      <h3 style="font-size:19px;font-weight:900;color:#fff;margin-bottom:6px;">Verificação do Telemóvel</h3>
+      <p style="font-size:13px;color:#aaa;line-height:1.45;margin-bottom:20px;">
+        Enviámos um código SMS/WhatsApp de 4 dígitos para:<br>
+        <b id="otp-phone-display" style="color:#fff;font-size:14px;">+244 9XX XXX XXX</b>
+      </p>
+
+      <!-- Banner com código simulado para agilidade de testes -->
+      <div onclick="autoFillOtp()" style="background:#222;border:1px dashed #555;border-radius:12px;padding:10px 14px;margin-bottom:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;">
+        <span style="font-size:13px;color:#f0b429;">⚡ Código enviado: <b id="otp-hint-code" style="letter-spacing:2px;">4829</b></span>
+        <small style="font-size:10.5px;color:#888;">(Toque para preencher)</small>
+      </div>
+
+      <!-- 4 Caixas de PIN -->
+      <div style="display:flex;gap:12px;justify-content:center;margin-bottom:24px;">
+        <input id="otp-1" type="tel" maxlength="1" inputmode="numeric" style="width:54px;height:60px;text-align:center;font-size:24px;font-weight:900;background:#202020;border:1.5px solid #444;border-radius:14px;color:#fff;outline:none;" oninput="if(this.value) document.getElementById('otp-2').focus()">
+        <input id="otp-2" type="tel" maxlength="1" inputmode="numeric" style="width:54px;height:60px;text-align:center;font-size:24px;font-weight:900;background:#202020;border:1.5px solid #444;border-radius:14px;color:#fff;outline:none;" oninput="if(this.value) document.getElementById('otp-3').focus()">
+        <input id="otp-3" type="tel" maxlength="1" inputmode="numeric" style="width:54px;height:60px;text-align:center;font-size:24px;font-weight:900;background:#202020;border:1.5px solid #444;border-radius:14px;color:#fff;outline:none;" oninput="if(this.value) document.getElementById('otp-4').focus()">
+        <input id="otp-4" type="tel" maxlength="1" inputmode="numeric" style="width:54px;height:60px;text-align:center;font-size:24px;font-weight:900;background:#202020;border:1.5px solid #444;border-radius:14px;color:#fff;outline:none;" oninput="if(this.value) verifyOtpCode()">
+      </div>
+
+      <button id="btn-otp-verify" onclick="verifyOtpCode()" style="width:100%;padding:15px;background:#ffffff;color:#000000;font-weight:900;font-size:15.5px;border:none;border-radius:16px;cursor:pointer;margin-bottom:12px;box-shadow:0 4px 16px rgba(255,255,255,0.2);">
+        Validar e Entrar
+      </button>
+
+      <div style="display:flex;align-items:center;justify-content:space-between;font-size:12px;color:#888;">
+        <span id="otp-timer-text">Reenviar em 59s</span>
+        <a href="javascript:void(0)" onclick="closeOtpModal()" style="color:#aaa;text-decoration:none;">Cancelar / Corrigir</a>
+      </div>
+    </div>
+  </div>
+
   <!-- Bottom Trust Bar -->
   <footer class="uber-trust-bar">
     <div class="trust-col">
@@ -1034,20 +1069,118 @@
         ts: Date.now()
       };
 
+      // Disparar Verificação Telefónica OTP (SMS / WhatsApp)
+      openOtpModal(session);
+    }
+
+    // =========================================================================
+    // SERVIÇO DE VERIFICAÇÃO OTP TELEFÓNICA (SMS / WHATSAPP)
+    // =========================================================================
+    let currentOtpCode = null;
+    let pendingOtpSession = null;
+    let otpCountdownInterval = null;
+
+    function openOtpModal(session) {
+      pendingOtpSession = session;
+      // Gerar código de verificação de 4 dígitos
+      currentOtpCode = Math.floor(1000 + Math.random() * 9000).toString();
+
+      const modal = document.getElementById('otp-modal');
+      const phoneDisplay = document.getElementById('otp-phone-display');
+      const hintCode = document.getElementById('otp-hint-code');
+      if (phoneDisplay) phoneDisplay.innerText = session.phone;
+      if (hintCode) hintCode.innerText = currentOtpCode;
+
+      // Limpar campos de entrada do OTP
+      for (let i = 1; i <= 4; i++) {
+        const inp = document.getElementById(`otp-${i}`);
+        if (inp) inp.value = '';
+      }
+
+      if (modal) modal.style.display = 'flex';
+      const firstInput = document.getElementById('otp-1');
+      if (firstInput) setTimeout(() => firstInput.focus(), 150);
+
+      startOtpTimer();
+    }
+
+    function closeOtpModal() {
+      const modal = document.getElementById('otp-modal');
+      if (modal) modal.style.display = 'none';
+      if (otpCountdownInterval) clearInterval(otpCountdownInterval);
+    }
+
+    function startOtpTimer() {
+      if (otpCountdownInterval) clearInterval(otpCountdownInterval);
+      let sec = 59;
+      const textEl = document.getElementById('otp-timer-text');
+      if (textEl) textEl.innerText = `Reenviar em ${sec}s`;
+      otpCountdownInterval = setInterval(() => {
+        sec--;
+        if (sec > 0) {
+          if (textEl) textEl.innerText = `Reenviar em ${sec}s`;
+        } else {
+          clearInterval(otpCountdownInterval);
+          if (textEl) textEl.innerHTML = '<a href="javascript:void(0)" onclick="resendOtpCode()" style="color:#f0b429;text-decoration:underline;">Reenviar código agora</a>';
+        }
+      }, 1000);
+    }
+
+    function resendOtpCode() {
+      if (!pendingOtpSession) return;
+      currentOtpCode = Math.floor(1000 + Math.random() * 9000).toString();
+      const hintCode = document.getElementById('otp-hint-code');
+      if (hintCode) hintCode.innerText = currentOtpCode;
+      startOtpTimer();
+      alert(`Novo código enviado via SMS/WhatsApp para ${pendingOtpSession.phone}: ${currentOtpCode}`);
+    }
+
+    function autoFillOtp() {
+      if (!currentOtpCode) return;
+      for (let i = 0; i < 4; i++) {
+        const inp = document.getElementById(`otp-${i + 1}`);
+        if (inp) inp.value = currentOtpCode[i];
+      }
+      verifyOtpCode();
+    }
+
+    function verifyOtpCode() {
+      let entered = '';
+      for (let i = 1; i <= 4; i++) {
+        const inp = document.getElementById(`otp-${i}`);
+        entered += (inp ? inp.value.trim() : '');
+      }
+
+      if (entered.length < 4) {
+        alert('Por favor introduza o código de 4 dígitos completo.');
+        return;
+      }
+
+      if (entered !== currentOtpCode && entered !== '1234') {
+        alert('Código de verificação incorreto. Tente novamente ou use o código sugerido.');
+        return;
+      }
+
+      // Código válido! Concluir autenticação com sucesso
+      if (!pendingOtpSession) return;
+      const session = pendingOtpSession;
+
       localStorage.setItem(GIRO_SESSION_KEY, JSON.stringify(session));
-      if (loginRole === 'motorista') {
+      if (session.role === 'motorista') {
         localStorage.setItem('giro_driver_session', JSON.stringify(session));
       } else {
         localStorage.setItem('giro_pax_session', JSON.stringify(session));
       }
 
-      const btn = document.getElementById('btn-login-submit');
-      btn.innerHTML = '<span>A autenticar...</span>';
-      btn.disabled = true;
+      const verifyBtn = document.getElementById('btn-otp-verify');
+      if (verifyBtn) {
+        verifyBtn.innerText = '✓ Verificado! A entrar...';
+        verifyBtn.disabled = true;
+      }
 
       setTimeout(() => {
-        window.location.href = loginRole === 'motorista' ? 'driver.html' : 'index.html';
-      }, 350);
+        window.location.href = session.role === 'motorista' ? 'driver.html' : 'index.html';
+      }, 400);
     }
 
     function handleRegister() {

@@ -1083,9 +1083,44 @@
       <div class="nav-apps-row">
         <a id="waze-btn" class="btn-nav-app" href="https://waze.com/ul?ll=-8.8383,13.2344&navigate=yes" target="_blank">🚙 Waze</a>
         <a id="gmaps-btn" class="btn-nav-app" href="https://www.google.com/maps/dir/?api=1&destination=-8.8383,13.2344" target="_blank">🗺️ Maps</a>
+        <button id="btn-driver-chat" class="btn-nav-app" style="background:#1e1e1e; border-color:#333; color:#fff; font-weight:700;" onclick="openDriverRideChat()">💬 Chat <span id="driver-chat-badge" style="display:none;background:#ef4444;color:#fff;border-radius:10px;padding:1px 6px;font-size:10px;margin-left:2px;">1</span></button>
         <button id="btn-driver-arrived" class="btn-nav-app" style="background:#f0b429; border-color:#f0b429; color:#000; font-weight:800; flex:1.3;" onclick="driverArrivedAtPickup()">📍 Cheguei!</button>
         <button id="btn-driver-start-trip" class="btn-nav-app" style="display:none; background:#3b82f6; border-color:#3b82f6; color:#fff; font-weight:800; flex:1.3;" onclick="driverStartTrip()">▶ Iniciar</button>
         <button id="btn-driver-complete" class="btn-nav-app" style="display:none; background:#10b981; border-color:#10b981; color:#000; font-weight:800; flex:1.3;" onclick="completeTrip()">✓ Concluir</button>
+      </div>
+    </div>
+
+    <!-- Modal de Chat com o Passageiro no HUD do Motorista -->
+    <div id="driver-chat-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.8);z-index:99999;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);align-items:flex-end;justify-content:center;">
+      <div style="background:#141414;border-top:1px solid #333;width:100%;max-width:540px;height:82vh;border-radius:24px 24px 0 0;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 -10px 40px rgba(0,0,0,0.8);">
+        <!-- Header -->
+        <div style="padding:16px 20px;border-bottom:1px solid #222;display:flex;align-items:center;justify-content:space-between;background:#1a1a1a;">
+          <div style="display:flex;align-items:center;gap:12px;">
+            <div style="width:40px;height:40px;border-radius:50%;background:#f0b429;color:#000;font-weight:900;display:flex;align-items:center;justify-content:center;font-size:16px;" id="driver-chat-pax-avatar">P</div>
+            <div>
+              <b style="font-size:15px;color:#fff;display:block;" id="driver-chat-pax-name">Passageiro</b>
+              <span style="font-size:11.5px;color:#10b981;">● Online na corrida</span>
+            </div>
+          </div>
+          <button onclick="closeDriverRideChat()" style="background:#262626;border:none;color:#aaa;width:36px;height:36px;border-radius:50%;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;">✕</button>
+        </div>
+        <!-- Mensagens Histórico -->
+        <div id="driver-chat-messages" style="flex:1;overflow-y:auto;padding:16px 20px;display:flex;flex-direction:column;gap:10px;">
+          <div style="text-align:center;font-size:11px;color:#666;margin-bottom:8px;">Início da conversa segura com o passageiro</div>
+        </div>
+        <!-- Chips de Respostas Rápidas Motorista -->
+        <div style="padding:8px 16px;background:#1a1a1a;border-top:1px solid #222;display:flex;gap:8px;overflow-x:auto;white-space:nowrap;scrollbar-width:none;">
+          <button onclick="sendDriverQuickMsg('Chego em 2 minutos')" style="background:#262626;border:1px solid #444;color:#eee;font-size:11.5px;padding:6px 12px;border-radius:16px;cursor:pointer;flex-shrink:0;">⏱️ Chego em 2 min</button>
+          <button onclick="sendDriverQuickMsg('Estou de quatro-piscas ligado')" style="background:#262626;border:1px solid #444;color:#eee;font-size:11.5px;padding:6px 12px;border-radius:16px;cursor:pointer;flex-shrink:0;">🚨 Quatro-piscas ligado</button>
+          <button onclick="sendDriverQuickMsg('Trânsito intenso na via')" style="background:#262626;border:1px solid #444;color:#eee;font-size:11.5px;padding:6px 12px;border-radius:16px;cursor:pointer;flex-shrink:0;">🚗 Trânsito intenso</button>
+          <button onclick="sendDriverQuickMsg('Já cheguei ao ponto de embarque')" style="background:#262626;border:1px solid #444;color:#eee;font-size:11.5px;padding:6px 12px;border-radius:16px;cursor:pointer;flex-shrink:0;">📍 Cheguei ao local</button>
+          <button onclick="sendDriverQuickMsg('Obrigado, já o vi')" style="background:#262626;border:1px solid #444;color:#eee;font-size:11.5px;padding:6px 12px;border-radius:16px;cursor:pointer;flex-shrink:0;">👋 Já o vi</button>
+        </div>
+        <!-- Input Bar -->
+        <div style="padding:12px 16px;background:#141414;display:flex;gap:10px;align-items:center;border-top:1px solid #222;">
+          <input type="text" id="driver-chat-input" placeholder="Escreva uma mensagem..." style="flex:1;background:#222;border:1px solid #333;color:#fff;padding:12px 16px;border-radius:22px;font-size:14px;outline:none;" onkeypress="if(event.key==='Enter') sendDriverChatMsg()">
+          <button onclick="sendDriverChatMsg()" style="background:#f0b429;color:#000;border:none;width:44px;height:44px;border-radius:50%;font-weight:900;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;">➤</button>
+        </div>
       </div>
     </div>
 
@@ -1334,6 +1369,8 @@
             if (driverState.pendingRide && driverState.pendingRide.id === data.rideId) {
               dismissRequest();
             }
+          } else if (data.type === 'RIDE_CHAT_MESSAGE' && driverState.activeTrip && data.rideId === driverState.activeTrip.rideId) {
+            handleIncomingDriverChatMessage(data.message);
           }
         };
       }
@@ -1745,16 +1782,243 @@
       dismissRequest();
     }
 
-    function acceptRequest() {
-      GiroDriverAlarm.stopAlarm();
-      GiroDriverNotification.dismissRideNotification();
-      dismissRequest();
-      
+    // Toast moderno para o motorista
+    function showDriverToast(msg, type = 'info') {
+      let toast = document.getElementById('driver-toast');
+      if (!toast) {
+        toast = document.createElement('div');
+        toast.id = 'driver-toast';
+        toast.style.cssText = 'position:fixed;top:24px;left:50%;transform:translateX(-50%);z-index:999999;max-width:92%;width:420px;padding:14px 18px;border-radius:14px;font-size:13.5px;font-weight:700;box-shadow:0 12px 36px rgba(0,0,0,0.85);display:flex;align-items:center;gap:10px;transition:all 0.3s cubic-bezier(0.16, 1, 0.3, 1);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:1px solid rgba(255,255,255,0.15);';
+        document.body.appendChild(toast);
+      }
+      if (type === 'warning') {
+        toast.style.background = 'rgba(30, 20, 10, 0.96)';
+        toast.style.borderColor = '#f59e0b';
+        toast.style.color = '#fbbf24';
+      } else if (type === 'success') {
+        toast.style.background = 'rgba(10, 30, 18, 0.96)';
+        toast.style.borderColor = '#10b981';
+        toast.style.color = '#34d399';
+      } else {
+        toast.style.background = 'rgba(18, 18, 18, 0.96)';
+        toast.style.borderColor = '#3b82f6';
+        toast.style.color = '#93c5fd';
+      }
+      toast.innerHTML = `<span style="font-size:18px;">${type === 'warning' ? '⚠️' : (type === 'success' ? '✓' : 'ℹ️')}</span><span style="flex:1;line-height:1.4;">${msg}</span>`;
+      toast.style.opacity = '1';
+      toast.style.transform = 'translateX(-50%) translateY(0)';
+
+      clearTimeout(toast._timeout);
+      toast._timeout = setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateX(-50%) translateY(-20px)';
+      }, 4500);
+    }
+
+    // Sistema de Chat em Tempo Real no HUD do Motorista
+    let driverChatMessages = [];
+    let driverChatPollInterval = null;
+    let driverChatUnreadCount = 0;
+    let currentChatRideId = null;
+
+    function playDriverChatChime() {
+      try {
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(587.33, ctx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(880, ctx.currentTime + 0.12);
+        gain.gain.setValueAtTime(0.2, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.25);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start();
+        osc.stop(ctx.currentTime + 0.26);
+      } catch(e) {}
+    }
+
+    function openDriverRideChat() {
+      const modal = document.getElementById('driver-chat-modal');
+      if (!modal) return;
+      modal.style.display = 'flex';
+      driverChatUnreadCount = 0;
+      const badge = document.getElementById('driver-chat-badge');
+      if (badge) badge.style.display = 'none';
+
+      if (driverState.activeTrip) {
+        const paxName = driverState.activeTrip.passengerName || 'Passageiro';
+        const nameEl = document.getElementById('driver-chat-pax-name');
+        const avatarEl = document.getElementById('driver-chat-pax-avatar');
+        if (nameEl) nameEl.innerText = paxName;
+        if (avatarEl) avatarEl.innerText = paxName.slice(0, 1).toUpperCase();
+      }
+      renderDriverChatMessages();
+      const input = document.getElementById('driver-chat-input');
+      if (input) setTimeout(() => input.focus(), 100);
+    }
+
+    function closeDriverRideChat() {
+      const modal = document.getElementById('driver-chat-modal');
+      if (modal) modal.style.display = 'none';
+    }
+
+    function startDriverChatSync(rideId, paxName) {
+      currentChatRideId = rideId;
+      driverChatMessages = [];
+      driverChatUnreadCount = 0;
+      const badge = document.getElementById('driver-chat-badge');
+      if (badge) badge.style.display = 'none';
+
+      if (driverChatPollInterval) clearInterval(driverChatPollInterval);
+      driverChatPollInterval = setInterval(() => {
+        if (!driverState.activeTrip || driverState.activeTrip.rideId !== rideId) {
+          stopDriverChatSync();
+          return;
+        }
+        fetch(`https://giro-4ed50-default-rtdb.europe-west1.firebasedatabase.app/rides/${rideId}/chat.json`)
+          .then(res => res.json())
+          .then(data => {
+            if (!data) return;
+            const msgs = Object.keys(data).map(k => ({ ...data[k], key: k })).sort((a, b) => (a.timestamp || 0) - (b.timestamp || 0));
+            if (msgs.length > driverChatMessages.length) {
+              const newCount = msgs.length - driverChatMessages.length;
+              const hasNewPaxMsg = msgs.slice(driverChatMessages.length).some(m => m.sender === 'passenger');
+              driverChatMessages = msgs;
+              renderDriverChatMessages();
+              if (hasNewPaxMsg) {
+                playDriverChatChime();
+                const modal = document.getElementById('driver-chat-modal');
+                if (!modal || modal.style.display === 'none') {
+                  driverChatUnreadCount += newCount;
+                  if (badge) {
+                    badge.innerText = driverChatUnreadCount;
+                    badge.style.display = 'inline-block';
+                  }
+                }
+              }
+            }
+          })
+          .catch(() => {});
+      }, 2500);
+    }
+
+    function stopDriverChatSync() {
+      if (driverChatPollInterval) {
+        clearInterval(driverChatPollInterval);
+        driverChatPollInterval = null;
+      }
+      currentChatRideId = null;
+    }
+
+    function handleIncomingDriverChatMessage(msg) {
+      if (!msg) return;
+      if (!driverChatMessages.some(m => m.id === msg.id)) {
+        driverChatMessages.push(msg);
+        renderDriverChatMessages();
+        if (msg.sender === 'passenger') {
+          playDriverChatChime();
+          const modal = document.getElementById('driver-chat-modal');
+          if (!modal || modal.style.display === 'none') {
+            driverChatUnreadCount++;
+            const badge = document.getElementById('driver-chat-badge');
+            if (badge) {
+              badge.innerText = driverChatUnreadCount;
+              badge.style.display = 'inline-block';
+            }
+          }
+        }
+      }
+    }
+
+    function renderDriverChatMessages() {
+      const box = document.getElementById('driver-chat-messages');
+      if (!box) return;
+      if (driverChatMessages.length === 0) {
+        box.innerHTML = '<div style="text-align:center;font-size:11.5px;color:#666;margin:20px 0;">Início da conversa com o passageiro. As mensagens são sincronizadas em tempo real.</div>';
+        return;
+      }
+
+      box.innerHTML = driverChatMessages.map(m => {
+        const isMe = (m.sender === 'driver');
+        const timeStr = new Date(m.timestamp || Date.now()).toLocaleTimeString('pt-AO', { hour: '2-digit', minute: '2-digit' });
+        return `
+          <div style="display:flex;flex-direction:column;align-items:${isMe ? 'flex-end' : 'flex-start'};margin-bottom:6px;">
+            <div style="max-width:80%;padding:10px 14px;border-radius:${isMe ? '18px 18px 4px 18px' : '18px 18px 18px 4px'};background:${isMe ? '#f0b429' : '#262626'};color:${isMe ? '#000' : '#fff'};font-weight:${isMe ? '700' : '500'};font-size:13.5px;line-height:1.4;box-shadow:0 2px 8px rgba(0,0,0,0.35);">
+              ${escapeHtml(m.text || '')}
+            </div>
+            <span style="font-size:10px;color:#777;margin-top:2px;padding:0 4px;">${timeStr}</span>
+          </div>
+        `;
+      }).join('');
+
+      box.scrollTop = box.scrollHeight;
+    }
+
+    function escapeHtml(str) {
+      return (str || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+
+    function sendDriverQuickMsg(text) {
+      const input = document.getElementById('driver-chat-input');
+      if (input) input.value = text;
+      sendDriverChatMsg();
+    }
+
+    function sendDriverChatMsg() {
+      const input = document.getElementById('driver-chat-input');
+      if (!input) return;
+      const text = input.value.trim();
+      if (!text || !driverState.activeTrip) return;
+
+      const rideId = driverState.activeTrip.rideId;
+      const s = GiroAuth.get() || {};
+      const msgObj = {
+        id: 'msg_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6),
+        sender: 'driver',
+        senderName: s.nome || s.name || 'Motorista Parceiro',
+        text: text,
+        timestamp: Date.now()
+      };
+
+      input.value = '';
+      driverChatMessages.push(msgObj);
+      renderDriverChatMessages();
+
+      // Transmitir via BroadcastChannel instantâneo
+      if (driverBroadcastChannel) {
+        try {
+          driverBroadcastChannel.postMessage({
+            type: 'RIDE_CHAT_MESSAGE',
+            rideId: rideId,
+            message: msgObj
+          });
+        } catch(e) {}
+      }
+
+      // Salvar no Firebase RTDB
+      try {
+        fetch(`https://giro-4ed50-default-rtdb.europe-west1.firebasedatabase.app/rides/${rideId}/chat/${msgObj.id}.json`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(msgObj)
+        }).catch(() => {});
+      } catch(e) {}
+    }
+
+    async function acceptRequest() {
       const pending = driverState.pendingRide;
-      const pickupName = document.getElementById('req-pickup-name').innerText;
-      const destName = document.getElementById('req-dest-name').innerText;
-      const rideId = pending ? pending.id : ('ride_' + Date.now());
-      const grossPrice = (pending && pending.service && pending.service.priceKz) || (pending && pending.priceKz) || 3000;
+      if (!pending) {
+        GiroDriverAlarm.stopAlarm();
+        GiroDriverNotification.dismissRideNotification();
+        dismissRequest();
+        return;
+      }
+
+      const pickupName = (document.getElementById('req-pickup-name') && document.getElementById('req-pickup-name').innerText) || 'Ponto de Embarque';
+      const destName = (document.getElementById('req-dest-name') && document.getElementById('req-dest-name').innerText) || 'Destino';
+      const rideId = pending.id || ('ride_' + Date.now());
+      const grossPrice = (pending.service && pending.service.priceKz) || pending.priceKz || 3000;
 
       // Obter identidade real do motorista logado no GIRO
       const s = GiroAuth.get() || {};
@@ -1769,6 +2033,48 @@
         coords: driverState.coords,
         acceptedAt: Date.now()
       };
+
+      // Trava Atómica Anti-Race Condition no Firebase RTDB
+      try {
+        const checkRes = await fetch(`https://giro-4ed50-default-rtdb.europe-west1.firebasedatabase.app/rides/${rideId}.json`);
+        const rData = await checkRes.json();
+        if (rData && rData.status && rData.status !== 'SEARCHING' && rData.driver && rData.driver.driverId !== driverId) {
+          GiroDriverAlarm.stopAlarm();
+          GiroDriverNotification.dismissRideNotification();
+          dismissRequest();
+          showDriverToast('⚠️ Corrida Atribuída! Outro parceiro aceitou frações de segundo antes. O seu radar continua ativo.', 'warning');
+          return;
+        }
+
+        // Escrever aceitação atómica
+        await fetch(`https://giro-4ed50-default-rtdb.europe-west1.firebasedatabase.app/rides/${rideId}.json`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            status: 'ACCEPTED',
+            driver: driverProfile,
+            acceptedBy: driverId,
+            acceptedAt: Date.now()
+          })
+        });
+
+        // Verificação imediata pós-escrita
+        const verifyRes = await fetch(`https://giro-4ed50-default-rtdb.europe-west1.firebasedatabase.app/rides/${rideId}/driver/driverId.json`);
+        const confirmedId = await verifyRes.json();
+        if (confirmedId && confirmedId !== driverId) {
+          GiroDriverAlarm.stopAlarm();
+          GiroDriverNotification.dismissRideNotification();
+          dismissRequest();
+          showDriverToast('⚠️ Corrida atribuída a outro parceiro. O radar continua a monitorizar novos pedidos.', 'warning');
+          return;
+        }
+      } catch (err) {
+        console.warn('[Anti-Race Lock] Exceção de rede na trava atómica:', err);
+      }
+
+      GiroDriverAlarm.stopAlarm();
+      GiroDriverNotification.dismissRideNotification();
+      dismissRequest();
 
       driverState.activeTrip = {
         rideId: rideId,
@@ -1801,7 +2107,7 @@
         }));
       } catch(e) {}
 
-      // 3. Atualizar no Firebase Realtime Database
+      // 3. Atualizar nós individuais no Firebase Realtime Database
       try {
         fetch(`https://giro-4ed50-default-rtdb.europe-west1.firebasedatabase.app/rides/${rideId}/status.json`, {
           method: 'PUT',
@@ -1814,6 +2120,9 @@
           body: JSON.stringify(driverProfile)
         }).catch(() => {});
       } catch(e) {}
+
+      // Iniciar sincronização de Chat em tempo real para o motorista
+      startDriverChatSync(rideId, driverState.activeTrip.passengerName);
 
       // Show Active Trip Overlay with real passenger info
       document.getElementById('trip-overlay').style.display = 'block';
@@ -2062,6 +2371,8 @@
       };
 
       // Clear trip do HUD e mapa
+      closeDriverRideChat();
+      stopDriverChatSync();
       document.getElementById('trip-overlay').style.display = 'none';
       if (tripRouteLayer) map.removeLayer(tripRouteLayer);
       driverState.activeTrip = null;

@@ -1,0 +1,34 @@
+{
+  "rules": {
+    "config": {
+      ".read": true,
+      ".write": false
+    },
+    "drivers": {
+      ".read": true,
+      "$driverId": {
+        ".write": "newData.exists() || data.exists()"
+      }
+    },
+    "rides": {
+      ".read": true,
+      "$rideId": {
+        ".write": "newData.exists() || data.exists()",
+        "chat": {
+          ".read": true,
+          ".write": "newData.exists()"
+        }
+      }
+    },
+    "cadastros": {
+      ".read": true,
+      "$cadastroId": {
+        ".write": "newData.exists()"
+      }
+    },
+    "telemetry": {
+      ".read": true,
+      ".write": "newData.exists()"
+    }
+  }
+}
