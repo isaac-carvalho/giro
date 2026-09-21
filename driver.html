@@ -1,20 +1,74 @@
 <!DOCTYPE html>
 <html lang="pt">
 <head>
+<script>
+// PWA Service Worker & Cache Controller Unificado
+(function initGiroDriverPWA() {
+  const GIRO_BUILD_SIG = 'giro_build_2026_09_21_pwa_v1';
+  try {
+    if (localStorage.getItem('giro_build_sig') !== GIRO_BUILD_SIG) {
+      localStorage.setItem('giro_build_sig', GIRO_BUILD_SIG);
+      if ('caches' in window) {
+        caches.keys().then(keys => {
+          return Promise.all(keys.filter(k => k !== 'giro-live-v2026-v5-firebase-suite').map(k => caches.delete(k)));
+        }).catch(() => {});
+      }
+    }
+  } catch(e) {}
+
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('./service-worker.js', { scope: './', updateViaCache: 'none' })
+        .then(reg => {
+          reg.update().catch(() => {});
+        })
+        .catch(err => {
+          console.warn('[SW Driver] Reg note:', err);
+        });
+    });
+  }
+})();
+</script>
+<script>
+// Auth Guard Motorista: Sincroniza chaves de sessão sem loops
+(function checkGiroDriverAuth() {
+  const GIRO_SESSION_KEY = 'giro_session';
+  const GIRO_DRIVER_SESSION_KEY = 'giro_driver_session';
+  try {
+    const rawDriver = localStorage.getItem(GIRO_DRIVER_SESSION_KEY);
+    const rawGlobal = localStorage.getItem(GIRO_SESSION_KEY);
+    if (!rawDriver && rawGlobal) {
+      try {
+        const parsed = JSON.parse(rawGlobal);
+        if (parsed && parsed.phone) {
+          localStorage.setItem(GIRO_DRIVER_SESSION_KEY, JSON.stringify({ ...parsed, role: 'motorista', ts: Date.now() }));
+        }
+      } catch(e) {}
+    } else if (rawDriver && !rawGlobal) {
+      localStorage.setItem(GIRO_SESSION_KEY, rawDriver);
+    }
+  } catch (e) {}
+})();
+</script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>GIRO Motorista Parceiro | Luanda</title>
-  
-  <!-- PWA & Android Meta -->
-  <link rel="manifest" href="./manifest.json">
+  <link rel="manifest" href="./manifest-driver.json">
   <meta name="theme-color" content="#000000">
+  <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <link rel="apple-touch-icon" href="./icons/icon-192.png">
+  <meta name="apple-mobile-web-app-title" content="GIRO Condutor">
+  <link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png">
+  <link rel="icon" type="image/png" sizes="512x512" href="./icons/icon-512.png">
+  <link rel="apple-touch-icon" sizes="192x192" href="./icons/icon-192.png">
+  <link rel="apple-touch-icon" sizes="512x512" href="./icons/icon-512.png">
   <link rel="icon" type="image/x-icon" href="./favicon.ico">
+  <link rel="shortcut icon" href="./favicon.ico">
 
-  <!-- Google Fonts & Leaflet -->  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+  <!-- Google Fonts & Leaflet -->  <link rel="stylesheet" href="./leaflet.css">
+  <script src="./leaflet.js"></script>
+  <script src="./telemetry.js"></script>
 
   <style>
     * {
@@ -416,19 +470,22 @@
 
     /* Incoming Request Card (Uber Radar) */
     .request-modal {
-      position: absolute;
+      position: fixed;
       bottom: 0;
       left: 0;
       right: 0;
-      background: #121212;
-      border-top: 2px solid #2563eb;
+      background: #141414;
+      border-top: 2px solid #ffffff;
       border-radius: 24px 24px 0 0;
-      padding: 20px;
-      z-index: 20;
-      box-shadow: 0 -12px 40px rgba(0,0,0,0.8);
+      padding: 18px 18px calc(26px + env(safe-area-inset-bottom, 16px));
+      z-index: 500;
+      box-shadow: 0 -16px 50px rgba(0,0,0,0.95);
       display: none;
       transform: translateY(100%);
       transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      max-height: 90vh;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
     }
 
     .request-modal.active {
@@ -442,13 +499,13 @@
       background: #262626;
       border-radius: 3px;
       overflow: hidden;
-      margin-bottom: 16px;
+      margin-bottom: 14px;
     }
 
     .req-timer-fill {
       height: 100%;
       width: 100%;
-      background: #2563eb;
+      background: #d4af37;
       transition: width 15s linear;
     }
 
@@ -456,7 +513,7 @@
       display: flex;
       justify-content: space-between;
       align-items: baseline;
-      margin-bottom: 12px;
+      margin-bottom: 10px;
     }
 
     .req-price {
@@ -475,7 +532,7 @@
       background: #1a1a1a;
       border-radius: 12px;
       padding: 12px;
-      margin-bottom: 16px;
+      margin-bottom: 14px;
     }
 
     .route-node {
@@ -501,30 +558,58 @@
 
     .req-actions {
       display: flex;
-      gap: 10px;
+      gap: 12px;
+      margin-top: 14px;
+      padding-bottom: 6px;
     }
 
     .btn-reject {
       flex: 1;
-      padding: 15px;
-      background: #262626;
+      min-height: 54px;
+      padding: 14px 10px;
+      background: #201315;
       color: #ef4444;
-      font-weight: 700;
-      border: 1px solid #383838;
-      border-radius: 14px;
+      font-weight: 800;
+      border: 1.5px solid #ef4444;
+      border-radius: 16px;
+      font-size: 15px;
       cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      box-shadow: 0 4px 15px rgba(239, 68, 68, 0.15);
+      transition: background 0.15s, transform 0.15s;
+    }
+
+    .btn-reject:active {
+      transform: scale(0.97);
+      background: #331518;
     }
 
     .btn-accept {
       flex: 2;
-      padding: 15px;
-      background: #000000;
-      color: #ffffff;
-      font-weight: 800;
-      border: 2px solid #ffffff;
-      border-radius: 14px;
+      min-height: 54px;
+      padding: 14px 10px;
+      background: #ffffff;
+      color: #000000;
+      font-weight: 900;
+      border: none;
+      border-radius: 16px;
       font-size: 16px;
+      letter-spacing: 0.02em;
       cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      box-shadow: 0 6px 25px rgba(255, 255, 255, 0.35);
+      transition: background 0.15s, transform 0.15s;
+    }
+
+    .btn-accept:active {
+      transform: scale(0.97);
+      background: #e5e5e5;
     }
 
     /* Active Trip Overlay */
@@ -812,6 +897,7 @@
       </div>
 
       <div class="top-actions">
+        <button id="driver-pwa-install-btn" onclick="installGiroDriverPwa()" style="display:none;align-items:center;gap:4px;background:#ffffff;color:#000000;border:none;border-radius:20px;padding:6px 12px;font-size:11px;font-weight:800;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,0.4);white-space:nowrap;letter-spacing:-0.2px;">⬇ Instalar</button>
         <button class="icon-btn sos-btn" onclick="triggerSosEmergency()" title="Botão do Pânico 5km">SOS</button>
       </div>
     </div>
@@ -943,8 +1029,8 @@
       </div>
 
       <div class="req-actions">
-        <button class="btn-reject" onclick="rejectRequest()">Recusar</button>
-        <button class="btn-accept" onclick="acceptRequest()">Aceitar Corrida</button>
+        <button class="btn-reject" onclick="rejectRequest()">✕ Recusar</button>
+        <button class="btn-accept" onclick="acceptRequest()">✓ Aceitar Corrida</button>
       </div>
     </div>
   </div>
@@ -1038,14 +1124,25 @@
     let map, driverMarker, tripRouteLayer;
 
     function initDriverMap() {
+      if (!driverState.coords || !driverState.coords[0]) {
+        driverState.coords = [-8.8383, 13.2344]; // Luanda Centro padrão
+      }
+
       map = L.map('map', {
         zoomControl: false,
         attributionControl: false
       }).setView(driverState.coords, 14);
 
-      L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+      // Camada de Ruas Oficial 100% Livre e Limpa (Sem Marcas de Água / Sem API Key)
+      const tiles = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
         maxZoom: 19
       }).addTo(map);
+
+      tiles.on('tileerror', function() {
+        L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', {
+          maxZoom: 19
+        }).addTo(map);
+      });
 
       // Driver custom icon
       const carIcon = L.divIcon({
@@ -1057,16 +1154,321 @@
 
       driverMarker = L.marker(driverState.coords, { icon: carIcon }).addTo(map);
 
-      // Try device geolocation
+      // Try device geolocation com trava estrita para Angola (Luanda Centro se fora)
       if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition((pos) => {
-          driverState.coords = [pos.coords.latitude, pos.coords.longitude];
-          map.setView(driverState.coords, 15);
-          driverMarker.setLatLng(driverState.coords);
+          const lat = pos.coords.latitude;
+          const lng = pos.coords.longitude;
+          if (lat >= -18.1 && lat <= -4.4 && lng >= 11.6 && lng <= 24.1) {
+            driverState.coords = [lat, lng];
+            map.setView(driverState.coords, 15);
+            driverMarker.setLatLng(driverState.coords);
+          } else {
+            console.log('GPS fora de Angola. Centrando em Luanda Centro.');
+            driverState.coords = [-8.8383, 13.2344];
+            map.setView(driverState.coords, 14);
+            driverMarker.setLatLng(driverState.coords);
+          }
         }, (err) => {
           console.log('GPS default Luanda');
-        }, { enableHighAccuracy: true });
+          driverState.coords = [-8.8383, 13.2344];
+          map.setView(driverState.coords, 14);
+          driverMarker.setLatLng(driverState.coords);
+        }, { enableHighAccuracy: true, timeout: 5000 });
       }
+    }
+
+    // Sincronização em Tempo Real Driver <-> Passenger
+    let driverBroadcastChannel = null;
+    let driverPollInterval = null;
+    let driverLocationBroadcastInterval = null;
+
+    try {
+      if (typeof BroadcastChannel !== 'undefined') {
+        driverBroadcastChannel = new BroadcastChannel('giro_ride_channel');
+        driverBroadcastChannel.onmessage = (event) => {
+          const data = event.data;
+          if (!data) return;
+          if (data.type === 'RIDE_REQUESTED' && driverState.isOnline && !driverState.activeTrip) {
+            receiveIncomingPassengerRide(data.ride);
+          } else if (data.type === 'RIDE_CANCELLED') {
+            if (driverState.pendingRide && driverState.pendingRide.id === data.rideId) {
+              dismissRequest();
+            }
+          }
+        };
+      }
+    } catch(e) {}
+
+    window.addEventListener('storage', (e) => {
+      if (e.key === 'giro_active_ride_request' && driverState.isOnline && !driverState.activeTrip) {
+        try {
+          const ride = JSON.parse(e.newValue);
+          if (ride && ride.status === 'SEARCHING') {
+            receiveIncomingPassengerRide(ride);
+          }
+        } catch(err) {}
+      }
+    });
+
+    // =============================================================================
+    // R3: Web Audio API Background Alarm Synthesizer (100% Offline, Dual-Tone)
+    // =============================================================================
+    const GiroDriverAlarm = {
+      ctx: null,
+      isPlaying: false,
+      intervalId: null,
+      activeOscs: [],
+
+      initContext() {
+        if (!this.ctx) {
+          const AudioCtxClass = window.AudioContext || window.webkitAudioContext;
+          if (AudioCtxClass) {
+            this.ctx = new AudioCtxClass();
+          }
+        }
+        if (this.ctx && this.ctx.state === 'suspended') {
+          this.ctx.resume().catch(() => {});
+        }
+        return this.ctx;
+      },
+
+      unlock() {
+        return this.initContext();
+      },
+
+      playDualTonePulse() {
+        try {
+          const ctx = this.initContext();
+          if (!ctx) return null;
+
+          const now = ctx.currentTime;
+          const osc1 = ctx.createOscillator();
+          const osc2 = ctx.createOscillator();
+          const gain = ctx.createGain();
+
+          osc1.type = 'triangle';
+          osc1.frequency.setValueAtTime(880, now);
+
+          osc2.type = 'sine';
+          osc2.frequency.setValueAtTime(1760, now);
+
+          gain.gain.setValueAtTime(0.001, now);
+          gain.gain.linearRampToValueAtTime(0.4, now + 0.04);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.38);
+
+          osc1.connect(gain);
+          osc2.connect(gain);
+          gain.connect(ctx.destination);
+
+          osc1.start(now);
+          osc2.start(now);
+          osc1.stop(now + 0.40);
+          osc2.stop(now + 0.40);
+
+          this.activeOscs.push(osc1, osc2);
+
+          osc1.onended = () => {
+            try { osc1.disconnect(); } catch(e) {}
+            this.activeOscs = this.activeOscs.filter(o => o !== osc1);
+          };
+          osc2.onended = () => {
+            try { osc2.disconnect(); } catch(e) {}
+            this.activeOscs = this.activeOscs.filter(o => o !== osc2);
+          };
+
+          return { osc1, osc2 };
+        } catch(e) {
+          return null;
+        }
+      },
+
+      startAlarm() {
+        if (this.isPlaying) {
+          this.stopAlarm();
+        }
+        this.isPlaying = true;
+        this.initContext();
+        const firstAlarm = this.playDualTonePulse();
+
+        if (this.intervalId) clearInterval(this.intervalId);
+        this.intervalId = setInterval(() => {
+          if (!this.isPlaying) {
+            clearInterval(this.intervalId);
+            this.intervalId = null;
+            return;
+          }
+          this.playDualTonePulse();
+        }, 750);
+
+        return firstAlarm;
+      },
+
+      triggerDualToneAlarm() {
+        return this.startAlarm();
+      },
+
+      stopAlarm() {
+        this.isPlaying = false;
+        if (this.intervalId) {
+          clearInterval(this.intervalId);
+          this.intervalId = null;
+        }
+        for (const osc of this.activeOscs) {
+          try { osc.stop(); } catch(e) {}
+          try { osc.disconnect(); } catch(e) {}
+        }
+        this.activeOscs = [];
+      }
+    };
+
+    // =============================================================================
+    // R3: Web Push & System Notification Dispatcher
+    // =============================================================================
+    const GiroDriverNotification = {
+      requestPermission() {
+        if ('Notification' in window && Notification.permission === 'default') {
+          try {
+            Notification.requestPermission().catch(() => {});
+          } catch(e) {}
+        }
+      },
+
+      showRideNotification(rideInfo) {
+        if (!('Notification' in window) || Notification.permission !== 'granted') {
+          return null;
+        }
+
+        const title = 'Nova Corrida Disponível — GIRO Angola';
+        const pickup = rideInfo.pickup || 'Passageiro próximo';
+        const cat = rideInfo.category || 'Conforto';
+        const fare = rideInfo.fare ? `${Number(rideInfo.fare).toLocaleString('pt-AO')} Kz` : '';
+        const body = `${pickup} · GIRO ${cat} (${fare})`.trim();
+
+        const options = {
+          body: body,
+          icon: './icons/icon-192.png',
+          badge: './icons/icon-192.png',
+          tag: 'giro-ride-request',
+          renotify: true,
+          requireInteraction: true,
+          vibrate: [200, 100, 200, 100, 400],
+          data: {
+            rideId: rideInfo.rideId || ('ride_' + Date.now()),
+            fare: rideInfo.fare || 0,
+            url: './driver.html'
+          },
+          actions: [
+            { action: 'accept', title: 'Aceitar Corrida' },
+            { action: 'dismiss', title: 'Recusar' }
+          ]
+        };
+
+        try {
+          if ('serviceWorker' in navigator && navigator.serviceWorker.ready) {
+            navigator.serviceWorker.ready.then(reg => {
+              reg.showNotification(title, options).catch(() => {
+                try { new Notification(title, options); } catch(e) {}
+              });
+            }).catch(() => {
+              try { new Notification(title, options); } catch(e) {}
+            });
+          } else {
+            return new Notification(title, options);
+          }
+        } catch(e) {
+          return null;
+        }
+      },
+
+      dismissRideNotification() {
+        try {
+          if ('serviceWorker' in navigator && navigator.serviceWorker.ready) {
+            navigator.serviceWorker.ready.then(reg => {
+              if (reg && reg.getNotifications) {
+                reg.getNotifications({ tag: 'giro-ride-request' }).then(notifs => {
+                  notifs.forEach(n => n.close());
+                }).catch(() => {});
+              }
+            }).catch(() => {});
+          }
+        } catch(e) {}
+      }
+    };
+
+    function pollFirebaseForAvailableRides() {
+      if (!driverState.isOnline || driverState.activeTrip) return;
+      fetch('https://giro-4ed50-default-rtdb.europe-west1.firebasedatabase.app/rides.json')
+        .then(res => res.json())
+        .then(rides => {
+          if (!rides || !driverState.isOnline || driverState.activeTrip) return;
+          const keys = Object.keys(rides);
+          for (let i = keys.length - 1; i >= 0; i--) {
+            const r = rides[keys[i]];
+            if (r && r.status === 'SEARCHING' && (Date.now() - (r.timestamp || 0) < 60000)) {
+              receiveIncomingPassengerRide(r);
+              break;
+            }
+          }
+        })
+        .catch(() => {});
+    }
+
+    function receiveIncomingPassengerRide(ride) {
+      if (!ride || driverState.activeTrip) return;
+      if (driverState.pendingRide && driverState.pendingRide.id === ride.id && document.getElementById('request-modal').classList.contains('active')) {
+        return;
+      }
+      driverState.pendingRide = ride;
+
+      const modal = document.getElementById('request-modal');
+      const timerFill = document.getElementById('req-timer-fill');
+
+      const gross = (ride.service && ride.service.priceKz) || ride.priceKz || 3000;
+      const net = Math.round(gross * 0.9);
+      const comm = gross - net;
+
+      // Disparar Alarme Sonoro Web Audio e Notificação Push Nativa
+      GiroDriverAlarm.startAlarm();
+      GiroDriverNotification.showRideNotification({
+        rideId: ride.id,
+        pickup: (ride.origin && ride.origin.name) || ride.originName || 'Talatona, Luanda',
+        dest: (ride.dest && ride.dest.name) || ride.destName || 'Kilamba, Luanda',
+        fare: net,
+        category: (ride.service && (ride.service.tierNome || ride.service.tierId)) || 'Conforto'
+      });
+
+      const priceEl = document.getElementById('req-price-display');
+      if (priceEl) priceEl.innerText = net.toLocaleString('pt-AO') + ' Kz';
+
+      const commTag = document.querySelector('.req-commission-tag');
+      if (commTag) commTag.innerText = `GIRO 10%: -${comm.toLocaleString('pt-AO')} Kz`;
+
+      const pickupEl = document.getElementById('req-pickup-name');
+      const destEl = document.getElementById('req-dest-name');
+      if (pickupEl) pickupEl.innerText = (ride.origin && ride.origin.name) || ride.originName || 'Talatona, Luanda';
+      if (destEl) destEl.innerText = (ride.dest && ride.dest.name) || ride.destName || 'Kilamba, Luanda';
+
+      const pOrig = (ride.origin && ride.origin.coords) || [-8.8383, 13.2344];
+      const pDest = (ride.dest && ride.dest.coords) || [-8.9147, 13.1893];
+      driverState._lastRouteOriginCoords = pOrig;
+      driverState._lastRouteDestCoords = pDest;
+
+      modal.classList.add('active');
+      const bottomNav = document.getElementById('bottom-tab-bar');
+      if (bottomNav) bottomNav.style.display = 'none';
+      timerFill.style.transition = 'none';
+      timerFill.style.width = '100%';
+
+      setTimeout(() => {
+        timerFill.style.transition = 'width 15s linear';
+        timerFill.style.width = '0%';
+      }, 50);
+
+      clearTimeout(timerInterval);
+      timerInterval = setTimeout(() => {
+        dismissRequest();
+      }, 15000);
     }
 
     // Toggle Online / Offline
@@ -1077,22 +1479,41 @@
       const dot = document.getElementById('top-status-dot');
 
       if (driverState.isOnline) {
+        GiroDriverAlarm.unlock();
+        GiroDriverNotification.requestPermission();
         goBtn.innerText = 'OFF';
         goBtn.classList.add('online');
         radar.classList.add('active');
         dot.classList.add('online');
+        if (typeof GiroTelemetry !== 'undefined') {
+          GiroTelemetry.info('Motorista alterou status para: ONLINE', 'driver_status_toggle', { isOnline: true, coords: driverState.coords });
+        }
         
-        // Auto simulate incoming ride after 3.5 seconds
+        // Iniciar busca de passageiros em tempo real na nuvem Firebase
+        if (driverPollInterval) clearInterval(driverPollInterval);
+        driverPollInterval = setInterval(pollFirebaseForAvailableRides, 3000);
+        pollFirebaseForAvailableRides();
+
+        // Fallback: se nenhum pedido real chegar após 5s, simula pedido
         setTimeout(() => {
-          if (driverState.isOnline && !driverState.activeTrip) {
+          if (driverState.isOnline && !driverState.activeTrip && !driverState.pendingRide) {
             simulateIncomingRequest();
           }
-        }, 3500);
+        }, 5000);
       } else {
+        GiroDriverAlarm.stopAlarm();
+        GiroDriverNotification.dismissRideNotification();
         goBtn.innerText = 'GO';
         goBtn.classList.remove('online');
         radar.classList.remove('active');
         dot.classList.remove('online');
+        if (typeof GiroTelemetry !== 'undefined') {
+          GiroTelemetry.info('Motorista alterou status para: OFFLINE', 'driver_status_toggle', { isOnline: false, coords: driverState.coords });
+        }
+        if (driverPollInterval) {
+          clearInterval(driverPollInterval);
+          driverPollInterval = null;
+        }
         dismissRequest();
       }
     }
@@ -1114,6 +1535,16 @@
       const gross = selected.price;
       const net = Math.round(gross * 0.9); // 10% commission
 
+      // Disparar Alarme Sonoro Web Audio e Notificação Push Nativa
+      GiroDriverAlarm.startAlarm();
+      GiroDriverNotification.showRideNotification({
+        rideId: 'sim_' + Date.now(),
+        pickup: selected.from,
+        dest: selected.to,
+        fare: net,
+        category: 'Conforto'
+      });
+
       document.getElementById('req-price-display').innerText = net.toLocaleString('pt-AO') + ' Kz';
       document.getElementById('req-pickup-name').innerText = selected.from;
       document.getElementById('req-dest-name').innerText = selected.to;
@@ -1123,6 +1554,8 @@
       driverState._lastRouteOriginCoords = selected.originCoords;
 
       modal.classList.add('active');
+      const bottomNav = document.getElementById('bottom-tab-bar');
+      if (bottomNav) bottomNav.style.display = 'none';
       timerFill.style.transition = 'none';
       timerFill.style.width = '100%';
 
@@ -1140,27 +1573,83 @@
 
     function dismissRequest() {
       clearTimeout(timerInterval);
+      GiroDriverAlarm.stopAlarm();
+      GiroDriverNotification.dismissRideNotification();
       document.getElementById('request-modal').classList.remove('active');
+      const bottomNav = document.getElementById('bottom-tab-bar');
+      if (bottomNav) bottomNav.style.display = 'flex';
     }
 
     function rejectRequest() {
+      GiroDriverAlarm.stopAlarm();
+      GiroDriverNotification.dismissRideNotification();
+      driverState.pendingRide = null;
       dismissRequest();
     }
 
     function acceptRequest() {
+      GiroDriverAlarm.stopAlarm();
+      GiroDriverNotification.dismissRideNotification();
       dismissRequest();
       
-      // Get pickup and destination names from the request card
+      const pending = driverState.pendingRide;
       const pickupName = document.getElementById('req-pickup-name').innerText;
       const destName = document.getElementById('req-dest-name').innerText;
+      const rideId = pending ? pending.id : ('ride_' + Date.now());
+      const grossPrice = (pending && pending.service && pending.service.priceKz) || 3000;
+
+      const driverProfile = {
+        name: 'Domingos Manuel',
+        car: 'Toyota Corolla Branco',
+        plate: 'LD-44-88-HA',
+        rating: '4.95',
+        phone: '+244 923 111 222',
+        coords: driverState.coords
+      };
 
       driverState.activeTrip = {
+        rideId: rideId,
         origin: driverState.coords,
         originName: pickupName,
         dest: driverState._lastRouteDestCoords || [-8.9147, 13.1893],
         destName: destName,
-        price: 3000
+        price: grossPrice,
+        passengerName: (pending && pending.passenger && pending.passenger.name) || 'Passageiro GIRO'
       };
+
+      // 1. Transmitir aceitação via BroadcastChannel
+      if (driverBroadcastChannel) {
+        try {
+          driverBroadcastChannel.postMessage({
+            type: 'RIDE_ACCEPTED',
+            rideId: rideId,
+            driver: driverProfile
+          });
+        } catch(e) {}
+      }
+
+      // 2. Transmitir via localStorage
+      try {
+        localStorage.setItem('giro_active_ride_status', JSON.stringify({
+          rideId: rideId,
+          status: 'ACCEPTED',
+          driver: driverProfile
+        }));
+      } catch(e) {}
+
+      // 3. Atualizar no Firebase Realtime Database
+      try {
+        fetch(`https://giro-4ed50-default-rtdb.europe-west1.firebasedatabase.app/rides/${rideId}/status.json`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify('ACCEPTED')
+        }).catch(() => {});
+        fetch(`https://giro-4ed50-default-rtdb.europe-west1.firebasedatabase.app/rides/${rideId}/driver.json`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(driverProfile)
+        }).catch(() => {});
+      } catch(e) {}
 
       // Show Active Trip Overlay with passenger info
       document.getElementById('trip-overlay').style.display = 'block';
@@ -1172,8 +1661,7 @@
       
       const tripCoords = [
         driverState.coords,
-        [-8.8500, 13.2200],
-        [-8.8800, 13.2000],
+        driverState._lastRouteOriginCoords || [-8.8500, 13.2200],
         driverState.activeTrip.dest
       ];
 
@@ -1185,20 +1673,82 @@
 
       map.fitBounds(tripRouteLayer.getBounds(), { padding: [80, 80] });
 
-      // Build navigation links with full addresses (origin → destination)
+      // Build navigation links with full addresses
       const originEnc = encodeURIComponent(pickupName + ', Angola');
       const destEnc = encodeURIComponent(destName + ', Angola');
       const destLat = driverState.activeTrip.dest[0];
       const destLng = driverState.activeTrip.dest[1];
 
-      // Waze: navigate to destination address
       document.getElementById('waze-btn').href = `https://waze.com/ul?q=${destEnc}&ll=${destLat},${destLng}&navigate=yes`;
-      // Google Maps: full route from pickup to destination
       document.getElementById('gmaps-btn').href = `https://www.google.com/maps/dir/?api=1&origin=${originEnc}&destination=${destEnc}&travelmode=driving`;
+
+      // Iniciar transmissão de localização do motorista em tempo real
+      if (driverLocationBroadcastInterval) clearInterval(driverLocationBroadcastInterval);
+      const pDest = driverState.activeTrip.dest;
+      let step = 0;
+      const totalSteps = 8;
+      
+      driverLocationBroadcastInterval = setInterval(() => {
+        if (!driverState.activeTrip) {
+          clearInterval(driverLocationBroadcastInterval);
+          return;
+        }
+        step++;
+        if (step <= totalSteps) {
+          const curLat = driverState.coords[0] + (pDest[0] - driverState.coords[0]) * (step / totalSteps);
+          const curLng = driverState.coords[1] + (pDest[1] - driverState.coords[1]) * (step / totalSteps);
+          const currentLoc = [curLat, curLng];
+          
+          if (driverMarker) driverMarker.setLatLng(currentLoc);
+          
+          if (driverBroadcastChannel) {
+            try {
+              driverBroadcastChannel.postMessage({
+                type: 'DRIVER_LOCATION_UPDATE',
+                rideId: rideId,
+                coords: currentLoc
+              });
+            } catch(e) {}
+          }
+          fetch(`https://giro-4ed50-default-rtdb.europe-west1.firebasedatabase.app/rides/${rideId}/driver/coords.json`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(currentLoc)
+          }).catch(() => {});
+        } else {
+          clearInterval(driverLocationBroadcastInterval);
+        }
+      }, 2500);
     }
 
     function completeTrip() {
       if (!driverState.activeTrip) return;
+
+      const rideId = driverState.activeTrip.rideId;
+      if (driverLocationBroadcastInterval) {
+        clearInterval(driverLocationBroadcastInterval);
+        driverLocationBroadcastInterval = null;
+      }
+
+      // Notificar conclusão ao passageiro
+      if (driverBroadcastChannel) {
+        try {
+          driverBroadcastChannel.postMessage({ type: 'RIDE_COMPLETED', rideId: rideId });
+        } catch(e) {}
+      }
+      try {
+        localStorage.setItem('giro_active_ride_status', JSON.stringify({
+          rideId: rideId,
+          status: 'COMPLETED'
+        }));
+      } catch(e) {}
+      try {
+        fetch(`https://giro-4ed50-default-rtdb.europe-west1.firebasedatabase.app/rides/${rideId}/status.json`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify('COMPLETED')
+        }).catch(() => {});
+      } catch(e) {}
 
       // Add earnings
       const tripGross = driverState.activeTrip.price;
@@ -1210,23 +1760,147 @@
       // Check 30K bonus
       if (driverState.dailyGross >= driverState.dailyTarget && !driverState.bonusAwarded) {
         driverState.bonusAwarded = true;
-        driverState.dailyGross += driverState.dailyBonus; // award +1500 Kz
-        alert(`🎉 PARABÉNS! Você completou o DESAFIO DIÁRIO 30K!
-
-Bônus de +1.500 Kz creditado imediatamente na sua Carteira Express sem cortes!`);
+        driverState.dailyGross += driverState.dailyBonus;
       }
 
       updateUI();
 
-      // Clear trip
+      // Guardar dados da corrida para o modal de avaliação
+      const completedTripData = {
+        rideId: rideId,
+        tripGross: tripGross,
+        tripNet: tripNet,
+        originName: driverState.activeTrip.originName,
+        destName: driverState.activeTrip.destName,
+        passengerName: driverState.activeTrip.passengerName
+      };
+
+      // Clear trip do HUD e mapa
       document.getElementById('trip-overlay').style.display = 'none';
       if (tripRouteLayer) map.removeLayer(tripRouteLayer);
       driverState.activeTrip = null;
+      driverState.pendingRide = null;
 
-      alert(`✅ Corrida concluída com sucesso!
-Faturamento bruto: +${tripGross.toLocaleString('pt-AO')} Kz
-Comissão GIRO (10%): -${(tripGross * 0.1).toLocaleString('pt-AO')} Kz
-Líquido na carteira: +${tripNet.toLocaleString('pt-AO')} Kz`);
+      // Abrir Modal de Avaliação do Passageiro
+      openPassengerRatingModal(completedTripData);
+    }
+
+
+    /* ==========================================================================
+       AVALIAÇÃO DO PASSAGEIRO PELO MOTORISTA (SISTEMA DE NOTAS E ELOGIOS)
+       ========================================================================== */
+    let currentRatingTripData = null;
+    let currentPaxRatingScore = 5;
+
+    const paxRatingFeedbackTexts = {
+      1: 'Comportamento inadequado ⭐ (Iremos analisar)',
+      2: 'Abaixo do esperado ⭐⭐ (Atrasou no embarque)',
+      3: 'Regular / Neutro ⭐⭐⭐',
+      4: 'Muito bom passageiro! ⭐⭐⭐⭐',
+      5: 'Excelente passageiro! ⭐⭐⭐⭐⭐'
+    };
+
+    function openPassengerRatingModal(tripData) {
+      currentRatingTripData = tripData;
+      currentPaxRatingScore = 5;
+      setPaxRating(5);
+
+      const modal = document.getElementById('passenger-rating-modal');
+      const fareEl = document.getElementById('pax-rating-net-fare');
+      const routeEl = document.getElementById('pax-rating-trip-route');
+      const nameEl = document.getElementById('pax-rating-name');
+
+      if (fareEl) fareEl.innerText = `+${tripData.tripNet.toLocaleString('pt-AO')} Kz`;
+      if (routeEl) routeEl.innerText = `${(tripData.originName || 'Mutamba').split(',')[0]} → ${(tripData.destName || 'Talatona').split(',')[0]}`;
+      if (nameEl) nameEl.innerText = tripData.passengerName || 'Passageiro GIRO';
+
+      // Ocultar barra de navegação durante avaliação
+      const bottomNav = document.getElementById('bottom-tab-bar');
+      if (bottomNav) bottomNav.style.display = 'none';
+
+      if (modal) modal.style.display = 'flex';
+    }
+
+    function closePaxRatingModal(showToast = true) {
+      const modal = document.getElementById('passenger-rating-modal');
+      if (modal) modal.style.display = 'none';
+
+      const bottomNav = document.getElementById('bottom-tab-bar');
+      if (bottomNav) bottomNav.style.display = 'flex';
+
+      if (showToast) {
+        alert(`⭐ Avaliação de ${currentPaxRatingScore} estrelas enviada com sucesso!\n\nSeus ganhos de +${(currentRatingTripData ? currentRatingTripData.tripNet : 2700).toLocaleString('pt-AO')} Kz já estão creditados na sua Carteira Express.`);
+      }
+
+      currentRatingTripData = null;
+    }
+
+    function setPaxRating(rating) {
+      currentPaxRatingScore = rating;
+      const stars = document.querySelectorAll('#pax-star-container .pax-star-icon');
+      stars.forEach((s, idx) => {
+        const val = idx + 1;
+        if (val <= rating) {
+          s.style.color = '#f59e0b';
+          s.style.transform = 'scale(1.18)';
+          setTimeout(() => s.style.transform = 'scale(1)', 150);
+        } else {
+          s.style.color = '#444';
+          s.style.transform = 'scale(1)';
+        }
+      });
+
+      const label = document.getElementById('pax-rating-label');
+      if (label) {
+        label.innerText = paxRatingFeedbackTexts[rating] || 'Avaliação registada';
+      }
+    }
+
+    function togglePaxCompliment(btn) {
+      btn.classList.toggle('active');
+      if (btn.classList.contains('active')) {
+        btn.style.background = '#262626';
+        btn.style.borderColor = '#555';
+        btn.style.color = '#fff';
+      } else {
+        btn.style.background = '#181818';
+        btn.style.borderColor = '#333';
+        btn.style.color = '#888';
+      }
+    }
+
+    function submitPaxRating() {
+      const selectedCompliments = [];
+      document.querySelectorAll('#pax-compliments-list .pax-compliment-chip.active').forEach(chip => {
+        selectedCompliments.push(chip.innerText.trim());
+      });
+
+      const ratingRecord = {
+        rideId: currentRatingTripData ? currentRatingTripData.rideId : ('ride_' + Date.now()),
+        passengerName: currentRatingTripData ? currentRatingTripData.passengerName : 'Passageiro GIRO',
+        rating: currentPaxRatingScore,
+        compliments: selectedCompliments,
+        ratedAt: new Date().toISOString(),
+        driverName: 'Domingos Manuel'
+      };
+
+      // Salvar na nuvem Firebase RTDB
+      try {
+        fetch(`https://giro-4ed50-default-rtdb.europe-west1.firebasedatabase.app/ratings/passengers/${ratingRecord.rideId}.json`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(ratingRecord)
+        }).catch(() => {});
+      } catch(e) {}
+
+      // Salvar localmente
+      try {
+        const existing = JSON.parse(localStorage.getItem('giro_passenger_ratings') || '[]');
+        existing.push(ratingRecord);
+        localStorage.setItem('giro_passenger_ratings', JSON.stringify(existing));
+      } catch(e) {}
+
+      closePaxRatingModal(true);
     }
 
     function updateUI() {
@@ -1296,74 +1970,287 @@ Valor disponível na sua conta em até 2 minutos.`);
     function showQuestDetails() {
       alert(`⚡ DESAFIO DIÁRIO 30K - GIRO ANGOLA
 
-` +
-            `• Meta do dia: Faturar 30.000 Kz em corridas brutas.
-` +
-            `• Prêmio: +1.500 Kz direto na carteira!
-` +
-            `• Regra Transparente: Como a taxa da GIRO é apenas 10%, a plataforma reinveste 50% da sua receita do dia diretamente no seu bolso, sem comprometer a estabilidade do sistema.
+• Meta do dia: Faturar 30.000 Kz em corridas brutas.
+• Prêmio: +1.500 Kz direto na carteira!
+• Regra Transparente: Como a taxa da GIRO é apenas 10%, a plataforma reinveste 50% da sua receita do dia diretamente no seu bolso, sem comprometer a estabilidade do sistema.
 
-` +
-            `Progresso atual: ${driverState.dailyGross.toLocaleString('pt-AO')} Kz (${Math.round((driverState.dailyGross/driverState.dailyTarget)*100)}%)`);
+Progresso atual: ${driverState.dailyGross.toLocaleString('pt-AO')} Kz (${Math.round((driverState.dailyGross/driverState.dailyTarget)*100)}%)`);
     }
 
-    // PWA Service Worker Registration
+    // PWA Service Worker Registration & Message Listener
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./service-worker.js').catch(err => {
+        navigator.serviceWorker.register('./service-worker.js', { scope: './', updateViaCache: 'none' }).then(reg => {
+          reg.update().catch(() => {});
+        }).catch(err => {
           console.log('SW registration note:', err);
         });
       });
+
+      navigator.serviceWorker.addEventListener('message', (event) => {
+        const data = event.data;
+        if (!data || data.type !== 'GIRO_RIDE_NOTIFICATION_ACTION') return;
+        if (data.action === 'accept') {
+          acceptRequest();
+        } else if (data.action === 'dismiss') {
+          dismissRequest();
+        }
+      });
     }
+
+    // PWA Native Installation Controller para Motorista Parceiro
+    let deferredDriverInstallPrompt = null;
+
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredDriverInstallPrompt = e;
+      const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+      const btn = document.getElementById('driver-pwa-install-btn');
+      if (btn && !isStandalone) {
+        btn.style.display = 'inline-flex';
+      }
+    });
+
+    window.addEventListener('appinstalled', () => {
+      deferredDriverInstallPrompt = null;
+      const btn = document.getElementById('driver-pwa-install-btn');
+      if (btn) btn.style.display = 'none';
+      console.log('[PWA] GIRO Condutor instalado com sucesso no ecrã inicial!');
+    });
+
+    function installGiroDriverPwa() {
+      if (deferredDriverInstallPrompt) {
+        deferredDriverInstallPrompt.prompt();
+        deferredDriverInstallPrompt.userChoice.then((choiceResult) => {
+          if (choiceResult.outcome === 'accepted') {
+            const btn = document.getElementById('driver-pwa-install-btn');
+            if (btn) btn.style.display = 'none';
+          }
+          deferredDriverInstallPrompt = null;
+        });
+      } else {
+        const isIos = /iphone|ipad|ipod/i.test(navigator.userAgent);
+        if (isIos) {
+          alert('📲 Para instalar o App GIRO Condutor no seu iPhone / iPad:\n\n1. Toque no botão de Partilhar [ ⎋ ] na barra inferior do Safari.\n2. Role para baixo e selecione "Ecrã Principal" (Add to Home Screen).\n3. O aplicativo de motorista parceiro será instalado no seu ecrã inicial!');
+        } else {
+          alert('📲 Como instalar este Web App:\n\nAbra o menu do navegador (ícone de 3 pontos no canto superior) e selecione "Instalar aplicativo" ou "Adicionar ao ecrã principal".');
+        }
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const isIos = /iphone|ipad|ipod/i.test(navigator.userAgent);
+      const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+      const btn = document.getElementById('driver-pwa-install-btn');
+      if (btn && !isStandalone && isIos) {
+        btn.style.display = 'inline-flex';
+      }
+    });
 
     window.addEventListener('DOMContentLoaded', () => {
       initDriverMap();
       updateUI();
+      ['click', 'touchstart'].forEach(evt => {
+        window.addEventListener(evt, () => GiroDriverAlarm.unlock(), { once: true, passive: true });
+      });
+
+      // Se aberto via notificação push com parâmetro ?action=accept
+      try {
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('action') === 'accept') {
+          setTimeout(() => {
+            if (driverState.pendingRide) {
+              acceptRequest();
+            }
+          }, 600);
+        }
+      } catch(e) {}
     });
   </script>
 
+  <!-- MODAL DE AUTENTICAÇÃO E CADASTRO MOTORISTA (EMBEDDED) -->
+  <div class="modal-backdrop" id="driver-auth-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:99999;align-items:center;justify-content:center;padding:16px;overflow-y:auto;">
+    <div class="modal-window" style="background:#121612;border:1.5px solid #d4af37;border-radius:20px;padding:24px;width:100%;max-width:440px;box-shadow:0 24px 60px rgba(0,0,0,.95);margin:auto;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+        <div style="display:flex;align-items:center;gap:10px;">
+          <div style="width:36px;height:36px;background:linear-gradient(135deg,#d4af37,#f0c040);border-radius:10px;display:flex;align-items:center;justify-content:center;color:#000;font-weight:900;font-size:18px;">G</div>
+          <div>
+            <b style="font-size:16px;color:#fff;display:block;">Motorista Parceiro GIRO</b>
+            <span style="font-size:11px;color:#d4af37;">Comissão Fixa 10% · Luanda</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Abas Entrar / Cadastro -->
+      <div style="display:flex;background:#1b221b;border-radius:10px;padding:4px;margin-bottom:18px;">
+        <button id="driver-tab-btn-login" onclick="switchDriverAuthTab('login')" style="flex:1;background:#d4af37;color:#000;border:none;border-radius:8px;padding:8px;font-size:13px;font-weight:700;cursor:pointer;">Entrar</button>
+        <button id="driver-tab-btn-register" onclick="switchDriverAuthTab('register')" style="flex:1;background:none;color:#8d9e8d;border:none;border-radius:8px;padding:8px;font-size:13px;font-weight:600;cursor:pointer;">Quero ser Motorista</button>
+      </div>
+
+      <!-- Formulário de Login Motorista -->
+      <form id="form-driver-login" onsubmit="handleDriverLogin(event)">
+        <div style="margin-bottom:12px;">
+          <label style="display:block;font-size:12px;color:#a6a6a6;margin-bottom:6px;">Telefone do Motorista</label>
+          <input type="tel" id="driver-login-phone" placeholder="923 000 000" value="923 888 777" required style="width:100%;background:#090d0a;border:1px solid #262626;border-radius:10px;padding:12px;color:#fff;font-size:14px;outline:none;box-sizing:border-box;">
+        </div>
+        <div style="margin-bottom:18px;">
+          <label style="display:block;font-size:12px;color:#a6a6a6;margin-bottom:6px;">Palavra-passe</label>
+          <input type="password" id="driver-login-pass" placeholder="••••••••" value="123456" required style="width:100%;background:#090d0a;border:1px solid #262626;border-radius:10px;padding:12px;color:#fff;font-size:14px;outline:none;box-sizing:border-box;">
+        </div>
+        <button type="submit" style="width:100%;padding:14px;border-radius:12px;background:linear-gradient(135deg,#d4af37,#f0c040);color:#000;font-weight:800;font-size:14px;cursor:pointer;border:none;">Acessar Radar do Motorista</button>
+      </form>
+
+      <!-- Formulário de Cadastro Motorista -->
+      <form id="form-driver-register" onsubmit="handleDriverRegister(event)" style="display:none;">
+        <div style="margin-bottom:10px;">
+          <label style="display:block;font-size:12px;color:#a6a6a6;margin-bottom:4px;">Nome Completo</label>
+          <input type="text" id="driver-reg-name" placeholder="Ex: Domingos Manuel" required style="width:100%;background:#090d0a;border:1px solid #262626;border-radius:10px;padding:10px 12px;color:#fff;font-size:13px;outline:none;box-sizing:border-box;">
+        </div>
+        <div style="margin-bottom:10px;">
+          <label style="display:block;font-size:12px;color:#a6a6a6;margin-bottom:4px;">Telefone / WhatsApp</label>
+          <input type="tel" id="driver-reg-phone" placeholder="923 000 000" required style="width:100%;background:#090d0a;border:1px solid #262626;border-radius:10px;padding:10px 12px;color:#fff;font-size:13px;outline:none;box-sizing:border-box;">
+        </div>
+        <div style="margin-bottom:10px;">
+          <label style="display:block;font-size:12px;color:#a6a6a6;margin-bottom:4px;">Tipo de Viatura</label>
+          <select id="driver-reg-veh" style="width:100%;background:#090d0a;border:1px solid #262626;border-radius:10px;padding:10px 12px;color:#fff;font-size:13px;outline:none;box-sizing:border-box;">
+            <option value="eco">Carro Particular / Sedan (Económico / Conforto)</option>
+            <option value="moto">Moto Urbana / Kupapata</option>
+            <option value="sete">Viatura 7 Lugares / Familiar</option>
+            <option value="deliv_van">Van / Furgão de Carga & Encomendas</option>
+          </select>
+        </div>
+        <div style="margin-bottom:10px;">
+          <label style="display:block;font-size:12px;color:#a6a6a6;margin-bottom:4px;">Matrícula da Viatura</label>
+          <input type="text" id="driver-reg-plate" placeholder="Ex: LD-45-88-GG" required style="width:100%;background:#090d0a;border:1px solid #262626;border-radius:10px;padding:10px 12px;color:#fff;font-size:13px;outline:none;box-sizing:border-box;">
+        </div>
+        <div style="margin-bottom:14px;">
+          <label style="display:block;font-size:12px;color:#a6a6a6;margin-bottom:4px;">Palavra-passe</label>
+          <input type="password" id="driver-reg-pass" placeholder="Mínimo 6 dígitos" required style="width:100%;background:#090d0a;border:1px solid #262626;border-radius:10px;padding:10px 12px;color:#fff;font-size:13px;outline:none;box-sizing:border-box;">
+        </div>
+        <button type="submit" style="width:100%;padding:14px;border-radius:12px;background:linear-gradient(135deg,#d4af37,#f0c040);color:#000;font-weight:800;font-size:14px;cursor:pointer;border:none;">Concluir Cadastro de Motorista</button>
+      </form>
+    </div>
+  </div>
+
 <script>
-const GIRO_SESSION_KEY='giro_session';
-const GiroAuth={
-  save(user){localStorage.setItem(GIRO_SESSION_KEY,JSON.stringify({...user,ts:Date.now()}));},
-  get(){
-    try{
-      const raw=localStorage.getItem(GIRO_SESSION_KEY);
-      if(!raw)return null;
-      const s=JSON.parse(raw);
-      if(Date.now()-s.ts>30*24*3600*1000){this.clear();return null;}
+function openDriverAuthModal(tab = 'login') {
+  const m = document.getElementById('driver-auth-modal');
+  if (m) {
+    m.style.display = 'flex';
+    switchDriverAuthTab(tab);
+  }
+}
+function closeDriverAuthModal() {
+  const m = document.getElementById('driver-auth-modal');
+  if (m) m.style.display = 'none';
+}
+function switchDriverAuthTab(tab) {
+  const btnL = document.getElementById('driver-tab-btn-login');
+  const btnR = document.getElementById('driver-tab-btn-register');
+  const formL = document.getElementById('form-driver-login');
+  const formR = document.getElementById('form-driver-register');
+  if (tab === 'login') {
+    if (btnL) { btnL.style.background = '#d4af37'; btnL.style.color = '#000'; btnL.style.fontWeight = '700'; }
+    if (btnR) { btnR.style.background = 'none'; btnR.style.color = '#8d9e8d'; btnR.style.fontWeight = '600'; }
+    if (formL) formL.style.display = 'block';
+    if (formR) formR.style.display = 'none';
+  } else {
+    if (btnR) { btnR.style.background = '#d4af37'; btnR.style.color = '#000'; btnR.style.fontWeight = '700'; }
+    if (btnL) { btnL.style.background = 'none'; btnL.style.color = '#8d9e8d'; btnL.style.fontWeight = '600'; }
+    if (formR) formR.style.display = 'block';
+    if (formL) formL.style.display = 'none';
+  }
+}
+function handleDriverLogin(e) {
+  e.preventDefault();
+  const phone = document.getElementById('driver-login-phone').value.trim();
+  GiroAuth.save({ phone, nome: 'Motorista Parceiro', role: 'motorista' });
+  closeDriverAuthModal();
+  GiroAuth.renderUserPill('auth-pill');
+}
+function handleDriverRegister(e) {
+  e.preventDefault();
+  const name = document.getElementById('driver-reg-name').value.trim();
+  const phone = document.getElementById('driver-reg-phone').value.trim();
+  const plate = document.getElementById('driver-reg-plate').value.trim();
+  GiroAuth.save({ phone, nome: name || 'Motorista Parceiro', plate, role: 'motorista' });
+  closeDriverAuthModal();
+  GiroAuth.renderUserPill('auth-pill');
+}
+
+const GIRO_DRIVER_SESSION_KEY='giro_driver_session';
+const GiroAuth = {
+  save(user) {
+    const sessionObj = { ...user, role: 'motorista', ts: Date.now() };
+    localStorage.setItem(GIRO_DRIVER_SESSION_KEY, JSON.stringify(sessionObj));
+    localStorage.setItem('giro_session', JSON.stringify(sessionObj));
+  },
+  get() {
+    try {
+      let raw = localStorage.getItem(GIRO_DRIVER_SESSION_KEY);
+      if (!raw) raw = localStorage.getItem('giro_session');
+      if (!raw) return null;
+      const s = JSON.parse(raw);
+      if (!s || !s.phone) return null;
+      // Garante papel de motorista dentro da driver app
+      if (s.role !== 'motorista') {
+        s.role = 'motorista';
+      }
+      if (s.ts && (Date.now() - s.ts > 30 * 24 * 3600 * 1000)) {
+        this.clear();
+        return null;
+      }
       return s;
-    }catch{return null;}
-  },
-  clear(){localStorage.removeItem(GIRO_SESSION_KEY);},
-  requireAuth(role){
-    const s=this.get();
-    if(!s){window.location.href='login.html';return null;}
-    if(role&&s.role!==role){window.location.href='login.html';return null;}
-    return s;
-  },
-  renderUserPill(containerId){
-    const s=this.get();
-    const el=document.getElementById(containerId);
-    if(!el)return;
-    if(s){
-      const initials=(s.nome||s.phone||'?')[0].toUpperCase();
-      el.innerHTML=`<div style="display:flex;align-items:center;gap:8px;">
-        <div style="width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#d4af37,#f0c040);display:flex;align-items:center;justify-content:center;font-weight:900;font-size:14px;color:#000;">${initials}</div>
-        <div style="line-height:1.2;"><div style="font-size:13px;font-weight:700;color:#f1f5f1;">${s.nome||s.phone}</div><div style="font-size:10px;color:#8d9e8d;text-transform:uppercase;">${s.role==='motorista'?'🚗 Motorista':'🧑 Passageiro'}</div></div>
-        <button onclick="GiroAuth.logout()" style="margin-left:4px;background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.3);border-radius:8px;padding:5px 10px;color:#fca5a5;font-size:12px;cursor:pointer;">Sair</button>
-      </div>`;
-    }else{
-      el.innerHTML='<a href="login.html" style="text-decoration:none;padding:7px 14px;border-radius:20px;background:rgba(212,175,55,.12);border:1px solid rgba(212,175,55,.3);color:#d4af37;font-size:13px;font-weight:700;">&#128100; Entrar</a>';
+    } catch (e) {
+      return null;
     }
   },
-  logout(){this.clear();window.location.href='login.html';}
+  clear() {
+    localStorage.removeItem(GIRO_DRIVER_SESSION_KEY);
+    localStorage.removeItem('giro_session');
+    localStorage.removeItem('giro_driver_online');
+    localStorage.removeItem('giro_pax_session');
+    localStorage.removeItem('giro_active_ride_request');
+  },
+  logout() {
+    this.clear();
+
+    window.location.replace('login.html?logout=1');
+  },
+  requireAuth() {
+    const s = this.get();
+    if (!s) {
+      if (typeof openDriverAuthModal === 'function') openDriverAuthModal();
+      return null;
+    }
+    return s;
+  },
+  renderUserPill(containerId) {
+    const s = this.get();
+    const el = document.getElementById(containerId);
+    if (!el) return;
+    if (s && s.phone) {
+      const initials = (s.nome || s.phone || 'M')[0].toUpperCase();
+      el.innerHTML = `<div style="display:flex;align-items:center;gap:8px;">
+        <div style="width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#d4af37,#f0c040);display:flex;align-items:center;justify-content:center;font-weight:900;font-size:14px;color:#000;">${initials}</div>
+        <div style="line-height:1.2;"><div style="font-size:13px;font-weight:700;color:#f1f5f1;">${s.nome || s.phone}</div><div style="font-size:10px;color:#8d9e8d;text-transform:uppercase;">🚗 Motorista</div></div>
+        <button onclick="GiroAuth.logout()" style="margin-left:4px;background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.3);border-radius:8px;padding:5px 10px;color:#fca5a5;font-size:12px;cursor:pointer;">Sair</button>
+      </div>`;
+    } else {
+      el.innerHTML = '<a href="login.html?role=motorista" style="text-decoration:none;cursor:pointer;padding:7px 14px;border-radius:20px;background:rgba(212,175,55,.15);border:1px solid rgba(212,175,55,.35);color:#d4af37;font-size:13px;font-weight:700;display:flex;align-items:center;gap:5px;">&#128100; Entrar</a>';
+    }
+  }
 };
-document.addEventListener('DOMContentLoaded',function(){
-  const _s=GiroAuth.requireAuth('motorista');if(!_s)throw new Error('not auth');
+document.addEventListener('DOMContentLoaded', function() {
+  const s = GiroAuth.get();
+  if (!s) {
+    console.info('Sessão ativa não detectada no carregamento inicial.');
+    if (typeof openDriverAuthModal === 'function') {
+      setTimeout(() => openDriverAuthModal(), 500);
+    }
+  }
   GiroAuth.renderUserPill('auth-pill');
-});
-</script>
+});</script>
 
 
   <!-- DRIVER NATIVE TAB SECTIONS -->
@@ -1429,47 +2316,163 @@ document.addEventListener('DOMContentLoaded',function(){
     </div>
   </section>
 
-  <!-- TAB: PERFIL DO MOTORISTA (STORE COMPLIANT) -->
-  <section id="driver-tab-profile" style="display:none;position:fixed;top:60px;bottom:54px;left:0;right:0;overflow-y:auto;padding:16px;background:#070907;z-index:150;">
-    <h2 style="font-size:20px;font-weight:800;color:#fff;margin-bottom:14px;">Perfil do Motorista</h2>
+  <!-- TAB: PERFIL DO MOTORISTA (EDITÁVEL - FULL EDIT) -->
+  <section id="driver-tab-profile" style="display:none;position:fixed;top:60px;bottom:54px;left:0;right:0;overflow-y:auto;background:#070707;z-index:150;">
+    <div style="padding:16px 16px 32px 16px;">
 
-    <div style="background:#121612;border:1px solid #262626;border-radius:14px;padding:16px;margin-bottom:14px;display:flex;align-items:center;gap:14px;">
-      <div style="width:50px;height:50px;border-radius:50%;background:linear-gradient(135deg,#d4af37,#f0c040);display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:900;color:#000;">D</div>
-      <div>
-        <div style="font-size:16px;font-weight:700;color:#fff;">Domingos Manuel</div>
-        <div style="font-size:12px;color:#8d9e8d;">+244 923 456 789</div>
-        <div style="font-size:11px;color:#4fe36a;margin-top:2px;">★ 4.9 · Motorista Verificado KYC ✓</div>
+      <!-- Header -->
+      <h2 style="font-size:20px;font-weight:900;color:#fff;margin:0 0 18px 0;letter-spacing:-0.3px;">Perfil do Motorista</h2>
+
+      <!-- Card Avatar + Nome + Telefone -->
+      <div style="background:#111;border:1px solid #222;border-radius:20px;padding:20px;margin-bottom:14px;text-align:center;">
+        <!-- Avatar com upload -->
+        <div style="position:relative;display:inline-block;margin-bottom:14px;">
+          <div id="drv-avatar-display" onclick="document.getElementById('drv-photo-input').click()"
+               style="width:80px;height:80px;border-radius:50%;background:linear-gradient(135deg,#d4af37,#f0c040);display:flex;align-items:center;justify-content:center;cursor:pointer;overflow:hidden;border:3px solid #d4af37;margin:0 auto;position:relative;">
+            <span id="drv-avatar-initials" style="font-size:32px;font-weight:900;color:#000;">D</span>
+            <img id="drv-avatar-img" src="" style="display:none;width:100%;height:100%;object-fit:cover;position:absolute;top:0;left:0;border-radius:50%;">
+          </div>
+          <div onclick="document.getElementById('drv-photo-input').click()"
+               style="position:absolute;bottom:-2px;right:-2px;width:26px;height:26px;background:#d4af37;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;border:2px solid #070707;font-size:13px;">✏️</div>
+        </div>
+        <input type="file" id="drv-photo-input" accept="image/*" style="display:none;" onchange="handleDrvPhotoUpload(event)">
+
+        <div id="drv-profile-name" style="font-size:18px;font-weight:800;color:#fff;margin-bottom:4px;">Motorista GIRO</div>
+        <div id="drv-profile-phone" style="font-size:13px;color:#888;margin-bottom:6px;">+244 9XX XXX XXX</div>
+        <div style="display:inline-flex;align-items:center;gap:6px;background:#1a1a0a;border:1px solid #3a3000;border-radius:20px;padding:4px 12px;">
+          <span style="color:#d4af37;font-size:13px;">★</span>
+          <span id="drv-profile-rating" style="font-size:13px;font-weight:700;color:#fff;">4.9</span>
+          <span style="font-size:11px;color:#888;">· Verificado KYC ✓</span>
+        </div>
       </div>
-    </div>
 
-    <!-- Veículo -->
-    <div style="background:#121612;border:1px solid #262626;border-radius:14px;padding:16px;margin-bottom:14px;">
-      <div style="font-size:13px;font-weight:700;color:#fff;margin-bottom:10px;">Viatura Registada</div>
-      <div style="font-size:13px;color:#fff;font-weight:600;">Toyota Corolla (Cinzento)</div>
-      <div style="font-size:12px;color:#d4af37;margin-top:2px;">Matrícula: LD-23-45-AA</div>
-      <div style="font-size:11px;color:#8d9e8d;margin-top:4px;">Seguro & Inspecção válidos até Nov/2026</div>
-    </div>
+      <!-- Estatísticas -->
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:14px;">
+        <div style="background:#111;border:1px solid #222;border-radius:14px;padding:12px;text-align:center;">
+          <div id="drv-stat-trips" style="font-size:20px;font-weight:900;color:#d4af37;">0</div>
+          <div style="font-size:10px;color:#666;margin-top:2px;font-weight:600;">CORRIDAS</div>
+        </div>
+        <div style="background:#111;border:1px solid #222;border-radius:14px;padding:12px;text-align:center;">
+          <div id="drv-stat-earnings" style="font-size:18px;font-weight:900;color:#06C167;">0</div>
+          <div style="font-size:10px;color:#666;margin-top:2px;font-weight:600;">GANHOS (Kz)</div>
+        </div>
+        <div style="background:#111;border:1px solid #222;border-radius:14px;padding:12px;text-align:center;">
+          <div id="drv-stat-accept" style="font-size:20px;font-weight:900;color:#fff;">—</div>
+          <div style="font-size:10px;color:#666;margin-top:2px;font-weight:600;">ACEITAÇÃO</div>
+        </div>
+      </div>
 
-    <!-- Documentação Legal & Eliminação de Conta -->
-    <div style="background:#121612;border:1px solid #262626;border-radius:14px;padding:16px;margin-bottom:14px;">
-      <div style="font-size:13px;font-weight:700;color:#fff;margin-bottom:10px;">Legal & Contrato</div>
-      <a href="termos.html" style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid #1f241f;color:#fff;text-decoration:none;">
-        <span style="font-size:13px;">Contrato de Parceria & Termos</span>
-        <span style="color:#8d9e8d;">›</span>
-      </a>
-      <a href="privacidade.html" style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid #1f241f;color:#fff;text-decoration:none;">
-        <span style="font-size:13px;">Política de Privacidade</span>
-        <span style="color:#8d9e8d;">›</span>
-      </a>
-      <a href="eliminar-conta.html" style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;color:#ef4444;text-decoration:none;">
-        <span style="font-size:13px;font-weight:600;">Eliminar Conta de Motorista</span>
-        <span style="color:#ef4444;">›</span>
-      </a>
-    </div>
+      <!-- Editar Dados Pessoais -->
+      <div style="background:#111;border:1px solid #222;border-radius:20px;padding:18px;margin-bottom:14px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+          <div style="font-size:15px;font-weight:800;color:#fff;">Dados Pessoais</div>
+          <div id="drv-save-status" style="display:none;font-size:12px;color:#06C167;font-weight:700;">✓ Guardado</div>
+        </div>
 
-    <button onclick="GiroAuth.logout()" style="width:100%;padding:14px;border-radius:10px;background:rgba(239,68,68,0.12);border:1px solid rgba(239,68,68,0.3);color:#fca5a5;font-size:14px;font-weight:700;cursor:pointer;">
-      Sair da Conta
-    </button>
+        <div style="display:flex;flex-direction:column;gap:14px;">
+          <div>
+            <label style="display:block;font-size:11px;font-weight:700;color:#666;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;">Nome Completo</label>
+            <input type="text" id="edit-drv-name" placeholder="Seu nome completo"
+                   style="width:100%;background:#1a1a1a;border:1px solid #2e2e2e;border-radius:12px;padding:12px 14px;color:#fff;font-size:16px;outline:none;box-sizing:border-box;font-family:inherit;"
+                   oninput="drvAutoSave()">
+          </div>
+          <div>
+            <label style="display:block;font-size:11px;font-weight:700;color:#666;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;">Telemóvel / WhatsApp (+244)</label>
+            <input type="tel" id="edit-drv-phone" placeholder="923 000 000"
+                   style="width:100%;background:#1a1a1a;border:1px solid #2e2e2e;border-radius:12px;padding:12px 14px;color:#fff;font-size:16px;outline:none;box-sizing:border-box;font-family:inherit;"
+                   oninput="drvAutoSave()">
+          </div>
+          <div>
+            <label style="display:block;font-size:11px;font-weight:700;color:#666;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;">E-mail (opcional)</label>
+            <input type="email" id="edit-drv-email" placeholder="exemplo@gmail.com"
+                   style="width:100%;background:#1a1a1a;border:1px solid #2e2e2e;border-radius:12px;padding:12px 14px;color:#fff;font-size:16px;outline:none;box-sizing:border-box;font-family:inherit;"
+                   oninput="drvAutoSave()">
+          </div>
+          <div>
+            <label style="display:block;font-size:11px;font-weight:700;color:#666;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;">Cidade / Localização Base</label>
+            <input type="text" id="edit-drv-city" placeholder="Ex: Luanda, Viana, Cacuaco..."
+                   style="width:100%;background:#1a1a1a;border:1px solid #2e2e2e;border-radius:12px;padding:12px 14px;color:#fff;font-size:16px;outline:none;box-sizing:border-box;font-family:inherit;"
+                   oninput="drvAutoSave()">
+          </div>
+        </div>
+      </div>
+
+      <!-- Editar Dados do Veículo -->
+      <div style="background:#111;border:1px solid #222;border-radius:20px;padding:18px;margin-bottom:14px;">
+        <div style="font-size:15px;font-weight:800;color:#fff;margin-bottom:16px;">🚗 Viatura Registada</div>
+
+        <div style="display:flex;flex-direction:column;gap:14px;">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+            <div>
+              <label style="display:block;font-size:11px;font-weight:700;color:#666;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;">Marca</label>
+              <input type="text" id="edit-drv-car-brand" placeholder="Toyota, Hyundai..."
+                     style="width:100%;background:#1a1a1a;border:1px solid #2e2e2e;border-radius:12px;padding:12px 10px;color:#fff;font-size:14px;outline:none;box-sizing:border-box;font-family:inherit;"
+                     oninput="drvAutoSave()">
+            </div>
+            <div>
+              <label style="display:block;font-size:11px;font-weight:700;color:#666;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;">Modelo</label>
+              <input type="text" id="edit-drv-car-model" placeholder="Corolla, Elantra..."
+                     style="width:100%;background:#1a1a1a;border:1px solid #2e2e2e;border-radius:12px;padding:12px 10px;color:#fff;font-size:14px;outline:none;box-sizing:border-box;font-family:inherit;"
+                     oninput="drvAutoSave()">
+            </div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+            <div>
+              <label style="display:block;font-size:11px;font-weight:700;color:#666;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;">Matrícula</label>
+              <input type="text" id="edit-drv-car-plate" placeholder="LD-00-00-AA"
+                     style="width:100%;background:#1a1a1a;border:1px solid #2e2e2e;border-radius:12px;padding:12px 10px;color:#fff;font-size:14px;outline:none;box-sizing:border-box;font-family:inherit;text-transform:uppercase;"
+                     oninput="this.value=this.value.toUpperCase();drvAutoSave()">
+            </div>
+            <div>
+              <label style="display:block;font-size:11px;font-weight:700;color:#666;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;">Cor</label>
+              <input type="text" id="edit-drv-car-color" placeholder="Branco, Preto..."
+                     style="width:100%;background:#1a1a1a;border:1px solid #2e2e2e;border-radius:12px;padding:12px 10px;color:#fff;font-size:14px;outline:none;box-sizing:border-box;font-family:inherit;"
+                     oninput="drvAutoSave()">
+            </div>
+          </div>
+          <div>
+            <label style="display:block;font-size:11px;font-weight:700;color:#666;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;">Categoria do Serviço</label>
+            <select id="edit-drv-car-category" onchange="drvAutoSave()"
+                    style="width:100%;background:#1a1a1a;border:1px solid #2e2e2e;border-radius:12px;padding:12px 14px;color:#fff;font-size:14px;outline:none;box-sizing:border-box;font-family:inherit;appearance:none;">
+              <option value="">Seleccionar categoria...</option>
+              <option value="eco">GIRO Eco (Sedan/Hatch compacto)</option>
+              <option value="conf">GIRO Confort (Sedan executivo)</option>
+              <option value="sete">GIRO 7 Lugares (SUV/Van)</option>
+              <option value="moto">GIRO Moto (Kupapata)</option>
+              <option value="deliv_moto">GIRO Delivery Moto</option>
+              <option value="deliv_car">GIRO Delivery Carro</option>
+              <option value="deliv_van">GIRO Delivery Van</option>
+              <option value="cargo_pickup">GIRO Cargo Pick-up</option>
+              <option value="cargo_canter">GIRO Cargo Canter</option>
+              <option value="cargo_heavy">GIRO Cargo Pesado 10T</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Legal & Contrato -->
+      <div style="background:#111;border:1px solid #222;border-radius:20px;padding:4px 18px;margin-bottom:14px;">
+        <a href="contrato-motorista.html" style="display:flex;justify-content:space-between;align-items:center;padding:14px 0;border-bottom:1px solid #1f1f1f;color:#fff;text-decoration:none;">
+          <span style="font-size:14px;">📄 Contrato de Parceria</span>
+          <span style="color:#555;font-size:18px;">›</span>
+        </a>
+        <a href="privacidade.html" style="display:flex;justify-content:space-between;align-items:center;padding:14px 0;border-bottom:1px solid #1f1f1f;color:#fff;text-decoration:none;">
+          <span style="font-size:14px;">🔒 Política de Privacidade</span>
+          <span style="color:#555;font-size:18px;">›</span>
+        </a>
+        <a href="eliminar-conta.html" style="display:flex;justify-content:space-between;align-items:center;padding:14px 0;color:#ef4444;text-decoration:none;">
+          <span style="font-size:14px;font-weight:600;">🗑️ Eliminar Conta de Motorista</span>
+          <span style="font-size:18px;">›</span>
+        </a>
+      </div>
+
+      <!-- Sair da Conta -->
+      <button onclick="GiroAuth.logout()"
+              style="width:100%;padding:16px;border-radius:14px;background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.3);color:#fca5a5;font-size:15px;font-weight:700;cursor:pointer;letter-spacing:0.3px;">
+        Sair da Conta
+      </button>
+
+    </div>
   </section>
 
 <nav id="bottom-tab-bar" style="position:fixed;bottom:0;left:0;right:0;height:54px;background:#111;border-top:1px solid #262626;display:flex;align-items:stretch;z-index:200;padding-bottom:env(safe-area-inset-bottom,0px);">
@@ -1516,5 +2519,285 @@ window.addEventListener('DOMContentLoaded', () => {
 
 
 </script>
+  <!-- Modal de Avaliação do Passageiro (Driver -> Passenger) -->
+  <div class="rating-modal-backdrop" id="passenger-rating-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:600;align-items:flex-end;justify-content:center;">
+    <div class="rating-sheet" style="background:#141414;border-top:2px solid #ffffff;border-radius:24px 24px 0 0;width:100%;max-width:520px;padding:22px 20px calc(26px + env(safe-area-inset-bottom, 16px));box-shadow:0 -16px 50px rgba(0,0,0,0.95);max-height:90vh;overflow-y:auto;">
+      
+      <!-- Resumo Financeiro da Corrida -->
+      <div style="text-align:center;margin-bottom:16px;">
+        <div style="width:48px;height:48px;border-radius:50%;background:#10b981;color:#000;display:flex;align-items:center;justify-content:center;margin:0 auto 10px;font-size:24px;font-weight:900;">✓</div>
+        <h3 style="font-size:20px;font-weight:900;color:#ffffff;margin-bottom:4px;">Corrida Finalizada!</h3>
+        <div id="pax-rating-net-fare" style="font-size:26px;font-weight:900;color:#10b981;margin-bottom:2px;">+2.700 Kz</div>
+        <div id="pax-rating-trip-route" style="font-size:12px;color:#9ca3af;">Mutamba → Talatona</div>
+      </div>
+
+      <!-- Cartão do Passageiro -->
+      <div style="background:#1c1c1c;border:1px solid #2e2e2e;border-radius:14px;padding:12px 16px;display:flex;align-items:center;gap:12px;margin-bottom:18px;">
+        <div style="width:42px;height:42px;border-radius:50%;background:#2e2e2e;display:flex;align-items:center;justify-content:center;font-size:18px;border:1px solid #444;" id="pax-rating-avatar">👤</div>
+        <div style="flex:1;">
+          <div style="display:flex;align-items:center;gap:8px;">
+            <b id="pax-rating-name" style="font-size:15px;color:#fff;">Passageiro GIRO</b>
+            <span style="background:rgba(245,158,11,0.15);color:#f59e0b;font-size:11px;font-weight:800;padding:2px 7px;border-radius:8px;border:1px solid rgba(245,158,11,0.3);">★ 4.9</span>
+          </div>
+          <span style="font-size:12px;color:#9ca3af;">Avalie a conduta do passageiro</span>
+        </div>
+      </div>
+
+      <!-- 5 Estrelas Grandes e Interativas -->
+      <div style="text-align:center;margin-bottom:18px;">
+        <div id="pax-star-container" style="display:flex;justify-content:center;gap:12px;margin-bottom:8px;">
+          <span class="pax-star-icon" onclick="setPaxRating(1)" style="font-size:38px;cursor:pointer;color:#f59e0b;transition:transform .15s, color .15s;user-select:none;">★</span>
+          <span class="pax-star-icon" onclick="setPaxRating(2)" style="font-size:38px;cursor:pointer;color:#f59e0b;transition:transform .15s, color .15s;user-select:none;">★</span>
+          <span class="pax-star-icon" onclick="setPaxRating(3)" style="font-size:38px;cursor:pointer;color:#f59e0b;transition:transform .15s, color .15s;user-select:none;">★</span>
+          <span class="pax-star-icon" onclick="setPaxRating(4)" style="font-size:38px;cursor:pointer;color:#f59e0b;transition:transform .15s, color .15s;user-select:none;">★</span>
+          <span class="pax-star-icon" onclick="setPaxRating(5)" style="font-size:38px;cursor:pointer;color:#f59e0b;transition:transform .15s, color .15s;user-select:none;">★</span>
+        </div>
+        <div id="pax-rating-label" style="font-size:13px;font-weight:800;color:#ffffff;">Excelente passageiro! ⭐⭐⭐⭐⭐</div>
+      </div>
+
+      <!-- Elogios & Observações Rápidas -->
+      <div style="margin-bottom:20px;">
+        <div style="font-size:11px;font-weight:700;color:#888;margin-bottom:8px;text-transform:uppercase;letter-spacing:0.04em;">Elogios / Feedback Rápido</div>
+        <div style="display:flex;flex-wrap:wrap;gap:8px;" id="pax-compliments-list">
+          <button type="button" class="pax-compliment-chip active" onclick="togglePaxCompliment(this)" style="background:#262626;border:1px solid #555;color:#fff;border-radius:20px;padding:7px 13px;font-size:12px;font-weight:600;cursor:pointer;transition:.15s;">⏱️ Pontual no embarque</button>
+          <button type="button" class="pax-compliment-chip active" onclick="togglePaxCompliment(this)" style="background:#262626;border:1px solid #555;color:#fff;border-radius:20px;padding:7px 13px;font-size:12px;font-weight:600;cursor:pointer;transition:.15s;">😊 Educado e respeitoso</button>
+          <button type="button" class="pax-compliment-chip" onclick="togglePaxCompliment(this)" style="background:#181818;border:1px solid #333;color:#888;border-radius:20px;padding:7px 13px;font-size:12px;font-weight:600;cursor:pointer;transition:.15s;">📍 Ponto de fácil acesso</button>
+          <button type="button" class="pax-compliment-chip" onclick="togglePaxCompliment(this)" style="background:#181818;border:1px solid #333;color:#888;border-radius:20px;padding:7px 13px;font-size:12px;font-weight:600;cursor:pointer;transition:.15s;">💳 Pagamento imediato</button>
+          <button type="button" class="pax-compliment-chip" onclick="togglePaxCompliment(this)" style="background:#181818;border:1px solid #333;color:#888;border-radius:20px;padding:7px 13px;font-size:12px;font-weight:600;cursor:pointer;transition:.15s;">✨ Deixou o carro limpo</button>
+        </div>
+      </div>
+
+      <!-- Ações de Enviar e Pular -->
+      <div style="display:flex;gap:12px;">
+        <button type="button" onclick="closePaxRatingModal(false)" style="flex:1;min-height:52px;background:#202020;border:1px solid #383838;color:#9ca3af;font-size:14px;font-weight:700;border-radius:14px;cursor:pointer;transition:.15s;">Pular</button>
+        <button type="button" onclick="submitPaxRating()" style="flex:2;min-height:52px;background:#ffffff;border:none;color:#000000;font-size:15px;font-weight:900;border-radius:14px;cursor:pointer;box-shadow:0 6px 20px rgba(255,255,255,0.25);transition:.15s;">✓ Enviar Avaliação</button>
+      </div>
+
+    </div>
+  </div>
+
+
+  <!-- DRIVER PROFILE JS -->
+  <script>
+    // Inicialização do Motor de Telemetria e Diagnóstico GIRO
+    if (typeof GiroTelemetry !== 'undefined') {
+      GiroTelemetry.initGlobalHandlers('driver');
+    }
+
+  function updateDriverProfileView() {
+    const s = GiroAuth.get();
+    const nameEl = document.getElementById('drv-profile-name');
+    const phoneEl = document.getElementById('drv-profile-phone');
+    const initEl = document.getElementById('drv-avatar-initials');
+    const imgEl = document.getElementById('drv-avatar-img');
+    const editName = document.getElementById('edit-drv-name');
+    const editPhone = document.getElementById('edit-drv-phone');
+    const editEmail = document.getElementById('edit-drv-email');
+    const editCity = document.getElementById('edit-drv-city');
+    const editBrand = document.getElementById('edit-drv-car-brand');
+    const editModel = document.getElementById('edit-drv-car-model');
+    const editPlate = document.getElementById('edit-drv-car-plate');
+    const editColor = document.getElementById('edit-drv-car-color');
+    const editCat = document.getElementById('edit-drv-car-category');
+    const statTrips = document.getElementById('drv-stat-trips');
+    const statEarn = document.getElementById('drv-stat-earnings');
+    const statAccept = document.getElementById('drv-stat-accept');
+
+    const nome = s ? (s.nome || s.name || 'Motorista GIRO') : 'Motorista GIRO';
+    const phone = s ? (s.phone || '+244 9XX XXX XXX') : '+244 9XX XXX XXX';
+    const initial = nome[0].toUpperCase();
+
+    if (nameEl) nameEl.textContent = nome;
+    if (phoneEl) phoneEl.textContent = phone;
+    if (initEl) initEl.textContent = initial;
+
+    if (s && s.photo) {
+      if (imgEl) { imgEl.src = s.photo; imgEl.style.display = 'block'; }
+      if (initEl) initEl.style.display = 'none';
+    } else {
+      if (imgEl) imgEl.style.display = 'none';
+      if (initEl) initEl.style.display = 'flex';
+    }
+
+    if (editName) editName.value = s ? (s.nome || s.name || '') : '';
+    if (editPhone) editPhone.value = s ? (s.phone || '') : '';
+    if (editEmail) editEmail.value = s ? (s.email || '') : '';
+    if (editCity) editCity.value = s ? (s.city || '') : '';
+
+    const veh = s ? (s.veiculo || {}) : {};
+    if (editBrand) editBrand.value = veh.marca || '';
+    if (editModel) editModel.value = veh.modelo || '';
+    if (editPlate) editPlate.value = veh.matricula || '';
+    if (editColor) editColor.value = veh.cor || '';
+    if (editCat) editCat.value = veh.categoria || '';
+
+    // Stats from localStorage
+    const trips = parseInt(localStorage.getItem('giro_driver_total_trips') || '0');
+    const earn = parseInt(localStorage.getItem('giro_driver_total_earnings') || '0');
+    if (statTrips) statTrips.textContent = trips;
+    if (statEarn) statEarn.textContent = earn.toLocaleString('pt-AO');
+    if (statAccept) statAccept.textContent = trips > 0 ? '98%' : '—';
+  }
+
+  let _drvSaveTimer = null;
+  function drvAutoSave() {
+    clearTimeout(_drvSaveTimer);
+    _drvSaveTimer = setTimeout(() => {
+      const s = GiroAuth.get() || {};
+      const nome = (document.getElementById('edit-drv-name') || {}).value || s.nome || '';
+      const phone = (document.getElementById('edit-drv-phone') || {}).value || s.phone || '';
+      const email = (document.getElementById('edit-drv-email') || {}).value || s.email || '';
+      const city = (document.getElementById('edit-drv-city') || {}).value || s.city || '';
+      const brand = (document.getElementById('edit-drv-car-brand') || {}).value || '';
+      const model = (document.getElementById('edit-drv-car-model') || {}).value || '';
+      const plate = (document.getElementById('edit-drv-car-plate') || {}).value || '';
+      const color = (document.getElementById('edit-drv-car-color') || {}).value || '';
+      const category = (document.getElementById('edit-drv-car-category') || {}).value || '';
+
+      const updated = {
+        ...s,
+        nome, phone, email, city,
+        veiculo: { marca: brand, modelo: model, matricula: plate, cor: color, categoria: category }
+      };
+      GiroAuth.save(updated);
+
+      // Update header pill
+      const nameEl = document.getElementById('drv-profile-name');
+      const phoneEl = document.getElementById('drv-profile-phone');
+      const initEl = document.getElementById('drv-avatar-initials');
+      if (nameEl && nome) nameEl.textContent = nome;
+      if (phoneEl && phone) phoneEl.textContent = phone;
+      if (initEl && nome) initEl.textContent = nome[0].toUpperCase();
+
+      // Show saved status
+      const statusEl = document.getElementById('drv-save-status');
+      if (statusEl) {
+        statusEl.style.display = 'block';
+        clearTimeout(statusEl._hideTimer);
+        statusEl._hideTimer = setTimeout(() => { statusEl.style.display = 'none'; }, 2500);
+      }
+
+      // Sync GiroAuth.renderUserPill
+      if (typeof GiroAuth !== 'undefined' && GiroAuth.renderUserPill) {
+        GiroAuth.renderUserPill('driver-user-pill');
+      }
+    }, 600);
+  }
+
+  const STORAGE_BUCKET = 'giro-4ed50.firebasestorage.app';
+
+  function compressImage(file, maxWidth = 1280, quality = 0.8) {
+    return new Promise((resolve) => {
+      if (!file || !file.type || !file.type.startsWith('image/')) {
+        return resolve(file);
+      }
+      const reader = new FileReader();
+      reader.onerror = () => resolve(file);
+      reader.onload = (e) => {
+        const img = new Image();
+        img.onerror = () => resolve(file);
+        img.onload = () => {
+          let width = img.width;
+          let height = img.height;
+          if (width > maxWidth || height > maxWidth) {
+            if (width > height) {
+              height = Math.round((height * maxWidth) / width);
+              width = maxWidth;
+            } else {
+              width = Math.round((width * maxWidth) / height);
+              height = maxWidth;
+            }
+          }
+          const canvas = document.createElement('canvas');
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, width, height);
+          canvas.toBlob((blob) => {
+            if (blob) resolve(blob);
+            else resolve(file);
+          }, 'image/jpeg', quality);
+        };
+        img.src = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    });
+  }
+
+  async function handleDrvPhotoUpload(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const s = (typeof GiroAuth !== 'undefined' && GiroAuth.get) ? (GiroAuth.get() || {}) : {};
+    const driverId = s.id || s.driverId || (s.phone ? 'drv_' + s.phone.replace(/\D/g, '') : 'drv_' + Date.now());
+
+    // Instant preview
+    const imgEl = document.getElementById('drv-avatar-img');
+    const initEl = document.getElementById('drv-avatar-initials');
+
+    try {
+      // 1. Compress photo using canvas
+      const compressedBlob = await compressImage(file, 1280, 0.8);
+
+      // 2. Direct Cloud Storage REST upload
+      const objectPath = `kyc/${driverId}/foto_perfil.jpg`;
+      const encodedName = encodeURIComponent(objectPath);
+      const uploadUrl = `https://firebasestorage.googleapis.com/v0/b/${STORAGE_BUCKET}/o?name=${encodedName}`;
+
+      const res = await fetch(uploadUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'image/jpeg' },
+        body: compressedBlob
+      });
+
+      let downloadUrl = '';
+      if (res.ok) {
+        const data = await res.json();
+        const token = (data.downloadTokens || '').split(',')[0];
+        if (token) {
+          downloadUrl = `https://firebasestorage.googleapis.com/v0/b/${STORAGE_BUCKET}/o/${encodedName}?alt=media&token=${token}`;
+        } else {
+          downloadUrl = `https://firebasestorage.googleapis.com/v0/b/${STORAGE_BUCKET}/o/${encodedName}?alt=media`;
+        }
+      } else {
+        console.warn(`[Cloud Storage] Falha no upload (${res.status}): balde pode estar pendente de ativação no Console.`);
+        downloadUrl = `https://firebasestorage.googleapis.com/v0/b/${STORAGE_BUCKET}/o/${encodedName}?alt=media&status=pending_bucket_init`;
+      }
+
+      // 3. Update local avatar display
+      if (imgEl && downloadUrl) {
+        imgEl.src = downloadUrl;
+        imgEl.style.display = 'block';
+      }
+      if (initEl) initEl.style.display = 'none';
+
+      // 4. Update session
+      if (typeof GiroAuth !== 'undefined' && GiroAuth.save) {
+        GiroAuth.save({ ...s, id: driverId, photo: downloadUrl });
+      }
+
+      // 5. PATCH /drivers/${driverId}.json with { photo: downloadUrl }
+      await fetch(`https://giro-4ed50-default-rtdb.europe-west1.firebasedatabase.app/drivers/${driverId}.json`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ photo: downloadUrl })
+      }).catch(err => console.warn('Erro ao atualizar foto no Firebase:', err));
+
+      drvAutoSave();
+    } catch (err) {
+      console.error('Erro no upload da foto de perfil:', err);
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const dataUrl = e.target.result;
+        if (imgEl) { imgEl.src = dataUrl; imgEl.style.display = 'block'; }
+        if (initEl) initEl.style.display = 'none';
+        if (typeof GiroAuth !== 'undefined' && GiroAuth.save) {
+          GiroAuth.save({ ...s, id: driverId, photo: dataUrl });
+        }
+        drvAutoSave();
+      };
+      reader.readAsDataURL(file);
+    }
+  }
+  </script>
 </body>
-</html>

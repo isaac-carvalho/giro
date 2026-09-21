@@ -1,66 +1,71 @@
 <!DOCTYPE html>
 <html lang="pt">
 <head>
+<script>
+// Redirecionamento automático unificado para o Portal Oficial Único login.html estilo Uber
+window.location.replace('login.html?mode=register&role=motorista');
+</script>
+
   <title>GIRO — Cadastro Motorista</title>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <meta name="theme-color" content="#070907">
+  <meta name="theme-color" content="#000000">
   <style>
-    :root{--bg:#070907;--bg2:#0f1410;--bg3:#1a211b;--gold:#d4af37;--gold2:#f0c040;--green:#22c55e;--green2:#16a34a;--red:#ef4444;--text:#f1f5f1;--muted:#8d9e8d;--border:rgba(212,175,55,0.18);--card:rgba(255,255,255,0.04);--radius:16px;--shadow:0 4px 24px rgba(0,0,0,0.6);}
+    :root{--bg:#000000;--bg2:#121212;--bg3:#1a1a1a;--accent:#ffffff;--accent-hover:#e5e5e5;--green:#06C167;--green2:#16a34a;--red:#ef4444;--text:#ffffff;--muted:#888888;--border:#262626;--card:#141414;--radius:16px;--shadow:0 8px 32px rgba(0,0,0,0.85);}
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
-    html,body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;min-height:100vh;-webkit-font-smoothing:antialiased;}
-    a{color:var(--gold);text-decoration:none;}a:hover{text-decoration:underline;}
+    html,body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,system-ui,sans-serif;min-height:100vh;-webkit-font-smoothing:antialiased;}
+    a{color:#ffffff;text-decoration:underline;}a:hover{color:#cccccc;}
     .auth-wrapper{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding:24px 16px 48px;}
     .auth-logo{margin-bottom:24px;text-align:center;}
-    .auth-logo .logo-g{font-size:48px;font-weight:900;color:var(--gold);letter-spacing:-2px;line-height:1;}
+    .auth-logo .logo-g{font-size:48px;font-weight:900;color:#ffffff;letter-spacing:-2px;line-height:1;}
     .auth-logo .logo-sub{font-size:11px;letter-spacing:4px;color:var(--muted);text-transform:uppercase;}
     .auth-card{width:100%;max-width:420px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:28px 24px 32px;box-shadow:var(--shadow);}
     .auth-title{font-size:20px;font-weight:700;color:var(--text);margin-bottom:6px;}
     .auth-subtitle{font-size:13px;color:var(--muted);margin-bottom:28px;}
     .progress-bar-wrap{display:flex;gap:6px;margin-bottom:24px;}
     .progress-bar-wrap .step-dot{flex:1;height:4px;border-radius:2px;background:var(--bg3);transition:background .3s;}
-    .progress-bar-wrap .step-dot.active{background:var(--gold);}
+    .progress-bar-wrap .step-dot.active{background:#ffffff;}
     .progress-bar-wrap .step-dot.done{background:var(--green);}
     .step-label{font-size:11px;color:var(--muted);margin-bottom:20px;}
     .form-group{margin-bottom:16px;}
     .form-label{display:block;font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:7px;}
     .form-control{width:100%;background:var(--bg3);border:1px solid rgba(255,255,255,.1);border-radius:10px;color:var(--text);font-size:16px;padding:12px 14px;outline:none;transition:border-color .2s;-webkit-appearance:none;}
-    .form-control:focus{border-color:var(--gold);}
+    .form-control:focus{border-color:#ffffff;}
     .form-control.error{border-color:var(--red);}
     .form-control.ok{border-color:var(--green);}
     .form-hint{font-size:11px;color:var(--muted);margin-top:5px;}
     .form-hint.err{color:var(--red);}
     .form-hint.suc{color:var(--green);}
     .phone-row{display:flex;gap:8px;}
-    .phone-prefix{background:var(--bg3);border:1px solid rgba(255,255,255,.1);border-radius:10px;color:var(--gold);font-size:15px;padding:12px 10px;min-width:80px;text-align:center;font-weight:700;}
+    .phone-prefix{background:var(--bg3);border:1px solid rgba(255,255,255,.1);border-radius:10px;color:#ffffff;font-size:15px;padding:12px 10px;min-width:80px;text-align:center;font-weight:700;}
     .pw-wrap{position:relative;}
     .pw-wrap .form-control{padding-right:44px;}
     .pw-eye{position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--muted);font-size:18px;padding:0;line-height:1;}
     .otp-row{display:flex;gap:10px;justify-content:center;}
     .otp-input{width:44px;height:54px;background:var(--bg3);border:1px solid rgba(255,255,255,.1);border-radius:10px;color:var(--text);font-size:22px;font-weight:700;text-align:center;outline:none;transition:border-color .2s;-webkit-appearance:none;}
-    .otp-input:focus{border-color:var(--gold);}
+    .otp-input:focus{border-color:#ffffff;}
     .strength-bar{display:flex;gap:4px;margin-top:8px;}
     .strength-bar span{flex:1;height:4px;border-radius:2px;background:var(--bg3);transition:background .3s;}
     .strength-label{font-size:11px;margin-top:5px;color:var(--muted);}
     .btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:14px;border:none;border-radius:10px;font-size:15px;font-weight:700;cursor:pointer;transition:opacity .2s,transform .1s;-webkit-appearance:none;}
     .btn:active{transform:scale(.98);}
-    .btn-gold{background:linear-gradient(135deg,var(--gold),var(--gold2));color:#000;}
+    .btn-primary{background:#ffffff;color:#000000;font-weight:900;border:none;border-radius:12px;padding:15px;font-size:16px;box-shadow:0 4px 18px rgba(255,255,255,0.12);cursor:pointer;}
     .btn-green{background:linear-gradient(135deg,var(--green),var(--green2));color:#fff;}
     .btn-outline{background:transparent;border:1px solid var(--border);color:var(--text);margin-top:10px;}
     .btn:disabled{opacity:.45;cursor:not-allowed;}
     .btn-sm{padding:10px 16px;font-size:13px;width:auto;border-radius:8px;}
     .nav-btns{display:flex;gap:10px;margin-top:20px;}
     .nav-btns .btn{margin-top:0;}
-    .upload-box{border:2px dashed rgba(212,175,55,.3);border-radius:12px;padding:18px 12px;text-align:center;cursor:pointer;transition:border-color .2s,background .2s;position:relative;}
-    .upload-box:hover,.upload-box.drag{border-color:var(--gold);background:rgba(212,175,55,.04);}
+    .upload-box{border:2px dashed rgba(255,255,255,.2);border-radius:12px;padding:18px 12px;text-align:center;cursor:pointer;transition:border-color .2s,background .2s;position:relative;}
+    .upload-box:hover,.upload-box.drag{border-color:#ffffff;background:rgba(255,255,255,.06);}
     .upload-box input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;}
     .upload-box .up-icon{font-size:28px;margin-bottom:6px;}
     .upload-box .up-label{font-size:13px;color:var(--muted);}
-    .upload-box .up-label strong{color:var(--gold);}
+    .upload-box .up-label strong{color:#ffffff;}
     .upload-preview{margin-top:8px;border-radius:8px;overflow:hidden;max-height:120px;display:none;}
     .upload-preview img{width:100%;object-fit:cover;max-height:120px;}
     .check-group{display:flex;align-items:flex-start;gap:12px;margin-bottom:14px;}
-    .check-group input[type=checkbox]{width:20px;height:20px;accent-color:var(--gold);flex-shrink:0;margin-top:2px;cursor:pointer;}
+    .check-group input[type=checkbox]{width:20px;height:20px;accent-color:#ffffff;flex-shrink:0;margin-top:2px;cursor:pointer;}
     .check-group label{font-size:13px;color:var(--muted);cursor:pointer;line-height:1.5;}
     .divider{display:flex;align-items:center;gap:12px;margin:20px 0;}
     .divider::before,.divider::after{content:'';flex:1;height:1px;background:rgba(255,255,255,.08);}
@@ -68,20 +73,20 @@
     .alert{padding:12px 14px;border-radius:10px;font-size:13px;margin-bottom:16px;display:none;}
     .alert.err{background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.3);color:#fca5a5;}
     .alert.suc{background:rgba(34,197,94,.12);border:1px solid rgba(34,197,94,.3);color:#86efac;}
-    .alert.info{background:rgba(212,175,55,.10);border:1px solid rgba(212,175,55,.3);color:var(--gold2);}
+    .alert.info{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.2);color:#ffffff;}
     .step-pane{display:none;}
     .step-pane.active{display:block;}
     .success-screen{text-align:center;padding:32px 0;}
     .success-screen .big-icon{font-size:64px;margin-bottom:16px;}
     .success-screen h2{font-size:22px;font-weight:800;margin-bottom:10px;}
     .success-screen p{font-size:14px;color:var(--muted);line-height:1.6;}
-    .success-screen .badge-pending{display:inline-block;margin-top:16px;padding:8px 18px;border-radius:20px;background:rgba(212,175,55,.12);border:1px solid var(--border);color:var(--gold);font-size:13px;font-weight:600;}
+    .success-screen .badge-pending{display:inline-block;margin-top:16px;padding:8px 18px;border-radius:20px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.25);color:#ffffff;font-size:13px;font-weight:700;}
     .resend-row{text-align:center;margin-top:16px;font-size:13px;color:var(--muted);}
-    .resend-btn{color:var(--gold);font-weight:600;cursor:pointer;background:none;border:none;font-size:13px;}
+    .resend-btn{color:#ffffff;font-weight:600;cursor:pointer;background:none;border:none;font-size:13px;}
     .resend-btn:disabled{color:var(--muted);cursor:default;}
     .role-cards{display:flex;gap:12px;margin-top:20px;}
     .role-card{flex:1;padding:18px 12px;border-radius:12px;border:2px solid rgba(255,255,255,.08);background:var(--bg3);text-align:center;cursor:pointer;transition:border-color .2s,background .2s;}
-    .role-card:hover{border-color:var(--gold);}
+    .role-card:hover{border-color:#ffffff;}
     .role-card .rc-icon{font-size:34px;margin-bottom:10px;}
     .role-card .rc-label{font-size:14px;font-weight:700;}
     .role-card .rc-desc{font-size:11px;color:var(--muted);margin-top:4px;}
@@ -89,11 +94,11 @@
     .auth-links a{font-weight:600;}
     .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
     .pill-skip{display:inline-block;margin-top:4px;padding:4px 12px;border-radius:20px;background:var(--bg3);border:1px solid rgba(255,255,255,.08);font-size:12px;color:var(--muted);cursor:pointer;}
-    .pill-skip:hover{border-color:var(--gold);color:var(--gold);}
+    .pill-skip:hover{border-color:#ffffff;color:#ffffff;}
     .veh-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
     .veh-btn{padding:10px 8px;border-radius:8px;border:1px solid rgba(255,255,255,.08);background:var(--bg3);color:var(--text);font-size:13px;cursor:pointer;transition:border-color .2s;}
-    .veh-btn.selected{border-color:var(--gold);background:rgba(212,175,55,.08);color:var(--gold);}
-    .kyc-info{background:rgba(212,175,55,.07);border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-bottom:16px;font-size:12px;color:var(--gold2);line-height:1.6;}
+    .veh-btn.selected{border-color:#ffffff;background:#ffffff;color:#000000;font-weight:700;}
+    .kyc-info{background:#181818;border:1px solid #2e2e2e;border-radius:10px;padding:12px 14px;margin-bottom:16px;font-size:12px;color:#cccccc;line-height:1.6;}
     .doc-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
     @media(max-width:380px){.grid-2,.veh-grid,.doc-grid{grid-template-columns:1fr;}}
     .earnings-box{background:var(--bg3);border-radius:12px;padding:16px;margin-bottom:18px;text-align:center;}
@@ -140,7 +145,7 @@
     /* Step dots (bolinhas) */
     .step-dot-row { display:flex; gap:8px; justify-content:center; padding:16px 0 8px; }
     .step-dot-circle { color: #333; font-size: 14px; transition: color .2s; }
-    .step-dot-circle.active { color: #d4af37; }
+    .step-dot-circle.active { color: #ffffff; font-weight: 900; }
     .step-dot-circle.done { color: #22c55e; }
 
     /* Active state — ÚNICA animação permitida */
@@ -161,7 +166,7 @@
 <body>
 <div class="auth-wrapper">
   <div style="padding: calc(env(safe-area-inset-top,0px) + 24px) 20px 12px; text-align:center;">
-    <div style="font-size:38px;font-weight:900;color:#d4af37;letter-spacing:-2px;line-height:1;">GIRO</div>
+    <div style="font-size:38px;font-weight:900;color:#ffffff;letter-spacing:-2px;line-height:1;">GIRO</div>
     <div style="font-size:10px;letter-spacing:4px;color:#8d9e8d;text-transform:uppercase;margin-top:5px;">Seja um Parceiro · Angola</div>
   </div>
 
@@ -196,7 +201,7 @@
           <input class="form-control" id="m-dob" type="date">
         </div>
       </div>
-      <button class="btn btn-gold" onclick="motNext(1)">Continuar →</button>
+      <button class="btn btn-primary" onclick="motNext(1)">Continuar →</button>
     </div>
 
     <!-- STEP 2: Senha + OTP -->
@@ -229,7 +234,7 @@
       </div>
       <div class="nav-btns">
         <button class="btn btn-outline" onclick="motBack(2)">← Voltar</button>
-        <button class="btn btn-gold" id="btn-mot-otp" onclick="handleStep2()">Enviar SMS →</button>
+        <button class="btn btn-primary" id="btn-mot-otp" onclick="handleStep2()">Enviar SMS →</button>
       </div>
     </div>
 
@@ -240,33 +245,37 @@
       <div class="kyc-info">⚠️ Use fotos bem iluminadas e sem reflexos. Todos os campos são obrigatórios.</div>
       <div class="doc-grid">
         <div><label class="form-label">BI — Frente *</label>
-          <div class="upload-box" id="box-bi-f"><input type="file" accept="image/*" capture="environment" onchange="previewDoc(this,'prev-bi-f','box-bi-f')">
+          <div class="upload-box" id="box-bi-f"><input type="file" id="file-bi-f" accept="image/*" capture="environment" onchange="previewDoc(this,'prev-bi-f','box-bi-f')">
           <div class="up-icon">🪪</div><div class="up-label"><strong>Carregar</strong><br>BI frente</div>
           <div class="upload-preview" id="prev-bi-f"><img alt=""></div></div></div>
         <div><label class="form-label">BI — Verso *</label>
-          <div class="upload-box" id="box-bi-v"><input type="file" accept="image/*" capture="environment" onchange="previewDoc(this,'prev-bi-v','box-bi-v')">
+          <div class="upload-box" id="box-bi-v"><input type="file" id="file-bi-v" accept="image/*" capture="environment" onchange="previewDoc(this,'prev-bi-v','box-bi-v')">
           <div class="up-icon">🪪</div><div class="up-label"><strong>Carregar</strong><br>BI verso</div>
           <div class="upload-preview" id="prev-bi-v"><img alt=""></div></div></div>
         <div><label class="form-label">Carta Cond. — Frente *</label>
-          <div class="upload-box" id="box-cc-f"><input type="file" accept="image/*" capture="environment" onchange="previewDoc(this,'prev-cc-f','box-cc-f')">
+          <div class="upload-box" id="box-cc-f"><input type="file" id="file-cc-f" accept="image/*" capture="environment" onchange="previewDoc(this,'prev-cc-f','box-cc-f')">
           <div class="up-icon">🪪</div><div class="up-label"><strong>Carregar</strong><br>Carta frente</div>
           <div class="upload-preview" id="prev-cc-f"><img alt=""></div></div></div>
         <div><label class="form-label">Carta Cond. — Verso *</label>
-          <div class="upload-box" id="box-cc-v"><input type="file" accept="image/*" capture="environment" onchange="previewDoc(this,'prev-cc-v','box-cc-v')">
+          <div class="upload-box" id="box-cc-v"><input type="file" id="file-cc-v" accept="image/*" capture="environment" onchange="previewDoc(this,'prev-cc-v','box-cc-v')">
           <div class="up-icon">🪪</div><div class="up-label"><strong>Carregar</strong><br>Carta verso</div>
           <div class="upload-preview" id="prev-cc-v"><img alt=""></div></div></div>
-        <div><label class="form-label">Seguro do Veículo *</label>
-          <div class="upload-box" id="box-seg"><input type="file" accept="image/*,application/pdf" onchange="previewDoc(this,'prev-seg','box-seg')">
+        <div><label class="form-label">Livrete do Veículo *</label>
+          <div class="upload-box" id="box-livrete"><input type="file" id="file-livrete" accept="image/*,application/pdf" capture="environment" onchange="previewDoc(this,'prev-livrete','box-livrete')">
+          <div class="up-icon">📑</div><div class="up-label"><strong>Carregar</strong><br>Livrete / Registo</div>
+          <div class="upload-preview" id="prev-livrete"><img alt=""></div></div></div>
+        <div><label class="form-label">Seguro do Veículo</label>
+          <div class="upload-box" id="box-seg"><input type="file" id="file-seg" accept="image/*,application/pdf" onchange="previewDoc(this,'prev-seg','box-seg')">
           <div class="up-icon">📋</div><div class="up-label"><strong>Carregar</strong><br>Apólice de seguro</div>
           <div class="upload-preview" id="prev-seg"><img alt=""></div></div></div>
         <div><label class="form-label">Selfie de Verificação *</label>
-          <div class="upload-box" id="box-selfie"><input type="file" accept="image/*" capture="user" onchange="previewDoc(this,'prev-selfie','box-selfie')">
+          <div class="upload-box" id="box-selfie"><input type="file" id="file-selfie" accept="image/*" capture="user" onchange="previewDoc(this,'prev-selfie','box-selfie')">
           <div class="up-icon">🤳</div><div class="up-label"><strong>Tirar foto</strong><br>Selfie clara</div>
           <div class="upload-preview" id="prev-selfie"><img alt=""></div></div></div>
       </div>
       <div class="nav-btns" style="margin-top:20px">
         <button class="btn btn-outline" onclick="motBack(3)">← Voltar</button>
-        <button class="btn btn-gold" onclick="goMotStep(4)">Continuar →</button>
+        <button class="btn btn-primary" onclick="validateMotStep3()">Continuar →</button>
       </div>
     </div>
 
@@ -296,13 +305,13 @@
       <div class="form-group"><label class="form-label">Matrícula *</label><input class="form-control" id="m-matricula" type="text" placeholder="Ex: LD-12-34-AX" style="text-transform:uppercase"></div>
       <div class="form-group">
         <label class="form-label">Foto do Veículo *</label>
-        <div class="upload-box" id="box-veh-foto"><input type="file" accept="image/*" capture="environment" onchange="previewDoc(this,'prev-veh','box-veh-foto')">
+        <div class="upload-box" id="box-veh-foto"><input type="file" id="file-veh-foto" accept="image/*" capture="environment" onchange="previewDoc(this,'prev-veh','box-veh-foto')">
         <div class="up-icon">📸</div><div class="up-label"><strong>Foto frontal</strong> do veículo</div>
         <div class="upload-preview" id="prev-veh"><img alt=""></div></div>
       </div>
       <div class="nav-btns">
         <button class="btn btn-outline" onclick="motBack(4)">← Voltar</button>
-        <button class="btn btn-gold" onclick="motNext(4)">Continuar →</button>
+        <button class="btn btn-primary" onclick="motNext(4)">Continuar →</button>
       </div>
     </div>
 
@@ -325,7 +334,7 @@
       <p style="font-size:12px;color:var(--muted);margin-bottom:16px">⚠️ Adicione pelo menos um método de pagamento.</p>
       <div class="nav-btns">
         <button class="btn btn-outline" onclick="motBack(5)">← Voltar</button>
-        <button class="btn btn-gold" onclick="motNext(5)">Continuar →</button>
+        <button class="btn btn-primary" onclick="motNext(5)">Continuar →</button>
       </div>
     </div>
 
@@ -340,16 +349,16 @@
       <!-- Scrollable contract -->
       <div id="contrato-scroll" style="background:var(--bg3);border-radius:12px;padding:16px;max-height:340px;overflow-y:auto;margin-bottom:14px;font-size:11.5px;color:var(--muted);line-height:1.75;border:1px solid var(--border);scroll-behavior:smooth">
         <div style="text-align:center;margin-bottom:14px">
-          <strong style="color:var(--gold);font-size:14px;letter-spacing:1px">CONTRATO DE PARCERIA</strong><br>
+          <strong style="color:#ffffff;font-size:14px;letter-spacing:1px">CONTRATO DE PARCERIA</strong><br>
           <span style="font-size:10px;color:var(--muted)">GIRO Angola — Plataforma de Mobilidade Urbana & Logística</span>
         </div>
 
         <strong style="color:var(--text)">PARTES:</strong><br>
         <strong>EMPRESA:</strong> GIRO Angola, operado por Oaken Technologies, representada por Isaac Carvalho, Fundador & CEO, com sede em Luanda, Angola.<br>
-        <strong>MOTORISTA PARCEIRO:</strong> <span style="color:var(--gold)" id="c-nome">—</span>, telefone <span style="color:var(--gold)" id="c-phone">—</span>, veículo <span style="color:var(--gold)" id="c-veiculo">—</span> <span style="color:var(--gold)" id="c-marca-modelo">—</span>, matrícula <span style="color:var(--gold)" id="c-matricula">—</span>.<br><br>
+        <strong>MOTORISTA PARCEIRO:</strong> <span style="color:#ffffff" id="c-nome">—</span>, telefone <span style="color:#ffffff" id="c-phone">—</span>, veículo <span style="color:#ffffff" id="c-veiculo">—</span> <span style="color:#ffffff" id="c-marca-modelo">—</span>, matrícula <span style="color:#ffffff" id="c-matricula">—</span>.<br><br>
 
         <strong style="color:var(--text)">CLÁUSULA 1.ª — NATUREZA DA RELAÇÃO</strong><br>
-        1.1. O presente contrato estabelece uma relação de colaboração comercial independente, <strong style="color:var(--gold)">sem vínculo laboral</strong>, subordinação hierárquica ou relação de emprego.<br>
+        1.1. O presente contrato estabelece uma relação de colaboração comercial independente, <strong style="color:#ffffff">sem vínculo laboral</strong>, subordinação hierárquica ou relação de emprego.<br>
         1.2. O Motorista Parceiro opera por conta própria, assumindo os seus custos operacionais (combustível, manutenção, comunicação).<br>
         1.3. O Motorista Parceiro não tem poderes de representação legal da EMPRESA.<br>
         1.4. Este contrato não gera qualquer expectativa de vínculo empregatício, indemnização laboral, férias, 13.º salário ou benefícios trabalhistas.<br><br>
@@ -359,11 +368,11 @@
         2.2. O Motorista Parceiro tem liberdade para aceitar ou recusar corridas, definir os seus horários e a sua zona de actuação.<br><br>
 
         <strong style="color:var(--text)">CLÁUSULA 3.ª — COMISSÃO E PAGAMENTOS</strong><br>
-        3.1. <strong style="color:var(--gold)">Comissão GIRO: 10% (dez por cento)</strong> sobre o valor total de cada viagem concluída com sucesso.<br>
+        3.1. <strong style="color:#ffffff">Comissão GIRO: 10% (dez por cento)</strong> sobre o valor total de cada viagem concluída com sucesso.<br>
         3.2. O Motorista Parceiro recebe <strong style="color:var(--green)">90% do valor da viagem</strong>.<br>
         3.3. Pagamentos digitais (Multicaixa Express / Unitel Money): a GIRO retém automaticamente 10% e credita 90% na conta do motorista.<br>
         3.4. Pagamentos em dinheiro: o motorista fica com 100% em mãos; a comissão de 10% é lançada a débito no saldo da conta GIRO e deduzida nas próximas corridas digitais.<br>
-        3.5. <strong style="color:var(--gold)">Bónus "Desafio 30K"</strong>: Ao facturar 30.000 Kz num único dia, o motorista recebe +1.500 Kz de bónus automático.<br>
+        3.5. <strong style="color:#ffffff">Bónus "Desafio 30K"</strong>: Ao facturar 30.000 Kz num único dia, o motorista recebe +1.500 Kz de bónus automático.<br>
         3.6. A EMPRESA reserva-se o direito de alterar a tabela de comissões com aviso prévio de 30 dias.<br><br>
 
         <strong style="color:var(--text)">CLÁUSULA 4.ª — OBRIGAÇÕES DO MOTORISTA PARCEIRO</strong><br>
@@ -429,17 +438,17 @@
         </div>
       </div>
       <!-- Scroll indicator -->
-      <div id="scroll-hint" style="text-align:center;font-size:11px;color:var(--gold);margin-bottom:14px;opacity:1;transition:opacity .3s">
+      <div id="scroll-hint" style="text-align:center;font-size:11px;color:#ffffff;margin-bottom:14px;opacity:1;transition:opacity .3s">
         ↓ Deslize para ler o contrato completo
       </div>
       <!-- Checkboxes -->
       <div class="check-group">
         <input type="checkbox" id="chk-m-termos">
-        <label for="chk-m-termos">Li integralmente e aceito os <a href="termos.html">Termos de Uso</a>, a <a href="privacidade.html">Política de Privacidade</a> e o presente <strong style="color:var(--gold)">Contrato de Parceria GIRO</strong>.</label>
+        <label for="chk-m-termos">Li integralmente e aceito os <a href="termos.html">Termos de Uso</a>, a <a href="privacidade.html">Política de Privacidade</a> e o presente <strong style="color:#ffffff">Contrato de Parceria GIRO</strong>.</label>
       </div>
       <div class="check-group">
         <input type="checkbox" id="chk-m-comissao">
-        <label for="chk-m-comissao">Declaro que estou ciente e aceito a comissão de <strong style="color:var(--gold)">10%</strong> sobre cada corrida concluída.</label>
+        <label for="chk-m-comissao">Declaro que estou ciente e aceito a comissão de <strong style="color:#ffffff">10%</strong> sobre cada corrida concluída.</label>
       </div>
       <div class="check-group">
         <input type="checkbox" id="chk-m-idade">
@@ -456,7 +465,7 @@
       <div class="success-screen">
         <div class="big-icon">🕐</div>
         <h2>Cadastro em Análise</h2>
-        <p>O seu cadastro foi enviado.<br>A nossa equipa valida os documentos em até <strong style="color:var(--gold)">24 horas</strong>.<br>Receberá um SMS quando a conta estiver activa.</p>
+        <p>O seu cadastro foi enviado.<br>A nossa equipa valida os documentos em até <strong style="color:#ffffff">24 horas</strong>.<br>Receberá um SMS quando a conta estiver activa.</p>
         <div class="badge-pending">⏳ Pendente de Validação</div>
         <br><br>
         <button class="btn btn-outline btn-sm" onclick="location.href='login.html'" style="margin:0 auto">Ir para Login</button>
@@ -493,12 +502,12 @@ const GiroAuth={
     if(s){
       const initials=(s.nome||s.phone||'?')[0].toUpperCase();
       el.innerHTML=`<div style="display:flex;align-items:center;gap:8px;">
-        <div style="width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#d4af37,#f0c040);display:flex;align-items:center;justify-content:center;font-weight:900;font-size:14px;color:#000;">${initials}</div>
+        <div style="width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#ffffff,#e5e5e5);display:flex;align-items:center;justify-content:center;font-weight:900;font-size:14px;color:#000;">${initials}</div>
         <div style="line-height:1.2;"><div style="font-size:13px;font-weight:700;color:#f1f5f1;">${s.nome||s.phone}</div><div style="font-size:10px;color:#8d9e8d;text-transform:uppercase;">${s.role==='motorista'?'🚗 Motorista':'🧑 Passageiro'}</div></div>
         <button onclick="GiroAuth.logout()" style="margin-left:4px;background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.3);border-radius:8px;padding:5px 10px;color:#fca5a5;font-size:12px;cursor:pointer;">Sair</button>
       </div>`;
     }else{
-      el.innerHTML='<a href="login.html" style="text-decoration:none;padding:7px 14px;border-radius:20px;background:rgba(212,175,55,.12);border:1px solid rgba(212,175,55,.3);color:#d4af37;font-size:13px;font-weight:700;">&#128100; Entrar</a>';
+      el.innerHTML='<a href="login.html" style="text-decoration:none;padding:7px 14px;border-radius:20px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.3);color:#ffffff;font-size:13px;font-weight:700;">&#128100; Entrar</a>';
     }
   },
   logout(){this.clear();window.location.href='login.html';}
@@ -643,6 +652,127 @@ function handleStep2(){
   }
 }
 
+const STORAGE_BUCKET = 'giro-4ed50.firebasestorage.app';
+
+function compressImage(file, maxWidth = 1280, quality = 0.8) {
+  return new Promise((resolve) => {
+    if (!file || !file.type || !file.type.startsWith('image/')) {
+      return resolve(file); // PDF or non-image
+    }
+    const reader = new FileReader();
+    reader.onerror = () => resolve(file);
+    reader.onload = (e) => {
+      const img = new Image();
+      img.onerror = () => resolve(file);
+      img.onload = () => {
+        let width = img.width;
+        let height = img.height;
+        if (width > maxWidth || height > maxWidth) {
+          if (width > height) {
+            height = Math.round((height * maxWidth) / width);
+            width = maxWidth;
+          } else {
+            width = Math.round((width * maxWidth) / height);
+            height = maxWidth;
+          }
+        }
+        const canvas = document.createElement('canvas');
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, width, height);
+        canvas.toBlob((blob) => {
+          if (blob) resolve(blob);
+          else resolve(file);
+        }, 'image/jpeg', quality);
+      };
+      img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+async function uploadKycDocument(driverId, docType, fileOrBlob) {
+  if (!fileOrBlob) return null;
+  const objectPath = `kyc/${driverId}/${docType}.jpg`;
+  const encodedName = encodeURIComponent(objectPath);
+  const uploadUrl = `https://firebasestorage.googleapis.com/v0/b/${STORAGE_BUCKET}/o?name=${encodedName}`;
+
+  try {
+    const payload = await compressImage(fileOrBlob, 1280, 0.8);
+    const res = await fetch(uploadUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': fileOrBlob.type || 'image/jpeg' },
+      body: payload
+    });
+
+    if (!res.ok) {
+      console.warn(`[Cloud Storage] Falha no upload de ${docType} (${res.status}): balde pode estar pendente de ativação no Console.`);
+      return `https://firebasestorage.googleapis.com/v0/b/${STORAGE_BUCKET}/o/${encodedName}?alt=media&status=pending_bucket_init`;
+    }
+
+    const data = await res.json();
+    const token = (data.downloadTokens || '').split(',')[0];
+    if (token) {
+      return `https://firebasestorage.googleapis.com/v0/b/${STORAGE_BUCKET}/o/${encodedName}?alt=media&token=${token}`;
+    }
+    return `https://firebasestorage.googleapis.com/v0/b/${STORAGE_BUCKET}/o/${encodedName}?alt=media`;
+  } catch (err) {
+    console.warn(`[Cloud Storage] Erro de rede no upload de ${docType}:`, err);
+    return `https://firebasestorage.googleapis.com/v0/b/${STORAGE_BUCKET}/o/${encodedName}?alt=media&status=offline_fallback`;
+  }
+}
+
+function validateStep3() {
+  return validateMotStep3();
+}
+
+function validateMotStep3() {
+  showAlert('');
+  const mandatoryDocs = [
+    { id: 'file-bi-f', boxId: 'box-bi-f', name: 'BI (Frente)' },
+    { id: 'file-bi-v', boxId: 'box-bi-v', name: 'BI (Verso)' },
+    { id: 'file-cc-f', boxId: 'box-cc-f', name: 'Carta de Condução (Frente)' },
+    { id: 'file-cc-v', boxId: 'box-cc-v', name: 'Carta de Condução (Verso)' },
+    { id: 'file-livrete', boxId: 'box-livrete', name: 'Livrete do Veículo' },
+    { id: 'file-selfie', boxId: 'box-selfie', name: 'Selfie de Verificação' }
+  ];
+
+  const missing = [];
+  let firstMissingBox = null;
+
+  mandatoryDocs.forEach(doc => {
+    const input = document.getElementById(doc.id);
+    const box = document.getElementById(doc.boxId);
+    const hasFile = !!(input && input.files && input.files[0] && input.files[0].size > 0);
+    if (!hasFile) {
+      missing.push(doc.name);
+      if (box) {
+        box.style.borderColor = 'var(--red)';
+        if (!firstMissingBox) firstMissingBox = box;
+      }
+    } else {
+      if (box) box.style.borderColor = 'var(--green)';
+    }
+  });
+
+  if (missing.length > 0) {
+    if (missing.length === mandatoryDocs.length) {
+      showAlert('Por favor, carregue todos os documentos obrigatórios (*) para avançar.');
+    } else {
+      showAlert('Faltam carregar os seguintes documentos (*): ' + missing.join(', ') + '.');
+    }
+    if (firstMissingBox) {
+      firstMissingBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+    return false;
+  }
+
+  showAlert('');
+  goMotStep(4);
+  return true;
+}
+
 function motNext(step){
   showAlert('');
   if(step===1){
@@ -656,6 +786,8 @@ function motNext(step){
     if(age<18){showAlert('É necessário ter pelo menos 18 anos');return;}
     MOT.nome=nome;MOT.phone=phone;MOT.dob=dob;MOT.email=document.getElementById('m-email').value.trim();
     goMotStep(2);
+  } else if(step===3){
+    return validateMotStep3();
   } else if(step===4){
     if(!MOT.veiculo){showAlert('Seleccione o tipo de veículo');return;}
     const marca=document.getElementById('m-marca').value.trim();
@@ -676,13 +808,106 @@ function motNext(step){
     if(!document.getElementById('chk-m-termos').checked){showAlert('Aceite os Termos de Uso e Contrato de Parceria');return;}
     if(!document.getElementById('chk-m-comissao').checked){showAlert('Confirme que está ciente da comissão de 10%');return;}
     if(!document.getElementById('chk-m-idade').checked){showAlert('Confirme que tem 18 anos ou mais');return;}
-    showAlert('A enviar o cadastro...','info');
-    setTimeout(()=>{
-      showAlert('');
-      // SALVAR SESSÃO — status pendente (aguarda activação pela Central)
-      GiroAuth.save({phone:'+244'+MOT.phone,nome:MOT.nome,email:MOT.email,role:'motorista',status:'pendente',veiculo:MOT.veiculo,marca:MOT.marca,modelo:MOT.modelo,cor:MOT.cor,matricula:MOT.matricula});
-      goMotStep(7);
-    },1400);
+    showAlert('A enviar o cadastro e documentos para o Cloud Storage...','info');
+
+    (async () => {
+      try {
+        const driverId = 'drv_' + Date.now();
+        const fileBiF = document.getElementById('file-bi-f')?.files?.[0];
+        const fileBiV = document.getElementById('file-bi-v')?.files?.[0];
+        const fileCcF = document.getElementById('file-cc-f')?.files?.[0];
+        const fileCcV = document.getElementById('file-cc-v')?.files?.[0];
+        const fileLivrete = document.getElementById('file-livrete')?.files?.[0] || document.getElementById('file-seg')?.files?.[0];
+        const fileSelfie = document.getElementById('file-selfie')?.files?.[0];
+        const fileVehFoto = document.getElementById('file-veh-foto')?.files?.[0];
+
+        const [bi_frente, bi_verso, carta_frente, carta_verso, livrete, foto_perfil, foto_viatura] = await Promise.all([
+          uploadKycDocument(driverId, 'bi_frente', fileBiF),
+          uploadKycDocument(driverId, 'bi_verso', fileBiV),
+          uploadKycDocument(driverId, 'carta_frente', fileCcF),
+          uploadKycDocument(driverId, 'carta_verso', fileCcV),
+          uploadKycDocument(driverId, 'livrete', fileLivrete),
+          uploadKycDocument(driverId, 'foto_perfil', fileSelfie),
+          uploadKycDocument(driverId, 'foto_viatura', fileVehFoto)
+        ]);
+
+        const documents = {
+          bi_frente: bi_frente || '',
+          bi_verso: bi_verso || '',
+          carta_frente: carta_frente || '',
+          carta_verso: carta_verso || '',
+          livrete: livrete || '',
+          foto_perfil: foto_perfil || '',
+          foto_viatura: foto_viatura || '',
+          selfie: foto_perfil || '',
+          bi_front: bi_frente || '',
+          bi_back: bi_verso || '',
+          license_front: carta_frente || '',
+          license_back: carta_verso || '',
+          foto_veiculo: foto_viatura || ''
+        };
+
+        const newDriverData = {
+          id: driverId,
+          nome: MOT.nome,
+          firstName: MOT.nome.split(' ')[0],
+          secondName: MOT.nome.split(' ').slice(1).join(' ') || '',
+          phone: '+244' + MOT.phone,
+          phoneNumber: '+244' + MOT.phone,
+          email: MOT.email || '',
+          dob: MOT.dob || '',
+          cat: MOT.veiculo || 'Carro',
+          car: `${MOT.marca || ''} ${MOT.modelo || ''} (${MOT.ano || ''})`.trim(),
+          plate: MOT.matricula || 'S/ MATRÍCULA',
+          multicaixa: MOT.multicaixa || '',
+          unitel: MOT.unitel || '',
+          status: 'pendente',
+          blockStatus: 'no',
+          isOnline: false,
+          date: new Date().toLocaleDateString('pt-AO'),
+          createdAt: Date.now(),
+          photo: foto_perfil || '',
+          documents: documents,
+          vehicleInfo: {
+            type: MOT.veiculo,
+            brand: MOT.marca,
+            model: MOT.modelo,
+            color: MOT.cor,
+            productionYear: MOT.ano,
+            registrationPlateNumber: MOT.matricula
+          }
+        };
+
+        // 1. Firebase Realtime Database (/drivers e /cadastros/motoristas)
+        fetch(`https://giro-4ed50-default-rtdb.europe-west1.firebasedatabase.app/drivers/${driverId}.json`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(newDriverData)
+        }).catch(e => console.warn('Erro ao salvar no Firebase:', e));
+
+        fetch(`https://giro-4ed50-default-rtdb.europe-west1.firebasedatabase.app/cadastros/motoristas/${driverId}.json`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ ...newDriverData, status: 'pendente' })
+        }).catch(e => console.warn('Erro ao salvar no Firebase cadastros:', e));
+
+        // 2. Admin Local Storage
+        try {
+          const list = JSON.parse(localStorage.getItem('giro_admin_drivers') || '[]');
+          list.unshift(newDriverData);
+          localStorage.setItem('giro_admin_drivers', JSON.stringify(list));
+        } catch(e) {}
+
+        // SALVAR SESSÃO — status pendente (aguarda activação pela Central)
+        GiroAuth.save({phone:'+244'+MOT.phone,nome:MOT.nome,email:MOT.email,role:'motorista',status:'pendente',veiculo:MOT.veiculo,marca:MOT.marca,modelo:MOT.modelo,cor:MOT.cor,matricula:MOT.matricula,photo:foto_perfil||'',documents});
+        showAlert('');
+        goMotStep(7);
+      } catch (err) {
+        console.error('Erro no cadastro do motorista:', err);
+        showAlert('Erro no envio, a prosseguir com modo local...', 'info');
+        setTimeout(() => goMotStep(7), 800);
+      }
+    })();
   }
 }
 </script>

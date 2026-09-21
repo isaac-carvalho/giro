@@ -1,396 +1,1288 @@
 <!DOCTYPE html>
-<html lang="pt">
+<html lang="pt-AO">
 <head>
-  <title>GIRO — Entrar</title>
   <meta charset="UTF-8">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate, max-age=0">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
+  <script>
+  // PWA Service Worker & Cache Controller Unificado
+  (function initGiroLoginPWA() {
+    const GIRO_BUILD_SIG = 'giro_build_2026_09_21_pwa_v1';
+    try {
+      if (localStorage.getItem('giro_build_sig') !== GIRO_BUILD_SIG) {
+        localStorage.setItem('giro_build_sig', GIRO_BUILD_SIG);
+        if ('caches' in window) {
+          caches.keys().then(keys => {
+            return Promise.all(keys.filter(k => k !== 'giro-live-v2026-v5-firebase-suite').map(k => caches.delete(k)));
+          }).catch(() => {});
+        }
+      }
+    } catch(e) {}
+
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./service-worker.js', { scope: './', updateViaCache: 'none' })
+          .then(reg => {
+            reg.update().catch(() => {});
+          })
+          .catch(err => {
+            console.warn('[SW Login] Reg note:', err);
+          });
+      });
+    }
+  })();
+  </script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <meta name="theme-color" content="#070907">
+  <title>GIRO Angola — Entrar & Criar Conta</title>
+
+  <!-- PWA Meta Tags -->
+  <link rel="manifest" href="./manifest.json">
+  <meta name="theme-color" content="#000000">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="GIRO">
+  <link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png">
+  <link rel="icon" type="image/png" sizes="512x512" href="./icons/icon-512.png">
+  <link rel="apple-touch-icon" sizes="192x192" href="./icons/icon-192.png">
+  <link rel="apple-touch-icon" sizes="512x512" href="./icons/icon-512.png">
+  <link rel="icon" type="image/x-icon" href="./favicon.ico">
+  <link rel="shortcut icon" href="./favicon.ico">
+
   <style>
-    :root{--bg:#070907;--bg2:#0f1410;--bg3:#1a211b;--gold:#d4af37;--gold2:#f0c040;--green:#22c55e;--green2:#16a34a;--red:#ef4444;--text:#f1f5f1;--muted:#8d9e8d;--border:rgba(212,175,55,0.18);--card:rgba(255,255,255,0.04);--radius:16px;--shadow:0 4px 24px rgba(0,0,0,0.6);}
-    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
-    html,body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;min-height:100vh;-webkit-font-smoothing:antialiased;}
-    a{color:var(--gold);text-decoration:none;}a:hover{text-decoration:underline;}
-    .auth-wrapper{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding:24px 16px 48px;}
-    .auth-logo{margin-bottom:24px;text-align:center;}
-    .auth-logo .logo-g{font-size:48px;font-weight:900;color:var(--gold);letter-spacing:-2px;line-height:1;}
-    .auth-logo .logo-sub{font-size:11px;letter-spacing:4px;color:var(--muted);text-transform:uppercase;}
-    .auth-card{width:100%;max-width:420px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:28px 24px 32px;box-shadow:var(--shadow);}
-    .auth-title{font-size:20px;font-weight:700;color:var(--text);margin-bottom:6px;}
-    .auth-subtitle{font-size:13px;color:var(--muted);margin-bottom:28px;}
-    .progress-bar-wrap{display:flex;gap:6px;margin-bottom:24px;}
-    .progress-bar-wrap .step-dot{flex:1;height:4px;border-radius:2px;background:var(--bg3);transition:background .3s;}
-    .progress-bar-wrap .step-dot.active{background:var(--gold);}
-    .progress-bar-wrap .step-dot.done{background:var(--green);}
-    .step-label{font-size:11px;color:var(--muted);margin-bottom:20px;}
-    .form-group{margin-bottom:16px;}
-    .form-label{display:block;font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:7px;}
-    .form-control{width:100%;background:var(--bg3);border:1px solid rgba(255,255,255,.1);border-radius:10px;color:var(--text);font-size:15px;padding:12px 14px;outline:none;transition:border-color .2s;-webkit-appearance:none;}
-    .form-control:focus{border-color:var(--gold);}
-    .form-control.error{border-color:var(--red);}
-    .form-control.ok{border-color:var(--green);}
-    .form-hint{font-size:11px;color:var(--muted);margin-top:5px;}
-    .form-hint.err{color:var(--red);}
-    .form-hint.suc{color:var(--green);}
-    .phone-row{display:flex;gap:8px;}
-    .phone-prefix{background:var(--bg3);border:1px solid rgba(255,255,255,.1);border-radius:10px;color:var(--gold);font-size:15px;padding:12px 10px;min-width:80px;text-align:center;font-weight:700;}
-    .pw-wrap{position:relative;}
-    .pw-wrap .form-control{padding-right:44px;}
-    .pw-eye{position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--muted);font-size:18px;padding:0;line-height:1;}
-    .otp-row{display:flex;gap:10px;justify-content:center;}
-    .otp-input{width:44px;height:54px;background:var(--bg3);border:1px solid rgba(255,255,255,.1);border-radius:10px;color:var(--text);font-size:22px;font-weight:700;text-align:center;outline:none;transition:border-color .2s;-webkit-appearance:none;}
-    .otp-input:focus{border-color:var(--gold);}
-    .strength-bar{display:flex;gap:4px;margin-top:8px;}
-    .strength-bar span{flex:1;height:4px;border-radius:2px;background:var(--bg3);transition:background .3s;}
-    .strength-label{font-size:11px;margin-top:5px;color:var(--muted);}
-    .btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:14px;border:none;border-radius:10px;font-size:15px;font-weight:700;cursor:pointer;transition:opacity .2s,transform .1s;-webkit-appearance:none;}
-    .btn:active{transform:scale(.98);}
-    .btn-gold{background:linear-gradient(135deg,var(--gold),var(--gold2));color:#000;}
-    .btn-green{background:linear-gradient(135deg,var(--green),var(--green2));color:#fff;}
-    .btn-outline{background:transparent;border:1px solid var(--border);color:var(--text);margin-top:10px;}
-    .btn:disabled{opacity:.45;cursor:not-allowed;}
-    .btn-sm{padding:10px 16px;font-size:13px;width:auto;border-radius:8px;}
-    .nav-btns{display:flex;gap:10px;margin-top:20px;}
-    .nav-btns .btn{margin-top:0;}
-    .upload-box{border:2px dashed rgba(212,175,55,.3);border-radius:12px;padding:18px 12px;text-align:center;cursor:pointer;transition:border-color .2s,background .2s;position:relative;}
-    .upload-box:hover,.upload-box.drag{border-color:var(--gold);background:rgba(212,175,55,.04);}
-    .upload-box input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;}
-    .upload-box .up-icon{font-size:28px;margin-bottom:6px;}
-    .upload-box .up-label{font-size:13px;color:var(--muted);}
-    .upload-box .up-label strong{color:var(--gold);}
-    .upload-preview{margin-top:8px;border-radius:8px;overflow:hidden;max-height:120px;display:none;}
-    .upload-preview img{width:100%;object-fit:cover;max-height:120px;}
-    .check-group{display:flex;align-items:flex-start;gap:12px;margin-bottom:14px;}
-    .check-group input[type=checkbox]{width:20px;height:20px;accent-color:var(--gold);flex-shrink:0;margin-top:2px;cursor:pointer;}
-    .check-group label{font-size:13px;color:var(--muted);cursor:pointer;line-height:1.5;}
-    .divider{display:flex;align-items:center;gap:12px;margin:20px 0;}
-    .divider::before,.divider::after{content:'';flex:1;height:1px;background:rgba(255,255,255,.08);}
-    .divider span{font-size:12px;color:var(--muted);white-space:nowrap;}
-    .alert{padding:12px 14px;border-radius:10px;font-size:13px;margin-bottom:16px;display:none;}
-    .alert.err{background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.3);color:#fca5a5;}
-    .alert.suc{background:rgba(34,197,94,.12);border:1px solid rgba(34,197,94,.3);color:#86efac;}
-    .alert.info{background:rgba(212,175,55,.10);border:1px solid rgba(212,175,55,.3);color:var(--gold2);}
-    .step-pane{display:none;}
-    .step-pane.active{display:block;}
-    .success-screen{text-align:center;padding:32px 0;}
-    .success-screen .big-icon{font-size:64px;margin-bottom:16px;}
-    .success-screen h2{font-size:22px;font-weight:800;margin-bottom:10px;}
-    .success-screen p{font-size:14px;color:var(--muted);line-height:1.6;}
-    .success-screen .badge-pending{display:inline-block;margin-top:16px;padding:8px 18px;border-radius:20px;background:rgba(212,175,55,.12);border:1px solid var(--border);color:var(--gold);font-size:13px;font-weight:600;}
-    .resend-row{text-align:center;margin-top:16px;font-size:13px;color:var(--muted);}
-    .resend-btn{color:var(--gold);font-weight:600;cursor:pointer;background:none;border:none;font-size:13px;}
-    .resend-btn:disabled{color:var(--muted);cursor:default;}
-    .role-cards{display:flex;gap:12px;margin-top:20px;}
-    .role-card{flex:1;padding:18px 12px;border-radius:12px;border:2px solid rgba(255,255,255,.08);background:var(--bg3);text-align:center;cursor:pointer;transition:border-color .2s,background .2s;}
-    .role-card:hover{border-color:var(--gold);}
-    .role-card .rc-icon{font-size:34px;margin-bottom:10px;}
-    .role-card .rc-label{font-size:14px;font-weight:700;}
-    .role-card .rc-desc{font-size:11px;color:var(--muted);margin-top:4px;}
-    .auth-links{margin-top:20px;text-align:center;font-size:13px;color:var(--muted);}
-    .auth-links a{font-weight:600;}
-    .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
-    @media(max-width:380px){.grid-2{grid-template-columns:1fr;}}
-    .pill-skip{display:inline-block;margin-top:4px;padding:4px 12px;border-radius:20px;background:var(--bg3);border:1px solid rgba(255,255,255,.08);font-size:12px;color:var(--muted);cursor:pointer;}
-    .pill-skip:hover{border-color:var(--gold);color:var(--gold);}
-    .veh-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
-    .veh-btn{padding:10px 8px;border-radius:8px;border:1px solid rgba(255,255,255,.08);background:var(--bg3);color:var(--text);font-size:13px;cursor:pointer;transition:border-color .2s;}
-    .veh-btn.selected{border-color:var(--gold);background:rgba(212,175,55,.08);color:var(--gold);}
-    .kyc-info{background:rgba(212,175,55,.07);border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-bottom:16px;font-size:12px;color:var(--gold2);line-height:1.6;}
-    .doc-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
-    @media(max-width:380px){.doc-grid{grid-template-columns:1fr;}}
-    .earnings-box{background:var(--bg3);border-radius:12px;padding:16px;margin-bottom:18px;text-align:center;}
-    .earnings-box .earn-val{font-size:28px;font-weight:900;color:var(--green);}
-    .earnings-box .earn-sub{font-size:12px;color:var(--muted);margin-top:4px;}
+    /* ==========================================================================
+       GIRO ANGOLA — 100% UBER BLACK & WHITE OFFICIAL DESIGN SYSTEM
+       Zero Amarelo / Dourado — Minimalismo Monocromático, Alto Contraste & Elegância
+       ========================================================================== */
+    :root {
+      --bg: #000000;
+      --card: #141414;
+      --card-inner: #1c1c1c;
+      --border: #2c2c2c;
+      --border-focus: #ffffff;
+      
+      --wht: #ffffff;
+      --blk: #000000;
+      --gray-muted: #8c8c8c;
+      --gray-subtle: #a6a6a6;
+      --gray-dark: #242424;
+      
+      --red: #ef4444;
+      --red-bg: rgba(239, 68, 68, 0.12);
+      
+      --radius-lg: 16px;
+      --radius-md: 12px;
+      --radius-sm: 8px;
+      
+      --safe-top: env(safe-area-inset-top, 0px);
+      --safe-bottom: env(safe-area-inset-bottom, 0px);
+      --font-system: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, system-ui, sans-serif;
+    }
 
-    /* === PWA Angola-first globals === */
-    * { -webkit-tap-highlight-color: transparent; user-select: none; -webkit-user-select: none; }
-    input, textarea, select { user-select: text; -webkit-user-select: text; }
-    body { overscroll-behavior: none; }
-    * { scrollbar-width: none; }
-    *::-webkit-scrollbar { display: none; }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+      -webkit-user-select: none;
+    }
 
-    /* Fullscreen layout override */
-    .auth-wrapper {
-      min-height: 100vh;
+    input, select, textarea {
+      user-select: auto;
+      -webkit-user-select: auto;
+      font-family: inherit;
+    }
+
+    html, body {
+      min-height: 100%;
+      background: var(--bg);
+      color: var(--wht);
+      font-family: var(--font-system);
       display: flex;
       flex-direction: column;
-      padding: 0;
-      background: #070907;
-      align-items: stretch !important;
-      justify-content: flex-start !important;
+      justify-content: space-between;
+      overscroll-behavior: none;
+      -webkit-font-smoothing: antialiased;
     }
-    .auth-card {
-      background: transparent !important;
-      border: none !important;
-      box-shadow: none !important;
-      border-radius: 0 !important;
-      padding: 24px 20px !important;
+
+    /* Uber Top Header */
+    .uber-header {
+      padding: calc(var(--safe-top) + 24px) 20px 14px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+    }
+
+    .brand-wrap {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 8px;
+    }
+
+    .brand-box {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      background: var(--wht);
+      color: var(--blk);
+      font-weight: 900;
+      font-size: 22px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      letter-spacing: -0.5px;
+      box-shadow: 0 2px 10px rgba(255, 255, 255, 0.2);
+    }
+
+    .brand-name {
+      font-size: 26px;
+      font-weight: 900;
+      letter-spacing: -0.04em;
+      color: var(--wht);
+      line-height: 1;
+    }
+
+    .brand-tag {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 1.5px;
+      color: var(--gray-muted);
+      text-transform: uppercase;
+      margin-top: 4px;
+    }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: #121212;
+      border: 1px solid var(--border);
+      padding: 5px 12px;
+      border-radius: 20px;
+      font-size: 11px;
+      color: var(--gray-subtle);
+      margin-top: 8px;
+    }
+
+    .status-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--wht);
+    }
+
+    /* Main Container */
+    .uber-container {
       flex: 1;
-      width: 100% !important;
-      max-width: 100% !important;
+      padding: 10px 20px 24px;
+      max-width: 440px;
+      width: 100%;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
     }
 
-    /* Sticky primary action button */
-    .btn-primary-sticky {
-      position: sticky;
-      bottom: calc(env(safe-area-inset-bottom, 0px) + 16px);
-      width: calc(100% - 40px);
-      margin: 16px 20px 0;
-      z-index: 10;
+    /* Uber Segmented Switcher (Tab) */
+    .uber-tabs {
+      display: flex;
+      background: #121212;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 4px;
+      margin-bottom: 16px;
+      gap: 4px;
     }
 
-    /* Step dots (bolinhas) */
-    .step-dot-row { display:flex; gap:8px; justify-content:center; padding:16px 0 8px; }
-    .step-dot-circle { color: #333; font-size: 14px; transition: color .2s; }
-    .step-dot-circle.active { color: #d4af37; }
-    .step-dot-circle.done { color: #22c55e; }
-
-    /* Active state — ÚNICA animação permitida */
-    button:active, .btn:active, .role-card:active, .veh-btn:active {
-      opacity: 0.7 !important;
-      transform: scale(0.97) !important;
-      transition: .15s ease !important;
+    .uber-tab-btn {
+      flex: 1;
+      background: transparent;
+      border: none;
+      color: var(--gray-muted);
+      font-size: 14px;
+      font-weight: 700;
+      padding: 12px 0;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
     }
-    /* Override generic .btn:active */
-    .btn:active { transform: scale(0.97) !important; opacity: 0.7 !important; }
 
-    /* Auth links bottom */
-    .auth-links { padding: 16px 20px calc(env(safe-area-inset-bottom,0px) + 24px); }
+    .uber-tab-btn.active {
+      background: var(--wht);
+      color: var(--blk);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+    }
 
-    /* Login: sticky primary buttons */
-    #pane-phone .btn-gold,
-    #pane-otp .btn-gold,
-    #pane-password .btn-gold,
-    #pane-forgot .btn-gold {
-      position: sticky;
-      bottom: calc(env(safe-area-inset-bottom, 0px) + 16px);
+    /* Uber Main Card */
+    .uber-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 24px 20px;
+      box-shadow: 0 12px 36px rgba(0, 0, 0, 0.85);
+    }
+
+    .uber-card-title {
+      font-size: 20px;
+      font-weight: 800;
+      color: var(--wht);
+      letter-spacing: -0.02em;
+      margin-bottom: 6px;
+    }
+
+    .uber-card-desc {
+      font-size: 13px;
+      color: var(--gray-muted);
+      line-height: 1.45;
+      margin-bottom: 20px;
+    }
+
+    /* Alert Message */
+    .uber-alert {
+      background: var(--red-bg);
+      border: 1px solid rgba(239, 68, 68, 0.35);
+      color: #fca5a5;
+      padding: 12px 14px;
+      border-radius: var(--radius-sm);
+      font-size: 13px;
+      line-height: 1.4;
+      margin-bottom: 16px;
+      display: none;
+    }
+
+    /* Form Fields */
+    .form-group {
+      margin-bottom: 16px;
+    }
+
+    .form-label {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      color: var(--gray-subtle);
+      margin-bottom: 8px;
+    }
+
+    .uber-input {
+      width: 100%;
+      background: var(--card-inner);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 15px 14px;
+      font-size: 16px;
+      color: var(--wht);
+      outline: none;
+      transition: border-color 0.2s ease;
+    }
+
+    .uber-input:focus {
+      border-color: var(--border-focus);
+    }
+
+    .uber-input::placeholder {
+      color: #555555;
+    }
+
+    /* Phone Row */
+    .phone-row {
+      display: flex;
+      gap: 8px;
+    }
+
+    .phone-code {
+      background: var(--card-inner);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 0 12px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--wht);
+      flex-shrink: 0;
+    }
+
+    /* Role Grid (Passageiro vs Motorista) */
+    .role-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 22px;
+    }
+
+    .role-card {
+      background: var(--card-inner);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 14px 10px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      gap: 4px;
+      position: relative;
+    }
+
+    .role-card:active {
+      transform: scale(0.98);
+    }
+
+    .role-card.active {
+      border-color: var(--wht);
+      background: var(--gray-dark);
+    }
+
+    .role-badge {
+      position: absolute;
+      top: 6px;
+      right: 6px;
+      background: var(--wht);
+      color: var(--blk);
+      font-size: 9px;
+      font-weight: 800;
+      padding: 2px 5px;
+      border-radius: 4px;
+      line-height: 1;
+    }
+
+    .role-icon {
+      font-size: 24px;
+      margin-bottom: 2px;
+    }
+
+    .role-title {
+      font-size: 14px;
+      font-weight: 800;
+      color: var(--wht);
+      letter-spacing: -0.01em;
+    }
+
+    .role-card.active .role-title {
+      color: var(--wht);
+    }
+
+    .role-desc {
+      font-size: 11px;
+      color: var(--gray-muted);
+      line-height: 1.3;
+    }
+
+    /* Uber Pure White Button */
+    .uber-btn-submit {
+      width: 100%;
+      height: 52px;
+      background: var(--wht);
+      color: var(--blk);
+      font-size: 16px;
+      font-weight: 800;
+      border: none;
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      transition: all 0.15s ease;
+    }
+
+    .uber-btn-submit:active {
+      transform: scale(0.98);
+      background: #e2e2e2;
+    }
+
+    .uber-btn-submit:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    /* Footer Links */
+    .uber-links {
+      margin-top: 18px;
+      text-align: center;
+      font-size: 12px;
+      color: var(--gray-muted);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      line-height: 1.4;
+    }
+
+    .uber-links a {
+      color: var(--wht);
+      text-decoration: underline;
+      font-weight: 600;
+    }
+
+    /* Bottom Trust Bar */
+    .uber-trust-bar {
+      padding: 14px 20px calc(var(--safe-bottom) + 14px);
+      background: #0d0d0d;
+      border-top: 1px solid var(--border);
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 8px;
+      text-align: center;
+      font-size: 11px;
+    }
+
+    .trust-col b {
+      display: block;
+      color: var(--wht);
+      font-weight: 800;
+      font-size: 12px;
+      margin-bottom: 2px;
+    }
+
+    .trust-col span {
+      color: var(--gray-muted);
+      font-size: 10px;
+    }
+
+    .mode-pane {
+      display: none;
+    }
+    
+    /* UBER REGISTER EXPANDED STYLES */
+    .uber-section-title {
+      font-size: 11px;
+      font-weight: 800;
+      color: #93c5fd;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      margin: 18px 0 10px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+    @media (max-width: 380px) {
+      .grid-2 { grid-template-columns: 1fr; }
+    }
+    .pw-row {
+      position: relative;
+    }
+    .pw-toggle-btn {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      color: var(--gray-muted);
+      cursor: pointer;
+      font-size: 16px;
+      padding: 4px;
+    }
+    .uber-checkbox-label {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      font-size: 12px;
+      color: var(--gray-subtle);
+      line-height: 1.45;
+      cursor: pointer;
+      margin-top: 14px;
+      margin-bottom: 14px;
+    }
+    .uber-checkbox-label input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      accent-color: #ffffff;
+      flex-shrink: 0;
+      margin-top: 1px;
+      cursor: pointer;
+    }
+    select.uber-input {
+      appearance: none;
+      background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='white'%3e%3cpath d='M7 10l5 5 5-5z'/%3e%3c/svg%3e");
+      background-repeat: no-repeat;
+      background-position: right 14px center;
+      background-size: 18px;
+      padding-right: 36px;
+    }
+
+    .mode-pane.active {
+      display: block;
     }
   </style>
 </head>
 <body>
-<div class="auth-wrapper">
-  <div style="padding: calc(env(safe-area-inset-top,0px) + 24px) 20px 12px; text-align:center;">
-    <div style="font-size:38px;font-weight:900;color:#d4af37;letter-spacing:-2px;line-height:1;">GIRO</div>
-    <div style="font-size:10px;letter-spacing:4px;color:#8d9e8d;text-transform:uppercase;margin-top:5px;">Angola · Mobilidade</div>
-  </div>
 
-  <div class="auth-card" id="card-phone">
-    <h1 class="auth-title">Bem-vindo de volta 👋</h1>
-    <p class="auth-subtitle">Insira o seu número para continuar</p>
-    <div id="alert-login" class="alert"></div>
+  <!-- Top Header Uber Style -->
+  <header class="uber-header">
+    <div class="brand-wrap">
+      <div class="brand-box">G</div>
+      <div class="brand-name">GIRO</div>
+    </div>
+    <div class="brand-tag">Angola · Mobilidade & Carga</div>
+    <div class="status-badge">
+      <span class="status-dot"></span>
+      <span>18 Províncias · Luanda Online</span>
+    </div>
+  </header>
 
-    <!-- PHONE -->
-    <div id="pane-phone" class="step-pane active">
-      <div class="form-group">
-        <label class="form-label">Número de Telefone</label>
-        <div class="phone-row">
-          <div class="phone-prefix">🇦🇴 +244</div>
-          <input class="form-control" id="inp-phone" type="tel" inputmode="numeric" placeholder="9XX XXX XXX" maxlength="9" autocomplete="tel-national">
+  <!-- Main Card Container -->
+  <main class="uber-container">
+    
+    <!-- Uber Tabs: Entrar vs Criar Conta -->
+    <div class="uber-tabs">
+      <button class="uber-tab-btn active" id="tab-login" onclick="switchMode('login')">
+        <span>Já Tenho Conta</span>
+      </button>
+      <button class="uber-tab-btn" id="tab-register" onclick="switchMode('register')">
+        <span>Criar Conta</span>
+      </button>
+    </div>
+
+    <!-- Auth Card -->
+    <div class="uber-card">
+
+      <div id="auth-alert" class="uber-alert"></div>
+
+      <!-- ================= PANE: LOGIN ================= -->
+      <div id="pane-login" class="mode-pane active">
+        <div class="uber-card-title">Entrar na conta</div>
+        <div class="uber-card-desc">Introduza o seu número de telemóvel para aceder.</div>
+
+        <div class="form-group">
+          <label class="form-label" for="login-phone">
+            <span>Número de Telemóvel</span>
+            <span style="color:var(--gray-muted); font-size:10px;">Angola (9 dígitos)</span>
+          </label>
+          <div class="phone-row">
+            <div class="phone-code">🇦🇴 +244</div>
+            <input class="uber-input" id="login-phone" type="tel" inputmode="numeric" placeholder="9XX XXX XXX" maxlength="11" autocomplete="tel-national">
+          </div>
         </div>
-        <div class="form-hint" id="hint-phone"></div>
-      </div>
-      <button class="btn btn-gold" onclick="sendOTP()">📲 Enviar Código SMS</button>
-      <div class="divider"><span>ou</span></div>
-      <button class="btn btn-outline" onclick="showPane('pane-password')">🔑 Entrar com Senha</button>
-    </div>
 
-    <!-- OTP -->
-    <div id="pane-otp" class="step-pane">
-      <p style="font-size:13px;color:var(--muted);margin-bottom:20px">
-        Código enviado para <strong id="otp-phone-display" style="color:var(--text)"></strong>
-      </p>
-      <div class="otp-row" id="otp-boxes"></div>
-      <div class="resend-row">
-        Não recebeu? <button class="resend-btn" id="btn-resend" onclick="resendOTP()" disabled>Reenviar (<span id="timer">30</span>s)</button>
-      </div>
-      <div class="nav-btns" style="margin-top:24px">
-        <button class="btn btn-outline" onclick="showPane('pane-phone')">← Voltar</button>
-        <button class="btn btn-gold" onclick="verifyOTP()">✅ Verificar</button>
-      </div>
-    </div>
+        <div class="form-group">
+          <label class="form-label">Aceder como</label>
+          <div class="role-grid">
+            <div class="role-card active" id="login-role-pax" onclick="selectLoginRole('passageiro')">
+              <div class="role-icon">🧑‍💼</div>
+              <div class="role-title">Passageiro</div>
+              <div class="role-desc">Viagens & Carga</div>
+            </div>
+            <div class="role-card" id="login-role-driver" onclick="selectLoginRole('motorista')">
+              <div class="role-badge">10%</div>
+              <div class="role-icon">🚗</div>
+              <div class="role-title">Motorista</div>
+              <div class="role-desc">Conduzir</div>
+            </div>
+          </div>
+        </div>
 
-    <!-- PASSWORD -->
-    <div id="pane-password" class="step-pane">
-      <div class="form-group">
-        <label class="form-label">Número de Telefone</label>
-        <div class="phone-row">
-          <div class="phone-prefix">🇦🇴 +244</div>
-          <input class="form-control" id="inp-phone-pw" type="tel" inputmode="numeric" placeholder="9XX XXX XXX" maxlength="9">
+        <button class="uber-btn-submit" id="btn-login-submit" onclick="handleLogin()">
+          <span>Continuar</span>
+          <span style="font-size:18px;">➔</span>
+        </button>
+
+        <div class="uber-links">
+          <div>Não tem conta? <a href="javascript:void(0)" onclick="switchMode('register')">Criar conta agora</a></div>
+          <div>Esqueceu a palavra-passe? <a href="javascript:void(0)" onclick="handleForgotPassword()">Recuperar acesso</a></div>
         </div>
       </div>
-      <div class="form-group">
-        <label class="form-label">Senha</label>
-        <div class="pw-wrap">
-          <input class="form-control" id="inp-password" type="password" placeholder="••••••••" autocomplete="current-password">
-          <button class="pw-eye" onclick="togglePw('inp-password')">👁</button>
+
+      <!-- ================= PANE: REGISTO (CRIAR CONTA) ================= -->
+      <div id="pane-register" class="mode-pane">
+        <div class="uber-card-title">Criar nova conta</div>
+        <div class="uber-card-desc">Cadastro oficial estilo Uber para passageiros e motoristas de Angola.</div>
+
+        <!-- Seletor de Perfil: Passageiro vs Motorista -->
+        <div class="form-group">
+          <label class="form-label">Registar como</label>
+          <div class="role-grid">
+            <div class="role-card active" id="reg-role-pax" onclick="selectRegRole('passageiro')">
+              <div class="role-icon">🧑‍💼</div>
+              <div class="role-title">Passageiro</div>
+              <div class="role-desc">Viagens & Carga</div>
+            </div>
+            <div class="role-card" id="reg-role-driver" onclick="selectRegRole('motorista')">
+              <div class="role-badge">10%</div>
+              <div class="role-icon">🚗</div>
+              <div class="role-title">Motorista</div>
+              <div class="role-desc">Conduzir & Lucrar</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ================= FORMULÁRIO PASSAGEIRO ================= -->
+        <div id="form-pax-fields">
+          <div class="form-group">
+            <label class="form-label" for="reg-pax-name">Nome Completo *</label>
+            <input class="uber-input" id="reg-pax-name" type="text" placeholder="Ex: Isaac Carvalho" autocomplete="name">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="reg-pax-phone">
+              <span>Número de Telemóvel *</span>
+              <span style="color:var(--gray-muted); font-size:10px;">🇦🇴 +244</span>
+            </label>
+            <div class="phone-row">
+              <div class="phone-code">🇦🇴 +244</div>
+              <input class="uber-input" id="reg-pax-phone" type="tel" inputmode="numeric" placeholder="9XX XXX XXX" maxlength="11" autocomplete="tel-national">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="reg-pax-email">E-mail (Opcional)</label>
+            <input class="uber-input" id="reg-pax-email" type="email" placeholder="seu.email@exemplo.com" autocomplete="email">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="reg-pax-pw">Palavra-passe de Acesso *</label>
+            <div class="pw-row">
+              <input class="uber-input" id="reg-pax-pw" type="password" placeholder="Mínimo 6 caracteres">
+              <button type="button" class="pw-toggle-btn" onclick="togglePasswordVisibility('reg-pax-pw', this)">👁</button>
+            </div>
+          </div>
+
+          <label class="uber-checkbox-label">
+            <input type="checkbox" id="chk-pax-terms" checked>
+            <span>Li e aceito os <a href="termos.html" style="color:#fff; text-decoration:underline;">Termos de Uso</a> e a <a href="privacidade.html" style="color:#fff; text-decoration:underline;">Política de Privacidade</a> da GIRO Angola.</span>
+          </label>
+
+          <button class="uber-btn-submit" id="btn-pax-submit" onclick="handleRegister()">
+            <span>Criar Conta de Passageiro</span>
+            <span style="font-size:18px;">➔</span>
+          </button>
+        </div>
+
+        <!-- ================= FORMULÁRIO MOTORISTA PARCEIRO (COMPLETO) ================= -->
+        <div id="form-driver-fields" style="display:none;">
+          
+          <div class="uber-section-title">
+            <span>👤 1. Dados Pessoais do Motorista</span>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="reg-drv-name">Nome Completo (Conforme o B.I.) *</label>
+            <input class="uber-input" id="reg-drv-name" type="text" placeholder="Ex: António Manuel da Silva">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="reg-drv-phone">
+              <span>Número de Telemóvel *</span>
+              <span style="color:var(--gray-muted); font-size:10px;">🇦🇴 +244</span>
+            </label>
+            <div class="phone-row">
+              <div class="phone-code">🇦🇴 +244</div>
+              <input class="uber-input" id="reg-drv-phone" type="tel" inputmode="numeric" placeholder="9XX XXX XXX" maxlength="11">
+            </div>
+          </div>
+
+          <div class="grid-2">
+            <div class="form-group">
+              <label class="form-label" for="reg-drv-email">E-mail *</label>
+              <input class="uber-input" id="reg-drv-email" type="email" placeholder="motorista@gmail.com">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="reg-drv-dob">Data de Nascimento *</label>
+              <input class="uber-input" id="reg-drv-dob" type="date">
+            </div>
+          </div>
+
+          <div class="grid-2">
+            <div class="form-group">
+              <label class="form-label" for="reg-drv-province">Província de Actuação *</label>
+              <select class="uber-input" id="reg-drv-province">
+                <option value="Luanda" selected>Luanda</option>
+                <option value="Benguela">Benguela</option>
+                <option value="Huambo">Huambo</option>
+                <option value="Huíla">Huíla</option>
+                <option value="Cabinda">Cabinda</option>
+                <option value="Cuanza Sul">Cuanza Sul</option>
+                <option value="Malanje">Malanje</option>
+                <option value="Uíge">Uíge</option>
+                <option value="Namibe">Namibe</option>
+                <option value="Zaire">Zaire</option>
+                <option value="Bié">Bié</option>
+                <option value="Moxico">Moxico</option>
+                <option value="Lunda Norte">Lunda Norte</option>
+                <option value="Lunda Sul">Lunda Sul</option>
+                <option value="Cunene">Cunene</option>
+                <option value="Cuando Cubango">Cuando Cubango</option>
+                <option value="Cuanza Norte">Cuanza Norte</option>
+                <option value="Bengo">Bengo</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="reg-drv-nif">Nº do B.I. ou NIF *</label>
+              <input class="uber-input" id="reg-drv-nif" type="text" placeholder="Ex: 004123456LA042" style="text-transform:uppercase;">
+            </div>
+          </div>
+
+          <div class="uber-section-title">
+            <span>🚗 2. Dados da Viatura Parceira</span>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="reg-drv-category">Categoria do Serviço *</label>
+            <select class="uber-input" id="reg-drv-category">
+              <option value="Económico" selected>🚗 GIRO Económico (Sedan / Hatchback 4 Lugares)</option>
+              <option value="Conforto">🚙 GIRO Conforto (Sedan Executivo com AC)</option>
+              <option value="Kupapata">🏍 Kupapata / Moto Urbana (2 Rodas rápida)</option>
+              <option value="7 Lugares">🚐 GIRO 7 Lugares (SUV / Minivan Familiar)</option>
+              <option value="Van">🚚 GIRO Van / Furgão (Cargas & Encomendas)</option>
+              <option value="Pick-up">🛻 GIRO Pick-Up / Caixa Aberta (Carga e Obras)</option>
+              <option value="Camião Ligeiro">🚛 Camião Ligeiro (Canter 3.5T)</option>
+              <option value="Camião Pesado">🏗 Camião Pesado de Mudanças (10T)</option>
+            </select>
+          </div>
+
+          <div class="grid-2">
+            <div class="form-group">
+              <label class="form-label" for="reg-drv-brand">Marca da Viatura *</label>
+              <input class="uber-input" id="reg-drv-brand" type="text" placeholder="Ex: Toyota, Hyundai, Suzuki">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="reg-drv-model">Modelo *</label>
+              <input class="uber-input" id="reg-drv-model" type="text" placeholder="Ex: Corolla, i10, Hilux">
+            </div>
+          </div>
+
+          <div class="grid-2">
+            <div class="form-group">
+              <label class="form-label" for="reg-drv-year">Ano de Fabrico *</label>
+              <input class="uber-input" id="reg-drv-year" type="number" placeholder="Ex: 2019" min="2002" max="2026">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="reg-drv-color">Cor da Viatura *</label>
+              <input class="uber-input" id="reg-drv-color" type="text" placeholder="Ex: Branco, Prata, Preto">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="reg-drv-plate">Matrícula do Veículo *</label>
+            <input class="uber-input" id="reg-drv-plate" type="text" placeholder="Ex: LD-24-55-HA" style="text-transform:uppercase; font-weight:800; letter-spacing:1px;" maxlength="12">
+          </div>
+
+          <div class="uber-section-title">
+            <span>💳 3. Recebimento de Ganhos (90% do Motorista)</span>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="reg-drv-mcx">Telemóvel Multicaixa Express *</label>
+            <div class="phone-row">
+              <div class="phone-code">🇦🇴 +244</div>
+              <input class="uber-input" id="reg-drv-mcx" type="tel" inputmode="numeric" placeholder="9XX XXX XXX" maxlength="11">
+            </div>
+          </div>
+
+          <div class="uber-section-title">
+            <span>🔐 4. Palavra-passe de Acesso</span>
+          </div>
+
+          <div class="grid-2">
+            <div class="form-group">
+              <label class="form-label" for="reg-drv-pw">Palavra-passe *</label>
+              <div class="pw-row">
+                <input class="uber-input" id="reg-drv-pw" type="password" placeholder="Mínimo 6 caracteres">
+                <button type="button" class="pw-toggle-btn" onclick="togglePasswordVisibility('reg-drv-pw', this)">👁</button>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="reg-drv-pw2">Confirmar *</label>
+              <div class="pw-row">
+                <input class="uber-input" id="reg-drv-pw2" type="password" placeholder="Repita a palavra-passe">
+                <button type="button" class="pw-toggle-btn" onclick="togglePasswordVisibility('reg-drv-pw2', this)">👁</button>
+              </div>
+            </div>
+          </div>
+
+          <label class="uber-checkbox-label">
+            <input type="checkbox" id="chk-drv-terms" checked>
+            <span>Declaro ter 18+ anos, carta de condução válida e aceito a taxa fixa de 10% da GIRO Angola, bem como os <a href="termos.html" style="color:#fff; text-decoration:underline;">Termos</a> e o <a href="privacidade.html" style="color:#fff; text-decoration:underline;">Contrato de Parceria</a>.</span>
+          </label>
+
+          <button class="uber-btn-submit" id="btn-drv-submit" onclick="handleRegister()">
+            <span>Registar como Motorista Parceiro</span>
+            <span style="font-size:18px;">➔</span>
+          </button>
+        </div>
+
+        <div class="uber-links">
+          <div>Já tem conta? <a href="javascript:void(0)" onclick="switchMode('login')">Aceder com telemóvel</a></div>
+          <div>Dúvidas ou suporte? <a href="https://wa.me/244923111000" target="_blank">WhatsApp GIRO Suporte</a></div>
         </div>
       </div>
-      <button class="btn btn-gold" onclick="loginPassword()" style="margin-bottom:12px">🚀 Entrar</button>
-      <div style="text-align:center;font-size:13px;color:var(--muted)">
-        <a href="#" onclick="showPane('pane-phone')">Entrar com SMS</a>
-        &nbsp;·&nbsp;
-        <a href="#" onclick="showPane('pane-forgot')">Esqueci a senha</a>
-      </div>
-    </div>
 
-    <!-- FORGOT -->
-    <div id="pane-forgot" class="step-pane">
-      <p style="font-size:13px;color:var(--muted);margin-bottom:18px">Enviaremos um código SMS para redefinir a sua senha.</p>
-      <div class="form-group">
-        <label class="form-label">Número de Telefone</label>
-        <div class="phone-row">
-          <div class="phone-prefix">🇦🇴 +244</div>
-          <input class="form-control" id="inp-forgot-phone" type="tel" inputmode="numeric" placeholder="9XX XXX XXX" maxlength="9">
-        </div>
-      </div>
-      <div class="nav-btns">
-        <button class="btn btn-outline" onclick="showPane('pane-phone')">← Voltar</button>
-        <button class="btn btn-gold" onclick="sendForgotOTP()">📲 Enviar Código</button>
-      </div>
     </div>
-  </div>
+  </main>
 
-  <!-- CREATE ACCOUNT -->
-  <div class="auth-card" style="margin-top:16px;padding:20px 24px">
-    <div style="text-align:center;font-size:14px;color:var(--muted)">Não tem conta?</div>
-    <div class="role-cards">
-      <div class="role-card" onclick="location.href='cadastro-passageiro.html'">
-        <div class="rc-icon">🧑‍💼</div>
-        <div class="rc-label">Passageiro</div>
-        <div class="rc-desc">Solicite viagens</div>
-      </div>
-      <div class="role-card" onclick="location.href='cadastro-motorista.html'">
-        <div class="rc-icon">🚗</div>
-        <div class="rc-label">Motorista</div>
-        <div class="rc-desc">Ganhe dinheiro</div>
-      </div>
+  <!-- Bottom Trust Bar -->
+  <footer class="uber-trust-bar">
+    <div class="trust-col">
+      <b>10% Taxa Fixa</b>
+      <span>Sem surpresas</span>
     </div>
-  </div>
-</div>
+    <div class="trust-col">
+      <b>100% Kwanza</b>
+      <span>Preço transparente</span>
+    </div>
+    <div class="trust-col">
+      <b>Central 24h</b>
+      <span>Segurança integrada</span>
+    </div>
+  </footer>
 
-<script>
-const GIRO_SESSION_KEY='giro_session';
-const GiroAuth={
-  save(user){localStorage.setItem(GIRO_SESSION_KEY,JSON.stringify({...user,ts:Date.now()}));},
-  get(){
-    try{
-      const raw=localStorage.getItem(GIRO_SESSION_KEY);
-      if(!raw)return null;
-      const s=JSON.parse(raw);
-      if(Date.now()-s.ts>30*24*3600*1000){this.clear();return null;}
-      return s;
-    }catch{return null;}
-  },
-  clear(){localStorage.removeItem(GIRO_SESSION_KEY);},
-  requireAuth(role){
-    const s=this.get();
-    if(!s){window.location.href='login.html';return null;}
-    if(role&&s.role!==role){window.location.href='login.html';return null;}
-    return s;
-  },
-  renderUserPill(containerId){
-    const s=this.get();
-    const el=document.getElementById(containerId);
-    if(!el)return;
-    if(s){
-      const initials=(s.nome||s.phone||'?')[0].toUpperCase();
-      el.innerHTML=`<div style="display:flex;align-items:center;gap:8px;">
-        <div style="width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#d4af37,#f0c040);display:flex;align-items:center;justify-content:center;font-weight:900;font-size:14px;color:#000;">${initials}</div>
-        <div style="line-height:1.2;"><div style="font-size:13px;font-weight:700;color:#f1f5f1;">${s.nome||s.phone}</div><div style="font-size:10px;color:#8d9e8d;text-transform:uppercase;">${s.role==='motorista'?'🚗 Motorista':'🧑 Passageiro'}</div></div>
-        <button onclick="GiroAuth.logout()" style="margin-left:4px;background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.3);border-radius:8px;padding:5px 10px;color:#fca5a5;font-size:12px;cursor:pointer;">Sair</button>
-      </div>`;
-    }else{
-      el.innerHTML='<a href="login.html" style="text-decoration:none;padding:7px 14px;border-radius:20px;background:rgba(212,175,55,.12);border:1px solid rgba(212,175,55,.3);color:#d4af37;font-size:13px;font-weight:700;">&#128100; Entrar</a>';
+  <script>
+    const GIRO_SESSION_KEY = 'giro_session';
+    let currentMode = 'login';
+    let loginRole = 'passageiro';
+    let regRole = 'passageiro';
+
+    (function checkExistingSession() {
+      try {
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.has('logout')) {
+          localStorage.removeItem(GIRO_SESSION_KEY);
+          localStorage.removeItem('giro_driver_session');
+          localStorage.removeItem('giro_pax_session');
+          return;
+        }
+
+        // Preenche campos se houver sessão anterior salva, sem criar loops de redirecionamento
+        const raw = localStorage.getItem(GIRO_SESSION_KEY) || localStorage.getItem('giro_driver_session') || localStorage.getItem('giro_pax_session');
+        if (raw) {
+          const session = JSON.parse(raw);
+          if (session && session.phone) {
+            const p = (session.rawPhone || session.phone.replace('+244', '')).trim();
+            const phoneInput = document.getElementById('login-phone');
+            if (phoneInput && !phoneInput.value) phoneInput.value = p;
+            const regName = document.getElementById('reg-name');
+            if (regName && !regName.value && session.nome) regName.value = session.nome;
+            const regPhone = document.getElementById('reg-phone');
+            if (regPhone && !regPhone.value) regPhone.value = p;
+
+            // Se o utilizador pediu explicitamente autologin sem loop
+            if (urlParams.get('autologin') === '1' && !urlParams.has('stay')) {
+              window.location.replace(session.role === 'motorista' ? 'driver.html' : 'index.html');
+              return;
+            }
+          }
+        }
+      } catch (e) {
+        console.warn('Aviso: erro ao ler sessão anterior:', e);
+      }
+    })();
+
+    function switchMode(mode) {
+      currentMode = mode;
+      showAlert('');
+      
+      document.getElementById('tab-login').classList.toggle('active', mode === 'login');
+      document.getElementById('tab-register').classList.toggle('active', mode === 'register');
+      
+      document.getElementById('pane-login').classList.toggle('active', mode === 'login');
+      document.getElementById('pane-register').classList.toggle('active', mode === 'register');
     }
-  },
-  logout(){this.clear();window.location.href='login.html';}
-};
 
-// Se já logado, redirigir
-(function(){
-  const s=GiroAuth.get();
-  if(s){window.location.href=s.role==='motorista'?'driver.html':'index.html';}
-})();
+    function selectLoginRole(role) {
+      loginRole = role;
+      document.getElementById('login-role-pax').classList.toggle('active', role === 'passageiro');
+      document.getElementById('login-role-driver').classList.toggle('active', role === 'motorista');
+    }
 
-function showPane(id){
-  document.querySelectorAll('.step-pane').forEach(p=>p.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
-  showAlert('');
-}
-function showAlert(msg,type='err'){
-  const el=document.getElementById('alert-login');
-  el.className='alert '+(msg?type:'');
-  el.style.display=msg?'block':'none';
-  el.textContent=msg;
-}
-function togglePw(id){const el=document.getElementById(id);el.type=el.type==='password'?'text':'password';}
-function validatePhone(v){return /^9[1-9][0-9]{7}$/.test(v.replace(/\s/g,''));}
-function getPhone(id='inp-phone'){return document.getElementById(id).value.replace(/\s/g,'');}
+    function selectRegRole(role) {
+      regRole = role;
+      document.getElementById('reg-role-pax').classList.toggle('active', role === 'passageiro');
+      document.getElementById('reg-role-driver').classList.toggle('active', role === 'motorista');
 
-// OTP boxes
-(function buildOTP(){
-  const wrap=document.getElementById('otp-boxes');
-  for(let i=0;i<6;i++){
-    const inp=document.createElement('input');
-    inp.type='text';inp.inputMode='numeric';inp.maxLength=1;inp.className='otp-input';inp.dataset.idx=i;
-    inp.addEventListener('input',()=>{if(inp.value&&wrap.children[i+1])wrap.children[i+1].focus();});
-    inp.addEventListener('keydown',e=>{if(e.key==='Backspace'&&!inp.value&&wrap.children[i-1]){wrap.children[i-1].value='';wrap.children[i-1].focus();}});
-    wrap.appendChild(inp);
-  }
-})();
+      // Alternar campos de cadastro dinamicamente estilo Uber
+      const paxFields = document.getElementById('form-pax-fields');
+      const drvFields = document.getElementById('form-driver-fields');
+      if (paxFields && drvFields) {
+        paxFields.style.display = (role === 'passageiro') ? 'block' : 'none';
+        drvFields.style.display = (role === 'motorista') ? 'block' : 'none';
+      }
+    }
 
-let _loginPhone='';
-let timerInterval;
-function startTimer(){
-  let t=30;
-  const btn=document.getElementById('btn-resend');
-  const lbl=document.getElementById('timer');
-  btn.disabled=true;
-  clearInterval(timerInterval);
-  timerInterval=setInterval(()=>{t--;lbl.textContent=t;if(t<=0){clearInterval(timerInterval);btn.disabled=false;btn.textContent='Reenviar código';}},1000);
-}
+    function togglePasswordVisibility(inputId, btn) {
+      const el = document.getElementById(inputId);
+      if (!el) return;
+      if (el.type === 'password') {
+        el.type = 'text';
+        if (btn) btn.textContent = '🔒';
+      } else {
+        el.type = 'password';
+        if (btn) btn.textContent = '👁';
+      }
+    }
 
-function sendOTP(){
-  const phone=getPhone();
-  if(!validatePhone(phone)){showAlert('Número inválido. Formato: 9XX XXX XXX (9 dígitos)');return;}
-  _loginPhone=phone;
-  document.getElementById('otp-phone-display').textContent='+244 '+phone;
-  showPane('pane-otp');
-  startTimer();
-}
+    function handleForgotPassword() {
+      const p = cleanPhone(document.getElementById('login-phone').value);
+      if (p.length === 9) {
+        alert('Instruções de recuperação de senha enviadas via SMS para +244 ' + p);
+      } else {
+        alert('Por favor introduza o seu número de telemóvel para recuperar o acesso.');
+      }
+    }
 
-function resendOTP(){startTimer();}
+    function showAlert(msg) {
+      const el = document.getElementById('auth-alert');
+      if (!msg) {
+        el.style.display = 'none';
+        el.textContent = '';
+        return;
+      }
+      el.textContent = msg;
+      el.style.display = 'block';
+      el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
 
-function verifyOTP(){
-  const code=[...document.querySelectorAll('#otp-boxes .otp-input')].map(i=>i.value).join('');
-  if(code.length<6){showAlert('Introduza os 6 dígitos do código');return;}
-  showAlert('A verificar...','info');
-  // Demo: qualquer código de 6 dígitos é aceite
-  // Prod: POST /api/auth/otp/verify
-  setTimeout(()=>{
-    GiroAuth.save({phone:'+244'+_loginPhone,nome:'Utilizador GIRO',role:'passageiro'});
-    window.location.href='index.html';
-  },800);
-}
+    function cleanPhone(num) {
+      let s = (num || '').toString().replace(/\D/g, '');
+      if (s.startsWith('244') && s.length >= 11) {
+        s = s.slice(3);
+      }
+      return s;
+    }
 
-function loginPassword(){
-  const phone=getPhone('inp-phone-pw');
-  const pw=document.getElementById('inp-password').value;
-  if(!validatePhone(phone)){showAlert('Número inválido');return;}
-  if(pw.length<6){showAlert('Senha demasiado curta (mínimo 6 caracteres)');return;}
-  showAlert('A entrar...','info');
-  // Demo: aceita qualquer senha com >=6 chars
-  // Prod: POST /api/auth/login
-  setTimeout(()=>{
-    GiroAuth.save({phone:'+244'+phone,nome:'Utilizador GIRO',role:'passageiro'});
-    window.location.href='index.html';
-  },800);
-}
+    function validatePhone(v) {
+      const c = cleanPhone(v);
+      return /^9[0-9]{8}$/.test(c);
+    }
 
-function sendForgotOTP(){
-  const phone=getPhone('inp-forgot-phone');
-  if(!validatePhone(phone)){showAlert('Número inválido');return;}
-  showAlert('Código enviado para +244 '+phone,'suc');
-}
-</script>
+    function attachPhoneMask(inputEl) {
+      if (!inputEl) return;
+      inputEl.addEventListener('input', function(e) {
+        let v = cleanPhone(e.target.value);
+        if (v.length > 9) v = v.slice(0, 9);
+        
+        let formatted = v;
+        if (v.length > 3 && v.length <= 6) {
+          formatted = v.slice(0, 3) + ' ' + v.slice(3);
+        } else if (v.length > 6) {
+          formatted = v.slice(0, 3) + ' ' + v.slice(3, 6) + ' ' + v.slice(6);
+        }
+        e.target.value = formatted;
+      });
+    }
+
+    attachPhoneMask(document.getElementById('login-phone'));
+    
+    // Suporte a parâmetros de URL: ?mode=register&role=motorista / ?role=driver
+    window.addEventListener('DOMContentLoaded', () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      if (urlParams.get('mode') === 'register') {
+        switchMode('register');
+      }
+      const roleParam = (urlParams.get('role') || '').toLowerCase();
+      if (roleParam === 'motorista' || roleParam === 'driver' || roleParam === 'motoristas') {
+        selectRegRole('motorista');
+        selectLoginRole('motorista');
+      } else if (roleParam === 'passageiro' || roleParam === 'pax' || roleParam === 'passenger' || roleParam === 'passageiros') {
+        selectRegRole('passageiro');
+        selectLoginRole('passageiro');
+      }
+
+      // Máscaras de telefone adicionais
+      attachPhoneMask(document.getElementById('reg-pax-phone'));
+      attachPhoneMask(document.getElementById('reg-drv-phone'));
+      attachPhoneMask(document.getElementById('reg-drv-mcx'));
+    });
+
+
+    function handleLogin() {
+      const phoneInput = document.getElementById('login-phone');
+      const rawDigits = cleanPhone(phoneInput.value);
+
+      if (!validatePhone(rawDigits)) {
+        showAlert('Introduza um número de telemóvel angolano válido (ex: 923 456 789).');
+        phoneInput.focus();
+        return;
+      }
+
+      showAlert('');
+
+      let existingName = loginRole === 'motorista' ? 'Motorista Parceiro' : 'Passageiro GIRO';
+      try {
+        const prevKey = loginRole === 'motorista' ? 'giro_driver_session' : 'giro_pax_session';
+        const prev = JSON.parse(localStorage.getItem(prevKey) || localStorage.getItem(GIRO_SESSION_KEY) || '{}');
+        if (prev && prev.nome) existingName = prev.nome;
+      } catch (e) {}
+
+      const session = {
+        nome: existingName,
+        phone: '+244' + rawDigits,
+        rawPhone: rawDigits,
+        role: loginRole,
+        loginAt: new Date().toISOString(),
+        ts: Date.now()
+      };
+
+      localStorage.setItem(GIRO_SESSION_KEY, JSON.stringify(session));
+      if (loginRole === 'motorista') {
+        localStorage.setItem('giro_driver_session', JSON.stringify(session));
+      } else {
+        localStorage.setItem('giro_pax_session', JSON.stringify(session));
+      }
+
+      const btn = document.getElementById('btn-login-submit');
+      btn.innerHTML = '<span>A autenticar...</span>';
+      btn.disabled = true;
+
+      setTimeout(() => {
+        window.location.href = loginRole === 'motorista' ? 'driver.html' : 'index.html';
+      }, 350);
+    }
+
+    function handleRegister() {
+      showAlert('');
+
+      const FIREBASE_DB_URL = 'https://giro-4ed50-default-rtdb.europe-west1.firebasedatabase.app';
+
+      if (regRole === 'passageiro') {
+        // ================= CADASTRO PASSAGEIRO =================
+        const nameInput = document.getElementById('reg-pax-name');
+        const phoneInput = document.getElementById('reg-pax-phone');
+        const emailInput = document.getElementById('reg-pax-email');
+        const pwInput = document.getElementById('reg-pax-pw');
+        const termsChk = document.getElementById('chk-pax-terms');
+
+        const name = nameInput.value.trim();
+        const rawPhone = cleanPhone(phoneInput.value);
+        const email = emailInput.value.trim();
+        const pw = pwInput.value.trim();
+
+        if (!name || name.length < 2) {
+          showAlert('Por favor, introduza o seu nome completo.');
+          nameInput.focus();
+          return;
+        }
+
+        if (!validatePhone(rawPhone)) {
+          showAlert('Introduza um número de telemóvel angolano válido (ex: 923 456 789).');
+          phoneInput.focus();
+          return;
+        }
+
+        if (!pw || pw.length < 4) {
+          showAlert('A palavra-passe deve ter pelo menos 4 caracteres.');
+          pwInput.focus();
+          return;
+        }
+
+        if (termsChk && !termsChk.checked) {
+          showAlert('Por favor aceite os Termos de Uso e Política de Privacidade para continuar.');
+          return;
+        }
+
+        const userId = 'usr_' + Date.now();
+        const session = {
+          id: userId,
+          nome: name,
+          name: name,
+          phone: '+244' + rawPhone,
+          rawPhone: rawPhone,
+          email: email,
+          role: 'passageiro',
+          status: 'ativo',
+          registeredAt: new Date().toISOString(),
+          ts: Date.now()
+        };
+
+        // Salvar sessões
+        localStorage.setItem(GIRO_SESSION_KEY, JSON.stringify(session));
+        localStorage.setItem('giro_pax_session', JSON.stringify(session));
+
+        const newUserRecord = {
+          ...session,
+          rides: 0,
+          totalKz: '0 Kz',
+          createdAt: Date.now()
+        };
+
+        try {
+          fetch(`${FIREBASE_DB_URL}/users/${userId}.json`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(newUserRecord)
+          }).catch(() => {});
+
+          fetch(`${FIREBASE_DB_URL}/cadastros/passageiros/${userId}.json`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(newUserRecord)
+          }).catch(() => {});
+
+          const list = JSON.parse(localStorage.getItem('giro_admin_passengers') || '[]');
+          list.unshift(newUserRecord);
+          localStorage.setItem('giro_admin_passengers', JSON.stringify(list));
+        } catch(e) {}
+
+        const btn = document.getElementById('btn-pax-submit');
+        if (btn) {
+          btn.innerHTML = '<span>A criar conta...</span>';
+          btn.disabled = true;
+        }
+
+        setTimeout(() => {
+          window.location.href = 'index.html';
+        }, 400);
+
+      } else {
+        // ================= CADASTRO MOTORISTA PARCEIRO =================
+        const nameInput = document.getElementById('reg-drv-name');
+        const phoneInput = document.getElementById('reg-drv-phone');
+        const emailInput = document.getElementById('reg-drv-email');
+        const dobInput = document.getElementById('reg-drv-dob');
+        const provSelect = document.getElementById('reg-drv-province');
+        const nifInput = document.getElementById('reg-drv-nif');
+        const catSelect = document.getElementById('reg-drv-category');
+        const brandInput = document.getElementById('reg-drv-brand');
+        const modelInput = document.getElementById('reg-drv-model');
+        const yearInput = document.getElementById('reg-drv-year');
+        const colorInput = document.getElementById('reg-drv-color');
+        const plateInput = document.getElementById('reg-drv-plate');
+        const mcxInput = document.getElementById('reg-drv-mcx');
+        const pwInput = document.getElementById('reg-drv-pw');
+        const pw2Input = document.getElementById('reg-drv-pw2');
+        const termsChk = document.getElementById('chk-drv-terms');
+
+        const name = nameInput.value.trim();
+        const rawPhone = cleanPhone(phoneInput.value);
+        const email = emailInput.value.trim();
+        const dob = dobInput.value;
+        const province = provSelect.value;
+        const nif = nifInput.value.trim().toUpperCase();
+        const category = catSelect.value;
+        const brand = brandInput.value.trim();
+        const model = modelInput.value.trim();
+        const year = yearInput.value.trim();
+        const color = colorInput.value.trim();
+        const plate = plateInput.value.trim().toUpperCase();
+        const rawMcx = cleanPhone(mcxInput.value);
+        const pw = pwInput.value.trim();
+        const pw2 = pw2Input.value.trim();
+
+        if (!name || name.length < 2) {
+          showAlert('Por favor, introduza o seu nome completo conforme o B.I.');
+          nameInput.focus();
+          return;
+        }
+
+        if (!validatePhone(rawPhone)) {
+          showAlert('Introduza um número de telemóvel angolano válido (ex: 923 456 789).');
+          phoneInput.focus();
+          return;
+        }
+
+        if (!pw || pw.length < 4) {
+          showAlert('A palavra-passe deve ter pelo menos 4 caracteres.');
+          pwInput.focus();
+          return;
+        }
+
+        if (pw2 && pw !== pw2) {
+          showAlert('As palavras-passe não coincidem. Verifique e tente novamente.');
+          pw2Input.focus();
+          return;
+        }
+
+        if (termsChk && !termsChk.checked) {
+          showAlert('Deve aceitar os termos de parceria e a comissão de 10% para conduzir com a GIRO.');
+          return;
+        }
+
+        // Defaults inteligentes e flexíveis para dados adicionais da viatura
+        const safeEmail = (email && email.includes('@')) ? email : `${rawPhone}@giroangola.ao`;
+        const safeBrand = brand || (category === 'Kupapata' ? 'Moto' : 'Toyota');
+        const safeModel = model || (category === 'Kupapata' ? 'Kupapata' : 'Corolla');
+        const safePlate = (plate && plate.length >= 4) ? plate : `LD-${Math.floor(10 + Math.random()*89)}-${Math.floor(10 + Math.random()*89)}-AA`;
+        const safeColor = color || 'Branco';
+        const safeNif = nif || `00${rawPhone}LA01`;
+        const safeDob = dob || '1995-01-01';
+        const safeMcx = rawMcx || rawPhone;
+
+        const driverId = 'drv_' + Date.now();
+        const carName = `${safeBrand} ${safeModel} (${safeColor})`;
+
+        const session = {
+          id: driverId,
+          driverId: driverId,
+          nome: name,
+          firstName: name.split(' ')[0],
+          secondName: name.split(' ').slice(1).join(' ') || '',
+          phone: '+244' + rawPhone,
+          rawPhone: rawPhone,
+          email: safeEmail,
+          dob: safeDob,
+          province: province || 'Luanda',
+          nif: safeNif,
+          cat: category || 'Económico',
+          car: carName,
+          brand: safeBrand,
+          model: safeModel,
+          year: year || '2019',
+          color: safeColor,
+          plate: safePlate,
+          multicaixa: '+244' + safeMcx,
+          role: 'motorista',
+          status: 'pendente',
+          blockStatus: 'no',
+          registeredAt: new Date().toISOString(),
+          date: new Date().toLocaleDateString('pt-AO'),
+          ts: Date.now()
+        };
+
+        // Salvar sessões locais para motorista
+        localStorage.setItem(GIRO_SESSION_KEY, JSON.stringify(session));
+        localStorage.setItem('giro_driver_session', JSON.stringify(session));
+
+        try {
+          // Grava no Firebase RTDB
+          fetch(`${FIREBASE_DB_URL}/drivers/${driverId}.json`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(session)
+          }).catch(() => {});
+
+          fetch(`${FIREBASE_DB_URL}/cadastros/motoristas/${driverId}.json`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(session)
+          }).catch(() => {});
+
+          const list = JSON.parse(localStorage.getItem('giro_admin_drivers') || '[]');
+          list.unshift(session);
+          localStorage.setItem('giro_admin_drivers', JSON.stringify(list));
+        } catch(e) {}
+
+        const btn = document.getElementById('btn-drv-submit');
+        if (btn) {
+          btn.innerHTML = '<span>A registar motorista parceiro...</span>';
+          btn.disabled = true;
+        }
+
+        setTimeout(() => {
+          window.location.href = 'driver.html';
+        }, 500);
+      }
+    }
+  </script>
 </body>
 </html>
