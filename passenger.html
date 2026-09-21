@@ -43,6 +43,10 @@
 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
+  if (window.location.search.includes('install=')) {
+    const target = window.location.search.includes('driver') ? 'driver' : 'pax';
+    setTimeout(() => openGiroUniversalInstallModal(target), 400);
+  }
       navigator.serviceWorker.register('./service-worker.js', { scope: './', updateViaCache: 'none' })
         .then(reg => {
           reg.update().catch(() => {});
@@ -521,6 +525,25 @@ body { overscroll-behavior: none; }
     <div style="display:flex;align-items:center;gap:6px;"><button id="giro-pwa-install-btn" onclick="openGiroPaxInstallModal()" style="display:inline-flex;align-items:center;gap:4px;background:#ffffff;color:#000000;border:none;border-radius:20px;padding:6px 12px;font-size:11px;font-weight:800;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,0.4);letter-spacing:-0.2px;">⬇ Instalar App</button><div id="auth-pill" style="display:flex;align-items:center;flex-shrink:0;"></div></div>
 </header>
 
+  <!-- BARRA DEDICADA DE INSTALAÇÃO DOS 2 APLICATIVOS (PASSAGEIRO & MOTORISTA) -->
+  <div id="giro-dual-install-bar" class="giro-dual-install-bar" style="position:relative;z-index:900;background:linear-gradient(90deg,#0a0f0b,#121a14);border-bottom:1px solid rgba(212,175,55,0.35);padding:8px 12px;display:flex;align-items:center;justify-content:space-between;gap:8px;box-sizing:border-box;">
+    <div style="display:flex;align-items:center;gap:6px;min-width:0;">
+      <span style="font-size:16px;">📲</span>
+      <div style="line-height:1.2;min-width:0;">
+        <div style="font-size:11.5px;font-weight:800;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Instalar Apps GIRO</div>
+        <div style="font-size:9.5px;color:#d4af37;font-weight:600;">Chrome & Safari · No Telemóvel</div>
+      </div>
+    </div>
+    <div style="display:flex;align-items:center;gap:6px;flex-shrink:0;">
+      <button type="button" onclick="openGiroUniversalInstallModal('pax')" style="background:#10b981;color:#000;border:none;border-radius:18px;padding:6px 12px;font-size:11px;font-weight:800;cursor:pointer;display:inline-flex;align-items:center;gap:4px;box-shadow:0 2px 8px rgba(16,185,129,0.3);white-space:nowrap;">
+        📲 App Passageiro
+      </button>
+      <button type="button" onclick="openGiroUniversalInstallModal('driver')" style="background:#d4af37;color:#000;border:none;border-radius:18px;padding:6px 12px;font-size:11px;font-weight:800;cursor:pointer;display:inline-flex;align-items:center;gap:4px;box-shadow:0 2px 8px rgba(212,175,55,0.3);white-space:nowrap;">
+        🚗 App Motorista
+      </button>
+    </div>
+  </div>
+
   <!-- 2. VIEWPORT COM MAPA GPS AO VIVO -->
   <main class="viewport-body">
     <!-- MAPA CARTOGRÁFICO REAL DE ANGOLA (LEAFLET + CARTODB POSITRON CLARO / OSM) -->
@@ -559,6 +582,27 @@ body { overscroll-behavior: none; }
             <span>Faça mais 2 viagens e ganhe 10% de desconto automático!</span>
           </div>
           <span class="promo-badge-tag">−10% BÓNUS</span>
+        </div>
+
+        <!-- CARTÃO DEDICADO DE INSTALAÇÃO NO PAINEL PRINCIPAL -->
+        <div id="pax-idle-install-card" style="margin:10px 0 14px;background:linear-gradient(135deg,#131914,#1a241c);border:1px solid rgba(212,175,55,0.35);border-radius:16px;padding:12px 14px;box-shadow:0 4px 16px rgba(0,0,0,0.4);">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+            <div style="display:flex;align-items:center;gap:8px;">
+              <div style="width:32px;height:32px;background:rgba(212,175,55,0.15);border:1px solid #d4af37;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;">📲</div>
+              <div>
+                <b style="font-size:13px;color:#fff;display:block;">Instale os Apps no Telemóvel</b>
+                <span style="font-size:10.5px;color:#8d9e8d;">Acesso rápido com 1 toque (Chrome & Safari)</span>
+              </div>
+            </div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+            <button type="button" onclick="openGiroUniversalInstallModal('pax')" style="background:#10b981;color:#000;border:none;border-radius:12px;padding:10px 8px;font-size:11.5px;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:5px;box-shadow:0 2px 8px rgba(16,185,129,0.35);">
+              📲 App Passageiro
+            </button>
+            <button type="button" onclick="openGiroUniversalInstallModal('driver')" style="background:#d4af37;color:#000;border:none;border-radius:12px;padding:10px 8px;font-size:11.5px;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:5px;box-shadow:0 2px 8px rgba(212,175,55,0.35);">
+              🚗 App Motorista
+            </button>
+          </div>
         </div>
         <!-- ROTA UBER (PONTO DE PARTIDA & DESTINO) -->
         <div class="uber-route-box" style="position:relative;">
@@ -681,6 +725,17 @@ body { overscroll-behavior: none; }
             <div id="search-progress-bar" style="height:100%;background:var(--gold-grad);width:100%;animation:progressBarAnim 4s linear forwards;"></div>
           </div>
 
+          <!-- Timeout de Busca / Nenhum Motorista Aceitou -->
+          <div id="pax-search-timeout-card" style="display:none;background:rgba(239,68,68,0.12);border:1px solid rgba(239,68,68,0.35);border-radius:14px;padding:14px;text-align:center;margin-bottom:16px;">
+            <div style="font-size:24px;margin-bottom:4px;">⏱️</div>
+            <b style="color:#fff;font-size:13.5px;display:block;">Nenhum motorista aceitou no momento</b>
+            <p style="color:#bbb;font-size:12px;margin:4px 0 12px;line-height:1.4;">Os motoristas mais próximos podem estar em viagem ou ocupados no momento.</p>
+            <div style="display:flex;gap:8px;">
+              <button type="button" onclick="retryTripSearch()" style="flex:1;background:#10b981;color:#000;font-weight:800;font-size:12.5px;padding:10px;border:none;border-radius:10px;cursor:pointer;">Tentar Novamente</button>
+              <button type="button" onclick="cancelTripSearch()" style="flex:1;background:#262626;color:#fff;font-weight:700;font-size:12.5px;padding:10px;border:none;border-radius:10px;cursor:pointer;">Cancelar</button>
+            </div>
+          </div>
+
           <button class="btn-uber-main" style="background:#222;color:#fff;box-shadow:none;" onclick="cancelRideRequest()">Cancelar Pedido</button>
         </div>
       </div>
@@ -760,7 +815,7 @@ body { overscroll-behavior: none; }
           </div>
 
           <!-- ESTRELAS DE AVALIAÇÃO UBER INTERATIVAS -->
-          <div style="font-size:13.5px;color:#ffffff;font-weight:800;margin-bottom:6px;">Como correu a sua viagem com Domingos?</div>
+          <div style="font-size:13.5px;color:#ffffff;font-weight:800;margin-bottom:6px;">Como correu a sua viagem com o motorista?</div>
           <div id="star-feedback-label" style="font-size:12px;color:#f59e0b;font-weight:700;min-height:18px;margin-bottom:8px;">Excelente! ⭐⭐⭐⭐⭐</div>
           
           <div style="display:flex;justify-content:center;gap:10px;font-size:32px;margin-bottom:14px;cursor:pointer;" id="pax-star-rating">
@@ -2678,6 +2733,45 @@ function handleDriverAcceptedRide(driver) {
   paxTo('trip');
 }
 
+
+function retryTripSearch() {
+  const timeoutCard = document.getElementById('pax-search-timeout-card');
+  if (timeoutCard) timeoutCard.style.display = 'none';
+  if (!currentActiveRide) return;
+  currentActiveRide.timestamp = Date.now();
+  try {
+    fetch(`https://giro-4ed50-default-rtdb.europe-west1.firebasedatabase.app/rides/${currentActiveRide.id}/timestamp.json`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(Date.now())
+    }).catch(() => {});
+    if (rideBroadcastChannel) {
+      rideBroadcastChannel.postMessage({ type: 'RIDE_REQUESTED', ride: currentActiveRide });
+    }
+  } catch(e) {}
+  const searchHead = document.getElementById('search-pane-head');
+  if (searchHead) searchHead.textContent = 'A reconectar com os motoristas GIRO…';
+}
+
+function cancelTripSearch() {
+  if (currentActiveRide) {
+    const rId = currentActiveRide.id;
+    try {
+      fetch(`https://giro-4ed50-default-rtdb.europe-west1.firebasedatabase.app/rides/${rId}/status.json`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify('CANCELLED')
+      }).catch(() => {});
+      if (rideBroadcastChannel) {
+        rideBroadcastChannel.postMessage({ type: 'RIDE_CANCELLED', rideId: rId });
+      }
+    } catch(e) {}
+  }
+  const timeoutCard = document.getElementById('pax-search-timeout-card');
+  if (timeoutCard) timeoutCard.style.display = 'none';
+  paxBack();
+}
+
 function cancelRideRequest() {
   if (typeof GiroTelemetry !== 'undefined') {
     GiroTelemetry.info('Corrida cancelada pelo passageiro', 'ride_cancelled_passenger', {
@@ -2813,30 +2907,32 @@ function confirmTripRide() {
       .catch(() => {});
   }, 2000);
 
-  // 6. Resiliência: Se nenhum motorista online aceitar em 6s, aceita com motorista parceiro credenciado
+  // 6. Monitorização em Tempo Real (Até 90 segundos com feedback dinâmico de busca)
+  let searchElapsedSec = 0;
+  const searchUpdateInterval = setInterval(() => {
+    if (!currentActiveRide || currentActiveRide.status !== 'SEARCHING') {
+      clearInterval(searchUpdateInterval);
+      return;
+    }
+    searchElapsedSec++;
+    const searchSub = document.getElementById('search-pane-sub');
+    if (searchSub) {
+      const min = Math.floor(searchElapsedSec / 60).toString().padStart(2, '0');
+      const sec = (searchElapsedSec % 60).toString().padStart(2, '0');
+      searchSub.textContent = `A contactar motoristas próximos (${min}:${sec}) • ${kz(finalPrice)}`;
+    }
+  }, 1000);
+  paxTimers.push(searchUpdateInterval);
+
+  // Se nenhum condutor aceitar após 90 segundos de busca real, exibir painel de opções
   paxTimers.push(setTimeout(() => {
     if (currentActiveRide && currentActiveRide.status === 'SEARCHING') {
-      const fallbackDriver = {
-        name: 'Domingos Manuel',
-        car: 'Toyota Corolla Branco',
-        plate: 'LD-44-88-HA',
-        rating: '4.95',
-        phone: '+244 923 111 222',
-        coords: [p1[0] - 0.008, p1[1] + 0.005]
-      };
-      fetch(`https://giro-4ed50-default-rtdb.europe-west1.firebasedatabase.app/rides/${rideId}/status.json`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify('ACCEPTED')
-      }).catch(() => {});
-      fetch(`https://giro-4ed50-default-rtdb.europe-west1.firebasedatabase.app/rides/${rideId}/driver.json`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(fallbackDriver)
-      }).catch(() => {});
-      handleDriverAcceptedRide(fallbackDriver);
+      const timeoutCard = document.getElementById('pax-search-timeout-card');
+      if (timeoutCard) timeoutCard.style.display = 'block';
+      const searchHead = document.getElementById('search-pane-head');
+      if (searchHead) searchHead.textContent = 'Sem motoristas disponíveis de momento';
     }
-  }, 6000));
+  }, 90000));
 }
 
 function togglePayDrawer() {
@@ -3396,30 +3492,50 @@ window.addEventListener('appinstalled', () => {
   console.log('[PWA] GIRO instalado com sucesso no ecrã inicial!');
 });
 
-function openGiroPaxInstallModal() {
+function openGiroUniversalInstallModal(targetApp = 'pax') {
   const modal = document.getElementById('giro-pax-pwa-modal');
   if (!modal) return;
   modal.style.display = 'flex';
+  switchGiroPaxInstallTab(targetApp);
+}
+
+function openGiroPaxInstallModal() {
+  openGiroUniversalInstallModal('pax');
+}
+
+function switchGiroPaxInstallTab(app) {
+  const tabPax = document.getElementById('pax-tab-inst-pax');
+  const tabDrv = document.getElementById('pax-tab-inst-driver');
+  const secPax = document.getElementById('pax-sec-inst-pax');
+  const secDrv = document.getElementById('pax-sec-inst-driver');
+
+  if (app === 'pax') {
+    if (tabPax) { tabPax.style.background = '#10b981'; tabPax.style.color = '#000'; }
+    if (tabDrv) { tabDrv.style.background = '#222'; tabDrv.style.color = '#fff'; }
+    if (secPax) secPax.style.display = 'block';
+    if (secDrv) secDrv.style.display = 'none';
+  } else {
+    if (tabPax) { tabPax.style.background = '#222'; tabPax.style.color = '#fff'; }
+    if (tabDrv) { tabDrv.style.background = '#d4af37'; tabDrv.style.color = '#000'; }
+    if (secPax) secPax.style.display = 'none';
+    if (secDrv) secDrv.style.display = 'block';
+  }
 
   const isIos = /iphone|ipad|ipod/i.test(navigator.userAgent);
   const isWebView = /wv|Instagram|FBAN|FBAV|WhatsApp|MicroMessenger/i.test(navigator.userAgent);
-  const promptSec = document.getElementById('pax-chrome-prompt-section');
-  const webviewAlert = document.getElementById('pax-webview-alert');
-  const safariGuide = document.getElementById('pax-safari-guide');
-  const chromeManualGuide = document.getElementById('pax-chrome-manual-guide');
 
-  if (webviewAlert) webviewAlert.style.display = isWebView ? 'block' : 'none';
-
-  if (isIos) {
-    if (safariGuide) safariGuide.style.display = 'block';
-    if (chromeManualGuide) chromeManualGuide.style.display = 'none';
-    if (promptSec) promptSec.style.display = 'none';
-  } else {
-    if (safariGuide) safariGuide.style.display = 'none';
-    if (chromeManualGuide) chromeManualGuide.style.display = 'block';
-    if (deferredGiroInstallPrompt && promptSec) {
-      promptSec.style.display = 'block';
-    }
+  document.querySelectorAll('.giro-pax-webview-alert').forEach(el => {
+    el.style.display = isWebView ? 'block' : 'none';
+  });
+  document.querySelectorAll('.giro-pax-safari-guide').forEach(el => {
+    el.style.display = isIos ? 'block' : 'none';
+  });
+  document.querySelectorAll('.giro-pax-chrome-guide').forEach(el => {
+    el.style.display = isIos ? 'none' : 'block';
+  });
+  if (deferredGiroInstallPrompt) {
+    const pSec = document.getElementById('pax-chrome-prompt-section');
+    if (pSec) pSec.style.display = 'block';
   }
 }
 
@@ -3443,73 +3559,100 @@ function triggerPaxNativeInstall() {
 }
 
 function installGiroPwa() {
-  openGiroPaxInstallModal();
+  openGiroUniversalInstallModal('pax');
 }
 </script>
 
-  <!-- ================= MODAL DE INSTALAÇÃO PWA PASSAGEIRO ================= -->
+  <!-- ================= MODAL UNIVERSAL DE INSTALAÇÃO PWA (PASSAGEIRO & MOTORISTA) ================= -->
   <div id="giro-pax-pwa-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:99999;align-items:center;justify-content:center;padding:16px;box-sizing:border-box;">
-    <div style="background:#141414;border:1px solid #333;border-radius:20px;max-width:440px;width:100%;padding:22px;box-sizing:border-box;color:#fff;box-shadow:0 12px 40px rgba(0,0,0,0.9);position:relative;">
+    <div style="background:#141414;border:1px solid #333;border-radius:20px;max-width:440px;width:100%;padding:20px;box-sizing:border-box;color:#fff;box-shadow:0 12px 40px rgba(0,0,0,0.9);position:relative;">
       <button onclick="closeGiroPaxInstallModal()" style="position:absolute;top:14px;right:14px;background:#262626;border:none;color:#aaa;font-size:18px;width:32px;height:32px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;">✕</button>
       
-      <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;">
-        <div style="width:48px;height:48px;background:rgba(212,175,55,0.15);border:1px solid #d4af37;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:24px;">📲</div>
-        <div>
-          <h3 style="font-size:17px;font-weight:900;color:#fff;margin:0;">Instalar GIRO Passageiro</h3>
-          <span style="font-size:12px;color:#d4af37;font-weight:700;">App Oficial de Mobilidade & Entregas</span>
+      <!-- Seletor de Tabs de Instalação -->
+      <div style="display:flex;gap:8px;margin-bottom:16px;background:#0d0d0d;padding:4px;border-radius:14px;border:1px solid #262626;">
+        <button type="button" id="pax-tab-inst-pax" onclick="switchGiroPaxInstallTab('pax')" style="flex:1;background:#10b981;color:#000;border:none;border-radius:10px;padding:9px;font-size:12px;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;">
+          📲 App Passageiro
+        </button>
+        <button type="button" id="pax-tab-inst-driver" onclick="switchGiroPaxInstallTab('driver')" style="flex:1;background:#222;color:#fff;border:none;border-radius:10px;padding:9px;font-size:12px;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;">
+          🚗 App Motorista
+        </button>
+      </div>
+
+      <!-- Seção: Passageiro -->
+      <div id="pax-sec-inst-pax">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px;">
+          <div style="width:46px;height:46px;background:rgba(16,185,129,0.15);border:1px solid #10b981;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:24px;">📲</div>
+          <div>
+            <h3 style="font-size:16px;font-weight:900;color:#fff;margin:0;">Instalar GIRO Passageiro</h3>
+            <span style="font-size:11.5px;color:#10b981;font-weight:700;">App de Mobilidade & Entregas Rápidas</span>
+          </div>
+        </div>
+
+        <!-- Android Chrome Prompt Section -->
+        <div id="pax-chrome-prompt-section" style="display:none;margin-bottom:14px;">
+          <button onclick="triggerPaxNativeInstall()" style="width:100%;background:#10b981;border:none;color:#000;font-weight:900;font-size:14px;padding:13px;border-radius:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 4px 14px rgba(16,185,129,0.35);">
+            📲 Instalar Agora no Android
+          </button>
+          <small style="display:block;text-align:center;color:#888;margin-top:6px;font-size:11px;">Instalação direta no seu ecrã principal</small>
+        </div>
+
+        <!-- Safari (iOS) Guide -->
+        <div class="giro-pax-safari-guide" style="display:none;background:#1a1a1a;border:1px solid #2a2a2a;border-radius:14px;padding:14px;margin-bottom:14px;">
+          <b style="font-size:13px;color:#fff;display:block;margin-bottom:10px;">Como instalar no iPhone (Apple Safari):</b>
+          <div style="display:flex;align-items:flex-start;gap:10px;margin-bottom:8px;font-size:12px;color:#ccc;">
+            <span style="background:#262626;border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center;font-weight:800;color:#d4af37;flex-shrink:0;">1</span>
+            <span>Toque no botão de <b>Partilhar [ ⎋ ]</b> na barra inferior do Safari.</span>
+          </div>
+          <div style="display:flex;align-items:flex-start;gap:10px;margin-bottom:8px;font-size:12px;color:#ccc;">
+            <span style="background:#262626;border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center;font-weight:800;color:#d4af37;flex-shrink:0;">2</span>
+            <span>Role para baixo e selecione <b>[ ➕ Ecrã Principal ]</b> (Add to Home Screen).</span>
+          </div>
+          <div style="display:flex;align-items:flex-start;gap:10px;font-size:12px;color:#ccc;">
+            <span style="background:#262626;border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center;font-weight:800;color:#d4af37;flex-shrink:0;">3</span>
+            <span>Toque em <b>[ Adicionar ]</b> no canto superior direito.</span>
+          </div>
+        </div>
+
+        <!-- Chrome Android Manual Guide -->
+        <div class="giro-pax-chrome-guide" style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:14px;padding:14px;margin-bottom:14px;">
+          <b style="font-size:13px;color:#fff;display:block;margin-bottom:10px;">Como instalar no Google Chrome (Android & PC):</b>
+          <div style="display:flex;align-items:flex-start;gap:10px;margin-bottom:8px;font-size:12px;color:#ccc;">
+            <span style="background:#262626;border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center;font-weight:800;color:#d4af37;flex-shrink:0;">1</span>
+            <span>Toque nos <b>três pontinhos [ ⋮ ]</b> no canto superior direito do Google Chrome.</span>
+          </div>
+          <div style="display:flex;align-items:flex-start;gap:10px;font-size:12px;color:#ccc;">
+            <span style="background:#262626;border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center;font-weight:800;color:#d4af37;flex-shrink:0;">2</span>
+            <span>Selecione <b>[ 📲 Instalar aplicativo ]</b> ou <b>[ Adicionar ao ecrã principal ]</b>.</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Seção: Motorista -->
+      <div id="pax-sec-inst-driver" style="display:none;">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px;">
+          <div style="width:46px;height:46px;background:rgba(212,175,55,0.15);border:1px solid #d4af37;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:24px;">🚗</div>
+          <div>
+            <h3 style="font-size:16px;font-weight:900;color:#fff;margin:0;">Instalar GIRO Condutor</h3>
+            <span style="font-size:11.5px;color:#d4af37;font-weight:700;">App do Motorista Parceiro (10% Comissão)</span>
+          </div>
+        </div>
+
+        <div style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:14px;padding:14px;margin-bottom:14px;text-align:center;">
+          <p style="font-size:12.5px;color:#ddd;margin:0 0 12px;line-height:1.4;">
+            Para instalar a aplicação de condutor parceiro no seu telemóvel:
+          </p>
+          <a href="driver.html?install=driver" style="display:inline-flex;align-items:center;justify-content:center;gap:8px;background:#d4af37;color:#000;font-weight:900;font-size:13px;padding:12px 18px;border-radius:12px;text-decoration:none;box-shadow:0 4px 14px rgba(212,175,55,0.35);">
+            🚗 Abrir e Instalar App Motorista →
+          </a>
         </div>
       </div>
 
       <!-- WebView Warning (WhatsApp/Facebook) -->
-      <div id="pax-webview-alert" style="display:none;background:rgba(239,68,68,0.15);border:1px solid rgba(239,68,68,0.4);border-radius:12px;padding:12px;margin-bottom:14px;">
+      <div class="giro-pax-webview-alert" style="display:none;background:rgba(239,68,68,0.15);border:1px solid rgba(239,68,68,0.4);border-radius:12px;padding:12px;margin-top:10px;">
         <b style="color:#ef4444;font-size:13px;display:block;margin-bottom:4px;">⚠️ Abra no Google Chrome ou Safari</b>
         <p style="font-size:12px;color:#ddd;margin:0;line-height:1.4;">
-          Está a usar o navegador interno do WhatsApp ou Facebook. Para instalar no telemóvel: toque nos <b>3 pontinhos (⋮)</b> no canto superior direito e selecione <b>"Abrir no Chrome"</b> ou <b>"Abrir no Safari"</b>.
+          Está no navegador interno do WhatsApp ou Facebook. Toque nos <b>3 pontinhos (⋮)</b> e selecione <b>"Abrir no Chrome"</b> ou <b>"Abrir no Safari"</b>.
         </p>
-      </div>
-
-      <!-- Android Chrome Prompt Section -->
-      <div id="pax-chrome-prompt-section" style="display:none;margin-bottom:14px;">
-        <button onclick="triggerPaxNativeInstall()" style="width:100%;background:#10b981;border:none;color:#000;font-weight:900;font-size:14px;padding:14px;border-radius:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 4px 14px rgba(16,185,129,0.35);">
-          📲 Instalar Agora no Android
-        </button>
-        <small style="display:block;text-align:center;color:#888;margin-top:6px;font-size:11px;">Instalação direta no seu ecrã principal</small>
-      </div>
-
-      <!-- Safari (iOS) Guide -->
-      <div id="pax-safari-guide" style="display:none;background:#1a1a1a;border:1px solid #2a2a2a;border-radius:14px;padding:14px;margin-bottom:14px;">
-        <b style="font-size:13px;color:#fff;display:block;margin-bottom:10px;">Como instalar no iPhone (Apple Safari):</b>
-        <div style="display:flex;align-items:flex-start;gap:10px;margin-bottom:10px;font-size:12px;color:#ccc;">
-          <span style="background:#262626;border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center;font-weight:800;color:#d4af37;flex-shrink:0;">1</span>
-          <span>Toque no botão de <b>Partilhar [ ⎋ ]</b> na barra inferior do Safari.</span>
-        </div>
-        <div style="display:flex;align-items:flex-start;gap:10px;margin-bottom:10px;font-size:12px;color:#ccc;">
-          <span style="background:#262626;border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center;font-weight:800;color:#d4af37;flex-shrink:0;">2</span>
-          <span>Role para baixo e selecione <b>[ ➕ Ecrã Principal ]</b> (Add to Home Screen).</span>
-        </div>
-        <div style="display:flex;align-items:flex-start;gap:10px;font-size:12px;color:#ccc;">
-          <span style="background:#262626;border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center;font-weight:800;color:#d4af37;flex-shrink:0;">3</span>
-          <span>Toque em <b>[ Adicionar ]</b> no canto superior direito.</span>
-        </div>
-      </div>
-
-      <!-- Chrome Android Manual Guide -->
-      <div id="pax-chrome-manual-guide" style="display:none;background:#1a1a1a;border:1px solid #2a2a2a;border-radius:14px;padding:14px;margin-bottom:14px;">
-        <b style="font-size:13px;color:#fff;display:block;margin-bottom:10px;">Como instalar no Google Chrome (Android):</b>
-        <div style="display:flex;align-items:flex-start;gap:10px;margin-bottom:10px;font-size:12px;color:#ccc;">
-          <span style="background:#262626;border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center;font-weight:800;color:#d4af37;flex-shrink:0;">1</span>
-          <span>Toque nos <b>três pontinhos [ ⋮ ]</b> no canto superior direito do Google Chrome.</span>
-        </div>
-        <div style="display:flex;align-items:flex-start;gap:10px;margin-bottom:10px;font-size:12px;color:#ccc;">
-          <span style="background:#262626;border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center;font-weight:800;color:#d4af37;flex-shrink:0;">2</span>
-          <span>Selecione <b>[ 📲 Instalar aplicativo ]</b> ou <b>[ Adicionar ao ecrã principal ]</b>.</span>
-        </div>
-      </div>
-
-      <!-- Cross Link to Driver App -->
-      <div style="border-top:1px solid #262626;padding-top:12px;display:flex;justify-content:space-between;align-items:center;">
-        <span style="font-size:12px;color:#888;">É condutor parceiro?</span>
-        <a href="driver.html" style="font-size:12px;color:#d4af37;text-decoration:none;font-weight:700;">Instalar App Motorista (10%) →</a>
       </div>
     </div>
   </div>

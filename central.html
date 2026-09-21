@@ -2208,8 +2208,11 @@
       if (!d) return;
 
       let lat = null, lng = null;
+      if (d.isOnline === false) return;
       if (d.coords && typeof d.coords.lat === 'number') {
         lat = d.coords.lat; lng = d.coords.lng;
+      } else if (Array.isArray(d.coords) && d.coords.length >= 2 && typeof d.coords[0] === 'number') {
+        lat = d.coords[0]; lng = d.coords[1];
       } else if (d.lat && d.lng) {
         lat = d.lat; lng = d.lng;
       }

@@ -5,8 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>GIRO Angola — Portal Master de Administração & Cofre Operacional</title>
   <link rel="icon" type="image/x-icon" href="favicon.ico">
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <link rel="stylesheet" href="./leaflet.css">
+  <script src="./leaflet.js"></script>
+  <script src="./telemetry.js"></script>
 
   <style>
     :root {
@@ -473,17 +474,31 @@
     }
     .modal-body { padding: 22px; overflow-y: auto; flex: 1; }
     .doc-preview-grid {
-      display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 12px; margin-bottom: 20px;
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin-bottom: 20px;
     }
     .doc-card {
       background: var(--card-inner); border: 1px solid var(--border);
-      border-radius: 10px; padding: 12px; text-align: center;
+      border-radius: 10px; padding: 10px; text-align: center;
+      display: flex; flex-direction: column; align-items: center;
+      transition: border-color 0.2s;
     }
-    .doc-card-img {
-      width: 100%; height: 100px; background: #070907; border-radius: 6px;
+    .doc-card:hover { border-color: var(--gold); }
+    .doc-card-img-wrap {
+      width: 100%; height: 110px; background: #0a0a0a; border-radius: 6px;
+      overflow: hidden; margin-bottom: 8px; border: 1px dashed #333;
       display: flex; align-items: center; justify-content: center;
-      margin-bottom: 8px; font-size: 32px; border: 1px dashed #333;
+      cursor: pointer; position: relative;
     }
+    .doc-card-img-wrap img {
+      width: 100%; height: 100%; object-fit: cover; transition: transform 0.2s;
+    }
+    .doc-card-img-wrap:hover img { transform: scale(1.05); }
+    .doc-card-title { font-size: 11px; font-weight: 700; color: #ffffff; margin-bottom: 4px; }
+    .doc-card-status { font-size: 10px; margin-bottom: 6px; }
+    .doc-card-status.ok { color: var(--green); }
+    .doc-card-status.empty { color: var(--muted); }
+    .doc-link-btn { font-size: 11px; color: var(--gold); text-decoration: none; display: inline-flex; align-items: center; gap: 4px; }
+    .doc-link-btn:hover { text-decoration: underline; }
 
     #sidebar-overlay { display: none; }
 
@@ -646,6 +661,13 @@
         </button>
         <button class="nav-item" onclick="switchNav('fleet')">
           <span>📍</span> Radar de Frotas ao Vivo
+        </button>
+        <button class="nav-item" onclick="switchNav('pricing')">
+          <span>🏷️</span> Tarifas & Preços Dinâmicos
+        </button>
+        <button class="nav-item" onclick="switchNav('telemetry')">
+          <span class="nav-icon">📊</span><span class="nav-label">Telemetria</span>
+          <span class="nav-badge" id="badge-telemetry-health" style="background:rgba(16,185,129,0.2);color:var(--green);">OK</span>
         </button>
         <button class="nav-item" onclick="switchNav('config')">
           <span>⚙️</span> Definições & API VPS
@@ -929,7 +951,7 @@
               <div style="font-weight:700;color:var(--gold);font-size:14px;">🔒 Acesso Restrito à Central de Monitoramento</div>
               <div style="font-size:12px;color:var(--muted);margin-top:2px;">Não há cadastro público na página da Central. Os operadores autenticam-se com os dados gerados aqui.</div>
             </div>
-            <a href="./central-login.html" target="_blank" class="btn-action outline" style="text-decoration:none;">↗ Abrir Login da Central</a>
+            <a href="./central.html" target="_blank" class="btn-action outline" style="text-decoration:none;">↗ Abrir Painel da Central</a>
           </div>
 
           <div class="data-table-wrap">
@@ -1174,6 +1196,160 @@
           </div>
         </section>
 
+        <!-- ABA: GESTÃO DE TARIFAS & PREÇOS DINÂMICOS (FIREBASE RTDB) -->
+        <section id="view-pricing" class="tab-view">
+          <div class="kpi-grid">
+            <div class="kpi-card gold">
+              <div class="kpi-label">Comissão Padrão Plataforma</div>
+              <div class="kpi-value" id="kpi-pricing-comm">10.0%</div>
+              <div class="kpi-sub">Fixa em todas as corridas GIRO</div>
+            </div>
+            <div class="kpi-card green">
+              <div class="kpi-label">Bandeirada Base Económico</div>
+              <div class="kpi-value" id="kpi-pricing-base">50 Kz</div>
+              <div class="kpi-sub">Tarifa inicial de partida</div>
+            </div>
+            <div class="kpi-card blue">
+              <div class="kpi-label">Taxa por KM (Económico)</div>
+              <div class="kpi-value" id="kpi-pricing-km">243 Kz</div>
+              <div class="kpi-sub">Referência urbana Luanda</div>
+            </div>
+            <div class="kpi-card">
+              <div class="kpi-label">Sincronização Firebase RTDB</div>
+              <div class="kpi-value" style="font-size:18px;color:var(--green);display:flex;align-items:center;gap:6px;">
+                <span style="font-size:10px;">●</span> /config/pricing
+              </div>
+              <div class="kpi-sub" id="kpi-pricing-updated">Sincronizado em tempo real</div>
+            </div>
+          </div>
+
+          <div class="data-table-wrap">
+            <div class="table-head-bar">
+              <div>
+                <b style="font-size:16px;color:#fff;display:block;">Tabela Tarifária Oficial GIRO (10 Categorias)</b>
+                <span style="font-size:12px;color:var(--muted);">Alterações gravadas no Firebase RTDB atualizam a estimativa dos passageiros instantaneamente.</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:10px;">
+                <button class="btn-action outline" onclick="loadAdminPricing(true)">🔄 Recarregar</button>
+                <button class="btn-action gold" onclick="saveAdminPricing()">💾 Gravar Todas as Alterações</button>
+              </div>
+            </div>
+
+            <div style="overflow-x:auto;">
+              <table id="pricing-admin-table">
+                <thead>
+                  <tr>
+                    <th>Categoria</th>
+                    <th>Modalidade</th>
+                    <th>Bandeirada (Kz)</th>
+                    <th>Taxa/Km (Kz)</th>
+                    <th>Taxa/Min (Kz)</th>
+                    <th>Tarifa Mínima (Kz)</th>
+                    <th>Longo Curso >50km (Kz/km)</th>
+                    <th>Comissão (%)</th>
+                    <th>Ações</th>
+                  </tr>
+                </thead>
+                <tbody id="pricing-tbody">
+                  <!-- Carregado dinamicamente via loadAdminPricing() -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- ABA: TELEMETRIA & DIAGNÓSTICOS EM TEMPO REAL (/telemetry) -->
+        <section id="view-telemetry" class="tab-view">
+          <!-- 1. System Health KPI Cards -->
+          <div class="kpi-grid">
+            <div class="kpi-card green" id="card-kpi-rtdb">
+              <div class="kpi-label">Latência Firebase RTDB</div>
+              <div class="kpi-value" id="kpi-telemetry-rtdb-ping">-- ms</div>
+              <div class="kpi-sub" id="kpi-telemetry-rtdb-status">Ping em tempo real (/config/pricing)</div>
+            </div>
+            <div class="kpi-card blue" id="card-kpi-storage">
+              <div class="kpi-label">Firebase Cloud Storage</div>
+              <div class="kpi-value" id="kpi-telemetry-storage-status">Conectado</div>
+              <div class="kpi-sub" id="kpi-telemetry-storage-sub">giro-4ed50.firebasestorage.app</div>
+            </div>
+            <div class="kpi-card red" id="card-kpi-errors">
+              <div class="kpi-label">Exceções & Falhas</div>
+              <div class="kpi-value" id="kpi-telemetry-error-count">0 / 0</div>
+              <div class="kpi-sub" id="kpi-telemetry-error-sub">0 na última hora · 0 no total</div>
+            </div>
+            <div class="kpi-card gold" id="card-kpi-events">
+              <div class="kpi-label">Eventos Operacionais</div>
+              <div class="kpi-value" id="kpi-telemetry-events-count">0</div>
+              <div class="kpi-sub" id="kpi-telemetry-events-sub">Nó /telemetry/events sincronizado</div>
+            </div>
+          </div>
+
+          <!-- 2. Real-time Telemetry Stream Table -->
+          <div class="data-table-wrap">
+            <div class="table-head-bar">
+              <div>
+                <b style="font-size:16px;color:#fff;display:block;">Fluxo de Telemetria & Registos de Diagnóstico</b>
+                <span style="font-size:12px;color:var(--muted);">Monitorização em tempo real de acessos, eventos de ciclo de vida e exceções capturadas.</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+                <!-- Level Filter Buttons -->
+                <div style="display:flex;align-items:center;gap:4px;" id="telemetry-filter-buttons">
+                  <span style="font-size:12px;color:var(--muted);margin-right:2px;">Filtro:</span>
+                  <button type="button" class="btn-action outline active" data-level="TODOS" onclick="setTelemetryFilter('TODOS')">TODOS</button>
+                  <button type="button" class="btn-action outline" data-level="INFO" onclick="setTelemetryFilter('INFO')">INFO</button>
+                  <button type="button" class="btn-action outline" data-level="WARN" onclick="setTelemetryFilter('WARN')">WARN</button>
+                  <button type="button" class="btn-action outline" data-level="ERROR" onclick="setTelemetryFilter('ERROR')">ERROR</button>
+                </div>
+                <select id="telemetry-level-filter" style="display:none;" onchange="setTelemetryFilter(this.value)">
+                  <option value="TODOS">TODOS</option>
+                  <option value="INFO">INFO</option>
+                  <option value="WARN">WARN</option>
+                  <option value="ERROR">ERROR</option>
+                </select>
+
+                <!-- Auto-refresh Toggle -->
+                <label style="display:flex;align-items:center;gap:6px;font-size:12px;color:#fff;cursor:pointer;user-select:none;">
+                  <input type="checkbox" id="telemetry-auto-refresh-toggle" checked onchange="toggleTelemetryAutoRefresh(this.checked)">
+                  <span>Auto (10s)</span>
+                </label>
+
+                <!-- Manual Refresh Button -->
+                <button type="button" class="btn-action outline" onclick="refreshTelemetryAndHealth(true)" title="Recarregar dados agora">🔄 Atualizar</button>
+
+                <!-- Clean/Purge Button -->
+                <button type="button" class="btn-action red" onclick="purgeTelemetryData()" title="Limpar todos os eventos e erros do Firebase">🗑️ Expurgar Telemetria</button>
+              </div>
+            </div>
+
+            <!-- Table Container -->
+            <div style="overflow-x:auto;">
+              <table id="telemetry-table">
+                <thead>
+                  <tr>
+                    <th style="width:150px;">Horário (Luanda)</th>
+                    <th style="width:110px;">Nível / Severidade</th>
+                    <th style="width:160px;">Contexto</th>
+                    <th>Mensagem / Detalhes</th>
+                    <th style="width:160px;">User-Agent</th>
+                  </tr>
+                </thead>
+                <tbody id="telemetry-tbody">
+                  <tr>
+                    <td colspan="5" style="text-align:center;padding:32px;color:var(--muted);">
+                      A carregar registos de telemetria...
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            
+            <div style="padding:12px 20px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;font-size:12px;color:var(--muted);">
+              <span id="telemetry-stream-status">Mostrando últimos 20 registos</span>
+              <span id="telemetry-last-sync">Última sincronização: --:--:--</span>
+            </div>
+          </div>
+        </section>
+
       </div>
     </main>
   </div>
@@ -1352,48 +1528,45 @@
 
   <!-- MODAL KYC -->
   <div class="modal-backdrop" id="kyc-modal">
-    <div class="modal-box">
+    <div class="modal-box" style="max-width:760px; width:95%;">
       <div class="modal-head">
         <div>
           <b style="font-size:17px;color:#fff;" id="modal-driver-name">Homologação KYC</b>
-          <div style="font-size:12px;color:var(--gold);" id="modal-driver-meta">Matrícula: LD-88-21-BH</div>
+          <div style="font-size:12px;color:var(--gold);" id="modal-driver-meta">Matrícula: — · Tel: —</div>
         </div>
         <button class="btn-action outline" onclick="closeKycModal()">✕ Fechar</button>
       </div>
       <div class="modal-body">
-        <div class="doc-preview-grid">
-          <div class="doc-card">
-            <div class="doc-card-img">🪪</div>
-            <b>BI (Frente e Verso)</b>
-            <div style="font-size:10px;color:var(--green);margin-top:2px;">Conferido com Registo Civil</div>
-          </div>
-          <div class="doc-card">
-            <div class="doc-card-img">📜</div>
-            <b>Carta de Condução</b>
-            <div style="font-size:10px;color:var(--green);margin-top:2px;">Categoria Válida (DTSER)</div>
-          </div>
-          <div class="doc-card">
-            <div class="doc-card-img">📋</div>
-            <b>Seguro Automóvel</b>
-            <div style="font-size:10px;color:var(--green);margin-top:2px;">Válido e em dia</div>
-          </div>
-          <div class="doc-card">
-            <div class="doc-card-img">🤳</div>
-            <b>Selfie Facial Biométrica</b>
-            <div style="font-size:10px;color:var(--green);margin-top:2px;">99.4% de correspondência</div>
-          </div>
+        <!-- Dynamic Document Grid -->
+        <div class="doc-preview-grid" id="kyc-doc-grid">
+          <!-- Dynamically populated via openKycModal -->
         </div>
 
-        <div style="display:flex;justify-content:flex-end;gap:12px;">
-          <button class="btn-action red" style="padding:12px 20px;" onclick="rejectKyc()">✕ Recusar</button>
-          <button class="btn-action green" style="padding:12px 24px;font-size:14px;" onclick="approveKyc()">✓ Homologar Motorista</button>
+        <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px solid var(--border); padding-top:16px;">
+          <div id="kyc-audit-summary" style="font-size:12px; color:var(--muted);">0 documentos verificados</div>
+          <div style="display:flex; gap:12px;">
+            <button class="btn-action red" style="padding:10px 18px;" onclick="rejectKyc()">✕ Recusar</button>
+            <button class="btn-action green" style="padding:10px 22px; font-size:13px;" onclick="approveKyc()">✓ Homologar Motorista</button>
+          </div>
         </div>
       </div>
     </div>
   </div>
 
+  <!-- LIGHTBOX MODAL FOR ZOOMING KYC DOCUMENTS -->
+  <div id="kyc-lightbox-modal" data-zoom="toggleZoom" data-transform="scale(1.8)" style="display:none; cursor:zoom-in; position:fixed; inset:0; background:rgba(0,0,0,0.92); z-index:9999; align-items:center; justify-content:center; flex-direction:column; padding:20px;" onclick="closeKycLightbox()">
+    <div style="position:absolute; top:20px; right:24px; font-size:24px; color:#fff; cursor:pointer;" onclick="closeKycLightbox()">✕ Fechar</div>
+    <div id="kyc-lightbox-title" style="color:var(--gold); font-weight:700; margin-bottom:12px; font-size:16px;" onclick="event.stopPropagation()">Documento</div>
+    <img id="kyc-lightbox-img" src="" alt="Zoom Preview" onclick="event.stopPropagation(); toggleLightboxZoom(event);" style="max-width:90vw; max-height:80vh; object-fit:contain; border-radius:8px; border:1px solid #333; box-shadow:0 12px 40px rgba(0,0,0,0.8); cursor:zoom-in; transition:transform 0.25s ease;">
+    <a id="kyc-lightbox-link" href="" target="_blank" rel="noopener" style="margin-top:14px; color:var(--gold); font-size:13px; text-decoration:underline;" onclick="event.stopPropagation()">🔗 Abrir original em nova aba</a>
+  </div>
+
   <script>
-    // ═════════════════════════════════════════════════════════════════
+    // Inicialização do Motor de Telemetria e Diagnóstico GIRO
+    if (typeof GiroTelemetry !== 'undefined') {
+      GiroTelemetry.initGlobalHandlers('admin');
+    }
+
     // BANK-GRADE SECURITY LOGIC & VAULT GATE
     // ═════════════════════════════════════════════════════════════════
     const MASTER_PIN = '181818'; // Código PIN padrão do Proprietário
@@ -1506,6 +1679,8 @@
       disputes: '⚖️ Disputas & Reembolsos',
       sos: '🚨 Monitor Tático & PNA (111)',
       fleet: '📍 Radar de Frotas ao Vivo',
+      pricing: '🏷️ Gestão de Tarifas & Comissões (Firebase RTDB)',
+      telemetry: 'Telemetria & Diagnóstico',
       config: '⚙️ Definições & Conexão VPS'
     };
 
@@ -1532,6 +1707,11 @@
 
       if (view === 'sos') setTimeout(initRadarMap, 150);
       if (view === 'fleet') setTimeout(initFleetMap, 150);
+      if (view === 'pricing') loadAdminPricing();
+      if (view === 'telemetry') {
+        loadTelemetryData();
+        pingTelemetryHealth();
+      }
       if (view === 'operators') renderVigiaFailuresTable();
       renderVigiaSuccessTable();
       refreshVigiaLiveMetrics();
@@ -1561,22 +1741,235 @@
       });
     }
 
-    // ── KYC Actions ──
+    // ── KYC Actions & Dynamic Document Inspection ──
+    let currentKycDriverId = null;
     let currentKycDriver = '';
-    function openKycModal(name, plate, phone, car) {
-      currentKycDriver = name;
-      document.getElementById('modal-driver-name').textContent = name + ' (' + car + ')';
-      document.getElementById('modal-driver-meta').textContent = 'Matrícula: ' + plate + ' · Tel: ' + phone;
+    let isLightboxZoomed = false;
+
+    function sanitizeDocUrl(url) {
+      if (!url || typeof url !== 'string') return null;
+      const trimmed = url.trim();
+      if (trimmed.length <= 5) return null;
+      if (!/^https?:\/\//i.test(trimmed) && !/^data:image\/(png|jpe?g|webp|gif);base64,/i.test(trimmed)) {
+        return null;
+      }
+      return trimmed;
+    }
+
+    function toggleLightboxZoom(e) {
+      if (e && e.stopPropagation) e.stopPropagation();
+      const img = document.getElementById('kyc-lightbox-img');
+      if (!img) return;
+      isLightboxZoomed = !isLightboxZoomed;
+      img.style.transform = isLightboxZoomed ? 'scale(1.8)' : 'scale(1)';
+      img.style.cursor = isLightboxZoomed ? 'zoom-out' : 'zoom-in';
+    }
+
+    const KYC_DOC_TYPES = [
+      { key: 'bi_frente', altKeys: ['bi_front'], label: 'BI — Frente', icon: '🪪' },
+      { key: 'bi_verso', altKeys: ['bi_back'], label: 'BI — Verso', icon: '🪪' },
+      { key: 'carta_frente', altKeys: ['license_front'], label: 'Carta de Condução — Frente', icon: '📜' },
+      { key: 'carta_verso', altKeys: ['license_back'], label: 'Carta de Condução — Verso', icon: '📜' },
+      { key: 'livrete', altKeys: ['seguro'], label: 'Livrete do Veículo', icon: '📑' },
+      { key: 'foto_perfil', altKeys: ['selfie'], label: 'Foto de Perfil / Selfie', icon: '🤳' },
+      { key: 'foto_viatura', altKeys: ['foto_veiculo'], label: 'Foto da Viatura', icon: '🚗' }
+    ];
+
+    function openKycModal(driverIdOrName, plate, phone, car) {
+      const list = getDrivers();
+      let driver = null;
+      if (driverIdOrName) {
+        driver = list.find(d => d.id === driverIdOrName) || list.find(d => d.nome === driverIdOrName);
+      }
+      if (!driver && driverIdOrName) {
+        driver = {
+          id: driverIdOrName,
+          nome: driverIdOrName,
+          plate: plate || 'S/ MATRÍCULA',
+          phone: phone || '—',
+          car: car || 'Viatura',
+          documents: {}
+        };
+      } else if (!driver) {
+        driver = { id: 'drv_temp', nome: 'Motorista', plate: '—', phone: '—', car: '—', documents: {} };
+      }
+
+      currentKycDriverId = driver.id;
+      currentKycDriver = driver.nome || driver.id;
+
+      const modalTitle = document.getElementById('modal-driver-name');
+      const modalMeta = document.getElementById('modal-driver-meta');
+      if (modalTitle) modalTitle.textContent = `Homologação KYC — ${driver.nome || 'Motorista'}`;
+      if (modalMeta) modalMeta.textContent = `Matrícula: ${driver.plate || '—'} · Tel: ${driver.phone || '—'} · Viatura: ${driver.car || '—'}`;
+
+      const container = document.getElementById('kyc-doc-grid');
+      if (container) {
+        container.innerHTML = '';
+        const docs = driver.documents || {};
+        let presentCount = 0;
+
+        KYC_DOC_TYPES.forEach(item => {
+          let rawUrl = docs[item.key];
+          if (!rawUrl && item.altKeys) {
+            for (const ak of item.altKeys) {
+              if (docs[ak]) { rawUrl = docs[ak]; break; }
+            }
+          }
+          if (!rawUrl && (item.key === 'foto_perfil' || item.key === 'selfie') && driver.photo) {
+            rawUrl = driver.photo;
+          }
+
+          const safeUrl = sanitizeDocUrl(rawUrl);
+          const url = safeUrl || '';
+          const hasDoc = !!safeUrl;
+          if (hasDoc) presentCount++;
+
+          const card = document.createElement('div');
+          card.className = 'doc-card';
+          card.innerHTML = `
+            <div class="doc-card-img-wrap" ${hasDoc ? `data-doc-url="${escapeHtml(url)}" data-doc-title="${escapeHtml(item.label)}" onclick="openKycLightbox('${escapeHtml(url)}', '${escapeHtml(item.label)}')" title="Clique para ampliar"` : ''}>
+              ${hasDoc 
+                ? `<img src="${escapeHtml(url)}" alt="${escapeHtml(item.label)}" loading="lazy">` 
+                : `<div style="font-size:28px; opacity:0.35;">${item.icon}</div>`
+              }
+            </div>
+            <div class="doc-card-title">${escapeHtml(item.label)}</div>
+            <div class="doc-card-status ${hasDoc ? 'ok' : 'empty'}">
+              ${hasDoc ? '● Enviado (Cloud)' : '○ Não enviado'}
+            </div>
+            ${hasDoc 
+              ? `<a href="${escapeHtml(url)}" target="_blank" rel="noopener" class="doc-link-btn" onclick="event.stopPropagation()">Ver Original ↗</a>` 
+              : `<span style="font-size:10px; color:#666;">Pendente</span>`
+            }
+          `;
+          container.appendChild(card);
+        });
+
+        const summary = document.getElementById('kyc-audit-summary');
+        if (summary) {
+          summary.textContent = `${presentCount} de ${KYC_DOC_TYPES.length} documentos disponíveis`;
+          summary.style.color = presentCount >= 4 ? 'var(--green)' : 'var(--gold)';
+        }
+      }
+
       document.getElementById('kyc-modal').classList.add('open');
     }
-    function closeKycModal() { document.getElementById('kyc-modal').classList.remove('open'); }
-    function approveKyc() {
-      alert('✓ Homologação confirmada! ' + currentKycDriver + ' adicionado à frota oficial ativa.');
-      closeKycModal();
+
+    function closeKycModal() {
+      document.getElementById('kyc-modal').classList.remove('open');
+      currentKycDriverId = null;
     }
-    function rejectKyc() {
-      const r = prompt('Motivo do indeferimento:');
-      if (r) { alert('Candidato notificado.'); closeKycModal(); }
+
+    function openKycLightbox(imgUrl, title) {
+      const modal = document.getElementById('kyc-lightbox-modal');
+      const img = document.getElementById('kyc-lightbox-img');
+      const titleEl = document.getElementById('kyc-lightbox-title');
+      const link = document.getElementById('kyc-lightbox-link');
+      if (modal && img) {
+        isLightboxZoomed = false;
+        img.style.transform = 'scale(1)';
+        img.style.cursor = 'zoom-in';
+
+        const safe = sanitizeDocUrl(imgUrl) || '';
+        img.src = safe;
+        if (titleEl) titleEl.textContent = title || 'Visualização do Documento';
+        if (link) link.href = safe;
+        modal.style.display = 'flex';
+      }
+    }
+
+    function closeKycLightbox() {
+      const modal = document.getElementById('kyc-lightbox-modal');
+      const img = document.getElementById('kyc-lightbox-img');
+      isLightboxZoomed = false;
+      if (img) img.style.transform = 'scale(1)';
+      if (img) img.style.cursor = 'zoom-in';
+      if (modal) modal.style.display = 'none';
+    }
+
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape' || e.key === 'Esc' || e.keyCode === 27) {
+        const lb = document.getElementById('kyc-lightbox-modal');
+        if (lb && lb.style.display !== 'none') {
+          closeKycLightbox();
+        } else {
+          const km = document.getElementById('kyc-modal');
+          if (km && km.classList.contains('open')) {
+            closeKycModal();
+          }
+        }
+      }
+    });
+
+    async function approveKyc(driverId) {
+      const targetId = driverId || currentKycDriverId;
+      if (!targetId) return;
+      if (!verifyAdminAuthorized()) return;
+
+      const list = getDrivers();
+      const driver = list.find(d => d.id === targetId);
+      const driverName = driver ? driver.nome : targetId;
+
+      try {
+        await Promise.all([
+          fetch(`${FIREBASE_DB_URL}/cadastros/motoristas/${targetId}.json`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ status: 'approved', approvedAt: Date.now() })
+          }).catch(e => console.warn('Erro ao atualizar /cadastros:', e)),
+          fetch(`${FIREBASE_DB_URL}/drivers/${targetId}.json`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ status: 'ativo', blockStatus: 'no', kycApproved: true, approvedAt: Date.now() })
+          }).catch(e => console.warn('Erro ao atualizar /drivers:', e))
+        ]);
+
+        if (driver) {
+          driver.status = 'ativo';
+          saveDrivers(list);
+        }
+        closeKycModal();
+        alert(`✓ Motorista ${driverName} HOMOLOGADO com sucesso!\nConta ativada e pronta para receber corridas.`);
+      } catch (err) {
+        alert('Erro ao comunicar aprovação ao Firebase: ' + err.message);
+      }
+    }
+
+    async function rejectKyc(driverId) {
+      const targetId = driverId || currentKycDriverId;
+      if (!targetId) return;
+      if (!verifyAdminAuthorized()) return;
+
+      const motivo = (typeof prompt !== 'undefined') ? prompt('Motivo do indeferimento / rejeição dos documentos KYC:', 'Documento ilegível ou expirado. Por favor, reenvie.') : 'Documentos reprovados';
+      if (!motivo) return;
+
+      const list = getDrivers();
+      const driver = list.find(d => d.id === targetId);
+      const driverName = driver ? driver.nome : targetId;
+
+      try {
+        await Promise.all([
+          fetch(`${FIREBASE_DB_URL}/cadastros/motoristas/${targetId}.json`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ status: 'rejected', rejectReason: motivo, rejectedAt: Date.now() })
+          }).catch(e => console.warn('Erro ao rejeitar em /cadastros:', e)),
+          fetch(`${FIREBASE_DB_URL}/drivers/${targetId}.json`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ status: 'bloqueado', blockStatus: 'yes', rejectReason: motivo, rejectedAt: Date.now() })
+          }).catch(e => console.warn('Erro ao rejeitar em /drivers:', e))
+        ]);
+
+        if (driver) {
+          driver.status = 'bloqueado';
+          saveDrivers(list);
+        }
+        closeKycModal();
+        alert(`✕ Homologação de ${driverName} rejeitada.\nMotivo registrado no sistema.`);
+      } catch (err) {
+        alert('Erro ao comunicar rejeição ao Firebase: ' + err.message);
+      }
     }
 
     function processBatchPayout() {
@@ -1737,7 +2130,183 @@
       }
     }
 
-    // ── DRIVER MANAGEMENT ──
+    // ── DRIVER MANAGEMENT & FIREBASE CLOUD SYNC ──
+    const FIREBASE_DB_URL = 'https://giro-4ed50-default-rtdb.europe-west1.firebasedatabase.app';
+
+    async function syncCloudData() {
+      // 1. Sincronizar Motoristas da Nuvem (Firebase Realtime DB)
+      try {
+        // Sincronizar Drivers e Cadastros Pendentes
+        try {
+          const cadRes = await fetch(`${FIREBASE_DB_URL}/cadastros/motoristas.json`);
+          if (cadRes.ok) {
+            const cadData = await cadRes.json();
+            if (cadData && typeof cadData === 'object') {
+              let localList = getDrivers();
+              const map = new Map(localList.map(d => [d.id, d]));
+              Object.keys(cadData).forEach(k => {
+                const fb = cadData[k];
+                if (!fb) return;
+                const id = fb.id || k;
+                const vInfo = fb.vehicleInfo || {};
+                const existing = map.get(id) || {};
+                const fbDriver = {
+                  id: id,
+                  nome: fb.nome || ((fb.firstName || '') + ' ' + (fb.secondName || '')).trim() || ('Motorista ' + id.slice(-4)),
+                  phone: fb.phoneNumber || fb.phone || 'Sem Telefone',
+                  email: fb.email || '',
+                  cat: fb.cat || vInfo.type || 'Carro',
+                  plate: fb.plate || vInfo.registrationPlateNumber || 'S/ MATRÍCULA',
+                  car: fb.car || `${vInfo.brand || ''} ${vInfo.model || ''} ${vInfo.productionYear ? '('+vInfo.productionYear+')' : ''}`.trim() || 'Viatura Padrão',
+                  status: fb.status || 'pendente',
+                  date: fb.date || (fb.createdAt ? new Date(fb.createdAt).toLocaleDateString('pt-AO') : 'Nuvem Realtime'),
+                  documents: fb.documents || existing.documents || {},
+                  photo: fb.photo || (fb.documents && (fb.documents.foto_perfil || fb.documents.selfie)) || existing.photo || ''
+                };
+                map.set(id, { ...existing, ...fbDriver });
+              });
+              localStorage.setItem(STORAGE_DRIVERS, JSON.stringify(Array.from(map.values())));
+              renderDriversTable();
+            }
+          }
+        } catch(e) {}
+        const res = await fetch(`${FIREBASE_DB_URL}/drivers.json`);
+        if (res.ok) {
+          const data = await res.json();
+          if (data && typeof data === 'object') {
+            let localList = getDrivers();
+            const map = new Map(localList.map(d => [d.id, d]));
+            Object.keys(data).forEach(k => {
+              const fb = data[k];
+              if (!fb) return;
+              const id = fb.id || k;
+              const vInfo = fb.vehicleInfo || {};
+              const existing = map.get(id) || {};
+              const fbDriver = {
+                id: id,
+                nome: fb.nome || ((fb.firstName || '') + ' ' + (fb.secondName || '')).trim() || ('Motorista ' + id.slice(-4)),
+                phone: fb.phoneNumber || fb.phone || 'Sem Telefone',
+                email: fb.email || '',
+                cat: fb.cat || vInfo.type || 'Carro',
+                plate: fb.plate || vInfo.registrationPlateNumber || 'S/ MATRÍCULA',
+                car: fb.car || `${vInfo.brand || ''} ${vInfo.model || ''} ${vInfo.productionYear ? '('+vInfo.productionYear+')' : ''}`.trim() || 'Viatura Padrão',
+                status: fb.status || (fb.blockStatus === 'yes' ? 'bloqueado' : (fb.newTripStatus === 'waiting' || fb.isOnline ? 'ativo' : 'pendente')),
+                date: fb.date || (fb.createdAt ? new Date(fb.createdAt).toLocaleDateString('pt-AO') : 'Nuvem Realtime'),
+                documents: fb.documents || existing.documents || {},
+                photo: fb.photo || (fb.documents && (fb.documents.foto_perfil || fb.documents.selfie)) || existing.photo || ''
+              };
+              map.set(id, { ...existing, ...fbDriver });
+            });
+            const merged = Array.from(map.values());
+            localStorage.setItem(STORAGE_DRIVERS, JSON.stringify(merged));
+            renderDriversTable();
+          }
+        }
+      } catch (err) {
+        console.warn('Sync drivers cloud err:', err);
+      }
+
+      // 2. Sincronizar Passageiros da Nuvem (Firebase Realtime DB)
+      try {
+        // Sincronizar Novos Cadastros de Passageiros
+        try {
+          const cadPaxRes = await fetch(`${FIREBASE_DB_URL}/cadastros/passageiros.json`);
+          if (cadPaxRes.ok) {
+            const paxData = await cadPaxRes.json();
+            if (paxData && typeof paxData === 'object') {
+              let localList = getPassengers();
+              const map = new Map(localList.map(p => [p.id, p]));
+              Object.keys(paxData).forEach(k => {
+                const fb = paxData[k];
+                if (!fb) return;
+                const id = fb.id || k;
+                const fbPax = {
+                  id: id,
+                  nome: fb.nome || fb.name || ('Passageiro ' + id.slice(-4)),
+                  phone: fb.phoneNumber || fb.phone || 'Sem Telefone',
+                  date: fb.date || (fb.createdAt ? new Date(fb.createdAt).toLocaleDateString('pt-AO') : 'Nuvem Realtime'),
+                  rides: fb.rides || 0,
+                  totalKz: fb.totalKz || '0 Kz',
+                  status: fb.status || 'ativo'
+                };
+                map.set(id, { ...(map.get(id) || {}), ...fbPax });
+              });
+              localStorage.setItem(STORAGE_PASSENGERS, JSON.stringify(Array.from(map.values())));
+              renderPassengersTable();
+            }
+          }
+        } catch(e) {}
+        const res = await fetch(`${FIREBASE_DB_URL}/users.json`);
+        if (res.ok) {
+          const data = await res.json();
+          if (data && typeof data === 'object') {
+            let localList = getPassengers();
+            const map = new Map(localList.map(p => [p.id, p]));
+            Object.keys(data).forEach(k => {
+              const fb = data[k];
+              if (!fb) return;
+              const id = fb.id || k;
+              const fbPax = {
+                id: id,
+                nome: fb.nome || fb.name || ('Passageiro ' + id.slice(-4)),
+                phone: fb.phoneNumber || fb.phone || 'Sem Telefone',
+                date: fb.date || (fb.createdAt ? new Date(fb.createdAt).toLocaleDateString('pt-AO') : 'Nuvem Realtime'),
+                rides: fb.rides || 0,
+                totalKz: fb.totalKz || '0 Kz',
+                status: fb.status || 'ativo'
+              };
+              map.set(id, { ...(map.get(id) || {}), ...fbPax });
+            });
+            const merged = Array.from(map.values());
+            localStorage.setItem(STORAGE_PASSENGERS, JSON.stringify(merged));
+            renderPassengersTable();
+          }
+        }
+      } catch (err) {
+        console.warn('Sync passengers cloud err:', err);
+      }
+
+      // 3. Sincronizar Corridas e Métricas Financeiras Reais da Nuvem (/rides.json)
+      try {
+        const ridesRes = await fetch(`${FIREBASE_DB_URL}/rides.json`);
+        if (ridesRes.ok) {
+          const ridesData = await ridesRes.json();
+          if (ridesData && typeof ridesData === 'object') {
+            const rideKeys = Object.keys(ridesData);
+            let totalCompleted = 0;
+            let totalActive = 0;
+            let totalVolumeKz = 0;
+            let totalCommissionKz = 0;
+
+            rideKeys.forEach(k => {
+              const r = ridesData[k];
+              if (!r) return;
+              const status = r.status;
+              const gross = (r.service && r.service.priceKz) || r.priceKz || 0;
+              if (status === 'COMPLETED') {
+                totalCompleted++;
+                totalVolumeKz += gross;
+                totalCommissionKz += Math.round(gross * 0.1);
+              } else if (status === 'SEARCHING' || status === 'ACCEPTED' || status === 'ARRIVED' || status === 'IN_PROGRESS') {
+                totalActive++;
+              }
+            });
+
+            const elActive = document.getElementById('kpi-active-rides');
+            if (elActive) elActive.textContent = totalActive;
+            const elComp = document.getElementById('kpi-completed-rides');
+            if (elComp) elComp.textContent = totalCompleted;
+            const elVol = document.getElementById('kpi-total-volume');
+            if (elVol && totalVolumeKz > 0) elVol.textContent = totalVolumeKz.toLocaleString('pt-AO') + ' Kz';
+            const elComm = document.getElementById('kpi-platform-commission');
+            if (elComm && totalCommissionKz > 0) elComm.textContent = totalCommissionKz.toLocaleString('pt-AO') + ' Kz';
+          }
+        }
+      } catch (err) {
+        console.warn('Sync rides cloud err:', err);
+      }
+    }
+
     function getDrivers() {
       try { return JSON.parse(localStorage.getItem(STORAGE_DRIVERS) || '[]'); } catch(e) { return []; }
     }
@@ -1755,9 +2324,9 @@
 
       const q = (document.getElementById('filter-driver-input')?.value || '').toLowerCase().trim();
       const filtered = list.filter(d => 
-        d.nome.toLowerCase().includes(q) || 
-        d.plate.toLowerCase().includes(q) || 
-        d.phone.includes(q) ||
+        (d.nome && d.nome.toLowerCase().includes(q)) || 
+        (d.plate && d.plate.toLowerCase().includes(q)) || 
+        (d.phone && d.phone.includes(q)) ||
         (d.car && d.car.toLowerCase().includes(q))
       );
 
@@ -1769,11 +2338,11 @@
       tbody.innerHTML = filtered.map(d => {
         const statusBadge = d.status === 'ativo' ? '<span class="badge green">● Ativo</span>' :
                             (d.status === 'pendente' ? '<span class="badge gold">⏳ Pendente KYC</span>' : '<span class="badge red">🔴 Bloqueado</span>');
-        const safeNome = escapeHtml(d.nome);
-        const safePhone = escapeHtml(d.phone);
-        const safeCat = escapeHtml(d.cat);
-        const safeCar = escapeHtml(d.car);
-        const safePlate = escapeHtml(d.plate);
+        const safeNome = escapeHtml(d.nome || 'Sem Nome');
+        const safePhone = escapeHtml(d.phone || 'Sem Telefone');
+        const safeCat = escapeHtml(d.cat || 'Carro');
+        const safeCar = escapeHtml(d.car || 'Viatura');
+        const safePlate = escapeHtml(d.plate || 'S/ MATRÍCULA');
         return `
           <tr>
             <td><b>${safeNome}</b><br><small style="color:var(--muted);">${escapeHtml(d.date) || 'Cadastrado'}</small></td>
@@ -1782,8 +2351,8 @@
             <td><span style="font-family:monospace;background:#1a221b;padding:3px 7px;border-radius:4px;color:var(--gold);font-weight:700;">${safePlate}</span></td>
             <td>${statusBadge}</td>
             <td>
-              <button class="btn-toggle-status" onclick="toggleDriverStatus('${d.id}')" title="Alterar Estado">${d.status === 'ativo' ? 'Bloquear' : 'Ativar'}</button>
-              <button class="btn-action gold" style="padding:6px 10px;font-size:11px;margin-right:4px;" onclick="openKycModal('${safeNome}', '${safePlate}', '${safePhone}', '${safeCar}')">Validar KYC</button>
+              <button class="btn-toggle-status" onclick="toggleDriverStatus('${d.id}')" title="Alterar Estado">${d.status === 'pendente' ? '✓ Aprovar' : (d.status === 'ativo' ? 'Bloquear' : 'Ativar')}</button>
+              <button class="btn-action gold" style="padding:6px 10px;font-size:11px;margin-right:4px;" onclick="openKycModal('${d.id}')">Validar KYC</button>
               <button class="btn-delete" onclick="deleteDriver('${d.id}', '${safeNome}')" title="Excluir Motorista Definitivamente">🗑️ Excluir</button>
             </td>
           </tr>
@@ -1806,13 +2375,21 @@
       const status = document.getElementById('drv-status').value;
 
       const list = getDrivers();
+      const driverId = 'drv-' + Date.now();
       const newD = {
-        id: 'drv-' + Date.now(),
+        id: driverId,
         nome, phone, email, cat, plate, car, status,
         date: 'Registado via Painel Admin'
       };
       list.unshift(newD);
       saveDrivers(list);
+      // Sincronizar criação para a nuvem Firebase
+      fetch(`${FIREBASE_DB_URL}/drivers/${driverId}.json`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(newD)
+      }).catch(e => console.warn(e));
+
       closeAddDriverModal();
       alert('✓ Motorista ' + nome + ' cadastrado com sucesso!');
     }
@@ -1824,6 +2401,15 @@
       if (item) {
         item.status = item.status === 'ativo' ? 'bloqueado' : 'ativo';
         saveDrivers(list);
+        // Sincronizar alteração de status para o Firebase
+        fetch(`${FIREBASE_DB_URL}/drivers/${id}.json`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            status: item.status,
+            blockStatus: item.status === 'bloqueado' ? 'yes' : 'no'
+          })
+        }).catch(e => console.warn(e));
       }
     }
 
@@ -1833,6 +2419,8 @@
         let list = getDrivers();
         list = list.filter(d => d.id !== id);
         saveDrivers(list);
+        // Remover do Firebase
+        fetch(`${FIREBASE_DB_URL}/drivers/${id}.json`, { method: 'DELETE' }).catch(e => console.warn(e));
       }
     }
 
@@ -2030,7 +2618,7 @@
     function copyOperatorWhatsApp(nome, username, password, phone) {
       const msg = `Olá ${nome}, aqui estão os teus acessos à Central de Rastreamento GIRO Angola 24h:
 
-🔗 Link de Acesso: https://isaac-carvalho.github.io/giro/central-login.html
+🔗 Link de Acesso: https://isaac-carvalho.github.io/giro/central.html
 👤 Utilizador: ${username}
 🔑 Senha: ${password}
 
@@ -2052,6 +2640,10 @@
       renderVigiaFailuresTable();
       renderVigiaSuccessTable();
       refreshVigiaLiveMetrics();
+
+      // Sincronização em tempo real com o banco de dados Firebase
+      syncCloudData();
+      setInterval(syncCloudData, 4000);
     });
 
 
@@ -2185,6 +2777,739 @@
       refreshVigiaLiveMetrics();
       }
     }
+
+    /* ==========================================================================
+       GESTÃO DE TARIFAS & PREÇOS DINÂMICOS (/config/pricing)
+       ========================================================================== */
+    let adminPricingCache = null;
+
+    const DEFAULT_PRICING_SEED = {
+      global: {
+        defaultCommission: 0.10,
+        defaultBaseFare: 50,
+        defaultPerKm: 243,
+        defaultPerMin: 1,
+        defaultMinimum: 900,
+        currency: 'Kz',
+        country: 'Angola'
+      },
+      categories: {
+        moto: { id: 'moto', name: 'GIRO Moto (Kupapata)', mode: 'pax', capacity: '1 lug', description: '1 lugar · rápido no trânsito · tarifa económica', baseFare: 25, perKm: 115, perMin: 1, minimum: 765, mult: 0.47, commission: 0.10, longDistancePerKm: 110, active: true },
+        eco: { id: 'eco', name: 'GIRO Económico', mode: 'pax', capacity: '4 lug', description: '4 lugares · ar condicionado · o mais pedido', baseFare: 50, perKm: 243, perMin: 1, minimum: 900, mult: 1.0, commission: 0.10, longDistancePerKm: 190, active: true },
+        conf: { id: 'conf', name: 'GIRO Conforto', mode: 'pax', capacity: '4 lug', description: 'Viatura recente · espaço extra · climatizado', baseFare: 60, perKm: 277, perMin: 2, minimum: 1000, mult: 1.14, commission: 0.10, longDistancePerKm: 225, active: true },
+        sete: { id: 'sete', name: 'GIRO 7 (Familiar)', mode: 'pax', capacity: '7 lug', description: '7 lugares · família ou malas para o aeroporto', baseFare: 70, perKm: 340, perMin: 2, minimum: 1300, mult: 1.40, commission: 0.10, longDistancePerKm: 275, active: true },
+        deliv_moto: { id: 'deliv_moto', name: 'GIRO Flash Moto', mode: 'delivery', capacity: '10 kg', description: 'Até 10 kg · encomendas, refeições e documentos', baseFare: 25, perKm: 117, perMin: 1, minimum: 765, mult: 0.48, commission: 0.10, longDistancePerKm: 110, active: true },
+        deliv_car: { id: 'deliv_car', name: 'GIRO Express Carro', mode: 'delivery', capacity: '60 kg', description: 'Até 60 kg · caixas médias, compras de mercado', baseFare: 55, perKm: 255, perMin: 1, minimum: 950, mult: 1.05, commission: 0.10, longDistancePerKm: 190, active: true },
+        deliv_van: { id: 'deliv_van', name: 'GIRO Van Encomendas', mode: 'delivery', capacity: '300 kg', description: 'Até 300 kg · volumes comerciais e mercadorias', baseFare: 70, perKm: 328, perMin: 2, minimum: 1200, mult: 1.35, commission: 0.10, longDistancePerKm: 210, active: true },
+        cargo_pickup: { id: 'cargo_pickup', name: 'GIRO Pick-Up / Caixa Aberta', mode: 'cargo', capacity: '1 Ton', description: 'Até 1 Tonelada · mobília, materiais e compras', baseFare: 270, perKm: 1312, perMin: 5, minimum: 7500, mult: 5.4, commission: 0.10, longDistancePerKm: 320, active: true },
+        cargo_canter: { id: 'cargo_canter', name: 'GIRO Camião Canter (3.5T)', mode: 'cargo', capacity: '3.5 Ton', description: 'Até 3.5 Toneladas · obras, comércio e mercadorias', baseFare: 700, perKm: 3402, perMin: 14, minimum: 22500, mult: 14.0, commission: 0.10, longDistancePerKm: 750, active: true },
+        cargo_heavy: { id: 'cargo_heavy', name: 'GIRO Camião Pesado (Mudanças)', mode: 'cargo', capacity: '10 Ton', description: 'Até 10 Toneladas · mudanças residenciais e industriais', baseFare: 1800, perKm: 8748, perMin: 36, minimum: 70000, mult: 36.0, commission: 0.10, longDistancePerKm: 1600, active: true }
+      }
+    };
+
+    async function loadAdminPricing(forceAlert = false) {
+      try {
+        const res = await fetch(`${FIREBASE_DB_URL}/config/pricing.json`);
+        if (res.ok) {
+          const data = await res.json();
+          if (data && (data.categories || data.tiers)) {
+            adminPricingCache = data;
+            renderAdminPricingTable(data);
+            updatePricingKpis(data);
+            if (forceAlert) alert('✓ Tarifas recarregadas do Firebase RTDB com sucesso!');
+            return;
+          }
+        }
+      } catch(e) {
+        console.warn('Erro ao carregar tarifas do Firebase:', e);
+      }
+      if (!adminPricingCache) {
+        adminPricingCache = DEFAULT_PRICING_SEED;
+        renderAdminPricingTable(adminPricingCache);
+        updatePricingKpis(adminPricingCache);
+      }
+    }
+
+    function updatePricingKpis(data) {
+      const cats = data.categories || data.tiers || {};
+      const eco = cats['eco'] || {};
+      const commEl = document.getElementById('kpi-pricing-comm');
+      const baseEl = document.getElementById('kpi-pricing-base');
+      const kmEl = document.getElementById('kpi-pricing-km');
+      const updEl = document.getElementById('kpi-pricing-updated');
+
+      const comm = eco.commission !== undefined ? eco.commission : (eco.comissao !== undefined ? eco.comissao : (data.global?.defaultCommission || 0.10));
+      if (commEl) commEl.textContent = (comm * 100).toFixed(1) + '%';
+      if (baseEl) baseEl.textContent = (eco.baseFare !== undefined ? eco.baseFare : (eco.base || 50)) + ' Kz';
+      if (kmEl) kmEl.textContent = (eco.perKm !== undefined ? eco.perKm : (eco.km || 243)) + ' Kz';
+      if (updEl && data.updatedAt) {
+        const d = new Date(data.updatedAt);
+        updEl.textContent = 'Atualizado: ' + d.toLocaleDateString('pt-AO') + ' ' + d.toLocaleTimeString('pt-AO');
+      }
+    }
+
+    function renderAdminPricingTable(pricingDoc) {
+      const tbody = document.getElementById('pricing-tbody');
+      if (!tbody) return;
+
+      const cats = pricingDoc.categories || pricingDoc.tiers || {};
+      const mergedCats = { ...DEFAULT_PRICING_SEED.categories, ...cats };
+      const order = ['moto', 'eco', 'conf', 'sete', 'deliv_moto', 'deliv_car', 'deliv_van', 'cargo_pickup', 'cargo_canter', 'cargo_heavy'];
+
+      tbody.innerHTML = order.map(catId => {
+        const c = mergedCats[catId] || { id: catId, name: catId };
+        const numOr = (val, fallback) => {
+          const n = parseFloat(val);
+          return (isFinite(n) && !isNaN(n)) ? n : fallback;
+        };
+        const base = numOr(c.baseFare !== undefined ? c.baseFare : c.base, 0);
+        const km = numOr(c.perKm !== undefined ? c.perKm : c.km, 0);
+        const min = numOr(c.perMin !== undefined ? c.perMin : c.min, 0);
+        const minimo = numOr(c.minimum !== undefined ? c.minimum : c.minimo, 0);
+        const rawComm = numOr(c.commission !== undefined ? c.commission : c.comissao, 0.10);
+        const commPct = Math.round(rawComm * 100);
+        const ldist = numOr(c.longDistancePerKm, 0);
+        const mode = c.mode || (catId.startsWith('cargo') ? 'cargo' : catId.startsWith('deliv') ? 'delivery' : 'pax');
+        const badgeColor = mode === 'pax' ? 'gold' : mode === 'delivery' ? 'green' : 'blue';
+        const modeLabel = mode === 'pax' ? 'Passageiro' : mode === 'delivery' ? 'Entrega' : 'Carga';
+
+        return `
+          <tr data-cat-id="${escapeHtml(catId)}">
+            <td>
+              <b style="color:#fff;display:block;">${escapeHtml(c.name || catId)}</b>
+              <span style="font-size:11px;color:var(--muted);">${escapeHtml(c.capacity || '')} · ${escapeHtml(c.description || '')}</span>
+            </td>
+            <td>
+              <span class="badge ${badgeColor}">${modeLabel}</span>
+            </td>
+            <td>
+              <input type="number" class="search-input input-pricing" style="width:90px;" data-field="baseFare" value="${base}" min="10" step="5">
+            </td>
+            <td>
+              <input type="number" class="search-input input-pricing" style="width:100px;" data-field="perKm" value="${km}" min="0" step="1">
+            </td>
+            <td>
+              <input type="number" class="search-input input-pricing" style="width:80px;" data-field="perMin" value="${min}" min="0" step="0.5">
+            </td>
+            <td>
+              <input type="number" class="search-input input-pricing" style="width:110px;" data-field="minimum" value="${minimo}" min="100" step="50">
+            </td>
+            <td>
+              <input type="number" class="search-input input-pricing" style="width:100px;" data-field="longDistancePerKm" value="${ldist}" min="0" step="5">
+            </td>
+            <td>
+              <input type="number" class="search-input input-pricing" style="width:80px;" data-field="commission" value="${commPct}" min="1" max="50" step="1">
+            </td>
+            <td>
+              <button class="btn-action outline" onclick="saveSingleCategoryPricing('${escapeHtml(catId)}')" title="Gravar alterações desta categoria no Firebase">💾 Salvar</button>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    async function saveAdminPricing() {
+      if (!verifyAdminAuthorized()) return;
+
+      const rows = document.querySelectorAll('#pricing-tbody tr');
+      const updatedCategories = { ...(adminPricingCache?.categories || DEFAULT_PRICING_SEED.categories) };
+
+      rows.forEach(tr => {
+        const catId = tr.dataset.catId;
+        if (!updatedCategories[catId]) {
+          updatedCategories[catId] = { ...(DEFAULT_PRICING_SEED.categories[catId] || { id: catId }) };
+        }
+
+        tr.querySelectorAll('.input-pricing').forEach(inp => {
+          const field = inp.dataset.field;
+          const raw = (inp.value || '').toString().trim().replace(',', '.');
+          let val = parseFloat(raw);
+          if (!isFinite(val) || isNaN(val)) {
+            const seed = DEFAULT_PRICING_SEED.categories[catId] || {};
+            val = (field === 'commission') ? (seed.commission !== undefined ? seed.commission * 100 : 10) :
+                  (field === 'baseFare') ? (seed.baseFare || 50) :
+                  (field === 'minimum') ? (seed.minimum || 900) :
+                  (seed[field] || 0);
+          }
+          if (val < 0) val = Math.max(0, val);
+          if (field === 'baseFare') val = Math.max(10, val);
+          if (field === 'minimum') val = Math.max(100, val);
+          if (field === 'commission') {
+            val = Math.min(50, Math.max(1, val)) / 100;
+            updatedCategories[catId]['commission'] = val;
+            updatedCategories[catId]['comissao'] = val;
+          } else {
+            updatedCategories[catId][field] = val;
+            if (field === 'baseFare') updatedCategories[catId]['base'] = val;
+            if (field === 'perKm') updatedCategories[catId]['km'] = val;
+            if (field === 'perMin') updatedCategories[catId]['min'] = val;
+            if (field === 'minimum') updatedCategories[catId]['minimo'] = val;
+          }
+        });
+      });
+
+      const eco = updatedCategories['eco'] || {};
+      const payload = {
+        updatedAt: Date.now(),
+        updatedBy: 'Isaac Carvalho (Admin Master)',
+        version: (adminPricingCache?.version || 1) + 1,
+        global: {
+          defaultCommission: eco.commission || 0.10,
+          defaultBaseFare: eco.baseFare || 50,
+          defaultPerKm: eco.perKm || 243,
+          defaultPerMin: eco.perMin || 1,
+          defaultMinimum: eco.minimum || 900,
+          currency: 'Kz',
+          country: 'Angola'
+        },
+        provinces: adminPricingCache?.provinces || {
+          luanda: { name: 'Luanda', multiplier: 1.0 },
+          benguela: { name: 'Benguela', multiplier: 0.90 },
+          lobito: { name: 'Lobito', multiplier: 0.90 },
+          huambo: { name: 'Huambo', multiplier: 0.85 },
+          lubango: { name: 'Lubango', multiplier: 0.85 }
+        },
+        categories: updatedCategories
+      };
+
+      try {
+        const res = await fetch(`${FIREBASE_DB_URL}/config/pricing.json`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+
+        if (res.ok) {
+          adminPricingCache = payload;
+          updatePricingKpis(payload);
+          alert('✓ Tarifas oficiais gravadas no Firebase RTDB com sucesso!\nTodos os passageiros e motoristas atualizarão as tarifas em tempo real.');
+        } else {
+          alert('Erro ao gravar no Firebase: ' + res.status + ' ' + res.statusText);
+        }
+      } catch(err) {
+        alert('Erro de conexão ao Firebase RTDB: ' + err.message);
+      }
+    }
+
+    async function saveSingleCategoryPricing(catId) {
+      if (!verifyAdminAuthorized()) return;
+      const tr = document.querySelector(`#pricing-tbody tr[data-cat-id="${catId}"]`);
+      if (!tr) return;
+
+      const updates = {};
+      tr.querySelectorAll('.input-pricing').forEach(inp => {
+        const field = inp.dataset.field;
+        const raw = (inp.value || '').toString().trim().replace(',', '.');
+        let val = parseFloat(raw);
+        if (!isFinite(val) || isNaN(val)) {
+          const seed = DEFAULT_PRICING_SEED.categories[catId] || {};
+          val = (field === 'commission') ? (seed.commission !== undefined ? seed.commission * 100 : 10) :
+                (field === 'baseFare') ? (seed.baseFare || 50) :
+                (field === 'minimum') ? (seed.minimum || 900) :
+                (seed[field] || 0);
+        }
+        if (val < 0) val = Math.max(0, val);
+        if (field === 'baseFare') val = Math.max(10, val);
+        if (field === 'minimum') val = Math.max(100, val);
+        if (field === 'commission') {
+          val = Math.min(50, Math.max(1, val)) / 100;
+          updates['commission'] = val;
+          updates['comissao'] = val;
+        } else {
+          updates[field] = val;
+          if (field === 'baseFare') updates['base'] = val;
+          if (field === 'perKm') updates['km'] = val;
+          if (field === 'perMin') updates['min'] = val;
+          if (field === 'minimum') updates['minimo'] = val;
+        }
+      });
+      updates['updatedAt'] = Date.now();
+
+      // Sincronizar defaults globais quando a categoria de referência (eco) for salva
+      if (catId === 'eco') {
+        const globalSync = {
+          defaultCommission: updates['commission'] !== undefined ? updates['commission'] : 0.10,
+          defaultBaseFare: updates['baseFare'] !== undefined ? updates['baseFare'] : 50,
+          defaultPerKm: updates['perKm'] !== undefined ? updates['perKm'] : 243,
+          defaultPerMin: updates['perMin'] !== undefined ? updates['perMin'] : 1,
+          defaultMinimum: updates['minimum'] !== undefined ? updates['minimum'] : 900
+        };
+        try {
+          await fetch(`${FIREBASE_DB_URL}/config/pricing/global.json`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(globalSync)
+          });
+          if (adminPricingCache && adminPricingCache.global) {
+            Object.assign(adminPricingCache.global, globalSync);
+          }
+        } catch(gErr) {
+          console.warn('Aviso: Falha ao sincronizar defaults globais:', gErr);
+        }
+      }
+
+      try {
+        const res = await fetch(`${FIREBASE_DB_URL}/config/pricing/categories/${catId}.json`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(updates)
+        });
+
+        if (res.ok) {
+          if (adminPricingCache && adminPricingCache.categories && adminPricingCache.categories[catId]) {
+            Object.assign(adminPricingCache.categories[catId], updates);
+            updatePricingKpis(adminPricingCache);
+          }
+          alert(`✓ Categoria ${catId} atualizada com sucesso no Firebase RTDB!`);
+        } else {
+          alert('Erro ao atualizar categoria: ' + res.statusText);
+        }
+      } catch(err) {
+        alert('Erro de rede: ' + err.message);
+      }
+    }
+
+    // Carregar tarifas na inicialização do Admin
+    loadAdminPricing();
+
+    // ═════════════════════════════════════════════════════════════════
+    // TELEMETRIA, DIAGNÓSTICOS & SAÚDE DO SISTEMA (/telemetry)
+    // ═════════════════════════════════════════════════════════════════
+    let allTelemetryRecords = [];
+    let currentTelemetryFilter = 'TODOS';
+    let telemetryAutoRefreshTimer = null;
+    let isTelemetryRefreshing = false;
+
+    function normalizeTelemetryItem(key, raw, typeHint = 'EVENT') {
+      if (!raw || typeof raw !== 'object') {
+        return {
+          id: key,
+          ts: Date.now(),
+          level: 'INFO',
+          context: 'general',
+          type: typeHint,
+          message: String(raw || ''),
+          source: 'Ecossistema',
+          details: '',
+          userAgent: 'N/A'
+        };
+      }
+
+      const ts = raw.ts || raw.timestamp || (typeof key === 'number' || /^\d+$/.test(key) ? parseInt(key, 10) : Date.now());
+      const type = raw.type || typeHint;
+      
+      let level = (raw.severity || raw.level || (raw.context && raw.context.severity) || (type === 'ERROR' ? 'ERROR' : 'INFO')).toUpperCase();
+      if (level.includes('ERR') || level === 'CRITICAL' || level === 'FATAL') {
+        level = 'ERROR';
+      } else if (level.includes('WARN') || level === 'ALERTA' || raw.evento === 'DORMIU_OU_AUSENTE_NO_TURNO') {
+        level = 'WARN';
+      } else {
+        level = 'INFO';
+      }
+
+      const message = raw.message || raw.eventType || raw.event || raw.evento || (type === 'ERROR' ? 'Erro não especificado' : 'Evento registrado');
+      
+      let contextStr = 'geral';
+      if (typeof raw.context === 'string') {
+        contextStr = raw.context;
+      } else if (raw.context && typeof raw.context === 'object') {
+        contextStr = raw.context.operation || raw.context.context || raw.context.url || raw.context.app || 'operacional';
+      } else if (raw.eventType) {
+        contextStr = raw.eventType;
+      } else if (raw.event || raw.evento) {
+        contextStr = raw.event || raw.evento;
+      }
+
+      const source = raw.app || (raw.context && (raw.context.url || raw.context.app)) || (raw.operador ? `Operador (${raw.operador})` : 'Web Client');
+
+      let details = '';
+      if (raw.stack && raw.stack !== 'N/A') {
+        details = String(raw.stack);
+      } else if (raw.meta && Object.keys(raw.meta).length > 0) {
+        try { details = JSON.stringify(raw.meta); } catch(e) { details = String(raw.meta); }
+      } else if (raw.context && Object.keys(raw.context).length > 0) {
+        try { details = JSON.stringify(raw.context); } catch(e) { details = String(raw.context); }
+      } else {
+        const copy = Object.assign({}, raw);
+        delete copy.ts; delete copy.timestamp; delete copy.message; delete copy.eventType;
+        delete copy.event; delete copy.evento; delete copy.severity; delete copy.level;
+        delete copy.app; delete copy.userAgent;
+        if (Object.keys(copy).length > 0) {
+          try { details = JSON.stringify(copy); } catch(e) { details = String(copy); }
+        }
+      }
+
+      const userAgent = raw.userAgent || (raw.context && raw.context.userAgent) || 'N/A';
+
+      return { id: key, ts, level, context: contextStr, type, message, source, details, userAgent };
+    }
+
+    function formatTelemetryTimestamp(ts) {
+      if (!ts) return '-';
+      try {
+        const d = new Date(ts);
+        if (isNaN(d.getTime())) return String(ts);
+        return new Intl.DateTimeFormat('pt-AO', {
+          timeZone: 'Africa/Luanda',
+          day: '2-digit',
+          month: '2-digit',
+          year: 'numeric',
+          hour: '2-digit',
+          minute: '2-digit',
+          second: '2-digit',
+          hour12: false
+        }).format(d);
+      } catch (e) {
+        const d = new Date(ts);
+        const pad = n => String(n).padStart(2, '0');
+        return `${pad(d.getDate())}/${pad(d.getMonth() + 1)} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+      }
+    }
+
+    async function pingFirebaseRtdb() {
+      const pingEl = document.getElementById('kpi-telemetry-rtdb-ping');
+      const statusEl = document.getElementById('kpi-telemetry-rtdb-status');
+      const cardEl = document.getElementById('card-kpi-rtdb');
+      const badgeNav = document.getElementById('badge-telemetry-health');
+
+      let latency = 0;
+      let ok = false;
+
+      if (typeof GiroTelemetry !== 'undefined' && typeof GiroTelemetry.measureLatency === 'function') {
+        const probe = await GiroTelemetry.measureLatency('/config/pricing.json?shallow=true');
+        latency = probe.latencyMs || 0;
+        ok = probe.ok;
+      } else {
+        const t0 = (typeof performance !== 'undefined' && performance.now) ? performance.now() : Date.now();
+        try {
+          const res = await fetch(`${FIREBASE_DB_URL}/config/pricing.json?shallow=true`, { cache: 'no-store' });
+          const t1 = (typeof performance !== 'undefined' && performance.now) ? performance.now() : Date.now();
+          latency = Math.round(t1 - t0);
+          ok = res.ok;
+        } catch (e) {
+          ok = false;
+        }
+      }
+
+      if (ok) {
+        if (pingEl) pingEl.textContent = `${latency} ms`;
+        if (statusEl) {
+          if (latency < 300) {
+            statusEl.textContent = 'Excelente resposta (< 300ms)';
+            if (cardEl) cardEl.className = 'kpi-card green';
+          } else if (latency < 800) {
+            statusEl.textContent = 'Latência aceitável (< 800ms)';
+            if (cardEl) cardEl.className = 'kpi-card gold';
+          } else {
+            statusEl.textContent = 'Latência elevada (> 800ms)';
+            if (cardEl) cardEl.className = 'kpi-card red';
+          }
+        }
+        if (badgeNav) {
+          badgeNav.textContent = `${latency}ms`;
+          badgeNav.style.color = latency < 800 ? 'var(--green)' : 'var(--gold)';
+          badgeNav.style.background = latency < 800 ? 'rgba(16,185,129,0.2)' : 'rgba(212,175,55,0.2)';
+        }
+        return { ok: true, latency };
+      } else {
+        if (pingEl) pingEl.textContent = 'Offline';
+        if (statusEl) statusEl.textContent = 'Falha de conexão / timeout';
+        if (cardEl) cardEl.className = 'kpi-card red';
+        if (badgeNav) {
+          badgeNav.textContent = 'OFFLINE';
+          badgeNav.style.color = 'var(--red)';
+          badgeNav.style.background = 'rgba(239,68,68,0.2)';
+        }
+        return { ok: false, error: 'Ping failed' };
+      }
+    }
+
+    async function pingFirebaseStorage() {
+      const statusEl = document.getElementById('kpi-telemetry-storage-status');
+      const subEl = document.getElementById('kpi-telemetry-storage-sub');
+      const cardEl = document.getElementById('card-kpi-storage');
+
+      const t0 = (typeof performance !== 'undefined' && performance.now) ? performance.now() : Date.now();
+      try {
+        const res = await fetch('https://firebasestorage.googleapis.com/v0/b/giro-4ed50.firebasestorage.app/o?maxResults=1', {
+          method: 'GET',
+          cache: 'no-store'
+        });
+        const t1 = (typeof performance !== 'undefined' && performance.now) ? performance.now() : Date.now();
+        const ms = Math.round(t1 - t0);
+
+        if (res.status < 500) {
+          if (statusEl) statusEl.textContent = `Conectado (${ms}ms)`;
+          if (subEl) subEl.textContent = 'giro-4ed50.firebasestorage.app ativo';
+          if (cardEl) cardEl.className = 'kpi-card blue';
+          return { ok: true, latency: ms };
+        } else {
+          if (statusEl) statusEl.textContent = `Erro ${res.status}`;
+          if (subEl) subEl.textContent = 'Instabilidade no Cloud Storage';
+          if (cardEl) cardEl.className = 'kpi-card red';
+          return { ok: false, status: res.status };
+        }
+      } catch(err) {
+        if (statusEl) statusEl.textContent = 'Inacessível';
+        if (subEl) subEl.textContent = 'Falha de rede com Storage';
+        if (cardEl) cardEl.className = 'kpi-card red';
+        return { ok: false, error: err.message };
+      }
+    }
+
+    function pingTelemetryHealth() {
+      return Promise.all([
+        pingFirebaseRtdb(),
+        pingFirebaseStorage()
+      ]);
+    }
+
+    function checkSystemHealth() {
+      return pingTelemetryHealth();
+    }
+
+    function updateTelemetryKpiCounts(eventsMap, errorsMap, sleepAlertsMap) {
+      const errorCountEl = document.getElementById('kpi-telemetry-error-count');
+      const errorSubEl = document.getElementById('kpi-telemetry-error-sub');
+      const cardErrors = document.getElementById('card-kpi-errors');
+      const eventsCountEl = document.getElementById('kpi-telemetry-events-count');
+      const eventsSubEl = document.getElementById('kpi-telemetry-events-sub');
+
+      let totalErrors = 0;
+      let errorsLastHour = 0;
+      const oneHourAgo = Date.now() - 3600000;
+
+      if (errorsMap && typeof errorsMap === 'object') {
+        Object.values(errorsMap).forEach(err => {
+          totalErrors++;
+          const ts = (err && (err.ts || err.timestamp)) || 0;
+          if (ts >= oneHourAgo) errorsLastHour++;
+        });
+      }
+
+      if (errorCountEl) {
+        errorCountEl.textContent = `${errorsLastHour} / ${totalErrors}`;
+      }
+      if (errorSubEl) {
+        errorSubEl.textContent = `${errorsLastHour} na última hora · ${totalErrors} no total`;
+      }
+      if (cardErrors) {
+        if (errorsLastHour > 0) {
+          cardErrors.className = 'kpi-card red';
+        } else if (totalErrors > 0) {
+          cardErrors.className = 'kpi-card gold';
+        } else {
+          cardErrors.className = 'kpi-card green';
+        }
+      }
+
+      let totalEvents = 0;
+      if (eventsMap && typeof eventsMap === 'object') {
+        totalEvents += Object.keys(eventsMap).length;
+      }
+      if (sleepAlertsMap && typeof sleepAlertsMap === 'object') {
+        totalEvents += Object.keys(sleepAlertsMap).length;
+      }
+
+      if (eventsCountEl) {
+        eventsCountEl.textContent = totalEvents.toLocaleString('pt-PT');
+      }
+      if (eventsSubEl) {
+        eventsSubEl.textContent = `${totalEvents} eventos operacionais registrados`;
+      }
+    }
+
+    async function loadTelemetryData(forceAlert = false) {
+      if (isTelemetryRefreshing) return;
+      isTelemetryRefreshing = true;
+
+      const lastSyncEl = document.getElementById('telemetry-last-sync');
+      try {
+        const [eventsRes, errorsRes, sleepRes] = await Promise.all([
+          fetch(`${FIREBASE_DB_URL}/telemetry/events.json`).catch(() => null),
+          fetch(`${FIREBASE_DB_URL}/telemetry/errors.json`).catch(() => null),
+          fetch(`${FIREBASE_DB_URL}/telemetry/sleep_alerts.json`).catch(() => null)
+        ]);
+
+        let eventsData = null;
+        let errorsData = null;
+        let sleepData = null;
+
+        if (eventsRes && eventsRes.ok) {
+          try { eventsData = await eventsRes.json(); } catch(e) {}
+        }
+        if (errorsRes && errorsRes.ok) {
+          try { errorsData = await errorsRes.json(); } catch(e) {}
+        }
+        if (sleepRes && sleepRes.ok) {
+          try { sleepData = await sleepRes.json(); } catch(e) {}
+        }
+
+        const records = [];
+
+        if (eventsData && typeof eventsData === 'object') {
+          Object.entries(eventsData).forEach(([k, v]) => {
+            records.push(normalizeTelemetryItem(k, v, 'EVENT'));
+          });
+        }
+
+        if (errorsData && typeof errorsData === 'object') {
+          Object.entries(errorsData).forEach(([k, v]) => {
+            records.push(normalizeTelemetryItem(k, v, 'ERROR'));
+          });
+        }
+
+        if (sleepData && typeof sleepData === 'object') {
+          Object.entries(sleepData).forEach(([k, v]) => {
+            records.push(normalizeTelemetryItem(k, v, 'EVENT'));
+          });
+        }
+
+        allTelemetryRecords = records;
+        renderTelemetryTable();
+        updateTelemetryKpiCounts(eventsData, errorsData, sleepData);
+
+        if (lastSyncEl) {
+          const now = new Date();
+          const pad = n => String(n).padStart(2, '0');
+          lastSyncEl.textContent = `Última sincronização: ${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
+        }
+
+        if (forceAlert) {
+          alert('✓ Dados de telemetria atualizados com sucesso!');
+        }
+      } catch (err) {
+        console.warn('Erro ao carregar telemetria:', err);
+        if (forceAlert) {
+          alert('Falha ao sincronizar telemetria: ' + err.message);
+        }
+      } finally {
+        isTelemetryRefreshing = false;
+      }
+    }
+
+    function renderTelemetryTable() {
+      const tbody = document.getElementById('telemetry-tbody');
+      if (!tbody) return;
+
+      let items = allTelemetryRecords.slice();
+
+      if (currentTelemetryFilter && currentTelemetryFilter !== 'TODOS') {
+        items = items.filter(item => item.level === currentTelemetryFilter);
+      }
+
+      items.sort((a, b) => (b.ts || 0) - (a.ts || 0));
+
+      const displayItems = items.slice(0, 20);
+
+      if (displayItems.length === 0) {
+        tbody.innerHTML = `<tr>
+          <td colspan="5" style="text-align:center;padding:32px;color:var(--muted);">
+            Nenhum evento registrado no nó de telemetria.
+          </td>
+        </tr>`;
+        const statusEl = document.getElementById('telemetry-stream-status');
+        if (statusEl) statusEl.textContent = '0 registos encontrados';
+        return;
+      }
+
+      let html = '';
+      displayItems.forEach(item => {
+        let badgeClass = 'blue';
+        if (item.level === 'ERROR') badgeClass = 'red';
+        else if (item.level === 'WARN') badgeClass = 'gold';
+        else if (item.level === 'INFO') badgeClass = 'green';
+
+        const formattedTime = formatTelemetryTimestamp(item.ts);
+        const detailsTrunc = (item.details || '-').slice(0, 120);
+        const uaTrunc = (item.userAgent || 'N/A').slice(0, 35);
+
+        html += `<tr data-id="${escapeHtml(item.id)}">
+          <td style="white-space:nowrap;font-size:12px;">${escapeHtml(formattedTime)}</td>
+          <td><span class="badge ${badgeClass}">${escapeHtml(item.level)}</span></td>
+          <td><span style="font-size:12px;color:var(--gold);font-weight:600;">${escapeHtml(item.context)}</span></td>
+          <td>
+            <b style="color:#fff;font-size:13px;display:block;">${escapeHtml(item.message)}</b>
+            ${item.details ? `<div style="font-family:monospace;font-size:11px;color:var(--muted);max-width:320px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${escapeHtml(item.details)}">${escapeHtml(detailsTrunc)}</div>` : ''}
+          </td>
+          <td style="font-size:11px;color:var(--muted);max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${escapeHtml(item.userAgent)}">
+            ${escapeHtml(uaTrunc)}
+          </td>
+        </tr>`;
+      });
+
+      tbody.innerHTML = html;
+
+      const statusEl = document.getElementById('telemetry-stream-status');
+      if (statusEl) statusEl.textContent = `Mostrando ${displayItems.length} de ${items.length} registos (Filtro: ${escapeHtml(currentTelemetryFilter)})`;
+    }
+
+    function setTelemetryFilter(level) {
+      currentTelemetryFilter = level || 'TODOS';
+      document.querySelectorAll('#telemetry-filter-buttons button').forEach(b => {
+        b.classList.toggle('active', b.getAttribute('data-level') === currentTelemetryFilter);
+      });
+      const sel = document.getElementById('telemetry-level-filter');
+      if (sel) sel.value = currentTelemetryFilter;
+      renderTelemetryTable();
+    }
+
+    function filterTelemetryStream() {
+      const select = document.getElementById('telemetry-level-filter');
+      if (select) setTelemetryFilter(select.value);
+    }
+
+    function toggleTelemetryAutoRefresh(enabled) {
+      if (telemetryAutoRefreshTimer) {
+        clearInterval(telemetryAutoRefreshTimer);
+        telemetryAutoRefreshTimer = null;
+      }
+      if (enabled) {
+        telemetryAutoRefreshTimer = setInterval(() => {
+          const telemetryTab = document.getElementById('view-telemetry');
+          if (telemetryTab && telemetryTab.classList.contains('active')) {
+            refreshTelemetryAndHealth(false);
+          }
+        }, 10000);
+      }
+    }
+
+    async function refreshTelemetryAndHealth(forceAlert = false) {
+      await Promise.all([
+        pingTelemetryHealth(),
+        loadTelemetryData(forceAlert)
+      ]);
+    }
+
+    async function purgeTelemetryData() {
+      if (typeof verifyAdminAuthorized === 'function' && !verifyAdminAuthorized()) {
+        return;
+      }
+
+      const confirmed = confirm('⚠️ ATENÇÃO: Deseja realmente expurgar todos os dados de telemetria e erros (/telemetry.json)?\nEsta ação limpará o histórico e não poderá ser revertida.');
+      if (!confirmed) return;
+
+      try {
+        const res = await fetch(`${FIREBASE_DB_URL}/telemetry.json`, {
+          method: 'DELETE'
+        });
+
+        if (res.ok) {
+          allTelemetryRecords = [];
+          renderTelemetryTable();
+          updateTelemetryKpiCounts(null, null, null);
+          alert('✓ Histórico de telemetria expurgado com sucesso no Firebase RTDB.');
+        } else {
+          alert(`Falha ao expurgar telemetria: HTTP ${res.status} ${res.statusText}`);
+        }
+      } catch (err) {
+        alert('Erro de conexão ao expurgar telemetria: ' + err.message);
+      }
+    }
+
+    // Inicialização da Telemetria
+    toggleTelemetryAutoRefresh(true);
+    pingTelemetryHealth();
 
   </script>
 </body>
