@@ -518,7 +518,7 @@ body { overscroll-behavior: none; }
 
     <!-- SELETOR DE APPS & PROVÍNCIA -->
     <div style="display:flex;align-items:center;gap:6px;">
-      <button id="giro-pwa-install-btn" onclick="installGiroPwa()" style="display:none;align-items:center;gap:4px;background:#ffffff;color:#000000;border:none;border-radius:20px;padding:6px 12px;font-size:11px;font-weight:800;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,0.4);letter-spacing:-0.2px;">⬇ Instalar App</button>
+      <button id="giro-pwa-install-btn" onclick="openGiroPaxInstallModal()" style="display:inline-flex;align-items:center;gap:4px;background:#ffffff;color:#000000;border:none;border-radius:20px;padding:6px 12px;font-size:11px;font-weight:800;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,0.4);letter-spacing:-0.2px;">⬇ Instalar App</button>
       <div id="auth-pill" style="display:flex;align-items:center;flex-shrink:0;"></div>
     </div>
   </header>
@@ -689,6 +689,17 @@ body { overscroll-behavior: none; }
 
       <!-- PANE 3: VIAGEM EM CURSO (UBER ACTIVE TRIP HUD) -->
       <div class="sheet-pane" id="pane-trip">
+        <!-- BANNER DE CHEGADA DO MOTORISTA ("CHEGUEI!") -->
+        <div id="pax-driver-arrived-alert" style="display:none;margin-bottom:12px;background:linear-gradient(135deg,#10b981 0%,#059669 100%);color:#fff;border-radius:14px;padding:14px 16px;box-shadow:0 8px 24px rgba(16,185,129,0.35);text-align:left;border:1px solid rgba(255,255,255,0.25);">
+          <div style="display:flex;align-items:center;gap:12px;">
+            <span style="font-size:30px;">📍</span>
+            <div style="flex:1;">
+              <b style="font-size:14.5px;display:block;letter-spacing:-0.2px;text-transform:uppercase;">O Seu Motorista Chegou!</b>
+              <span style="font-size:12px;opacity:0.95;display:block;margin-top:2px;">A viatura aguarda no ponto de embarque. Dirija-se ao veículo.</span>
+            </div>
+          </div>
+        </div>
+
         <div class="active-trip-card">
           <div class="driver-profile-row">
             <div class="driver-photo-badge" id="trip-driver-initials">DM</div>
@@ -1089,6 +1100,232 @@ body { overscroll-behavior: none; }
 
 <!-- JAVASCRIPT NATIVO PASSAGEIRO (UBER GPS ENGINE & TARIFAS ANGOLA) -->
 <script>
+// ==========================================================================
+// R3: WEB AUDIO API CHIMES & NOTIFICATIONS (100% OFFLINE SYNTHESIZER)
+// ==========================================================================
+const GiroChime = (function() {
+  let ctx = null;
+  let unlocked = false;
+
+  function getCtx() {
+    if (!ctx) {
+      const AudioCtx = window.AudioContext || window.webkitAudioContext;
+      if (AudioCtx) ctx = new AudioCtx();
+    }
+    if (ctx && ctx.state === 'suspended') {
+      ctx.resume().catch(() => {});
+    }
+    return ctx;
+  }
+
+  function initUnlockListener() {
+    if (typeof window === 'undefined' || unlocked) return;
+    const unlock = () => {
+      const c = getCtx();
+      if (c && c.state === 'suspended') {
+        c.resume().then(() => { unlocked = true; }).catch(() => {});
+      } else {
+        unlocked = true;
+      }
+      ['click', 'touchstart', 'keydown'].forEach(ev => {
+        window.removeEventListener(ev, unlock, { capture: true });
+      });
+    };
+    ['click', 'touchstart', 'keydown'].forEach(ev => {
+      window.addEventListener(ev, unlock, { capture: true, passive: true });
+    });
+  }
+
+  function playTone(freq, startOffset, duration, opts = {}) {
+    const c = getCtx();
+    if (!c) return null;
+
+    const startTime = c.currentTime + startOffset;
+    const osc = c.createOscillator();
+    const gain = c.createGain();
+    const type = opts.type || 'sine';
+    const peakGain = opts.gain !== undefined ? opts.gain : 0.22;
+    const attack = opts.attack || 0.015;
+
+    osc.type = type;
+    osc.frequency.setValueAtTime(freq, startTime);
+
+    gain.gain.setValueAtTime(0.0001, startTime);
+    gain.gain.linearRampToValueAtTime(peakGain, startTime + attack);
+    gain.gain.exponentialRampToValueAtTime(0.0001, startTime + duration);
+
+    osc.connect(gain);
+    gain.connect(c.destination);
+
+    osc.start(startTime);
+    osc.stop(startTime + duration + 0.05);
+
+    osc.onended = () => {
+      try {
+        osc.disconnect();
+        gain.disconnect();
+      } catch(e) {}
+    };
+
+    return { osc, gain };
+  }
+
+  return {
+    getCtx,
+    initUnlockListener,
+
+    // 1. Motorista aceitou: arpejo ascendente C5 -> E5 -> G5 -> C6
+    playMatch() {
+      try {
+        playTone(523.25, 0.00, 0.25, { type: 'sine', gain: 0.20 });
+        playTone(659.25, 0.08, 0.28, { type: 'sine', gain: 0.22 });
+        playTone(783.99, 0.16, 0.32, { type: 'sine', gain: 0.24 });
+        playTone(1046.50, 0.24, 0.45, { type: 'triangle', gain: 0.26 });
+      } catch(e) {}
+    },
+
+    // 2. Motorista chegou: sino cristalino duplo E6+G6 (~1318Hz + 1568Hz)
+    playArrival() {
+      try {
+        playTone(1318.51, 0.00, 0.45, { type: 'sine', gain: 0.24, attack: 0.005 });
+        playTone(2637.02, 0.00, 0.30, { type: 'sine', gain: 0.07, attack: 0.005 });
+        playTone(1567.98, 0.14, 0.65, { type: 'sine', gain: 0.28, attack: 0.005 });
+        playTone(3135.96, 0.14, 0.45, { type: 'sine', gain: 0.08, attack: 0.005 });
+      } catch(e) {}
+    },
+
+    // 3. Início de viagem / chamada: quinta ascendente D5 -> A5
+    playTripStart() {
+      try {
+        playTone(587.33, 0.00, 0.22, { type: 'sine', gain: 0.20 });
+        playTone(880.00, 0.12, 0.38, { type: 'triangle', gain: 0.22 });
+      } catch(e) {}
+    },
+
+    // 4. Viagem concluída: acorde de resolução harmónica (G4 -> C5 -> E5 -> G5)
+    playCompleted() {
+      try {
+        playTone(392.00, 0.00, 0.30, { type: 'sine', gain: 0.18 });
+        playTone(523.25, 0.09, 0.35, { type: 'sine', gain: 0.22 });
+        playTone(659.25, 0.18, 0.40, { type: 'sine', gain: 0.24 });
+        playTone(783.99, 0.27, 0.60, { type: 'sine', gain: 0.26 });
+      } catch(e) {}
+    },
+
+    // 5. Cancelamento
+    playCancelled() {
+      try {
+        playTone(659.25, 0.00, 0.20, { type: 'triangle', gain: 0.18 });
+        playTone(523.25, 0.12, 0.30, { type: 'sine', gain: 0.16 });
+      } catch(e) {}
+    }
+  };
+})();
+
+const GiroNotify = (function() {
+  let requestedOnce = false;
+
+  function isSupported() {
+    return typeof window !== 'undefined' && 'Notification' in window;
+  }
+
+  function getPermission() {
+    if (!isSupported()) return 'unsupported';
+    return Notification.permission;
+  }
+
+  async function requestPermission() {
+    if (!isSupported() || requestedOnce) return getPermission();
+    requestedOnce = true;
+    try {
+      return await Notification.requestPermission();
+    } catch(e) {
+      return getPermission();
+    }
+  }
+
+  function showInAppToast(title, body, type = 'info') {
+    if (typeof document === 'undefined') return;
+    let container = document.getElementById('giro-toast-container');
+    if (!container) {
+      container = document.createElement('div');
+      container.id = 'giro-toast-container';
+      container.style.cssText = 'position:fixed;top:24px;right:20px;z-index:999999;display:flex;flex-direction:column;gap:8px;max-width:350px;pointer-events:none;';
+      document.body.appendChild(container);
+    }
+
+    const toast = document.createElement('div');
+    const borderColor = type === 'success' ? '#06C167' : type === 'warning' ? '#d4af37' : type === 'danger' ? '#ef4444' : '#383838';
+    toast.style.cssText = `background:rgba(12,12,12,0.95);border:1px solid #262626;border-left:4px solid ${borderColor};border-radius:8px;padding:10px 14px;color:#ffffff;box-shadow:0 8px 24px rgba(0,0,0,0.7);pointer-events:auto;transform:translateX(120%);transition:transform 0.25s cubic-bezier(0.16,1,0.3,1),opacity 0.25s ease;opacity:0;`;
+    toast.innerHTML = `<div style="font-size:12px;font-weight:800;color:${borderColor};margin-bottom:2px;">${title}</div><div style="font-size:11px;color:#cbd5e1;line-height:1.35;">${body}</div>`;
+
+    container.appendChild(toast);
+    requestAnimationFrame(() => {
+      toast.style.transform = 'translateX(0)';
+      toast.style.opacity = '1';
+    });
+
+    setTimeout(() => {
+      toast.style.transform = 'translateX(120%)';
+      toast.style.opacity = '0';
+      setTimeout(() => {
+        if (toast.parentNode) toast.parentNode.removeChild(toast);
+      }, 300);
+    }, 4500);
+  }
+
+  async function send(title, body, opts = {}) {
+    const perm = getPermission();
+
+    if (perm !== 'granted') {
+      showInAppToast(title, body, opts.type || 'info');
+      return { method: 'in_app_toast', delivered: true };
+    }
+
+    const notifOptions = {
+      body: body,
+      icon: opts.icon || './icons/icon-192.png',
+      badge: opts.badge || './icons/icon-192.png',
+      tag: opts.tag || 'giro-pax-status',
+      renotify: opts.renotify !== undefined ? opts.renotify : true,
+      requireInteraction: opts.requireInteraction || false,
+      data: opts.data || { url: window.location.href }
+    };
+
+    if ('serviceWorker' in navigator && navigator.serviceWorker.ready) {
+      try {
+        const reg = await navigator.serviceWorker.ready;
+        if (reg && reg.showNotification) {
+          await reg.showNotification(title, notifOptions);
+          return { method: 'service_worker', delivered: true };
+        }
+      } catch(e) {}
+    }
+
+    try {
+      const n = new Notification(title, notifOptions);
+      n.onclick = () => {
+        window.focus();
+        n.close();
+      };
+      return { method: 'window_notification', delivered: true };
+    } catch(e) {
+      showInAppToast(title, body, opts.type || 'info');
+      return { method: 'in_app_toast_fallback', delivered: true };
+    }
+  }
+
+  return {
+    isSupported,
+    getPermission,
+    requestPermission,
+    showInAppToast,
+    send
+  };
+})();
+
+GiroChime.initUnlockListener();
+
 /* ==========================================================================
    CONFIGURAÇÃO TARIFÁRIA & ESTADO DO PASSAGEIRO
    ========================================================================== */
@@ -2269,6 +2506,10 @@ try {
       if (!data) return;
       if (data.type === 'RIDE_ACCEPTED' && currentActiveRide && data.rideId === currentActiveRide.id) {
         handleDriverAcceptedRide(data.driver);
+      } else if (data.type === 'RIDE_ARRIVED' && currentActiveRide && data.rideId === currentActiveRide.id) {
+        handleDriverArrived(data);
+      } else if (data.type === 'RIDE_IN_PROGRESS' && currentActiveRide && data.rideId === currentActiveRide.id) {
+        handleTripInProgress(data);
       } else if (data.type === 'DRIVER_LOCATION_UPDATE' && currentActiveRide && data.rideId === currentActiveRide.id) {
         if (data.coords && carMarker) {
           carMarker.setLatLng(data.coords);
@@ -2288,6 +2529,10 @@ window.addEventListener('storage', (e) => {
       if (val && val.rideId === currentActiveRide.id) {
         if (val.status === 'ACCEPTED') {
           handleDriverAcceptedRide(val.driver);
+        } else if (val.status === 'ARRIVED') {
+          handleDriverArrived(val);
+        } else if (val.status === 'IN_PROGRESS') {
+          handleTripInProgress(val);
         } else if (val.status === 'COMPLETED') {
           paxTo('end');
         }
@@ -2296,13 +2541,102 @@ window.addEventListener('storage', (e) => {
   }
 });
 
+function handleDriverArrived(data) {
+  if (!currentActiveRide) return;
+  if (currentActiveRide.status === 'ARRIVED') return;
+  currentActiveRide.status = 'ARRIVED';
+
+  // Som cristalino de chegada do motorista
+  if (typeof GiroChime !== 'undefined' && GiroChime.playArrival) {
+    GiroChime.playArrival();
+  }
+
+  // Vibração no telemóvel do passageiro
+  if (navigator.vibrate) {
+    try { navigator.vibrate([300, 150, 300, 150, 600]); } catch(e) {}
+  }
+
+  // Notificação no sistema do telemóvel
+  const drv = (data && data.driver) || currentActiveRide.driver || {};
+  const drvName = drv.name || 'O seu motorista';
+  const drvCar = drv.car || 'A viatura';
+  const drvPlate = drv.plate ? `(${drv.plate})` : '';
+  if (typeof GiroNotify !== 'undefined') {
+    GiroNotify.send('🚗 GIRO — O seu motorista CHEGOU!', `${drvName} chegou no seu ${drvCar} ${drvPlate}. A viatura aguarda no ponto de encontro.`, {
+      tag: 'giro-driver-arrived',
+      type: 'warning',
+      requireInteraction: true
+    });
+  }
+
+  // Exibir alerta visual destacado no HUD
+  const alertCard = document.getElementById('pax-driver-arrived-alert');
+  if (alertCard) alertCard.style.display = 'block';
+
+  const metaEl = document.getElementById('trip-driver-meta');
+  if (metaEl && currentActiveRide.driver) {
+    metaEl.textContent = `📍 CHEGOU AO PONTO · ${currentActiveRide.driver.car || 'Viatura'}`;
+  }
+
+  if (typeof GiroTelemetry !== 'undefined') {
+    GiroTelemetry.info('Alerta de motorista no local recebido pelo passageiro', 'passenger_driver_arrived', {
+      rideId: currentActiveRide.id
+    });
+  }
+}
+
+function handleTripInProgress(data) {
+  if (!currentActiveRide) return;
+  currentActiveRide.status = 'IN_PROGRESS';
+  const alertCard = document.getElementById('pax-driver-arrived-alert');
+  if (alertCard) alertCard.style.display = 'none';
+
+  const metaEl = document.getElementById('trip-driver-meta');
+  if (metaEl && currentActiveRide.driver) {
+    metaEl.textContent = `▶ EM VIAGEM · ${currentActiveRide.driver.car || 'Viatura'}`;
+  }
+}
+
+function startContinuousRidePolling(rideId) {
+  if (rideStatusPollInterval) clearInterval(rideStatusPollInterval);
+  rideStatusPollInterval = setInterval(() => {
+    if (!currentActiveRide || currentActiveRide.status === 'COMPLETED' || currentActiveRide.status === 'CANCELLED') {
+      clearInterval(rideStatusPollInterval);
+      rideStatusPollInterval = null;
+      return;
+    }
+    fetch(`https://giro-4ed50-default-rtdb.europe-west1.firebasedatabase.app/rides/${rideId}.json`)
+      .then(res => res.json())
+      .then(data => {
+        if (!data || !currentActiveRide) return;
+        if (data.status === 'ACCEPTED' && currentActiveRide.status === 'SEARCHING') {
+          handleDriverAcceptedRide(data.driver);
+        } else if (data.status === 'ARRIVED' && currentActiveRide.status !== 'ARRIVED') {
+          handleDriverArrived(data);
+        } else if (data.status === 'IN_PROGRESS' && currentActiveRide.status !== 'IN_PROGRESS') {
+          handleTripInProgress(data);
+        } else if (data.status === 'COMPLETED') {
+          if (rideStatusPollInterval) {
+            clearInterval(rideStatusPollInterval);
+            rideStatusPollInterval = null;
+          }
+          paxTo('end');
+        }
+        if (data.driver && data.driver.coords && carMarker) {
+          carMarker.setLatLng(data.driver.coords);
+        }
+      })
+      .catch(() => {});
+  }, 2500);
+}
+
 function handleDriverAcceptedRide(driver) {
   if (!currentActiveRide) return;
   currentActiveRide.status = 'ACCEPTED';
-  if (rideStatusPollInterval) {
-    clearInterval(rideStatusPollInterval);
-    rideStatusPollInterval = null;
-  }
+  if (driver) currentActiveRide.driver = driver;
+  const alertCard = document.getElementById('pax-driver-arrived-alert');
+  if (alertCard) alertCard.style.display = 'none';
+  startContinuousRidePolling(currentActiveRide.id);
   
   if (driver) {
     const nameEl = document.getElementById('trip-driver-name');
@@ -2993,11 +3327,10 @@ document.addEventListener('DOMContentLoaded',function(){
   GiroAuth.renderUserPill('auth-pill');
   updateProfileView();
 
-  const isIos = /iphone|ipad|ipod/i.test(navigator.userAgent);
   const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
   const installBtn = document.getElementById('giro-pwa-install-btn');
-  if (installBtn && !isStandalone && isIos) {
-    installBtn.style.display = 'inline-flex';
+  if (installBtn) {
+    installBtn.style.display = isStandalone ? 'none' : 'inline-flex';
   }
 });
 
@@ -3012,35 +3345,135 @@ window.addEventListener('beforeinstallprompt', (e) => {
   if (installBtn && !isStandalone) {
     installBtn.style.display = 'inline-flex';
   }
+  const promptSec = document.getElementById('pax-chrome-prompt-section');
+  if (promptSec) promptSec.style.display = 'block';
 });
 
 window.addEventListener('appinstalled', () => {
   deferredGiroInstallPrompt = null;
   const installBtn = document.getElementById('giro-pwa-install-btn');
   if (installBtn) installBtn.style.display = 'none';
+  closeGiroPaxInstallModal();
   console.log('[PWA] GIRO instalado com sucesso no ecrã inicial!');
 });
 
-function installGiroPwa() {
+function openGiroPaxInstallModal() {
+  const modal = document.getElementById('giro-pax-pwa-modal');
+  if (!modal) return;
+  modal.style.display = 'flex';
+
+  const isIos = /iphone|ipad|ipod/i.test(navigator.userAgent);
+  const isWebView = /wv|Instagram|FBAN|FBAV|WhatsApp|MicroMessenger/i.test(navigator.userAgent);
+  const promptSec = document.getElementById('pax-chrome-prompt-section');
+  const webviewAlert = document.getElementById('pax-webview-alert');
+  const safariGuide = document.getElementById('pax-safari-guide');
+  const chromeManualGuide = document.getElementById('pax-chrome-manual-guide');
+
+  if (webviewAlert) webviewAlert.style.display = isWebView ? 'block' : 'none';
+
+  if (isIos) {
+    if (safariGuide) safariGuide.style.display = 'block';
+    if (chromeManualGuide) chromeManualGuide.style.display = 'none';
+    if (promptSec) promptSec.style.display = 'none';
+  } else {
+    if (safariGuide) safariGuide.style.display = 'none';
+    if (chromeManualGuide) chromeManualGuide.style.display = 'block';
+    if (deferredGiroInstallPrompt && promptSec) {
+      promptSec.style.display = 'block';
+    }
+  }
+}
+
+function closeGiroPaxInstallModal() {
+  const modal = document.getElementById('giro-pax-pwa-modal');
+  if (modal) modal.style.display = 'none';
+}
+
+function triggerPaxNativeInstall() {
   if (deferredGiroInstallPrompt) {
     deferredGiroInstallPrompt.prompt();
     deferredGiroInstallPrompt.userChoice.then((choiceResult) => {
       if (choiceResult.outcome === 'accepted') {
         const installBtn = document.getElementById('giro-pwa-install-btn');
         if (installBtn) installBtn.style.display = 'none';
+        closeGiroPaxInstallModal();
       }
       deferredGiroInstallPrompt = null;
     });
-  } else {
-    const isIos = /iphone|ipad|ipod/i.test(navigator.userAgent);
-    if (isIos) {
-      alert('📲 Para instalar a GIRO no seu iPhone / iPad:\n\n1. Toque no botão de Partilhar [ ⎋ ] na barra do Safari.\n2. Role para baixo e toque em "Ecrã Principal" (Add to Home Screen).\n3. O app oficial da GIRO será instalado no seu ecrã inicial como aplicativo nativo!');
-    } else {
-      alert('📲 Como instalar este Web App:\n\nAbra o menu do navegador (ícone de 3 pontos no canto superior) e clique em "Instalar aplicativo" ou "Adicionar ao ecrã principal".');
-    }
   }
 }
+
+function installGiroPwa() {
+  openGiroPaxInstallModal();
+}
 </script>
+
+  <!-- ================= MODAL DE INSTALAÇÃO PWA PASSAGEIRO ================= -->
+  <div id="giro-pax-pwa-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:99999;align-items:center;justify-content:center;padding:16px;box-sizing:border-box;">
+    <div style="background:#141414;border:1px solid #333;border-radius:20px;max-width:440px;width:100%;padding:22px;box-sizing:border-box;color:#fff;box-shadow:0 12px 40px rgba(0,0,0,0.9);position:relative;">
+      <button onclick="closeGiroPaxInstallModal()" style="position:absolute;top:14px;right:14px;background:#262626;border:none;color:#aaa;font-size:18px;width:32px;height:32px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;">✕</button>
+      
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;">
+        <div style="width:48px;height:48px;background:rgba(212,175,55,0.15);border:1px solid #d4af37;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:24px;">📲</div>
+        <div>
+          <h3 style="font-size:17px;font-weight:900;color:#fff;margin:0;">Instalar GIRO Passageiro</h3>
+          <span style="font-size:12px;color:#d4af37;font-weight:700;">App Oficial de Mobilidade & Entregas</span>
+        </div>
+      </div>
+
+      <!-- WebView Warning (WhatsApp/Facebook) -->
+      <div id="pax-webview-alert" style="display:none;background:rgba(239,68,68,0.15);border:1px solid rgba(239,68,68,0.4);border-radius:12px;padding:12px;margin-bottom:14px;">
+        <b style="color:#ef4444;font-size:13px;display:block;margin-bottom:4px;">⚠️ Abra no Google Chrome ou Safari</b>
+        <p style="font-size:12px;color:#ddd;margin:0;line-height:1.4;">
+          Está a usar o navegador interno do WhatsApp ou Facebook. Para instalar no telemóvel: toque nos <b>3 pontinhos (⋮)</b> no canto superior direito e selecione <b>"Abrir no Chrome"</b> ou <b>"Abrir no Safari"</b>.
+        </p>
+      </div>
+
+      <!-- Android Chrome Prompt Section -->
+      <div id="pax-chrome-prompt-section" style="display:none;margin-bottom:14px;">
+        <button onclick="triggerPaxNativeInstall()" style="width:100%;background:#10b981;border:none;color:#000;font-weight:900;font-size:14px;padding:14px;border-radius:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 4px 14px rgba(16,185,129,0.35);">
+          📲 Instalar Agora no Android
+        </button>
+        <small style="display:block;text-align:center;color:#888;margin-top:6px;font-size:11px;">Instalação direta no seu ecrã principal</small>
+      </div>
+
+      <!-- Safari (iOS) Guide -->
+      <div id="pax-safari-guide" style="display:none;background:#1a1a1a;border:1px solid #2a2a2a;border-radius:14px;padding:14px;margin-bottom:14px;">
+        <b style="font-size:13px;color:#fff;display:block;margin-bottom:10px;">Como instalar no iPhone (Apple Safari):</b>
+        <div style="display:flex;align-items:flex-start;gap:10px;margin-bottom:10px;font-size:12px;color:#ccc;">
+          <span style="background:#262626;border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center;font-weight:800;color:#d4af37;flex-shrink:0;">1</span>
+          <span>Toque no botão de <b>Partilhar [ ⎋ ]</b> na barra inferior do Safari.</span>
+        </div>
+        <div style="display:flex;align-items:flex-start;gap:10px;margin-bottom:10px;font-size:12px;color:#ccc;">
+          <span style="background:#262626;border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center;font-weight:800;color:#d4af37;flex-shrink:0;">2</span>
+          <span>Role para baixo e selecione <b>[ ➕ Ecrã Principal ]</b> (Add to Home Screen).</span>
+        </div>
+        <div style="display:flex;align-items:flex-start;gap:10px;font-size:12px;color:#ccc;">
+          <span style="background:#262626;border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center;font-weight:800;color:#d4af37;flex-shrink:0;">3</span>
+          <span>Toque em <b>[ Adicionar ]</b> no canto superior direito.</span>
+        </div>
+      </div>
+
+      <!-- Chrome Android Manual Guide -->
+      <div id="pax-chrome-manual-guide" style="display:none;background:#1a1a1a;border:1px solid #2a2a2a;border-radius:14px;padding:14px;margin-bottom:14px;">
+        <b style="font-size:13px;color:#fff;display:block;margin-bottom:10px;">Como instalar no Google Chrome (Android):</b>
+        <div style="display:flex;align-items:flex-start;gap:10px;margin-bottom:10px;font-size:12px;color:#ccc;">
+          <span style="background:#262626;border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center;font-weight:800;color:#d4af37;flex-shrink:0;">1</span>
+          <span>Toque nos <b>três pontinhos [ ⋮ ]</b> no canto superior direito do Google Chrome.</span>
+        </div>
+        <div style="display:flex;align-items:flex-start;gap:10px;margin-bottom:10px;font-size:12px;color:#ccc;">
+          <span style="background:#262626;border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center;font-weight:800;color:#d4af37;flex-shrink:0;">2</span>
+          <span>Selecione <b>[ 📲 Instalar aplicativo ]</b> ou <b>[ Adicionar ao ecrã principal ]</b>.</span>
+        </div>
+      </div>
+
+      <!-- Cross Link to Driver App -->
+      <div style="border-top:1px solid #262626;padding-top:12px;display:flex;justify-content:space-between;align-items:center;">
+        <span style="font-size:12px;color:#888;">É condutor parceiro?</span>
+        <a href="driver.html" style="font-size:12px;color:#d4af37;text-decoration:none;font-weight:700;">Instalar App Motorista (10%) →</a>
+      </div>
+    </div>
+  </div>
 
   <!-- ================= MODAL DE EXTRATO FINANCEIRO DETALHADO ================= -->
   <div id="wallet-statement-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:9999;align-items:flex-end;justify-content:center;">
