@@ -1,4 +1,4 @@
-﻿# ⚡ GIRO Angola — Mobilidade Urbana & Logística Inteligente
+# ⚡ GIRO Angola — Mobilidade Urbana & Logística Inteligente
 
 > Plataforma completa de mobilidade urbana, transporte de passageiros, entregas expressas e logística de carga adaptada à realidade de Angola.
 
@@ -10,7 +10,9 @@
 - 🚖 **App de Passageiro (Demo Web):** [Abrir App Passageiro](https://isaac-carvalho.github.io/giro/)
 - 🚗 **App de Motorista (Comissão 10%):** [Abrir App Motorista](https://isaac-carvalho.github.io/giro/driver.html)
 - 🖥️ **Central Operacional & Despacho 24/7:** [Abrir Central](https://isaac-carvalho.github.io/giro/central.html)
-- 📊 **Painel Administrativo & CRM Multi-Agente:** [Abrir CRM GIRO](https://isaac-carvalho.github.io/giro/crm.html)
+- 📑 **Dossiê de Parcerias com Associações de Taxistas (ANATA / ATA / AMOTRANG):** [Ver Dossiê HTML Online](https://isaac-carvalho.github.io/giro/dossie_transportes_angola.html)
+- 📄 **Dossiê Oficial em PDF (11 Páginas para Download):** [Baixar PDF](./DOSSIE_REPRESENTANTES_TRANSPORTES_ANGOLA.pdf)
+- 📊 **Base de Dados dos Representantes em Excel:** [Baixar Planilha Excel](./REPRESENTANTES_TRANSPORTES_ANGOLA.xlsx)
 - 📝 **Cadastro de Motoristas:** [Formulário de Cadastro](https://isaac-carvalho.github.io/giro/cadastro-motorista.html)
 
 ---

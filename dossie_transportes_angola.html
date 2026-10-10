@@ -1,0 +1,959 @@
+<!DOCTYPE html>
+<html lang="pt-AO">
+<head>
+<meta charset="UTF-8">
+<title>Dossiê Executivo: Representantes dos Transportes em Angola & Estratégia de Proposta</title>
+<style>
+  @page {
+    size: A4;
+    margin: 15mm 15mm 15mm 15mm;
+  }
+  
+  * {
+    box-sizing: border-box;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  body {
+    font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, Helvetica, Arial, sans-serif;
+    color: #1e293b;
+    background-color: #ffffff;
+    line-height: 1.5;
+    font-size: 10.5pt;
+    margin: 0;
+    padding: 0;
+    padding-top: 55px;
+  }
+
+  @media print {
+    .no-print { display: none !important; }
+    body { padding-top: 0 !important; }
+  }
+
+  .top-action-bar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 52px;
+    background: #0f172a;
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 24px;
+    z-index: 9999;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.25);
+    font-size: 13px;
+  }
+
+  .top-action-bar a.btn-top, .top-action-bar button.btn-top {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: #0284c7;
+    color: #ffffff;
+    padding: 7px 14px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 12px;
+    border: none;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+
+  .top-action-bar a.btn-top:hover, .top-action-bar button.btn-top:hover {
+    background: #0369a1;
+  }
+
+  .top-action-bar a.btn-gold {
+    background: #d4af37;
+    color: #000000;
+  }
+
+  .top-action-bar a.btn-gold:hover {
+    background: #f5d77f;
+  }
+
+  .page-break {
+    page-break-before: always;
+  }
+
+  .avoid-break {
+    page-break-inside: avoid;
+  }
+
+  /* Capa */
+  .cover {
+    height: 100%;
+    min-height: 250mm;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 30mm 20mm 20mm 20mm;
+    border-left: 8px solid #0284c7;
+    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  }
+
+  .cover-header {
+    border-bottom: 2px solid #e2e8f0;
+    padding-bottom: 20px;
+  }
+
+  .badge-confidential {
+    display: inline-block;
+    background-color: #0f172a;
+    color: #38bdf8;
+    padding: 6px 14px;
+    font-size: 8.5pt;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    border-radius: 4px;
+    margin-bottom: 15px;
+  }
+
+  .cover-title {
+    font-size: 26pt;
+    font-weight: 800;
+    color: #0f172a;
+    margin: 0 0 10px 0;
+    line-height: 1.15;
+  }
+
+  .cover-subtitle {
+    font-size: 14pt;
+    font-weight: 500;
+    color: #475569;
+    margin: 0;
+  }
+
+  .cover-body {
+    margin: 40px 0;
+  }
+
+  .cover-desc {
+    font-size: 11pt;
+    color: #334155;
+    max-width: 90%;
+    line-height: 1.6;
+  }
+
+  .cover-meta {
+    background-color: #ffffff;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    padding: 16px 20px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+  }
+
+  .cover-meta table {
+    width: 100%;
+    font-size: 9.5pt;
+    border-collapse: collapse;
+  }
+
+  .cover-meta td {
+    padding: 6px 0;
+    border-bottom: 1px dashed #e2e8f0;
+  }
+
+  .cover-meta td:last-child {
+    font-weight: 600;
+    color: #0f172a;
+    text-align: right;
+  }
+
+  .cover-footer {
+    font-size: 9pt;
+    color: #64748b;
+    border-top: 1px solid #e2e8f0;
+    padding-top: 15px;
+    display: flex;
+    justify-content: space-between;
+  }
+
+  /* Cabeçalhos internos */
+  h1, h2, h3, h4 {
+    color: #0f172a;
+    margin-top: 0;
+  }
+
+  h1 {
+    font-size: 18pt;
+    font-weight: 800;
+    border-bottom: 2px solid #0284c7;
+    padding-bottom: 8px;
+    margin-bottom: 18px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  h2 {
+    font-size: 13pt;
+    font-weight: 700;
+    color: #0369a1;
+    margin-top: 22px;
+    margin-bottom: 10px;
+    border-left: 4px solid #0284c7;
+    padding-left: 10px;
+  }
+
+  h3 {
+    font-size: 11pt;
+    font-weight: 700;
+    color: #1e293b;
+    margin-top: 14px;
+    margin-bottom: 6px;
+  }
+
+  p {
+    margin: 0 0 10px 0;
+  }
+
+  /* Cartões e Tabelas */
+  .card {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 14px 16px;
+    margin-bottom: 16px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  }
+
+  .card-highlight {
+    border-left: 5px solid #0284c7;
+    background: #f8fafc;
+  }
+
+  .tag {
+    display: inline-block;
+    padding: 2px 8px;
+    font-size: 8pt;
+    font-weight: 600;
+    border-radius: 4px;
+    margin-right: 6px;
+  }
+
+  .tag-blue { background: #e0f2fe; color: #0369a1; }
+  .tag-green { background: #dcfce7; color: #15803d; }
+  .tag-amber { background: #fef3c7; color: #b45309; }
+  .tag-purple { background: #f3e8ff; color: #7e22ce; }
+
+  table.data-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 9pt;
+    margin-bottom: 16px;
+  }
+
+  table.data-table th {
+    background: #0f172a;
+    color: #ffffff;
+    text-align: left;
+    padding: 8px 10px;
+    font-weight: 600;
+  }
+
+  table.data-table td {
+    padding: 8px 10px;
+    border-bottom: 1px solid #e2e8f0;
+    vertical-align: top;
+  }
+
+  table.data-table tr:nth-child(even) td {
+    background-color: #f8fafc;
+  }
+
+  .contact-box {
+    background: #ecfdf5;
+    border: 1px solid #a7f3d0;
+    border-radius: 6px;
+    padding: 8px 12px;
+    font-size: 9pt;
+    color: #065f46;
+    margin: 6px 0;
+  }
+
+  .pain-box {
+    background: #fff7ed;
+    border: 1px solid #ffedd5;
+    border-radius: 6px;
+    padding: 8px 12px;
+    font-size: 9pt;
+    color: #9a3412;
+    margin: 6px 0;
+  }
+
+  .pitch-box {
+    background: #f0f9ff;
+    border: 1px solid #bae6fd;
+    border-radius: 6px;
+    padding: 8px 12px;
+    font-size: 9pt;
+    color: #075985;
+    margin: 6px 0;
+  }
+
+  /* Cartas de Proposta */
+  .letter-container {
+    background: #ffffff;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    padding: 24px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.03);
+  }
+
+  .letter-head {
+    border-bottom: 2px solid #0f172a;
+    padding-bottom: 10px;
+    margin-bottom: 14px;
+    display: flex;
+    justify-content: space-between;
+    font-size: 9pt;
+  }
+
+  .letter-title {
+    font-size: 11.5pt;
+    font-weight: 800;
+    color: #0f172a;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+    text-align: center;
+  }
+
+  .letter-body {
+    font-size: 9.5pt;
+    line-height: 1.55;
+    color: #334155;
+    text-align: justify;
+  }
+
+  .letter-points {
+    margin: 10px 0;
+    padding-left: 20px;
+  }
+
+  .letter-points li {
+    margin-bottom: 6px;
+  }
+
+  .letter-sign {
+    margin-top: 25px;
+    border-top: 1px solid #cbd5e1;
+    padding-top: 10px;
+    display: flex;
+    justify-content: space-between;
+    font-size: 9pt;
+  }
+</style>
+</head>
+<body>
+
+<!-- BARRA DE AÇÕES SUPERIOR (VISÍVEL APENAS NA WEB, OCULTA NA IMPRESSÃO) -->
+<div class="top-action-bar no-print">
+  <div style="display:flex;align-items:center;gap:12px;">
+    <a href="landing.html" class="btn-top" style="background:#1e293b;border:1px solid #334155;">← Voltar ao GIRO</a>
+    <span style="font-weight:700;letter-spacing:0.5px;">GIRO Angola &bull; Dossiê de Transportes & Parcerias</span>
+  </div>
+  <div style="display:flex;align-items:center;gap:10px;">
+    <a href="DOSSIE_REPRESENTANTES_TRANSPORTES_ANGOLA.pdf" download="DOSSIE_REPRESENTANTES_TRANSPORTES_ANGOLA.pdf" class="btn-top btn-gold">📄 Baixar PDF Oficial</a>
+    <a href="REPRESENTANTES_TRANSPORTES_ANGOLA.xlsx" download="REPRESENTANTES_TRANSPORTES_ANGOLA.xlsx" class="btn-top">📊 Baixar Excel (.xlsx)</a>
+    <button onclick="window.print()" class="btn-top" style="background:#334155;">🖨️ Imprimir / Guardar</button>
+  </div>
+</div>
+
+<!-- CAPA DO DOSSIÊ -->
+<div class="cover">
+  <div class="cover-header">
+    <div class="badge-confidential">Dossiê Estratégico & Diretório Nacional</div>
+    <h1 class="cover-title">REPRESENTANTES DOS TAXISTAS & TRANSPORTES EM ANGOLA</h1>
+    <p class="cover-subtitle">Base de Dados Completa, Mapeamento Provincial & Propostas Irresistíveis de Parceria</p>
+  </div>
+
+  <div class="cover-body">
+    <p class="cover-desc">
+      Dossiê de inteligência de mercado contendo o perfil aprofundado, estatuto de liderança, 
+      contactos telefónicos diretos, sedes provinciais e análise dos pontos de dor de todas as 
+      associações e cooperativas de transportes (Candongueiros, Moto-táxis/Kupapatas, Carga e Reguladores) em Angola.
+      Inclui a estratégia de abordagem e cartas formais de proposta de parceria individualizadas.
+    </p>
+
+    <div class="cover-meta">
+      <table>
+        <tr>
+          <td>Âmbito Geográfico</td>
+          <td>Nacional (Luanda, Benguela, Huambo, Huíla, Cabinda, Cuanza Norte, Cuanza Sul e Demais Províncias)</td>
+        </tr>
+        <tr>
+          <td>Setores Mapeados</td>
+          <td>Táxis Coletivos Urbanos, Moto-táxis (Kupapatas), Cooperativas e Órgãos Tutelares</td>
+        </tr>
+        <tr>
+          <td>Lideranças Centrais</td>
+          <td>ANATA, ATA, ATL, CTCA (BASTA), CTMF, AMOTRANG, UMANGOLA, ATC, AATA e ANTT</td>
+        </tr>
+        <tr>
+          <td>Objetivo Estratégico</td>
+          <td>Fecho de Parcerias Estruturadas, Digitalização de Frotas e Repasse de Receitas</td>
+        </tr>
+        <tr>
+          <td>Atualização</td>
+          <td>Ano Corrente (Refletindo a amnistia de 2026 e substituições de liderança na ANATA/ATA)</td>
+        </tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="cover-footer">
+    <span>Documento Técnico e Comercial Reservado</span>
+    <span>República de Angola &bull; Luanda</span>
+  </div>
+</div>
+
+<div class="page-break"></div>
+
+<!-- PARTE 1: VISÃO GERAL E O PODER DAS ASSOCIAÇÕES -->
+<h1>1. O Ecossistema dos Transportes em Angola</h1>
+
+<div class="card card-highlight">
+  <h3 style="margin-top:0; color:#0369a1;">A Realidade Estratégica do Setor</h3>
+  <p>
+    Em Angola, os <strong>taxistas azuis e brancos ("candongueiros")</strong> e os <strong>moto-taxistas ("kupapatas")</strong> 
+    são a espinha dorsal indispensável da mobilidade urbana e intermunicipal, transportando mais de <strong>80% da população trabalhadora diariamente</strong>.
+  </p>
+  <p>
+    Tentar entrar no mercado angolano através de soluções tecnológicas (aplicativos de mobilidade ou entrega) 
+    como um interveniente isolado ou cobrando taxas abusivas gera forte resistência, boicotes e fiscalização adversa. 
+    <strong>O segredo do sucesso absoluto reside em transformar as associações em sócias e beneficiárias diretas do sistema</strong>.
+  </p>
+</div>
+
+<h2>As Três Grandes Dores das Associações e dos Motoristas</h2>
+
+<div class="pain-box">
+  <strong>1. Combustível e Inflação de Custos:</strong> A redução progressiva dos subsídios à gasolina e gasóleo comprimiu brutalmente as margens diárias dos taxistas. O custo diário de operação disparou, tornando a rentabilidade crítica.
+</div>
+
+<div class="pain-box">
+  <strong>2. Segurança, Dinheiro Físico e Assaltos:</strong> Operar com quantias elevadas de Kwanzas em notas vivas expõe os motoristas a assaltos violentos e extorsões constantes nos pontos de paragem e rotas secundárias.
+</div>
+
+<div class="pain-box">
+  <strong>3. Arrecadação de Quotas das Associações:</strong> As associações têm enormes dificuldades em cobrar quotas mensais aos associados na praça. O processo manual é caótico, vulnerável a desvios por cobradores de rua e gera atritos.
+</div>
+
+<div class="pitch-box">
+  <strong>O Eixo da "Proposta Irresistível":</strong><br>
+  A nossa proposta resolve estes 3 problemas de uma só vez: 
+  <em>(a)</em> repassa automaticamente uma percentagem ou valor fixo (ex: 20 a 50 Kz) de cada corrida diretamente para a conta bancária da Associação (acabando com a cobrança de rua); 
+  <em>(b)</em> oferece pagamentos por Multicaixa Express (MCX) e carteira digital segura; 
+  <em>(c)</em> formaliza o motorista para acesso a segurança social (INSS) e descontos agrupados em pneus, peças e combustível.
+</div>
+
+<div class="page-break"></div>
+
+<!-- PARTE 2: DIRETÓRIO NACIONAL DAS ASSOCIAÇÕES -->
+<h1>2. Diretório Oficial & Inteligência das Associações</h1>
+
+<!-- ANATA -->
+<div class="card avoid-break">
+  <div style="display:flex; justify-content:space-between; align-items:center;">
+    <h3 style="margin:0; font-size:12pt; color:#0f172a;">ANATA &ndash; Associação Nova Aliança dos Taxistas de Angola</h3>
+    <span class="tag tag-blue">Nacional / Maior Força</span>
+  </div>
+  <p style="margin-top:6px; font-size:9.5pt;">
+    <strong>Representatividade:</strong> Representa cerca de 65% a 70% da frota ativa de táxis coletivos no país, com presença consolidada em Luanda, Benguela, Huambo, Huíla, Bié, Zaire e Uíge.
+  </p>
+  <div class="contact-box">
+    <strong>Liderança Central:</strong> Rodrigo Luciano Catimba (Presidente Oficial em funções) | Francisco Paciente (Líder histórico e de grande influência de base)<br>
+    <strong>Telefones / WhatsApp de Direção:</strong> +244 923 404 461 / +244 923 405 178 / +244 932 550 954 / +244 946 160 016 / +244 923 444 550<br>
+    <strong>Sede / Localização:</strong> Luanda (Zona de Cambamba / Talatona / Kilamba Kiaxi), com delegações provinciais.<br>
+    <strong>Canal Digital:</strong> Página Oficial de Facebook: <em>Associação Nova Aliança dos Taxistas de Angola ANATA</em>
+  </div>
+  <p style="font-size:9pt; color:#475569; margin:4px 0 0 0;">
+    <strong>Gatilho de Negociação:</strong> Valorizam muito a dignificação e a legalização institucional dos taxistas perante o Executivo e o INSS. Uma proposta com repasse automático de quotas associativas e certificação profissional atinge diretamente as suas metas.
+  </p>
+</div>
+
+<!-- ATA -->
+<div class="card avoid-break">
+  <div style="display:flex; justify-content:space-between; align-items:center;">
+    <h3 style="margin:0; font-size:12pt; color:#0f172a;">ATA &ndash; Associação dos Taxistas de Angola</h3>
+    <span class="tag tag-green">Pioneira / Interprovincial</span>
+  </div>
+  <p style="margin-top:6px; font-size:9.5pt;">
+    <strong>Representatividade:</strong> Uma das mais tradicionais organizações de taxistas, forte operadora em rotas urbanas, praças interprovinciais e nós de ligação do Norte e Centro do país.
+  </p>
+  <div class="contact-box">
+    <strong>Liderança:</strong> Francisco Eduardo (Presidente da Direção)<br>
+    <strong>Telefones da Sede Nacional (Luanda):</strong> +244 924 198 878 / +244 994 198 879 / +244 924 462 219<br>
+    <strong>Telefones Delegação Cuanza Norte:</strong> +244 921 326 943 / +244 998 326 843 / +244 933 073 817 / +244 924 363 655<br>
+    <strong>Endereço da Sede:</strong> Rua Direita de Cacuaco, Estrada Nacional nº 100, Casa S/N, Luanda - Angola
+  </div>
+  <p style="font-size:9pt; color:#475569; margin:4px 0 0 0;">
+    <strong>Gatilho de Negociação:</strong> Foco em gestão de rotas organizadas, defesa contra abusos em paragens e criação de fundos de assistência a avarias e acidentes para os membros.
+  </p>
+</div>
+
+<!-- CTCA & MOVIMENTO BASTA -->
+<div class="card avoid-break">
+  <div style="display:flex; justify-content:space-between; align-items:center;">
+    <h3 style="margin:0; font-size:12pt; color:#0f172a;">CTCA & Movimento BASTA (Cooperativa de Táxis Comunitários)</h3>
+    <span class="tag tag-amber">Forte Base Reivindicativa</span>
+  </div>
+  <p style="margin-top:6px; font-size:9.5pt;">
+    <strong>Representatividade:</strong> Mobiliza os operadores que mais sentem o impacto dos combustíveis e da manutenção. Grande penetração nas paragens periféricas de Viana, Cacuaco, Benfica e Zango.
+  </p>
+  <div class="contact-box">
+    <strong>Liderança Central:</strong> Rafael Ginga Inácio (Presidente da CTCA e Coordenador Nacional do Movimento BASTA)<br>
+    <strong>Localização:</strong> Luanda e províncias vizinhas (comunicação intensiva via canais comunitários e redes sociais)
+  </div>
+  <p style="font-size:9pt; color:#475569; margin:4px 0 0 0;">
+    <strong>Gatilho de Negociação:</strong> Combate à carência económica do taxista individual. Qualquer proposta que coloque dinheiro diretamente no bolso do motorista e reduza a perda de rendimento diário tem aprovação imediata.
+  </p>
+</div>
+
+<!-- AMOTRANG -->
+<div class="card avoid-break">
+  <div style="display:flex; justify-content:space-between; align-items:center;">
+    <h3 style="margin:0; font-size:12pt; color:#0f172a;">AMOTRANG &ndash; Motoqueiros e Transportadores de Angola</h3>
+    <span class="tag tag-purple">Maior Força em Número (+500.000)</span>
+  </div>
+  <p style="margin-top:6px; font-size:9.5pt;">
+    <strong>Representatividade:</strong> A maior força de base em Angola em termos de volume de operadores. Controla o segmento de duas rodas (Kupapatas e estafetas) nas 18 províncias.
+  </p>
+  <div class="contact-box">
+    <strong>Presidente Nacional:</strong> Bento Rafael Bento (ou Bento Francisco)<br>
+    <strong>Contacto Telefónico / WhatsApp:</strong> +244 926 391 764 / +244 222 760 130<br>
+    <strong>Sede Nacional:</strong> Município de Cacuaco, Luanda (com centros de formação operacionais em Viana e Kilamba Kiaxi)<br>
+    <strong>Estruturas Provinciais:</strong> Delegados ativos em todas as províncias (ex.: Huambo c/ José Domingos António, Benguela, Huíla, etc.)
+  </div>
+  <p style="font-size:9pt; color:#475569; margin:4px 0 0 0;">
+    <strong>Gatilho de Negociação:</strong> Segurança do motociclista (capacetes, coletes refletores com publicidade conjunta), inserção no mercado de entregas rápidas (delivery) e facilitação de crédito para motos novas.
+  </p>
+</div>
+
+<div class="page-break"></div>
+
+<!-- DEMAIS ENTIDADES -->
+<h2>Outras Entidades Chave do Setor</h2>
+
+<div class="card avoid-break">
+  <div style="display:flex; justify-content:space-between; align-items:center;">
+    <h3 style="margin:0; font-size:11pt; color:#0f172a;">ATL &ndash; Associação dos Taxistas de Luanda</h3>
+    <span class="tag tag-blue">Capital / Urbano</span>
+  </div>
+  <p style="margin-top:4px; font-size:9pt;">
+    <strong>Liderança:</strong> Manuel Faustino (Líder de referência na capital)<br>
+    <strong>Foco:</strong> Gestão das rotas urbanas de grande fluxo em Luanda (Cuca, São Paulo, Mutamba, Viana, Estalagem, Benfica).
+  </p>
+</div>
+
+<div class="card avoid-break">
+  <div style="display:flex; justify-content:space-between; align-items:center;">
+    <h3 style="margin:0; font-size:11pt; color:#0f172a;">CTMF &ndash; Cooperativa dos Taxistas e Motociclistas Freitas</h3>
+    <span class="tag tag-green">Frota Mista Táxi + Moto</span>
+  </div>
+  <p style="margin-top:4px; font-size:9pt;">
+    <strong>Liderança:</strong> António Alexandre Freitas (Presidente)<br>
+    <strong>Foco:</strong> Modelo híbrido de cooperação integrando operadores de carros e motociclos em Luanda.
+  </p>
+</div>
+
+<div class="card avoid-break">
+  <div style="display:flex; justify-content:space-between; align-items:center;">
+    <h3 style="margin:0; font-size:11pt; color:#0f172a;">AATA &ndash; Associação dos Taxistas de Angola (Aeroporto / CCR)</h3>
+    <span class="tag tag-amber">Segmento Corporativo & Turismo</span>
+  </div>
+  <div class="contact-box">
+    <strong>Endereço:</strong> Aeroporto Internacional 4 de Fevereiro, Edifício CCR, Luanda<br>
+    <strong>Telefones:</strong> +244 924 608 224 / +244 923 265 554 | <strong>E-mail:</strong> associacao_aata@hotmail.com
+  </div>
+  <p style="font-size:9pt; margin:4px 0 0 0;">
+    <strong>Foco:</strong> Transfers de aeroporto, passageiros executivos, ligação ao Novo Aeroporto Dr. António Agostinho Neto (AIAAN).
+  </p>
+</div>
+
+<div class="card avoid-break">
+  <div style="display:flex; justify-content:space-between; align-items:center;">
+    <h3 style="margin:0; font-size:11pt; color:#0f172a;">ATC &ndash; Associação dos Taxistas de Cabinda</h3>
+    <span class="tag tag-purple">Província de Cabinda</span>
+  </div>
+  <div class="contact-box">
+    <strong>Contacto Telefónico:</strong> +244 926 706 218<br>
+    <strong>Localização:</strong> Província de Cabinda (atuação conjunta com a Associação Provincial dos Moto-Taxistas de Cabinda / SIGPMA)
+  </div>
+</div>
+
+<div class="card avoid-break">
+  <div style="display:flex; justify-content:space-between; align-items:center;">
+    <h3 style="margin:0; font-size:11pt; color:#0f172a;">ANTT &ndash; Agência Nacional dos Transportes Terrestres (Regulador Estatal)</h3>
+    <span class="tag tag-blue">Órgão Governamental de Tutela</span>
+  </div>
+  <div class="contact-box">
+    <strong>Sede Administrativa:</strong> Muxima Plaza, Edifício A2 / Rua Friedrich Engels, Luanda<br>
+    <strong>Atendimento ao Público:</strong> Rua Rainha Ginga nº 74, 1º Andar, Luanda<br>
+    <strong>Telefone / WhatsApp Geral:</strong> +244 941 004 300 | <strong>E-mail:</strong> geral@antt.gov.ao / antt.gov.ao
+  </div>
+  <p style="font-size:9pt; margin:4px 0 0 0;">
+    <strong>Papel:</strong> Homologação de tecnologias de bilhética, emissão de licenças operacionais e regulação de tarifas.
+  </p>
+</div>
+
+<div class="page-break"></div>
+
+<!-- PARTE 3: TABELA DE COBERTURA PROVINCIAL -->
+<h1>3. Matriz de Cobertura e Contactos Provinciais</h1>
+
+<p style="font-size:9.5pt; color:#475569;">
+Abaixo encontra-se a consolidação das principais representações e canais de diálogo em cada província de Angola:
+</p>
+
+<table class="data-table">
+  <thead>
+    <tr>
+      <th style="width:18%;">Província</th>
+      <th style="width:32%;">Entidades / Associações Activas</th>
+      <th style="width:25%;">Canais de Contacto</th>
+      <th style="width:25%;">Pontos Críticos / Paragens</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>Luanda</strong></td>
+      <td>ANATA, ATA, ATL, AMOTRANG, CTCA, CTMF, AATA</td>
+      <td>+244 923 404 461<br>+244 924 198 878<br>+244 926 391 764</td>
+      <td>Cacuaco, Viana, Zango, Estalagem, Mutamba, Benfica, Cuca</td>
+    </tr>
+    <tr>
+      <td><strong>Benguela</strong> (Lobito / Baía Farta)</td>
+      <td>Núcleo Provincial ANATA, ATA-Benguela, Associações Locais de Kupapatas</td>
+      <td>Canais via ANATA Central e Governo Provincial de Benguela (Transportes)</td>
+      <td>Terminal do Lobito, Praça da Peça, Rotunda do Calomboto, Mercado 4 de Abril</td>
+    </tr>
+    <tr>
+      <td><strong>Huambo</strong></td>
+      <td>ASTAHUA (Assoc. Taxistas Huambo), AMOTRANG (Del. José Domingos António), ANATA</td>
+      <td>+244 926 391 764 (AMOTRANG Central) / Núcleo Local Huambo</td>
+      <td>Terminal Rodoviário do São João, Praça da Alemanha, Rotunda da Cidade Alta</td>
+    </tr>
+    <tr>
+      <td><strong>Huíla</strong> (Lubango)</td>
+      <td>ANATA-Huíla, ATA-Huíla, Cooperativas de Moto-táxis do Lubango</td>
+      <td>Canais via Direção Provincial dos Transportes e ANATA Central</td>
+      <td>Paragem do Bairro da Lage, Mercado do Mutundo, Terminal do Caminho de Ferro</td>
+    </tr>
+    <tr>
+      <td><strong>Cabinda</strong></td>
+      <td>ATC (Assoc. Taxistas de Cabinda), Assoc. Prov. Moto-Taxistas (SIGPMA)</td>
+      <td>+244 926 706 218</td>
+      <td>Mercado do Povo, Praça 1º de Maio, Paragem da Fronteira do Iema</td>
+    </tr>
+    <tr>
+      <td><strong>Cuanza Norte</strong> (N'dalatando)</td>
+      <td>ATA Delegação Cuanza Norte, AMOTRANG</td>
+      <td>+244 921 326 943<br>+244 998 326 843</td>
+      <td>Cruzamento de Dondo, Terminal de N'dalatando, Mercado das Mangueiras</td>
+    </tr>
+    <tr>
+      <td><strong>Cuanza Sul</strong> (Sumbe / Porto Amboim)</td>
+      <td>UMANGOLA, Núcleos Provinciais de Táxi e Moto-táxi</td>
+      <td>Via Direcção de Transportes e UMANGOLA Regional</td>
+      <td>Rotunda do Sumbe, Mercado Municipal, Desvio de Porto Amboim</td>
+    </tr>
+    <tr>
+      <td><strong>Bié</strong> (Cuito)</td>
+      <td>UMANGOLA, Cooperativas Locais de Kupapatas</td>
+      <td>Canais de Tráfego e Mobilidade Urbana do Bié</td>
+      <td>Terminal do Cuito, Mercado do Caluquembe, Paragem dos Caminhões</td>
+    </tr>
+    <tr>
+      <td><strong>Uíge & Zaire</strong></td>
+      <td>ANATA Delegações Norte, ATA, AMOTRANG Norte</td>
+      <td>+244 923 404 461 / Sede Nacional ANATA</td>
+      <td>Fronteiras comerciais, Paragem Central de Uíge, Rotunda de Mbanza Kongo</td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="page-break"></div>
+
+<!-- PARTE 4: A PROPOSTA IRRESISTÍVEL - ESTRUTURA -->
+<h1>4. Arquitetura da "Proposta Irresistível"</h1>
+
+<p style="font-size:10pt;">
+Para convencer cada líder associativo a assinar um acordo de cooperação e recomendar a adesão aos seus membros em massa, 
+a proposta deve conter os seguintes <strong>cinco pilares fundamentais de atração mútua</strong>:
+</p>
+
+<div class="card avoid-break">
+  <h3 style="color:#0284c7; margin-top:0;">Pilar 1: Fonte Automática de Receita para a Associação (Quotas Digitais)</h3>
+  <p style="font-size:9.5pt;">
+    <strong>Como Funciona:</strong> Em cada corrida realizada através da plataforma pelos membros da associação, 
+    uma fatia fixa (por exemplo, <strong>25 a 50 Kwanzas por corrida</strong> ou <strong>1% a 2% do valor total</strong>) é retida 
+    e depositada diretamente na conta bancária institucional da Associação.
+  </p>
+  <p style="font-size:9pt; background:#f1f5f9; padding:8px; border-radius:4px; margin:0;">
+    <strong>Exemplo de Lucro da Associação:</strong> Com 2.000 taxistas a realizarem em média 12 corridas/dia = 24.000 corridas diárias. 
+    A 25 Kz/corrida = <strong>600.000 Kz/dia</strong>, gerando <strong>15.600.000 Kz/mês</strong> em receita garantida e limpa para os cofres da Associação, 
+    sem necessidade de fiscais na rua!
+  </p>
+</div>
+
+<div class="card avoid-break">
+  <h3 style="color:#0284c7; margin-top:0;">Pilar 2: Carteira Digital & Fim do "Troco" e Assaltos (Multicaixa Express)</h3>
+  <p style="font-size:9.5pt;">
+    Os passageiros pagam por QR Code ou Multicaixa Express (MCX) diretamente para a carteira virtual do taxista no telemóvel. 
+    Isto acaba com a crise da falta de troco, reduz a circulação de notas no veículo e neutraliza os assaltos armados contra os motoristas.
+  </p>
+</div>
+
+<div class="card avoid-break">
+  <h3 style="color:#0284c7; margin-top:0;">Pilar 3: Painel de Controlo Exclusivo para o Presidente e Secretariado</h3>
+  <p style="font-size:9.5pt;">
+    A direção da associação recebe um portal web administrativo próprio onde visualiza: 
+    quantos membros estão ativos, mapa de frotas em tempo real, receita acumulada das quotas e relatórios estatísticos 
+    para apresentar ao Governo Provincial e à ANTT.
+  </p>
+</div>
+
+<div class="card avoid-break">
+  <h3 style="color:#0284c7; margin-top:0;">Pilar 4: Benefícios Sociais Reais (Segurança Social INSS & Seguros)</h3>
+  <p style="font-size:9.5pt;">
+    A plataforma gera extratos de rendimentos validados que permitem a cada taxista regularizar a sua inscrição 
+    no Instituto Nacional de Segurança Social (INSS), além de facultar acesso a apólices coletivas de microseguro contra acidentes pessoais 
+    e assistência médica em parceria com seguradoras angolanas.
+  </p>
+</div>
+
+<div class="card avoid-break">
+  <h3 style="color:#0284c7; margin-top:0;">Pilar 5: Clube de Compras Coletivas (Pneus, Peças & Combustível)</h3>
+  <p style="font-size:9.5pt;">
+    Ao agrupar a frota sob a plataforma, criamos poder de negociação em escala perante importadores de pneus (Kumho, Triangle, Linglong), 
+    óleos de motor e redes de abastecimento, oferecendo cupões de desconto em combustível exclusivos para motoristas associados.
+  </p>
+</div>
+
+<div class="page-break"></div>
+
+<!-- PARTE 5: MINUTAS DE CARTAS DE PROPOSTA INDIVIDUAIS -->
+<h1>5. Minutas de Propostas Personalizadas (Prontas a Enviar)</h1>
+
+<!-- CARTA 1: ANATA -->
+<div class="letter-container avoid-break">
+  <div class="letter-head">
+    <span><strong>CONFIDENCIAL &bull; CARTA DE INTENÇÃO E PROPOSTA COMERCIAL</strong></span>
+    <span>Luanda, Data: ____/____/2026</span>
+  </div>
+
+  <div style="margin-bottom:12px; font-size:9pt;">
+    <strong>À Direcção Nacional da ANATA &ndash; Associação Nova Aliança dos Taxistas de Angola</strong><br>
+    <strong>A/C:</strong> Exmo. Senhor Presidente Rodrigo Luciano Catimba / Ilmo. Sr. Francisco Paciente<br>
+    <strong>Sede Nacional:</strong> Luanda &ndash; República de Angola
+  </div>
+
+  <div class="letter-title">
+    ASSUNTO: PROPOSTA DE PARCERIA ESTRATÉGICA &ndash; DIGITALIZAÇÃO DA CLASSE, ARRECADAÇÃO AUTOMÁTICA DE QUOTAS ASSOCIATIVAS E VALORIZAÇÃO SOCIAL DO TAXISTA
+  </div>
+
+  <div class="letter-body">
+    <p>
+      Excelentíssimos Senhores Dirigentes da ANATA,
+    </p>
+    <p>
+      Reconhecendo a ANATA como a mais ativa e representativa organização dos profissionais do volante na República de Angola, 
+      dirigimo-nos a V. Exas. com uma proposta concebida à medida das reais reivindicações e necessidades da vossa classe.
+    </p>
+    <p>
+      Sabemos que os taxistas angolanos enfrentam hoje três desafios asfixiantes: <em>o impacto do preço dos combustíveis</em>, 
+      <em>o risco diário de assaltos por porte de dinheiro em notas</em> e a <em>dificuldade das associações na arrecadação sistemática das quotas dos seus membros</em>.
+    </p>
+    <p>
+      Para transformar este cenário sem criar qualquer custo para a ANATA, propomos uma <strong>Aliança Tecnológica Institucional</strong>:
+    </p>
+    <ul class="letter-points">
+      <li><strong>Repasse Automático de Quotas para a ANATA:</strong> A cada corrida intermediada pelo nosso sistema, é descontada uma quota social fixa (ex: 25 Kz a 50 Kz) repassada 100% diretamente para a conta bancária oficial da ANATA. Uma frota de 2.500 taxistas pode gerar mais de <strong>15.000.000 Kz mensais</strong> garantidos e transparentes para a vossa tesouraria.</li>
+      <li><strong>Pagamentos Digitais por Multicaixa Express (MCX):</strong> O passageiro paga pelo telemóvel, acabando com a questão da falta de trocos e eliminando o volume de notas que atrai a criminalidade.</li>
+      <li><strong>Plataforma de Integração no INSS:</strong> Implementação do programa conjunto para inserção dos taxistas associados na Segurança Social e acesso a microcrédito para compra de peças e pneus.</li>
+      <li><strong>Painel de Gestão e Monitorização Exclusivo:</strong> Fornecimento de software de gestão gratuito à sede da ANATA para controlo e censo dos associados em tempo real em todas as províncias.</li>
+    </ul>
+    <p>
+      Gostaríamos de solicitar uma audiência presencial ou de trabalho de 30 minutos na vossa sede nacional para demonstração prática da tecnologia e assinatura do Acordo de Cooperação e Confidencialidade.
+    </p>
+  </div>
+
+  <div class="letter-sign">
+    <div>
+      ____________________________________________<br>
+      <strong>A Direcção Executiva / Giro Angola</strong><br>
+      Telefone / WhatsApp: (+244) __________________<br>
+      E-mail: comercial@giroangola.ao
+    </div>
+    <div style="text-align:right;">
+      <strong>Pela ANATA &ndash; Direcção Nacional:</strong><br><br>
+      Data de Receção: ____ / ____ / 2026<br>
+      Carimbo / Protocolo: ________________
+    </div>
+  </div>
+</div>
+
+<div class="page-break"></div>
+
+<!-- CARTA 2: AMOTRANG -->
+<div class="letter-container avoid-break">
+  <div class="letter-head">
+    <span><strong>CONFIDENCIAL &bull; CARTA DE INTENÇÃO E COOPERAÇÃO NACIONAL</strong></span>
+    <span>Luanda, Data: ____/____/2026</span>
+  </div>
+
+  <div style="margin-bottom:12px; font-size:9pt;">
+    <strong>À Direcção Central da AMOTRANG &ndash; Associação dos Motoqueiros e Transportadores de Angola</strong><br>
+    <strong>A/C:</strong> Exmo. Senhor Presidente Bento Rafael Bento (Bento Francisco)<br>
+    <strong>Sede Nacional:</strong> Município de Cacuaco, Luanda &ndash; República de Angola
+  </div>
+
+  <div class="letter-title">
+    ASSUNTO: PROPOSTA DE PARCERIA &ndash; INCLUSÃO DOS MOTOQUEIROS (KUPAPATAS) NO MERCADO DE ENTREGAS E CORRIDAS DIGITAIS COM ARRECADAÇÃO ASSOCIATIVA
+  </div>
+
+  <div class="letter-body">
+    <p>
+      Estimado Presidente Bento Rafael e distinta Direcção da AMOTRANG,
+    </p>
+    <p>
+      A AMOTRANG é hoje a maior força de inclusão laboral jovem de Angola, com mais de meio milhão de motoqueiros empenhados diariamente 
+      no sustento das suas famílias através do transporte de passageiros e bens em todas as 18 províncias.
+    </p>
+    <p>
+      Apresentamos à AMOTRANG uma proposta exclusiva para converter cada motoqueiro associado num <strong>profissional de entregas rápidas (delivery) e transporte individual seguro</strong>:
+    </p>
+    <ul class="letter-points">
+      <li><strong>Fundo de Apoio Social à AMOTRANG:</strong> Repasse de comissão automática por cada entrega ou corrida efetuada pelos motoqueiros cadastrados com carteira da AMOTRANG, capitalizando os fundos de assistência social e formação da associação.</li>
+      <li><strong>Kit de Segurança Rodoviária Subsidiado:</strong> Fornecimento conjunto de capacetes certificados, coletes refletores padronizados com os logótipos da AMOTRANG e suportes de telemóvel para os associados ativos.</li>
+      <li><strong>Acesso Imediato a Corridas e Encomendas Comerciais:</strong> Integração dos motoqueiros com os grandes comércios, armazéns, farmácias e clientes particulares locais, garantindo trabalho diário contínuo e rendimentos superiores.</li>
+      <li><strong>Recebimento Seguro e Sem Dinheiro Vivo:</strong> Pagamentos automáticos na carteira virtual, salvaguardando a integridade física do motoqueiro contra assaltos nas artérias periféricas.</li>
+    </ul>
+    <p>
+      Propomos a realização de um encontro oficial na vossa sede em Cacuaco para estabelecermos os termos deste protocolo nacional.
+    </p>
+  </div>
+
+  <div class="letter-sign">
+    <div>
+      ____________________________________________<br>
+      <strong>A Direcção de Parcerias Estratégicas</strong><br>
+      Contacto: (+244) __________________<br>
+      Luanda &ndash; Angola
+    </div>
+    <div style="text-align:right;">
+      <strong>Pela AMOTRANG &ndash; Gabinete da Presidência:</strong><br><br>
+      Assinatura / Protocolo: __________________<br>
+      Data: ____ / ____ / 2026
+    </div>
+  </div>
+</div>
+
+<div class="page-break"></div>
+
+<!-- CARTA 3: ATA -->
+<div class="letter-container avoid-break">
+  <div class="letter-head">
+    <span><strong>CONFIDENCIAL &bull; CARTA DE PROPOSTA DE PARCERIA OPERACIONAL</strong></span>
+    <span>Luanda, Data: ____/____/2026</span>
+  </div>
+
+  <div style="margin-bottom:12px; font-size:9pt;">
+    <strong>À Direcção da ATA &ndash; Associação dos Taxistas de Angola</strong><br>
+    <strong>A/C:</strong> Exmo. Senhor Presidente Francisco Eduardo<br>
+    <strong>Sede Nacional:</strong> Rua Direita de Cacuaco, Estrada Nacional nº 100, Luanda
+  </div>
+
+  <div class="letter-title">
+    ASSUNTO: MODERNIZAÇÃO TECNOLÓGICA DAS FROTAS DA ATA &ndash; SISTEMA DE GESTÃO INTEGRADO E ARRECADAÇÃO AUTOMÁTICA
+  </div>
+
+  <div class="letter-body">
+    <p>
+      Ilustre Presidente Francisco Eduardo e Membros da Direcção da ATA,
+    </p>
+    <p>
+      Com o histórico pioneiro da ATA na organização do transporte em Luanda e no interior do país (nomeadamente no Cuanza Norte, Benguela e Huíla), 
+      apresentamos uma solução prática e de alto impacto financeiro para fortalecer a vossa estrutura organizacional:
+    </p>
+    <ul class="letter-points">
+      <li><strong>Automação Completa da Quota Social da ATA:</strong> Sem recurso a cobradores físicos nas praças nem extravios de valores, a nossa plataforma canaliza uma contribuição institucional direta por cada trajeto efetuado pelos taxistas com inscrição válida na ATA.</li>
+      <li><strong>Proteção dos Motoristas nas Paragens:</strong> Sistema de despacho digital que organiza os passageiros de forma ordenada, reduzindo tempos de espera vazios e consumo desnecessário de combustível.</li>
+      <li><strong>Descontos Coletivos em Peças e Pneus:</strong> Parcerias corporativas diretas para os motoristas da ATA adquirirem peças essenciais com desconto perante fornecedores homologados.</li>
+      <li><strong>Modernização e Certificação:</strong> Apoio institucional para formalização e acesso a linhas de benefícios e regalias sociais perante a ANTT e os órgãos governamentais.</li>
+    </ul>
+    <p>
+      Colocamo-nos à inteira disposição para agendar a reunião preparatória nas vossas instalações de Cacuaco com a vossa equipa diretiva.
+    </p>
+  </div>
+
+  <div class="letter-sign">
+    <div>
+      ____________________________________________<br>
+      <strong>Giro Angola &ndash; Mobilidade Inteligente</strong><br>
+      Contacto: (+244) __________________
+    </div>
+    <div style="text-align:right;">
+      <strong>Pela ATA &ndash; Direcção:</strong><br><br>
+      Recebido por: _________________________<br>
+      Data: ____ / ____ / 2026
+    </div>
+  </div>
+</div>
+
+<div class="page-break"></div>
+
+<!-- PARTE 6: GUIÃO DE ABORDAGEM PRESENCIAL -->
+<h1>6. Guião Prático de Abordagem Presencial (Script de Negociação)</h1>
+
+<div class="card avoid-break">
+  <h3 style="color:#0369a1; margin-top:0;">Fase 1: O Que Dizer no Primeiro Minuto (Gabinete do Presidente)</h3>
+  <p style="font-size:9.5pt; font-style:italic; background:#f8fafc; padding:10px; border-left:3px solid #0369a1;">
+    "Senhor Presidente, viemos aqui hoje porque conhecemos a luta diária da vossa classe. O combustível subiu, as peças estão caras e cobrar as quotas na praça aos taxistas é uma dor de cabeça constante. 
+    Nós não somos uma empresa estrangeira que vem levar 15% ou 20% do suor dos vossos taxistas para fora do país. Nós viemos propor que a vossa Associação ganhe dinheiro a cada corrida feita, 
+    recebendo as quotas diretamente no banco, enquanto o vosso taxista fica protegido de assaltos com pagamentos no Multicaixa Express."
+  </p>
+</div>
+
+<div class="card avoid-break">
+  <h3 style="color:#0369a1; margin-top:0;">Fase 2: As 3 Principais Objeções e Como Responder Imediatamente</h3>
+  
+  <p style="font-size:9.5pt; margin-bottom:4px;">
+    <strong>Objeção 1:</strong> <em>"Os nossos taxistas e passageiros não sabem usar telemóveis complicados ou não têm saldo de internet."</em><br>
+    <strong>Resposta:</strong> "O nosso aplicativo foi desenhado para gastar quase zero dados e funciona de forma extremamente simples por botões intuitivos ou até via QR Code impresso no vidro do táxi. 
+    O passageiro apenas aponta a câmara do Multicaixa Express ou confirma no telemóvel e o dinheiro entra na hora na conta do taxista."
+  </p>
+  
+  <p style="font-size:9.5pt; margin-bottom:4px;">
+    <strong>Objeção 2:</strong> <em>"Já vieram aqui outras aplicações e depois abandonaram a associação e só queriam os taxistas."</em><br>
+    <strong>Resposta:</strong> "Com a nossa plataforma, a Associação assina um contrato formal e juridicamente vinculativo com cláusula de repasse obrigatório de quotas. 
+    A Associação tem acesso a um painel de controlo próprio para auditar todas as corridas e saques de valores diariamente."
+  </p>
+
+  <p style="font-size:9.5pt; margin-bottom:0;">
+    <strong>Objeção 3:</strong> <em>"Quanto vai custar isso à Associação?"</em><br>
+    <strong>Resposta:</strong> "Zero Kwanzas. A Associação não paga um único Kwanza pela tecnologia nem pela adesão. A Associação apenas recebe receitas e beneficia os seus membros."
+  </p>
+</div>
+
+<div class="card avoid-break" style="border: 2px solid #0284c7; background:#f0f9ff;">
+  <h3 style="color:#0369a1; margin-top:0;">Checklist de Fecho de Acordo</h3>
+  <ul style="font-size:9pt; margin:0; padding-left:18px;">
+    <li>Entregar a Carta Formal de Proposta impressa e rubricada com protocolo de entrega;</li>
+    <li>Apresentar o protótipo funcional do aplicativo a funcionar num telemóvel Android comum;</li>
+    <li>Agendar demonstração prática numa das paragens principais de Luanda (ex.: Paragem do São Paulo ou Paragem de Cacuaco);</li>
+    <li>Celebrar o Memorando de Entendimento (MoU) com a Direção Nacional da Associação.</li>
+  </ul>
+</div>
+
+</body>
+</html>
