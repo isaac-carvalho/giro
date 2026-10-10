@@ -10,6 +10,7 @@
 - 🚖 **App de Passageiro (Demo Web):** [Abrir App Passageiro](https://isaac-carvalho.github.io/giro/)
 - 🚗 **App de Motorista (Comissão 10%):** [Abrir App Motorista](https://isaac-carvalho.github.io/giro/driver.html)
 - 🖥️ **Central Operacional & Despacho 24/7:** [Abrir Central](https://isaac-carvalho.github.io/giro/central.html)
+- 🤝 **Proposta Oficial para Associações (Pitch Online & Simulador):** [Aceder à Proposta Interativa](https://isaac-carvalho.github.io/giro/proposta-associacoes.html)
 - 📑 **Dossiê de Parcerias com Associações de Taxistas (ANATA / ATA / AMOTRANG):** [Ver Dossiê HTML Online](https://isaac-carvalho.github.io/giro/dossie_transportes_angola.html)
 - 📄 **Dossiê Oficial em PDF (11 Páginas para Download):** [Baixar PDF](./DOSSIE_REPRESENTANTES_TRANSPORTES_ANGOLA.pdf)
 - 📊 **Base de Dados dos Representantes em Excel:** [Baixar Planilha Excel](./REPRESENTANTES_TRANSPORTES_ANGOLA.xlsx)

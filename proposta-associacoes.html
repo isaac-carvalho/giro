@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="pt-AO">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>Aliança Estratégica GIRO & Associações dos Transportes de Angola</title>
+<meta name="description" content="Proposta Oficial de Aliança Estratégica e Modernização da Classe dos Taxistas e Motoqueiros de Angola. Repasse automático de quotas, pagamentos por Multicaixa Express e dignidade profissional.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+  :root {
+    --bg-dark: #07090b;
+    --bg-card: #0f141a;
+    --bg-card-hover: #161e27;
+    --border: #1e293b;
+    --border-accent: #0284c7;
+    --gold: #d4af37;
+    --gold-glow: #f5d77f;
+    --emerald: #10b981;
+    --emerald-glow: #34d399;
+    --sky: #38bdf8;
+    --text-primary: #f8fafc;
+    --text-secondary: #94a3b8;
+    --text-muted: #64748b;
+    --danger: #ef4444;
+  }
+
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  body {
+    background-color: var(--bg-dark);
+    color: var(--text-primary);
+    font-family: 'Plus Jakarta Sans', 'Inter', -apple-system, sans-serif;
+    line-height: 1.6;
+    overflow-x: hidden;
+    padding-bottom: 90px;
+  }
+
+  /* BARRA SUPERIOR */
+  header.top-nav {
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    background: rgba(7, 9, 11, 0.92);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    padding: 14px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .nav-brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+    color: inherit;
+  }
+
+  .logo-badge {
+    width: 38px;
+    height: 38px;
+    background: linear-gradient(135deg, var(--gold), #b8860b);
+    color: #000;
+    font-weight: 900;
+    font-size: 20px;
+    border-radius: 9px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 0 15px rgba(212, 175, 55, 0.3);
+  }
+
+  .brand-text h1 {
+    font-size: 16px;
+    font-weight: 800;
+    letter-spacing: -0.3px;
+    line-height: 1.1;
+  }
+
+  .brand-text span {
+    font-size: 10px;
+    color: var(--gold);
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+  }
+
+  .btn-wa-header {
+    background: #25d366;
+    color: #000;
+    font-weight: 800;
+    font-size: 12.5px;
+    padding: 8px 16px;
+    border-radius: 8px;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: transform 0.15s ease;
+  }
+
+  .btn-wa-header:hover {
+    transform: scale(1.02);
+  }
+
+  /* CONTAINER GERAL */
+  .container {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 0 20px;
+  }
+
+  /* HERO */
+  .hero-section {
+    padding: 48px 0 36px;
+    text-align: center;
+  }
+
+  .hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(2, 132, 199, 0.12);
+    border: 1px solid rgba(56, 189, 248, 0.3);
+    color: var(--sky);
+    font-size: 12px;
+    font-weight: 700;
+    padding: 6px 14px;
+    border-radius: 999px;
+    margin-bottom: 20px;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+  }
+
+  .hero-title {
+    font-size: 32px;
+    font-weight: 900;
+    line-height: 1.2;
+    letter-spacing: -0.8px;
+    margin-bottom: 16px;
+    color: #ffffff;
+  }
+
+  .hero-title span {
+    background: linear-gradient(135deg, var(--gold-glow), var(--gold));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .hero-subtitle {
+    font-size: 16px;
+    color: var(--text-secondary);
+    max-width: 720px;
+    margin: 0 auto 28px;
+    line-height: 1.6;
+  }
+
+  /* CARDS DE DESTAQUE */
+  .card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 24px;
+    margin-bottom: 24px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .card-highlight {
+    border-left: 4px solid var(--gold);
+    background: linear-gradient(180deg, #131922 0%, var(--bg-card) 100%);
+  }
+
+  .card-emerald {
+    border-left: 4px solid var(--emerald);
+  }
+
+  /* COMPARAÇÃO: MULTINACIONAIS VS GIRO */
+  .comparison-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-top: 18px;
+  }
+
+  @media (max-width: 680px) {
+    .comparison-grid {
+      grid-template-columns: 1fr;
+    }
+    .hero-title {
+      font-size: 26px;
+    }
+  }
+
+  .comp-box {
+    padding: 18px;
+    border-radius: 10px;
+    font-size: 13.5px;
+  }
+
+  .comp-box.negative {
+    background: rgba(239, 68, 68, 0.06);
+    border: 1px solid rgba(239, 68, 68, 0.2);
+  }
+
+  .comp-box.positive {
+    background: rgba(16, 185, 129, 0.08);
+    border: 1px solid rgba(16, 185, 129, 0.3);
+  }
+
+  .comp-title {
+    font-size: 14px;
+    font-weight: 800;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .comp-box.negative .comp-title { color: #fca5a5; }
+  .comp-box.positive .comp-title { color: #6ee7b7; }
+
+  ul.check-list {
+    list-style: none;
+    padding: 0;
+  }
+
+  ul.check-list li {
+    margin-bottom: 8px;
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    font-size: 13px;
+  }
+
+  /* SIMULADOR DE ARRECADAÇÃO */
+  .calc-card {
+    background: radial-gradient(circle at top right, #1a2332 0%, var(--bg-card) 70%);
+    border: 1px solid #2d3b4f;
+    border-radius: 16px;
+    padding: 28px;
+    margin: 32px 0;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+  }
+
+  .calc-header {
+    text-align: center;
+    margin-bottom: 24px;
+  }
+
+  .calc-header h3 {
+    font-size: 20px;
+    font-weight: 800;
+    color: var(--gold-glow);
+    margin-bottom: 6px;
+  }
+
+  .calc-slider-box {
+    margin: 20px 0;
+  }
+
+  .slider-label {
+    display: flex;
+    justify-content: space-between;
+    font-size: 14px;
+    font-weight: 700;
+    margin-bottom: 8px;
+    color: var(--text-primary);
+  }
+
+  input[type="range"] {
+    width: 100%;
+    height: 8px;
+    background: #1e293b;
+    border-radius: 5px;
+    outline: none;
+    accent-color: var(--gold);
+    cursor: pointer;
+  }
+
+  .calc-results {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-top: 24px;
+  }
+
+  @media (max-width: 580px) {
+    .calc-results {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .result-pill {
+    background: rgba(15, 23, 42, 0.8);
+    border: 1px solid #334155;
+    border-radius: 12px;
+    padding: 16px;
+    text-align: center;
+  }
+
+  .result-val {
+    font-size: 26px;
+    font-weight: 900;
+    color: var(--emerald-glow);
+    margin-top: 4px;
+    font-family: 'Plus Jakarta Sans', monospace;
+  }
+
+  .result-desc {
+    font-size: 11.5px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  /* OS 5 PILARES */
+  .pilar-item {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 20px;
+    align-items: flex-start;
+  }
+
+  .pilar-num {
+    width: 36px;
+    height: 36px;
+    background: rgba(2, 132, 199, 0.15);
+    border: 1px solid var(--sky);
+    color: var(--sky);
+    font-weight: 900;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .pilar-content h4 {
+    font-size: 15px;
+    font-weight: 800;
+    color: #ffffff;
+    margin-bottom: 4px;
+  }
+
+  .pilar-content p {
+    font-size: 13.5px;
+    color: var(--text-secondary);
+    line-height: 1.5;
+  }
+
+  /* BARRA FIXA INFERIOR DE CONTATO */
+  .bottom-cta-bar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: rgba(7, 9, 11, 0.95);
+    backdrop-filter: blur(12px);
+    border-top: 1px solid var(--border);
+    padding: 12px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    z-index: 1000;
+  }
+
+  .cta-inner {
+    max-width: 960px;
+    width: 100%;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .btn-action-primary {
+    background: linear-gradient(135deg, var(--gold), #c99700);
+    color: #000;
+    font-weight: 800;
+    font-size: 14px;
+    padding: 12px 22px;
+    border-radius: 9px;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 0 4px 14px rgba(212, 175, 55, 0.3);
+    transition: transform 0.15s ease;
+    border: none;
+    cursor: pointer;
+    text-align: center;
+  }
+
+  .btn-action-primary:hover {
+    transform: translateY(-2px);
+  }
+
+  .btn-action-sec {
+    background: #1e293b;
+    color: #fff;
+    font-weight: 700;
+    font-size: 13px;
+    padding: 11px 18px;
+    border-radius: 9px;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    border: 1px solid #334155;
+    transition: background 0.15s;
+  }
+
+  .btn-action-sec:hover {
+    background: #334155;
+  }
+
+  /* DOCUMENTOS ANEXOS */
+  .doc-badge-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 14px;
+  }
+
+  .doc-badge {
+    background: #141b24;
+    border: 1px solid var(--border);
+    padding: 10px 16px;
+    border-radius: 8px;
+    text-decoration: none;
+    color: var(--text-primary);
+    font-size: 12.5px;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: border-color 0.15s;
+  }
+
+  .doc-badge:hover {
+    border-color: var(--sky);
+  }
+</style>
+</head>
+<body>
+
+<!-- NAVEGAÇÃO SUPERIOR -->
+<header class="top-nav">
+  <a href="https://isaac-carvalho.github.io/giro/" class="nav-brand">
+    <div class="logo-badge">G</div>
+    <div class="brand-text">
+      <h1>GIRO ANGOLA</h1>
+      <span>Aliança com os Transportes</span>
+    </div>
+  </a>
+
+  <a href="https://wa.me/244923000000?text=Ol%C3%A1%20Isaac%2C%20represento%20uma%20Associa%C3%A7%C3%A3o%20de%20Transportes%20e%20quero%20agendar%20a%20audi%C3%AAncia%20presencial%20sobre%20a%20parceria." target="_blank" class="btn-wa-header">
+    📲 Falar no WhatsApp
+  </a>
+</header>
+
+<main class="container">
+
+  <!-- HERO -->
+  <section class="hero-section">
+    <div class="hero-badge">🇦🇴 Proposta Oficial para Lideranças & Direções</div>
+    <h2 class="hero-title">
+      Uma Parceria Onde a <span>Sua Associação Lucra</span> e os Seus Motoristas Trabalham com Segurança
+    </h2>
+    <p class="hero-subtitle">
+      Apresentamos ao Senhor Presidente e à Direção Nacional a primeira tecnologia de mobilidade 
+      desenhada em Angola que <strong>repassa quotas automáticas para a conta bancária da Associação</strong>, 
+      acaba com os assaltos por dinheiro vivo via Multicaixa Express e dignifica a classe perante o Estado.
+    </p>
+
+    <!-- LINKS DIRETOS PARA DEMONSTRAÇÕES ONLINE -->
+    <div class="doc-badge-group" style="justify-content:center;">
+      <a href="https://isaac-carvalho.github.io/giro/dossie_transportes_angola.html" class="doc-badge" style="border-color:var(--gold);color:var(--gold-glow);">
+        📑 Ver Dossiê Completo das Associações
+      </a>
+      <a href="https://isaac-carvalho.github.io/giro/DOSSIE_REPRESENTANTES_TRANSPORTES_ANGOLA.pdf" class="doc-badge" download>
+        📄 Baixar PDF Oficial (11 Páginas)
+      </a>
+      <a href="https://isaac-carvalho.github.io/giro/REPRESENTANTES_TRANSPORTES_ANGOLA.xlsx" class="doc-badge" download>
+        📊 Baixar Lista de Contactos (Excel)
+      </a>
+    </div>
+  </section>
+
+  <!-- MENSAGEM DIRETA ÀS LIDERANÇAS -->
+  <div class="card card-highlight">
+    <h3 style="font-size:18px;font-weight:800;color:var(--gold);margin-bottom:10px;">
+      Palavra de Honra às Direções da ANATA, ATA, AMOTRANG e Cooperativas:
+    </h3>
+    <p style="font-size:14px;color:#cbd5e1;margin-bottom:12px;">
+      Nós sabemos que quem acorda às 04h da manhã para movimentar Luanda e as 18 províncias são os vossos taxistas e motoqueiros. 
+      E sabemos que as aplicações multinacionais que entraram em Angola estão a levar 15% a 20% do dinheiro suado para fora do país, 
+      deixando os motoristas com a gasolina cara e a Associação de mãos vazias.
+    </p>
+    <p style="font-size:14.5px;color:#ffffff;font-weight:700;">
+      A nossa proposta com a vossa Direção é diferente e baseia-se num princípio sagrado: 
+      <span style="color:var(--gold-glow);">A Associação é sócia e beneficiária financeira direta de cada corrida realizada no sistema.</span>
+    </p>
+  </div>
+
+  <!-- COMPARAÇÃO DIRETA -->
+  <div class="card">
+    <h3 style="font-size:17px;font-weight:800;color:#ffffff;margin-bottom:6px;">
+      A Diferença Real: Apps Estrangeiros vs. Parceria GIRO Angola
+    </h3>
+    <div class="comparison-grid">
+      <div class="comp-box negative">
+        <div class="comp-title">❌ O Que as Multinacionais Fazem:</div>
+        <ul class="check-list">
+          <li>Cobram 15% a 20% de comissão de cada motorista;</li>
+          <li>Zero Kwanzas transferidos para os cofres da Associação;</li>
+          <li>Não querem saber das quotas associativas nem do INSS;</li>
+          <li>Deixam o taxista exposto a assaltos com dinheiro vivo na rota;</li>
+          <li>Ignoram os presidentes e o poder das paragens organizadas.</li>
+        </ul>
+      </div>
+
+      <div class="comp-box positive">
+        <div class="comp-title">✅ O Que a Parceria GIRO Garante:</div>
+        <ul class="check-list">
+          <li><strong>Repasse Automático de Quotas:</strong> 25 a 50 Kz por corrida caem direto na conta bancária da Associação;</li>
+          <li><strong>Menor Comissão:</strong> O motorista retém 90% do valor da corrida no bolso;</li>
+          <li><strong>Pagamentos por Multicaixa Express (MCX):</strong> Fim dos assaltos e da falta de trocos nas paragens;</li>
+          <li><strong>Software Gratuito:</strong> A Direção recebe um painel para ver todas as frotas e associados ativos;</li>
+          <li><strong>Custo Zero:</strong> A Associação não gasta 1 Kwanza para aderir.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- SIMULADOR INTERATIVO DE ARRECADAÇÃO -->
+  <div class="calc-card">
+    <div class="calc-header">
+      <h3>💰 Simulador de Arrecadação para a Sua Associação</h3>
+      <p style="font-size:13px;color:var(--text-secondary);">
+        Mova o controlo abaixo e veja quanto a sua Associação arrecadará automaticamente no banco todos os meses:
+      </p>
+    </div>
+
+    <div class="calc-slider-box">
+      <div class="slider-label">
+        <span>Número de Motoristas / Taxistas Associados:</span>
+        <span id="label-motoristas" style="color:var(--gold-glow);font-size:17px;">2.000 Associados</span>
+      </div>
+      <input type="range" id="slider-motoristas" min="100" max="10000" step="100" value="2000" oninput="atualizarSimulador()">
+    </div>
+
+    <div class="calc-slider-box">
+      <div class="slider-label">
+        <span>Quota Social Retida por Corrida:</span>
+        <span id="label-quota" style="color:var(--sky);font-size:17px;">25 Kwanzas</span>
+      </div>
+      <input type="range" id="slider-quota" min="15" max="100" step="5" value="25" oninput="atualizarSimulador()">
+    </div>
+
+    <div class="calc-results">
+      <div class="result-pill">
+        <div class="result-desc">Arrecadação Diária Estimada</div>
+        <div class="result-val" id="res-diario">600.000 Kz</div>
+        <div style="font-size:11px;color:var(--text-muted);margin-top:4px;">(Com média de 12 corridas/dia por carro)</div>
+      </div>
+
+      <div class="result-pill" style="border-color:rgba(16, 185, 129, 0.4);background:rgba(16, 185, 129, 0.05);">
+        <div class="result-desc" style="color:#6ee7b7;">Receita Mensal para a Associação</div>
+        <div class="result-val" id="res-mensal" style="color:#34d399;">15.600.000 Kz</div>
+        <div style="font-size:11px;color:#a7f3d0;margin-top:4px;">Direto na conta bancária oficial</div>
+      </div>
+    </div>
+
+    <p style="text-align:center;font-size:12px;color:var(--text-muted);margin-top:16px;">
+      * Sem fiscais na rua, sem cobrança manual nas paragens, com transparência auditável em tempo real no portal da Associação.
+    </p>
+  </div>
+
+  <!-- OS 5 PILARES DA PARCERIA -->
+  <div class="card card-emerald">
+    <h3 style="font-size:18px;font-weight:800;color:#ffffff;margin-bottom:16px;">
+      Os 5 Pilares que Beneficiam os Seus Membros
+    </h3>
+
+    <div class="pilar-item">
+      <div class="pilar-num">1</div>
+      <div class="pilar-content">
+        <h4>Fim dos Assaltos por Dinheiro Vivo</h4>
+        <p>Com o Multicaixa Express e QR Code no vidro do táxi, o passageiro paga pelo telemóvel e o valor entra na conta do motorista. Acaba o risco de roubos com arma de fogo e as discussões diárias por falta de troco.</p>
+      </div>
+    </div>
+
+    <div class="pilar-item">
+      <div class="pilar-num">2</div>
+      <div class="pilar-content">
+        <h4>Apoio Oficial à Segurança Social (INSS)</h4>
+        <p>O aplicativo emite extratos de rendimento válidos para que os taxistas e motoqueiros possam regularizar o seu registo no INSS e garantir reforma e assistência por acidente.</p>
+      </div>
+    </div>
+
+    <div class="pilar-item">
+      <div class="pilar-num">3</div>
+      <div class="pilar-content">
+        <h4>Clube de Benefícios em Peças, Pneus e Combustível</h4>
+        <p>Negociação coletiva em grande escala junto das redes de combustíveis e importadores para disponibilizar pneus novos e óleos com desconto exclusivo aos motoristas associados.</p>
+      </div>
+    </div>
+
+    <div class="pilar-item">
+      <div class="pilar-num">4</div>
+      <div class="pilar-content">
+        <h4>Painel de Gestão para a Direção da Associação</h4>
+        <p>A Direção Nacional recebe acesso a um portal web onde acompanha o censo dos associados em todas as províncias, quantidade de viagens e o saldo exato das quotas arrecadadas.</p>
+      </div>
+    </div>
+
+    <div class="pilar-item">
+      <div class="pilar-num">5</div>
+      <div class="pilar-content">
+        <h4>Piloto com 50 Viaturas Sem Risco</h4>
+        <p>Não exigimos exclusividade nem adesões forçadas. Começamos com um grupo pioneiro de 50 taxistas da vossa confiança durante 15 dias. Os resultados falarão por si.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- CONTATO & ASSINATURA -->
+  <div class="card" style="text-align:center;padding:32px 20px;">
+    <h3 style="font-size:20px;font-weight:800;color:var(--gold-glow);margin-bottom:10px;">
+      Pronto para Agendar a Audiência Presencial na Vossa Sede?
+    </h3>
+    <p style="font-size:14px;color:var(--text-secondary);max-width:600px;margin:0 auto 20px;">
+      Levaremos o protótipo do sistema e a minuta formal de Acordo de Cooperação e Confidencialidade para apresentar à Direção Nacional.
+    </p>
+
+    <div style="display:flex;justify-content:center;gap:12px;flex-wrap:wrap;">
+      <a href="https://wa.me/244923000000?text=Sauda%C3%A7%C3%B5es%20Isaac%2C%20li%20a%20proposta%20do%20GIRO%20para%20as%20associa%C3%A7%C3%B5es%20e%20gostaria%20de%20marcar%20uma%20reuni%C3%A3o%20connosco." target="_blank" class="btn-action-primary">
+        📲 Agendar Reunião no WhatsApp
+      </a>
+      <a href="https://isaac-carvalho.github.io/giro/DOSSIE_REPRESENTANTES_TRANSPORTES_ANGOLA.pdf" download class="btn-action-sec">
+        📄 Baixar PDF do Dossiê Completo
+      </a>
+    </div>
+  </div>
+
+</main>
+
+<!-- BARRA FIXA INFERIOR -->
+<div class="bottom-cta-bar">
+  <div class="cta-inner">
+    <div>
+      <div style="font-size:12px;color:var(--text-muted);">GIRO & Associações</div>
+      <div style="font-size:14px;font-weight:800;color:var(--gold-glow);">Aliança Estratégica Nacional</div>
+    </div>
+    <a href="https://wa.me/244923000000?text=Ol%C3%A1%20Isaac%2C%20quero%20agendar%20uma%20audi%C3%AAncia%20sobre%20a%20parceria%20GIRO%20com%20a%20nossa%20Associa%C3%A7%C3%A3o." target="_blank" class="btn-action-primary" style="padding:10px 18px;font-size:13px;">
+      📲 Falar com Isaac Carvalho
+    </a>
+  </div>
+</div>
+
+<script>
+  function formatarKz(valor) {
+    return new Intl.NumberFormat('pt-AO').format(Math.round(valor)) + ' Kz';
+  }
+
+  function atualizarSimulador() {
+    const motoristas = parseInt(document.getElementById('slider-motoristas').value);
+    const quota = parseInt(document.getElementById('slider-quota').value);
+
+    document.getElementById('label-motoristas').innerText = new Intl.NumberFormat('pt-AO').format(motoristas) + ' Associados';
+    document.getElementById('label-quota').innerText = quota + ' Kwanzas';
+
+    const corridasPorDia = 12;
+    const diasPorMes = 26;
+
+    const receitaDiaria = motoristas * corridasPorDia * quota;
+    const receitaMensal = receitaDiaria * diasPorMes;
+
+    document.getElementById('res-diario').innerText = formatarKz(receitaDiaria);
+    document.getElementById('res-mensal').innerText = formatarKz(receitaMensal);
+  }
+
+  // Inicializar cálculo na carga
+  atualizarSimulador();
+</script>
+
+</body>
+</html>
